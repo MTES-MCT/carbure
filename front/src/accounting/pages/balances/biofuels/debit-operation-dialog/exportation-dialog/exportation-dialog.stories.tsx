@@ -62,7 +62,7 @@ export const FirstStep: Story = {
       value: "50",
     })
     await waitFor(() => {
-      within(canvas.canvasElement).getByText("2 500 litres")
+      within(canvas.canvasElement).getByText("250 000 litres")
     })
   },
 }

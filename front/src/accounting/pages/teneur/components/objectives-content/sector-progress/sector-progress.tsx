@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next"
-import { formatSector } from "accounting/utils/formatters"
+import { formatEnergyNumber, formatSector } from "accounting/utils/formatters"
 import { CardProgress } from "../../card-progress"
 import { ObjectiveSection } from "../objective-section"
 import { SectorObjective } from "../../../types"
 import { CardGrid } from "../../card-grid"
 import { formatNumber } from "common/utils/formatters"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
-import { formatObjectiveGJ } from "../../../utils/formatters"
+import { formatObjectiveGJ } from "../../../utils/objectives"
 import { ObjectiveProgressRecap } from "../objective-progress-recap"
 
 type SectorProgressProps = {
@@ -35,20 +35,18 @@ export const SectorProgress = ({ sectors }: SectorProgressProps) => {
                 "Objectif en GJ en {{date}}: {{objective}} ({{target_percent}}% du total pour cette catégorie)",
                 {
                   date: selectedYear,
-                  objective: formatObjectiveGJ(sector.target),
-                  target_percent: formatNumber(sector.target_percent),
+                  objective: formatObjectiveGJ(progress.target),
+                  target_percent: formatNumber(sector.target_percent ?? 0),
                 }
               )}
-              mainValue={formatNumber(progress.total_teneur_declared, {
-                fractionDigits: 0,
-              })}
+              mainValue={formatEnergyNumber(progress.total_teneur_declared)}
               mainText={t("GJ")}
-              baseQuantity={progress.base_quantity}
-              targetQuantity={progress.target_quantity}
-              declaredQuantity={progress.declared_quantity}
+              baseQuantity={sector.teneur_declared_mj}
+              targetQuantity={sector.target_mj ?? 0}
+              declaredQuantity={sector.pending_teneur_mj}
               badge={
                 <CardProgress.DefaultBadge
-                  targetQuantity={progress.target_quantity}
+                  targetQuantity={progress.target}
                   declaredQuantity={progress.total_teneur_declared}
                 />
               }

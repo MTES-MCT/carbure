@@ -10,7 +10,10 @@ import { useState } from "react"
 import { importSupplyPlan } from "../api"
 import { Notice } from "common/components/notice"
 import { Box } from "common/components/scaffold"
-import { ExcelImportErrors } from "./excel-import-errors"
+import {
+  ExcelImportErrors,
+  ImportErrorResponse,
+} from "common/molecules/excel-import-errors"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { Text } from "common/components/text"
 import { useRoutes } from "common/hooks/routes"
@@ -18,17 +21,6 @@ import { NavLink } from "common/components/nav-link"
 
 interface ImportFormData {
   supplyPlanFile: File | null
-}
-
-interface ValidationError {
-  row: number
-  errors: Record<string, string[]>
-}
-
-export interface ImportErrorResponse {
-  validation_errors: ValidationError[]
-  total_errors: number
-  total_rows_processed: number
 }
 
 export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
@@ -42,12 +34,30 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
     null
   )
 
+  const fieldLabels = {
+    feedstock: t("Intrant"),
+    material_unit: t("Unité matière"),
+    dry_matter_ratio_percent: t("Ratio de matière sèche"),
+    type_cive: t("Type de CIVE"),
+    culture_details: t("Précisez la culture"),
+    collection_type: t("Type de collecte"),
+    volume: t("Volume"),
+    average_weighted_distance_km: t("Distance moyenne pondérée"),
+    maximum_distance_km: t("Distance maximale"),
+    origin_country: t("Pays d'origine"),
+    origin_department: t("Département d'origine"),
+  }
+
   const { value, bind } = useForm<ImportFormData>({
     supplyPlanFile: null,
   })
 
   const { execute: executeImport, loading } = useMutation(importSupplyPlan, {
-    invalidates: ["supply-plan-inputs", annualDeclarationKey],
+    invalidates: [
+      "supply-plan-inputs",
+      "tariff-coefficient-proportions",
+      annualDeclarationKey,
+    ],
     onSuccess: () => {
       notify(t("Fichier importé avec succès"), { variant: "success" })
       onClose()
@@ -156,7 +166,10 @@ export const ExcelImportDialog = ({ onClose }: { onClose: () => void }) => {
           />
 
           {importErrors && importErrors.validation_errors.length > 0 && (
-            <ExcelImportErrors importErrors={importErrors} />
+            <ExcelImportErrors
+              importErrors={importErrors}
+              fieldLabels={fieldLabels}
+            />
           )}
         </Form>
       </Box>

@@ -104,25 +104,37 @@ export const useRejectOperation = ({
   })
 }
 
-export const useValidateDraftTransfer = ({
+export const useValidateDraftOperation = ({
+  operation,
   onSuccess,
 }: {
+  operation?: Operation
   onSuccess?: () => void
 }) => {
   const notify = useNotify()
   const { t } = useTranslation()
 
+  const getSuccessMessage = () => {
+    switch (operation?.type) {
+      case OperationType.EXPEDITION:
+        return t(
+          "L'opération a bien été validée et est en attente de validation par l'administration."
+        )
+      case OperationType.TRANSFERT:
+        return t(
+          "L'opération a bien été validée, le transfert doit maintenant être accepté par le destinataire."
+        )
+      default:
+        return t("L'opération a bien été validée.")
+    }
+  }
+
   const mutation = useMutation(api.patchOperation, {
     invalidates: ["operations"],
     onSuccess: () => {
-      notify(
-        t(
-          "L'opération a bien été envoyée et est en attente de validation par l'administration."
-        ),
-        {
-          variant: "success",
-        }
-      )
+      notify(getSuccessMessage(), {
+        variant: "success",
+      })
       onSuccess?.()
     },
     onError: () => {

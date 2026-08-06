@@ -21,11 +21,13 @@ class ResponseFactory:
         self.parsed_XML = ET.fromstring(payload)
 
     def response(self):
+        def is_success(status):
+            return status in ["FOUND", "SUCCESS"]
+
         response_status = self.udb_response_status()
-        status_found = response_status == "FOUND"
         response_class = (
             self.response_class
-            if status_found
+            if is_success(response_status)
             else self._ERROR_RESPONSE_CLASSES.get(response_status, UnknownStatusErrorResponse)
         )
 

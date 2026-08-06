@@ -15,16 +15,25 @@ import { OperationDetail } from "./pages/operation-detail"
 import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useUnit } from "common/hooks/unit"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+} from "accounting/config"
 import { ActionBar } from "common/components/scaffold"
 import { ExportButton } from "common/components/export"
 import { Notice } from "common/components/notice"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { Button } from "common/components/button2"
+import { useLocation, useNavigate } from "react-router-dom"
+import { OperationsExcelImportDialog } from "./pages/operations-excel-import-dialog"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
-  const { formatUnit } = useUnit()
+  const { formatUnit } = useUnit(DEFAULT_UNIT_OPERATION)
   const { selectedEntityId } = useSelectedEntity()
+  const navigate = useNavigate()
+  const location = useLocation()
   const filterLabels = {
     [OperationsFilter.years]: t("Année"),
     [OperationsFilter.status]: t("Statut"),
@@ -42,7 +51,7 @@ const OperationsBiofuels = () => {
     useQueryBuilder<OperationsQueryBuilder["config"]>()
 
   const { result, loading } = useQuery(api.getOperations, {
-    key: `operations-${selectedEntityId}`,
+    key: `operations`,
     params: [query, selectedEntityId],
   })
 
@@ -61,6 +70,16 @@ const OperationsBiofuels = () => {
     <>
       <ActionBar>
         <ExportButton query={query} download={api.downloadOperations} />
+        <Button
+          onClick={() => {
+            navigate({ search: location.search, hash: "#import" })
+          }}
+          iconId="ri-upload-line"
+          asideX
+          priority="secondary"
+        >
+          {t("Importer des opérations")}
+        </Button>
       </ActionBar>
 
       <FilterMultiSelect2
@@ -87,8 +106,8 @@ const OperationsBiofuels = () => {
           <RecapQuantity
             text={t("{{count}} opérations pour un total de {{total}}", {
               count: result?.data?.count ?? 0,
-              total: formatUnit(result?.data?.total_quantity ?? 0, {
-                fractionDigits: 0,
+              total: formatUnit(result?.data?.total_volume ?? 0, {
+                fractionDigits: FRACTION_DIGITS_LITERS,
               }),
             })}
           />
@@ -115,6 +134,16 @@ const OperationsBiofuels = () => {
       )}
 
       <HashRoute path="operation/:id" element={<OperationDetail />} />
+      <HashRoute
+        path="/import"
+        element={
+          <OperationsExcelImportDialog
+            onClose={() => {
+              navigate({ search: location.search, hash: "#" })
+            }}
+          />
+        }
+      />
     </>
   )
 }

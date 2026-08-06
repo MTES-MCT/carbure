@@ -31,6 +31,11 @@ class ResponseFactoryTest(TestCase):
         self.assertIsInstance(response, BaseRequestResponse)
         self.assertEqual(self.payload(), response.payload)
 
+    def test_accepts_success_status_as_a_success(self):
+        factory = ResponseFactory(BaseRequestResponse, self.payload(status="SUCCESS"))
+        response = factory.response()
+        self.assertIs(type(response), BaseRequestResponse)
+
     def test_returns_an_error_response_on_UDB_response_status_not_found(self):
         factory = ResponseFactory(BaseRequestResponse, self.payload(status="NOT_FOUND"))
         response = factory.response()

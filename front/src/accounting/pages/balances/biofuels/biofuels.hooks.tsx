@@ -14,12 +14,16 @@ import {
   OperationOrder,
 } from "accounting/types"
 import * as api from "accounting/api/biofuels/balances"
-import { formatSector } from "accounting/utils/formatters"
+import { formatSector, formatTCO2Number } from "accounting/utils/formatters"
 import { useNormalizeSector } from "accounting/hooks/normalizers"
 import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
 import { compact } from "common/utils/collection"
 import { useUnit } from "common/hooks/unit"
 import { formatNumber } from "common/utils/formatters"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+} from "accounting/config"
 
 export const useBalancesBiofuelsColumns = () => {
   const { t } = useTranslation()
@@ -27,7 +31,7 @@ export const useBalancesBiofuelsColumns = () => {
   const routes = useRoutes()
   const portal = usePortal()
   const { canTransferBalance } = useAccountingPermissions()
-  const { unit } = useUnit()
+  const { unit } = useUnit(DEFAULT_UNIT_OPERATION)
 
   const columns: Column<apiTypes["Balance"]>[] = compact([
     {
@@ -48,12 +52,14 @@ export const useBalancesBiofuelsColumns = () => {
     {
       header: `${t("Solde disponible")} (${unit.toLocaleUpperCase()})`,
       cell: (item) =>
-        formatNumber(item.available_balance, { fractionDigits: 0 }),
+        formatNumber(item.available_balance, {
+          fractionDigits: FRACTION_DIGITS_LITERS,
+        }),
       key: OperationOrder.available_balance,
     },
     {
       header: `${t("Solde disponible max. (tCO2)")}`,
-      cell: (item) => formatNumber(item.saved_emissions, { fractionDigits: 0 }),
+      cell: (item) => formatTCO2Number(item.saved_emissions),
       key: OperationOrder.saved_emissions,
     },
     {

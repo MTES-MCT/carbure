@@ -1,16 +1,12 @@
 from unittest import TestCase
-from unittest.mock import Mock
 
-from core.models import Biocarburant
 from tiruert.serializers.balance import (
     BalanceBiofuelSerializer,
-    BalanceByDepotSerializer,
     BalanceByLotSerializer,
     BalanceBySectorSerializer,
-    BalanceDepotSerializer,
     BalanceLotSerializer,
-    BalanceQuantitySerializer,
     BalanceSerializer,
+    BalanceVolumeSerializer,
     BaseBalanceSerializer,
 )
 
@@ -20,7 +16,13 @@ class BalanceSerializersTest(TestCase):
 
     def test_balance_biofuel_serializer(self):
         """Test that BalanceBiofuelSerializer correctly serializes a biofuel object"""
-        data = {"id": 1, "code": "ETH", "renewable_energy_share": 0.8}
+        data = {
+            "id": 1,
+            "code": "ETH",
+            "renewable_energy_share": 0.8,
+            "pci_litre": 21.1,
+            "masse_volumique": 0.79,
+        }
         serializer = BalanceBiofuelSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data["code"], "ETH")
@@ -28,7 +30,7 @@ class BalanceSerializersTest(TestCase):
     def test_balance_quantity_serializer(self):
         """Test that BalanceQuantitySerializer correctly serializes credit and debit values"""
         quantity = {"credit": 100.0, "debit": 50.0}
-        serializer = BalanceQuantitySerializer(data=quantity)
+        serializer = BalanceVolumeSerializer(data=quantity)
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data["credit"], 100.0)
         self.assertEqual(serializer.validated_data["debit"], 50.0)
@@ -45,13 +47,18 @@ class BalanceSerializersTest(TestCase):
         data = {
             "sector": "ESSENCE",
             "customs_category": "CONV",
-            "biofuel": {"id": 1, "code": "ETH", "renewable_energy_share": 0.8},
+            "biofuel": {
+                "id": 1,
+                "code": "ETH",
+                "renewable_energy_share": 0.8,
+                "pci_litre": 21.1,
+                "masse_volumique": 0.79,
+            },
             "available_balance": 150.0,
-            "quantity": {"credit": 100.0, "debit": 50.0},
+            "volume": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 0.0,
             "declared_teneur": 0.0,
             "pending_operations": 0,
-            "unit": "liters",
             "ghg_reduction_min": 60.0,
             "ghg_reduction_max": 80.0,
             "saved_emissions": 42.0,
@@ -73,18 +80,6 @@ class BalanceSerializersTest(TestCase):
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data["lot"], 42)
 
-    def test_balance_depot_serializer(self):
-        """Test that BalanceDepotSerializer serializes depot data including quantity and unit"""
-        data = {
-            "id": 7,
-            "name": "Depot A",
-            "quantity": {"credit": 100.0, "debit": 50.0},
-            "unit": "l",
-        }
-        serializer = BalanceDepotSerializer(data=data)
-        self.assertTrue(serializer.is_valid())
-        self.assertEqual(serializer.validated_data["name"], "Depot A")
-
 
 class BalanceBySectorSerializerTest(TestCase):
     """Test BalanceBySectorSerializer"""
@@ -94,11 +89,10 @@ class BalanceBySectorSerializerTest(TestCase):
         data = {
             "sector": "ESSENCE",
             "available_balance": 150.0,
-            "quantity": {"credit": 100.0, "debit": 50.0},
+            "volume": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 10.0,
             "declared_teneur": 5.0,
             "pending_operations": 3,
-            "unit": "l",
         }
         serializer = BalanceBySectorSerializer(data=data)
         self.assertTrue(serializer.is_valid())
@@ -110,7 +104,7 @@ class BalanceSerializerValidationTest(TestCase):
 
     def test_balance_quantity_serializer_with_defaults(self):
         """Test that BalanceQuantitySerializer applies default values for missing fields"""
-        serializer = BalanceQuantitySerializer(data={})
+        serializer = BalanceVolumeSerializer(data={})
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data["credit"], 0.0)
         self.assertEqual(serializer.validated_data["debit"], 0.0)
@@ -120,13 +114,18 @@ class BalanceSerializerValidationTest(TestCase):
         data = {
             "sector": "INVALID_SECTOR",
             "customs_category": "CONV",
-            "biofuel": {"id": 1, "code": "ETH", "renewable_energy_share": 0.8},
+            "biofuel": {
+                "id": 1,
+                "code": "ETH",
+                "renewable_energy_share": 0.8,
+                "pci_litre": 21.1,
+                "masse_volumique": 0.79,
+            },
             "available_balance": 150.0,
             "quantity": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 0.0,
             "declared_teneur": 0.0,
             "pending_operations": 0,
-            "unit": "l",
             "ghg_reduction_min": 60.0,
             "ghg_reduction_max": 80.0,
             "saved_emissions": 42.0,
@@ -140,13 +139,18 @@ class BalanceSerializerValidationTest(TestCase):
         data = {
             "sector": "ESSENCE",
             "customs_category": "INVALID_CATEGORY",
-            "biofuel": {"id": 1, "code": "ETH", "renewable_energy_share": 0.8},
+            "biofuel": {
+                "id": 1,
+                "code": "ETH",
+                "renewable_energy_share": 0.8,
+                "pci_litre": 21.1,
+                "masse_volumique": 0.79,
+            },
             "available_balance": 150.0,
             "quantity": {"credit": 100.0, "debit": 50.0},
             "pending_teneur": 0.0,
             "declared_teneur": 0.0,
             "pending_operations": 0,
-            "unit": "l",
             "ghg_reduction_min": 60.0,
             "ghg_reduction_max": 80.0,
             "saved_emissions": 42.0,
@@ -179,11 +183,6 @@ class BalanceSerializerValidationTest(TestCase):
         result = BalanceByLotSerializer.prepare_data({})
         self.assertEqual(result, [])
 
-    def test_balance_by_depot_prepare_data_with_empty_dict(self):
-        """Test that BalanceByDepotSerializer.prepare_data handles empty dictionary"""
-        result = BalanceByDepotSerializer.prepare_data({})
-        self.assertEqual(result, [])
-
 
 class BalancePrepareDataAggregationTest(TestCase):
     """Test aggregation logic in prepare_data methods"""
@@ -193,17 +192,17 @@ class BalancePrepareDataAggregationTest(TestCase):
         balance_dict = {
             ("ESSENCE", "CONV", "ETH", 42): {
                 "available_balance": 100.0,
-                "quantity": {"credit": 50.0, "debit": 25.0},
+                "volume": {"credit": 50.0, "debit": 25.0},
                 "emission_rate_per_mj": 25.0,
             },
             ("ESSENCE", "CONV", "ETH", 43): {
                 "available_balance": 50.0,
-                "quantity": {"credit": 30.0, "debit": 15.0},
+                "volume": {"credit": 30.0, "debit": 15.0},
                 "emission_rate_per_mj": 26.0,
             },
             ("GAZOLE", "CONV", "EMHV", 44): {
                 "available_balance": 200.0,
-                "quantity": {"credit": 100.0, "debit": 50.0},
+                "volume": {"credit": 100.0, "debit": 50.0},
                 "emission_rate_per_mj": 30.0,
             },
         }
@@ -224,44 +223,22 @@ class BalancePrepareDataAggregationTest(TestCase):
         self.assertEqual(len(emhv_group["lots"]), 1)
         self.assertEqual(emhv_group["available_balance"], 200.0)
 
-    def test_balance_by_depot_prepare_data_aggregates_multiple_depots(self):
-        """Test that BalanceByDepotSerializer.prepare_data correctly groups and sums multiple depots"""
-        depot_mock_1 = Mock()
-        depot_mock_1.id = 7
-        depot_mock_1.name = "Depot A"
-
-        depot_mock_2 = Mock()
-        depot_mock_2.id = 8
-        depot_mock_2.name = "Depot B"
-
-        biofuel = Biocarburant(id=1, code="ETH", renewable_energy_share=0.8)
-
+    def test_balance_by_lot_prepare_data_keeps_volume_field(self):
+        """Lot prepare_data should keep volume and never emit quantity in lot items."""
         balance_dict = {
-            ("ESSENCE", "CONV", "ETH", depot_mock_1): {
+            ("ESSENCE", "CONV", "ETH", 42): {
                 "available_balance": 100.0,
-                "quantity": {"credit": 50.0, "debit": 25.0},
-                "unit": "l",
-                "biofuel": biofuel,
-            },
-            ("ESSENCE", "CONV", "ETH", depot_mock_2): {
-                "available_balance": 75.0,
-                "quantity": {"credit": 40.0, "debit": 20.0},
-                "unit": "l",
-                "biofuel": biofuel,
-            },
+                "volume": {"credit": 50.0, "debit": 25.0},
+                "emission_rate_per_mj": 25.0,
+            }
         }
-        result = BalanceByDepotSerializer.prepare_data(balance_dict)
 
-        # Should have 1 group: (CONV, ETH)
+        result = BalanceByLotSerializer.prepare_data(balance_dict)
+
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["customs_category"], "CONV")
-        self.assertEqual(len(result[0]["depots"]), 2)
-        self.assertEqual(result[0]["available_balance"], 175.0)  # 100 + 75
-
-        # Verify both depots are present
-        depot_names = [d["name"] for d in result[0]["depots"]]
-        self.assertIn("Depot A", depot_names)
-        self.assertIn("Depot B", depot_names)
+        self.assertIn("lots", result[0])
+        self.assertIn("volume", result[0]["lots"][0])
+        self.assertNotIn("quantity", result[0]["lots"][0])
 
 
 class BalanceSerializationTest(TestCase):
@@ -269,7 +246,13 @@ class BalanceSerializationTest(TestCase):
 
     def test_balance_serializer_serializes_instance(self):
         """Test that BalanceSerializer correctly serializes a Python dict instance to JSON"""
-        biofuel_instance = {"id": 1, "code": "ETH", "renewable_energy_share": 0.8}
+        biofuel_instance = {
+            "id": 1,
+            "code": "ETH",
+            "renewable_energy_share": 0.8,
+            "pci_litre": 21.1,
+            "masse_volumique": 0.79,
+        }
         instance = {
             "sector": "ESSENCE",
             "customs_category": "CONV",
@@ -279,7 +262,6 @@ class BalanceSerializationTest(TestCase):
             "pending_teneur": 10.0,
             "declared_teneur": 5.0,
             "pending_operations": 3,
-            "unit": "l",
             "ghg_reduction_min": 60.0,
             "ghg_reduction_max": 80.0,
             "saved_emissions": 42.0,
@@ -292,8 +274,8 @@ class BalanceSerializationTest(TestCase):
         self.assertEqual(data["customs_category"], "CONV")
         self.assertEqual(data["biofuel"]["code"], "ETH")
         self.assertEqual(data["available_balance"], 150.0)
-        self.assertEqual(data["quantity"]["credit"], 100.0)
-        self.assertEqual(data["quantity"]["debit"], 50.0)
+        self.assertEqual(data["volume"]["credit"], 100.0)
+        self.assertEqual(data["volume"]["debit"], 50.0)
         # Verify initial_balance is calculated and present
         self.assertIn("initial_balance", data)
         self.assertEqual(data["initial_balance"], 100.0)  # 150 - 100 + 50
@@ -307,7 +289,6 @@ class BalanceSerializationTest(TestCase):
             "pending_teneur": 10.0,
             "declared_teneur": 5.0,
             "pending_operations": 5,
-            "unit": "l",
         }
         serializer = BalanceBySectorSerializer(instance)
         data = serializer.data

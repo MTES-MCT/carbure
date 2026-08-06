@@ -49,7 +49,7 @@ def get_years(request, *args, **kwargs):
     if entity.entity_type == Entity.CPO:
         provision_years = provision_years.filter(cpo=entity)
         transfer_years = transfer_years.filter(supplier=entity)
-    elif entity.entity_type == Entity.OPERATOR:
+    elif entity.is_tiruert_liable and entity.has_elec:
         provision_years = provision_years.none()
         transfer_years = transfer_years.filter(client=entity)
 

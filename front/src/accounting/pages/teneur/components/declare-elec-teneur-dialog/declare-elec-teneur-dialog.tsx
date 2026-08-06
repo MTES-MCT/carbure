@@ -13,13 +13,16 @@ import {
   SectorObjective,
   TargetType,
 } from "../../types"
-import { formatUnit } from "common/utils/formatters"
-import { ExtendedUnit } from "common/types"
-import { DeclareTeneurProgressBar } from "../declare-teneur-dialog/declare-teneur-progress-bar"
+import { CONVERSIONS } from "common/utils/formatters"
+import {
+  Co2TeneurProgressBar,
+  EnergyTeneurProgressBar,
+} from "../declare-teneur-dialog/declare-teneur-progress-bar"
 import { Notice } from "common/components/notice"
 import { ObjectiveSectorPicker } from "../objective-sector-picker"
 import { useMemo } from "react"
 import { formatSector } from "accounting/utils/formatters"
+import { formatObjectiveGJ } from "../../utils/objectives"
 
 interface DeclareElecTeneurDialogProps {
   objective: ElecCategoryObjective
@@ -84,7 +87,7 @@ export const DeclareElecTeneurDialog = ({
               <NumberInput
                 label={t("Quantité déclarée en teneur (GJ)")}
                 min={1}
-                max={objective.quantity_available}
+                max={objective.progress.quantity_available}
                 {...form.bind("quantity")}
                 required
               />
@@ -93,9 +96,7 @@ export const DeclareElecTeneurDialog = ({
                 {t("Quantité disponible")}
                 {" : "}
                 <b>
-                  {formatUnit(objective.quantity_available, ExtendedUnit.GJ, {
-                    fractionDigits: 0,
-                  })}
+                  {formatObjectiveGJ(objective.progress.quantity_available)}
                 </b>
               </Notice>
             </Box>
@@ -109,25 +110,24 @@ export const DeclareElecTeneurDialog = ({
 
               <Grid gap="xl">
                 {mainObjective && (
-                  <DeclareTeneurProgressBar
+                  <Co2TeneurProgressBar
                     teneurDeclared={mainObjective.teneur_declared}
                     pendingTeneur={mainObjective.pending_teneur}
                     target={mainObjective.target}
-                    quantity={avoidedEmissions}
+                    additionalQuantity={avoidedEmissions}
                     label={t("Objectif global")}
                     targetType={TargetType.REACH}
-                    formatRemaining={(v) => formatUnit(v, ExtendedUnit.tCO2ev)}
                   />
                 )}
 
                 {sectorObjective && (
-                  <DeclareTeneurProgressBar
-                    teneurDeclared={sectorObjective?.teneur_declared ?? 0}
-                    pendingTeneur={sectorObjective?.pending_teneur ?? 0}
-                    target={sectorObjective?.target ?? 0}
-                    quantity={form.value.quantity ?? 0}
+                  <EnergyTeneurProgressBar
+                    objective={sectorObjective}
+                    additionalMj={CONVERSIONS.energy.GJ_TO_MJ(
+                      form.value.quantity ?? 0
+                    )}
                     label={t("Filière {{sector}}", {
-                      sector: formatSector(sectorObjective?.code),
+                      sector: formatSector(sectorObjective.code),
                     })}
                     targetType={TargetType.REACH}
                   />

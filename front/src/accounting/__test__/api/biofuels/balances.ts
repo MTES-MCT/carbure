@@ -8,7 +8,7 @@ export const okGetBalances = http.get(
     return HttpResponse.json<apiTypes["PaginatedBalanceResponseList"]>({
       results: [balance],
       count: 1,
-      total_quantity: balance.available_balance,
+      total_volume: balance.available_balance,
     })
   }
 )
@@ -19,7 +19,7 @@ export const okGetBalancesWithZeroAvailableBalance = http.get(
     return HttpResponse.json<apiTypes["PaginatedBalanceResponseList"]>({
       results: [{ ...balance, available_balance: 0 }],
       count: 1,
-      total_quantity: 0,
+      total_volume: 0,
     })
   }
 )
@@ -49,6 +49,6 @@ export const okGetBalancesWithUpdatedBoundsWhenDurabilityPeriodSelected =
           : balance,
       ],
       count: 1,
-      total_quantity: 1200,
+      total_volume: 1200,
     })
   })

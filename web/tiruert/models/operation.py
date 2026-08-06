@@ -1,8 +1,8 @@
 from django.db import models
 
 from core.models import MatierePremiere, Pays
-from core.models.entity import Entity
-from saf.models.constants import SAF_BIOFUEL_TYPES
+from core.utils import truncate
+from tiruert.services.energy import energy_mj
 
 
 class OperationManager(models.Manager):
@@ -114,8 +114,6 @@ class Operation(models.Model):
         (CARBUREACTEUR, CARBUREACTEUR),
     )
 
-    OPERATION_UNIT_CHOICE = Entity.UNIT_CHOICE + (("gj", "gj"),)
-
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
     status = models.CharField(max_length=12, choices=OPERATION_STATUSES, default=PENDING)
     customs_category = models.CharField(max_length=20, choices=MatierePremiere.MP_CATEGORIES, default=MatierePremiere.CONV)
@@ -153,54 +151,52 @@ class Operation(models.Model):
 
     @property
     def sector(self):
-        if self.biofuel.compatible_essence:
-            return Operation.ESSENCE
-        elif self.biofuel.compatible_diesel:
-            return Operation.GAZOLE
-        elif self.biofuel.code in SAF_BIOFUEL_TYPES:
-            return Operation.CARBUREACTEUR
+        from tiruert.services.operation import OperationService
+
+        return OperationService.define_sector(self.biofuel)
 
     @property
-    def volume(self):
+    def volume_unsigned(self):
         return sum([detail.volume for detail in self.details.all()])
 
     @property
-    def volume_l(self):
+    def volume(self):
+        """Returns the volume in liters, rounded to 2 decimal places."""
         if getattr(self, "_volume", None) is not None:
-            return self._volume
+            return truncate(self._volume)
 
-        return self.volume
+        return truncate(self.volume_unsigned)  # unsigned
+
+    @property
+    def energy(self):
+        """Returns the energy in MJ, rounded to 0 decimal places."""
+        if getattr(self, "_energy", None) is not None:
+            return truncate(self._energy, 0)
+
+        return truncate(
+            energy_mj(self.volume_unsigned, self.biofuel.pci_litre, self.renewable_energy_share),
+            0,
+        )  # unsigned
 
     @property
     def avoided_emissions(self):
-        return round(sum(detail.avoided_emissions for detail in self.details.all()), 2)  # in tCO2
+        """Returns the avoided emissions in tCO2, rounded to 2 decimal places."""
+        if getattr(self, "_avoided_emissions", None) is not None:
+            return truncate(self._avoided_emissions)
+
+        return truncate(sum(detail.avoided_emissions for detail in self.details.all()))  # in tCO2
 
     class Meta:
         db_table = "tiruert_operations"
         verbose_name = "Opération"
         verbose_name_plural = "Opérations"
 
-    def is_credit(self, entity):
+    def is_credit(self, entity_id):
         if self.credited_entity is None:
             return False
-        return self.credited_entity.id == int(entity)
+        return self.credited_entity.id == int(entity_id)
 
     def is_acquisition(self, entity_id):
         if self.credited_entity is None:
             return False
         return self.credited_entity.id == int(entity_id) and self.type == Operation.CESSION
-
-    def quantity(self, unit="l", force=False):
-        if getattr(self, "_quantity", None) is not None and not force:
-            return round(self._quantity, 2)
-
-        volume = self.volume_l
-        return round(self.volume_to_quantity(volume, unit), 2)
-
-    def volume_to_quantity(self, volume, unit):
-        if unit == "mj":
-            return volume * self.biofuel.pci_litre
-        elif unit == "kg":
-            return volume * self.biofuel.masse_volumique
-        else:
-            return volume

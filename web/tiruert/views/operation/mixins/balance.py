@@ -6,9 +6,9 @@ from rest_framework import status
 from rest_framework.decorators import action
 
 from core.pagination import MetadataPageNumberPagination
+from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.serializers import (
-    BalanceByDepotSerializer,
     BalanceByLotSerializer,
     BalanceBySectorSerializer,
     BalanceSerializer,
@@ -17,28 +17,29 @@ from tiruert.services.balance import BalanceService
 
 
 class BalancePagination(MetadataPageNumberPagination):
-    aggregate_fields = {"total_quantity": 0}
+    aggregate_fields = {"total_volume": 0.0}
 
     def get_extra_metadata(self):
-        metadata = {"total_quantity": 0}
+        metadata = {"total_volume": 0.0}
 
         for balance in self.queryset:
-            metadata["total_quantity"] += balance["available_balance"]
+            metadata["total_volume"] += balance["available_balance"]
+        metadata["total_volume"] = truncate(metadata["total_volume"], 2)
         return metadata
 
 
 class BalanceActionMixin:
     @extend_schema(
         operation_id="list_balances",
-        description="Retrieve balances grouped by mp category / biofuel or by sector or by depot",
+        description="Retrieve balances grouped by mp category / biofuel or by sector",
         filters=True,
         parameters=[
             OpenApiParameter(
                 name="group_by",
                 type=str,
-                enum=["sector", "lot", "depot"],
+                enum=["sector", "lot"],
                 location=OpenApiParameter.QUERY,
-                description="Group by sector, lot or depot.",
+                description="Group by sector, lot.",
                 default="",
             ),
             OpenApiParameter(
@@ -55,7 +56,6 @@ class BalanceActionMixin:
                 component_name="BalanceResponse",
                 serializers=[
                     BalanceSerializer,
-                    BalanceByDepotSerializer,
                     BalanceBySectorSerializer,
                 ],
                 resource_type_field_name=None,
@@ -71,7 +71,7 @@ class BalanceActionMixin:
     )
     def balance(self, request, pk=None):
         entity_id = request.entity.id
-        unit = request.unit
+        unit = "l"
         group_by = request.query_params.get("group_by", None)
         date_from_str = request.query_params.get("date_from")
         date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
@@ -104,11 +104,10 @@ class BalanceActionMixin:
         # Convert balance to a list of dictionaries for serialization
         serializer_class = {
             "lot": BalanceByLotSerializer,
-            "depot": BalanceByDepotSerializer,
             "sector": BalanceBySectorSerializer,
         }.get(group_by, self.get_serializer_class())
 
-        data = serializer_class.prepare_data(balance) if group_by in ["lot", "depot"] else list(balance.values())
+        data = serializer_class.prepare_data(balance) if group_by in ["lot"] else list(balance.values())
 
         # These sortings can't be done in operations filters because they are not in the queryset
         # Theses info are calculated in the balance service

@@ -783,6 +783,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/biomethane/supply-input/tariff-coefficient-proportions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Volume-weighted P1/P2/P3/P/Pef shares for the filtered supply plan inputs. */
+        get: operations["biomethane_supply_input_tariff_coefficient_proportions_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/biomethane/supply-plan/download-template/": {
         parameters: {
             query?: never;
@@ -2759,6 +2776,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/elec-operations/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["tiruert_elec_operations_export_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/elec-operations/filters/": {
         parameters: {
             query?: never;
@@ -2873,30 +2906,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         get: operations["tiruert_operations_list"];
         put?: never;
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         post: operations["tiruert_operations_create"];
         delete?: never;
         options?: never;
@@ -2911,45 +2922,12 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         get: operations["tiruert_operations_retrieve"];
         put?: never;
         post?: never;
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         delete: operations["tiruert_operations_destroy"];
         options?: never;
         head?: never;
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         patch: operations["tiruert_operations_partial_update"];
         trace?: never;
     };
@@ -2987,6 +2965,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/operations/{id}/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["export_tiruert_operation_details_excel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/operations/{id}/reject/": {
         parameters: {
             query?: never;
@@ -3011,7 +3005,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Retrieve balances grouped by mp category / biofuel or by sector or by depot */
+        /** @description Retrieve balances grouped by mp category / biofuel or by sector */
         get: operations["list_balances"];
         put?: never;
         post?: never;
@@ -3045,17 +3039,6 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * @description Mixin to manage the unit of measurement (L, MJ, KG) in views.
-         *
-         *     This mixin automatically adds the unit to the request via `initialize_request()`
-         *     and to the serializer context via `get_serializer_context()`.
-         *
-         *     The unit is determined in the following order:
-         *     1. 'unit' parameter from the request (POST or GET)
-         *     2. Entity's preferred unit (entity.preferred_unit)
-         *     3. Default value: 'l' (liters)
-         */
         get: operations["tiruert_operations_export_retrieve"];
         put?: never;
         post?: never;
@@ -3074,6 +3057,40 @@ export interface paths {
         };
         /** @description Retrieve content of a specific filter */
         get: operations["filter_operations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tiruert/operations/import/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Validate or create TIRUERT operations from an Excel file */
+        post: operations["import_operations_from_excel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tiruert/operations/import/template/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Download the TIRUERT operation import template */
+        get: operations["download_operations_import_template"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3304,13 +3321,12 @@ export interface components {
             readonly initial_balance: number;
             /** Format: double */
             available_balance: number;
-            quantity: components["schemas"]["BalanceQuantity"];
+            volume: components["schemas"]["BalanceVolume"];
             /** Format: double */
             pending_teneur: number;
             /** Format: double */
             declared_teneur: number;
             pending_operations: number;
-            unit: string;
             customs_category: components["schemas"]["MPCategoriesEnum"];
             biofuel: components["schemas"]["BalanceBiofuel"];
             /** Format: double */
@@ -3325,11 +3341,10 @@ export interface components {
             code: string;
             /** Format: double */
             renewable_energy_share: number;
-        };
-        BalanceByDepot: {
-            customs_category: string;
-            biofuel: components["schemas"]["BalanceBiofuel"];
-            depots: components["schemas"]["BalanceDepot"][];
+            /** Format: double */
+            pci_litre: number;
+            /** Format: double */
+            masse_volumique: number;
         };
         BalanceBySector: {
             sector: components["schemas"]["ObjectiveSectorCodeEnum"];
@@ -3337,19 +3352,12 @@ export interface components {
             readonly initial_balance: number;
             /** Format: double */
             available_balance: number;
-            quantity: components["schemas"]["BalanceQuantity"];
+            volume: components["schemas"]["BalanceVolume"];
             /** Format: double */
             pending_teneur: number;
             /** Format: double */
             declared_teneur: number;
             pending_operations: number;
-            unit: string;
-        };
-        BalanceDepot: {
-            id: number;
-            name: string;
-            quantity: components["schemas"]["BalanceQuantity"];
-            unit?: string;
         };
         BalanceQuantity: {
             /**
@@ -3363,7 +3371,19 @@ export interface components {
              */
             debit: number;
         };
-        BalanceResponse: components["schemas"]["Balance"] | components["schemas"]["BalanceByDepot"] | components["schemas"]["BalanceBySector"];
+        BalanceResponse: components["schemas"]["Balance"] | components["schemas"]["BalanceBySector"];
+        BalanceVolume: {
+            /**
+             * Format: double
+             * @default 0
+             */
+            credit: number;
+            /**
+             * Format: double
+             * @default 0
+             */
+            debit: number;
+        };
         BaseUser: {
             /** Format: email */
             readonly email: string;
@@ -4381,6 +4401,7 @@ export interface components {
          *     * `REDCERT` - REDCERT
          *     * `2BS` - 2BS
          *     * `KZR_INIG` - KZR_INIG
+         *     * `CERTIFHY` - CERTIFHY
          * @enum {string}
          */
         CertificateTypeEnum: CertificateTypeEnum;
@@ -4416,10 +4437,12 @@ export interface components {
             group: string;
             category: string;
             subcategory: string;
+            readonly crop_type: components["schemas"]["CropTypeEnum"] | null;
         };
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
+         *     * `IAA` - Issus d'IAA
          * @enum {string}
          */
         CollectionTypeEnum: CollectionTypeEnum;
@@ -4549,6 +4572,12 @@ export interface components {
             insee_code?: string;
             site_siret?: string;
         };
+        /**
+         * @description * `PRIMARY` - PRIMARY
+         *     * `INTERMEDIATE` - INTERMEDIATE
+         * @enum {string}
+         */
+        CropTypeEnum: CropTypeEnum;
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -5544,6 +5573,12 @@ export interface components {
          * @enum {string}
          */
         MethanizationProcessEnum: MethanizationProcessEnum;
+        /**
+         * @description * `validate` - validate
+         *     * `create` - create
+         * @enum {string}
+         */
+        ModeEnum: ModeEnum;
         MonthlyReportDataRequest: {
             month: number;
             /** Format: double */
@@ -5625,9 +5660,9 @@ export interface components {
             readonly sector: string;
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             customs_category?: components["schemas"]["MPCategoriesEnum"];
-            readonly biofuel: string;
+            readonly biofuel: components["schemas"]["BalanceBiofuel"];
             /** Format: double */
-            renewable_energy_share: number;
+            renewable_energy_share?: number;
             credited_entity: components["schemas"]["OperationEntity"];
             debited_entity: components["schemas"]["OperationEntity"];
             /** entity */
@@ -5644,12 +5679,11 @@ export interface components {
             validation_date?: string | null;
             durability_period?: string | null;
             /** Format: double */
-            readonly quantity: number;
+            readonly volume: number;
             /** Format: double */
-            readonly quantity_mj: number;
+            readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
-            readonly unit: string;
             readonly year: number;
         };
         OperationCorrectionRequest: {
@@ -5663,6 +5697,30 @@ export interface components {
         OperationEntity: {
             id: number;
             name: string;
+        };
+        OperationExcelImportRequestRequest: {
+            /** Format: binary */
+            file: File;
+            /** @default validate */
+            mode: components["schemas"]["ModeEnum"];
+        };
+        OperationImportGroup: {
+            operation_id: number | null;
+            status: string;
+            type: string;
+            sector: string;
+            customs_category: string;
+            biofuel: string;
+            debited_entity: components["schemas"]["OperationEntity"];
+            credited_entity: components["schemas"]["OperationEntity"] | null;
+            lot_count: number;
+            /** Format: double */
+            total_volume: number;
+            rows: number[];
+        };
+        OperationImportResponse: {
+            mode: components["schemas"]["ModeEnum"];
+            operations: components["schemas"]["OperationImportGroup"][];
         };
         OperationInput: {
             type: components["schemas"]["OperationTypeEnum"];
@@ -5699,9 +5757,9 @@ export interface components {
             readonly sector: string;
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             customs_category?: components["schemas"]["MPCategoriesEnum"];
-            readonly biofuel: string;
+            readonly biofuel: components["schemas"]["BalanceBiofuel"];
             /** Format: double */
-            renewable_energy_share: number;
+            renewable_energy_share?: number;
             credited_entity: components["schemas"]["OperationEntity"];
             debited_entity: components["schemas"]["OperationEntity"];
             /** entity */
@@ -5714,8 +5772,9 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string;
             /** Format: double */
-            readonly quantity: number;
-            readonly unit: string;
+            readonly volume: number;
+            /** Format: double */
+            readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
@@ -5793,7 +5852,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["BalanceResponse"][];
-            total_quantity?: number;
+            total_volume?: number;
         };
         PaginatedBiomethaneAdminAnnualDeclarationList: {
             /** @example 123 */
@@ -5981,7 +6040,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["OperationList"][];
-            total_quantity?: number;
+            total_volume?: number;
         };
         PaginatedSafTicketPreviewList: {
             /** @example 123 */
@@ -6573,6 +6632,24 @@ export interface components {
          * @enum {string}
          */
         TargetTypeEnum: TargetTypeEnum;
+        TariffCoefficientProportions: {
+            readonly tariff_coefficients: components["schemas"]["TariffCoefficients"] | null;
+            /** Format: double */
+            readonly primary_crop: number;
+        };
+        /** @description P1 / P2 / P3 / P / Pef shares from the tariff decree referential. */
+        TariffCoefficients: {
+            /** Format: double */
+            readonly p1: number;
+            /** Format: double */
+            readonly p2: number;
+            /** Format: double */
+            readonly p3: number;
+            /** Format: double */
+            readonly p: number;
+            /** Format: double */
+            readonly pef: number;
+        };
         /**
          * @description * `2011` - 2011
          *     * `2020` - 2020
@@ -8561,6 +8638,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    biomethane_supply_input_tariff_coefficient_proportions_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Producer entity ID (optional, used by DREAL to filter specific producer). */
+                producer_id?: number;
+                /** @description Year of the supply plan. */
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TariffCoefficientProportions"];
                 };
             };
         };
@@ -13160,6 +13263,56 @@ export interface operations {
             };
         };
     };
+    tiruert_elec_operations_export_retrieve: {
+        parameters: {
+            query: {
+                date_from?: string;
+                date_to?: string;
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                from_to?: string;
+                operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `created_at` - Created at
+                 *     * `-created_at` - Created at (décroissant)
+                 *     * `operation` - Operation
+                 *     * `-operation` - Operation (décroissant)
+                 *     * `status` - Status
+                 *     * `-status` - Status (décroissant)
+                 *     * `period` - Period
+                 *     * `-period` - Period (décroissant)
+                 *     * `quantity` - Quantity
+                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `from_to` - From to
+                 *     * `-from_to` - From to (décroissant)
+                 */
+                order_by?: PathsApiTiruertElecOperationsGetParametersQueryOrder_by[];
+                period?: string[];
+                /** @description Entity whose operations are exported when acting as an administrator. */
+                selected_entity_id?: number;
+                status?: PathsApiTiruertElecOperationsGetParametersQueryStatus[];
+                type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
+                years?: number[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Excel file download */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.ms-excel": File;
+                };
+            };
+        };
+    };
     filter_elec_operations: {
         parameters: {
             query: {
@@ -13414,8 +13567,8 @@ export interface operations {
                  *     * `-depot` - Depot (décroissant)
                  *     * `from_to` - From to
                  *     * `-from_to` - From to (décroissant)
-                 *     * `quantity` - Quantity
-                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `volume` - Volume
+                 *     * `-volume` - Volume (décroissant)
                  *     * `durability_period` - Durability period
                  *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
@@ -13459,8 +13612,6 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
                 years?: number[];
             };
             header?: never;
@@ -13484,8 +13635,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -13514,8 +13663,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13541,8 +13688,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13567,8 +13712,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13600,8 +13743,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13646,8 +13787,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13684,13 +13823,36 @@ export interface operations {
             };
         };
     };
+    export_tiruert_operation_details_excel: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Opération. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.ms-excel": File;
+                };
+            };
+        };
+    };
     reject_operation: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path: {
@@ -13745,7 +13907,7 @@ export interface operations {
                 from_to?: string;
                 ges_bound_max?: number;
                 ges_bound_min?: number;
-                /** @description Group by sector, lot or depot. */
+                /** @description Group by sector, lot. */
                 group_by?: PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by;
                 /**
                  * @description * `INCORPORATION` - INCORPORATION
@@ -13781,8 +13943,8 @@ export interface operations {
                  *     * `-depot` - Depot (décroissant)
                  *     * `from_to` - From to
                  *     * `-from_to` - From to (décroissant)
-                 *     * `quantity` - Quantity
-                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `volume` - Volume
+                 *     * `-volume` - Volume (décroissant)
                  *     * `durability_period` - Durability period
                  *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
@@ -13826,8 +13988,6 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -13901,8 +14061,8 @@ export interface operations {
                  *     * `-depot` - Depot (décroissant)
                  *     * `from_to` - From to
                  *     * `-from_to` - From to (décroissant)
-                 *     * `quantity` - Quantity
-                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `volume` - Volume
+                 *     * `-volume` - Volume (décroissant)
                  *     * `durability_period` - Durability period
                  *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
@@ -13942,8 +14102,6 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
                 years?: number[];
             };
             header?: never;
@@ -13967,8 +14125,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14042,8 +14198,8 @@ export interface operations {
                  *     * `-depot` - Depot (décroissant)
                  *     * `from_to` - From to
                  *     * `-from_to` - From to (décroissant)
-                 *     * `quantity` - Quantity
-                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `volume` - Volume
+                 *     * `-volume` - Volume (décroissant)
                  *     * `durability_period` - Durability period
                  *     * `-durability_period` - Durability period (décroissant)
                  *     * `available_balance` - available_balance
@@ -14083,8 +14239,6 @@ export interface operations {
                  *     * `DEBIT` - DEBIT
                  */
                 type?: PathsApiTiruertElecOperationsGetParametersQueryType[];
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
                 years?: number[];
             };
             header?: never;
@@ -14103,13 +14257,62 @@ export interface operations {
             };
         };
     };
+    import_operations_from_excel: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperationExcelImportRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["OperationExcelImportRequestRequest"];
+                "multipart/form-data": components["schemas"]["OperationExcelImportRequestRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationImportResponse"];
+                };
+            };
+        };
+    };
+    download_operations_import_template: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Fichier Excel généré */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": File;
+                };
+            };
+        };
+    };
     simulate: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14138,8 +14341,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14168,8 +14369,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description Specify the volume unit. */
-                unit?: PathsApiTiruertOperationsGetParametersQueryUnit;
             };
             header?: never;
             path?: never;
@@ -14644,11 +14843,11 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
     ValueMinusdurability_period = "-durability_period",
     ValueMinusfrom_to = "-from_to",
     ValueMinuspending_operations = "-pending_operations",
-    ValueMinusquantity = "-quantity",
     ValueMinussaved_emissions = "-saved_emissions",
     ValueMinussector = "-sector",
     ValueMinusstatus = "-status",
     ValueMinustype = "-type",
+    ValueMinusvolume = "-volume",
     available_balance = "available_balance",
     biofuel = "biofuel",
     created_at = "created_at",
@@ -14657,11 +14856,11 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
     durability_period = "durability_period",
     from_to = "from_to",
     pending_operations = "pending_operations",
-    quantity = "quantity",
     saved_emissions = "saved_emissions",
     sector = "sector",
     status = "status",
-    type = "type"
+    type = "type",
+    volume = "volume"
 }
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
     CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
@@ -14678,14 +14877,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryStatus {
     REJECTED = "REJECTED",
     VALIDATED = "VALIDATED"
 }
-export enum PathsApiTiruertOperationsGetParametersQueryUnit {
-    MJ = "MJ",
-    gj = "gj",
-    kg = "kg",
-    l = "l"
-}
 export enum PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by {
-    depot = "depot",
     lot = "lot",
     sector = "sector"
 }
@@ -14745,11 +14937,13 @@ export enum CertificateTypeEnum {
     ISCC = "ISCC",
     REDCERT = "REDCERT",
     Value2BS = "2BS",
-    KZR_INIG = "KZR_INIG"
+    KZR_INIG = "KZR_INIG",
+    CERTIFHY = "CERTIFHY"
 }
 export enum CollectionTypeEnum {
     PRIVATE = "PRIVATE",
-    LOCAL = "LOCAL"
+    LOCAL = "LOCAL",
+    IAA = "IAA"
 }
 export enum ComplementaryAidOrganismsEnum {
     ADEME = "ADEME",
@@ -14764,6 +14958,10 @@ export enum CorrectionStatusEnum {
     NO_PROBLEMO = "NO_PROBLEMO",
     IN_CORRECTION = "IN_CORRECTION",
     FIXED = "FIXED"
+}
+export enum CropTypeEnum {
+    PRIMARY = "PRIMARY",
+    INTERMEDIATE = "INTERMEDIATE"
 }
 export enum DeliveryTypeEnum {
     UNKNOWN = "UNKNOWN",
@@ -14908,6 +15106,10 @@ export enum MethanizationProcessEnum {
     CONTINUOUS_INFINITELY_MIXED = "CONTINUOUS_INFINITELY_MIXED",
     PLUG_FLOW_SEMI_CONTINUOUS = "PLUG_FLOW_SEMI_CONTINUOUS",
     BATCH_SILOS = "BATCH_SILOS"
+}
+export enum ModeEnum {
+    validate = "validate",
+    create = "create"
 }
 export enum NetworkTypeEnum {
     TRANSPORT = "TRANSPORT",

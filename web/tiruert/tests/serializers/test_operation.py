@@ -1,12 +1,14 @@
 from unittest.mock import Mock, patch
 
 from django.test import TestCase
+from rest_framework import serializers
 
 from core.models import Biocarburant, MatierePremiere
 from tiruert.models import Operation
 from tiruert.serializers import OperationListSerializer, OperationSerializer
 from tiruert.serializers.operation import (
     BaseOperationSerializer,
+    OperationExcelRowSerializer,
     OperationInputSerializer,
     OperationUpdateSerializer,
 )
@@ -24,35 +26,25 @@ class BaseOperationSerializerTest(TestCase):
             context = {}
         return BaseOperationSerializer(context=context)
 
-    def test_get_volume_l_delegates_to_model(self):
-        """Should delegate to instance.volume_l property."""
+    def test_get_volume_delegates_to_model(self):
+        """Should delegate to instance.volume with default serializer behavior."""
         serializer = self._create_serializer()
         instance = Mock(spec=Operation)
-        instance.volume_l = 1500.0
+        instance.volume = 1500.0
 
-        result = serializer.get_volume_l(instance)
+        result = serializer.get_volume(instance)
 
         self.assertEqual(result, 1500.0)
 
-    def test_get_quantity_delegates_to_model_with_unit(self):
-        """Should delegate to instance.quantity(unit) with unit from context."""
-        serializer = self._create_serializer(context={"unit": "mj"})
+    def test_get_energy_delegates_to_model(self):
+        """Should delegate to instance.energy with default serializer behavior."""
+        serializer = self._create_serializer()
         instance = Mock(spec=Operation)
-        instance.quantity = Mock(return_value=36000.0)
+        instance.energy = 72000.0
 
-        result = serializer.get_quantity(instance)
+        result = serializer.get_energy(instance)
 
-        instance.quantity.assert_called_once_with(unit="mj")
-        self.assertEqual(result, 36000.0)
-
-    def test_get_unit_returns_unit_from_context(self):
-        """Should return unit from context."""
-        serializer = self._create_serializer(context={"unit": "kg"})
-        instance = Mock(spec=Operation)
-
-        result = serializer.get_unit(instance)
-
-        self.assertEqual(result, "kg")
+        self.assertEqual(result, 72000.0)
 
     def test_get_fields_removes_details_when_not_requested(self):
         """Should not build the nested details field on list responses by default."""
@@ -66,7 +58,7 @@ class BaseOperationSerializerTest(TestCase):
 
         self.assertIn("details", serializer.fields)
 
-    def test_operation_list_serializer_uses_annotated_quantity_and_avoided_emissions(self):
+    def test_operation_list_serializer_uses_annotated_volume_energy_and_avoided_emissions(self):
         """List serializer should read pre-annotated numeric fields directly."""
         operation = Mock(spec=Operation)
         operation.id = 1
@@ -75,7 +67,13 @@ class BaseOperationSerializerTest(TestCase):
         operation._sector = Operation.ESSENCE
         operation.objective_sector = None
         operation.customs_category = MatierePremiere.CONV
-        operation.biofuel = Mock(code="ETH")
+        operation.biofuel = Biocarburant(
+            id=1,
+            code="ETH",
+            renewable_energy_share=1.0,
+            pci_litre=21.1,
+            masse_volumique=0.79,
+        )
         operation.renewable_energy_share = 1.0
         operation.credited_entity = Mock(id=1, name="Credited")
         operation.debited_entity = Mock(id=2, name="Debited")
@@ -85,13 +83,15 @@ class BaseOperationSerializerTest(TestCase):
         operation._depot = "To"
         operation.export_country = None
         operation.created_at = None
-        operation._quantity = 123.456
+        operation._volume = 123.456
+        operation._energy = 4567.891
         operation._avoided_emissions = 78.901
         operation.declaration_year = 2024
 
-        serializer = OperationListSerializer(operation, context={"details": False, "unit": "l"})
+        serializer = OperationListSerializer(operation, context={"details": False})
 
-        self.assertEqual(serializer.data["quantity"], 123.46)
+        self.assertEqual(serializer.data["volume"], 123.45)
+        self.assertEqual(serializer.data["energy"], 4567)
         self.assertEqual(serializer.data["avoided_emissions"], 78.9)
 
 
@@ -114,30 +114,26 @@ class OperationSerializerTest(TestCase):
 
         self.assertEqual(result, 451.50)
 
-    def test_get_avoided_emissions_uses_annotation_when_available(self):
-        """Should prefer annotated avoided emissions on list querysets."""
+    def test_get_avoided_emissions_delegates_to_model_even_if_annotation_exists(self):
+        """Should delegate avoided_emissions to model property."""
         serializer = self._create_serializer()
-        instance = Mock(spec=Operation)
+        instance = Mock()
         instance._avoided_emissions = 451.504
+        instance.avoided_emissions = 0.0
 
         result = serializer.get_avoided_emissions(instance)
 
-        self.assertEqual(result, 451.5)
+        self.assertEqual(result, 0.0)
 
-    def test_get_quantity_mj_always_uses_mj_unit(self):
-        """Should always use 'mj' unit regardless of context unit."""
-        # Test with different context units to ensure mj is always used
-        for context_unit in ["l", "kg", "mj"]:
-            with self.subTest(context_unit=context_unit):
-                serializer = self._create_serializer(context={"unit": context_unit})
-                instance = Mock(spec=Operation)
-                instance.quantity = Mock(return_value=72000.0)
+    def test_get_energy_delegates_to_model_property(self):
+        """Should use the energy property directly."""
+        serializer = self._create_serializer()
+        instance = Mock(spec=Operation)
+        instance.energy = 72000.0
 
-                result = serializer.get_quantity_mj(instance)
+        result = serializer.get_energy(instance)
 
-                # Should always call with "mj" regardless of context
-                instance.quantity.assert_called_once_with(unit="mj", force=True)
-                self.assertEqual(result, 72000.0)
+        self.assertEqual(result, 72000.0)
 
 
 class OperationInputSerializerCreateTest(TestCase):
@@ -228,8 +224,15 @@ class OperationInputSerializerCreateTest(TestCase):
 
         mock_service.define_operation_status.assert_called_once_with(validated_data)
 
-    @patch("tiruert.serializers.operation.OperationService")
-    def test_create_creates_operation_and_details(self, mock_service):
+    @patch("tiruert.serializers.operation.OperationService.get_emission_rates_by_lot")
+    @patch("tiruert.serializers.operation.OperationService.define_operation_status")
+    @patch("tiruert.serializers.operation.OperationService.perform_checks_before_create")
+    def test_create_creates_operation_and_details(
+        self,
+        _mock_perform_checks,
+        _mock_define_operation_status,
+        mock_get_emission_rates_by_lot,
+    ):
         """Should create Operation and OperationDetails from lots."""
         # Create real CarbureLot for ForeignKey constraint
         lot = CarbureLotFactory.create(
@@ -255,9 +258,7 @@ class OperationInputSerializerCreateTest(TestCase):
             ],
         }
 
-        mock_service.perform_checks_before_create.return_value = None
-        mock_service.define_operation_status.return_value = None
-        mock_service.get_emission_rates_by_lot.return_value = {lot.id: 9.8}
+        mock_get_emission_rates_by_lot.return_value = {lot.id: 9.8}
 
         operation = serializer.create(validated_data)
 
@@ -281,6 +282,13 @@ class OperationInputSerializerCreateTest(TestCase):
         # Only test the first one is enough, the whole list is tested in model tests
         result = serializer.validate_type(Operation.API_CREATABLE_TYPES[0])
         self.assertEqual(result, Operation.API_CREATABLE_TYPES[0])
+
+    def test_validate_type_rejects_unauthorized_type(self):
+        """Should reject operation types that cannot be created by the API."""
+        serializer = OperationInputSerializer()
+
+        with self.assertRaises(serializers.ValidationError):
+            serializer.validate_type(Operation.CESSION)
 
     def test_objective_sector_invalid_on_non_teneur(self):
         """objective_sector must be rejected when type is not TENEUR."""
@@ -323,6 +331,91 @@ class OperationUpdateSerializerTest(TestCase):
         allowed_fields = set(serializer.Meta.fields)
 
         self.assertEqual(allowed_fields, {"to_depot", "status"})
+
+
+class OperationExcelRowSerializerTest(TestCase):
+    """Tests for OperationExcelRowSerializer validation rules."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/entities.json",
+        "json/depots.json",
+    ]
+
+    def setUp(self):
+        from core.models import Entity
+
+        self.entity = Entity.objects.create(
+            name="TIRUERT Operator",
+            entity_type=Entity.OPERATOR,
+            is_enabled=True,
+            is_tiruert_liable=True,
+            accise_number="ACC-001",
+        )
+        self.biofuel_eth = Biocarburant.objects.get(code="ETH")
+        self.feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
+        self.lot = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            volume=1000,
+        )
+
+    def test_transfert_requires_credited_entity(self):
+        """TRANSFERT rows should require a credited entity."""
+        serializer = OperationExcelRowSerializer()
+
+        with self.assertRaises(serializers.ValidationError) as context:
+            serializer.validate({"operation_type": Operation.TRANSFERT})
+
+        self.assertEqual(
+            context.exception.detail,
+            {
+                "credited_entity": serializers.ErrorDetail(
+                    string="Destinataire requis pour les opérations de type TRANSFERT.",
+                    code="invalid",
+                )
+            },
+        )
+
+    def test_operation_type_is_normalized_and_validated(self):
+        """Operation type should be normalized to uppercase and validated."""
+        serializer = OperationExcelRowSerializer()
+
+        self.assertEqual(serializer.validate_operation_type(" transfert "), Operation.TRANSFERT)
+        with self.assertRaises(serializers.ValidationError):
+            serializer.validate_operation_type("invalid")
+
+    def test_volume_must_be_positive(self):
+        """Volume should be strictly greater than zero."""
+        serializer = OperationExcelRowSerializer()
+
+        with self.assertRaises(serializers.ValidationError) as context:
+            serializer.validate_volume(0)
+
+        self.assertEqual(
+            context.exception.detail,
+            ["La valeur du volume doit être supérieure à zéro."],
+        )
+
+    def test_serializer_validates_transfert_row(self):
+        """A valid TRANSFERT row should resolve related objects correctly."""
+        serializer = OperationExcelRowSerializer(
+            data={
+                "lot_id": self.lot.id,
+                "volume": 125.5,
+                "operation_type": " transfert ",
+                "credited_entity": self.entity.id,
+            }
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["operation_type"], Operation.TRANSFERT)
+        self.assertEqual(serializer.validated_data["credited_entity"], self.entity)
+        self.assertEqual(serializer.validated_data["lot_id"], self.lot)
 
 
 class OperationCorrectionSerializerUpdateTest(TestCase):

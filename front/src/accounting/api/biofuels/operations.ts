@@ -1,7 +1,9 @@
 import { apiTypes } from "common/services/api-fetch.types"
 import { OperationsFilter, OperationsQuery, OperationOrder } from "../../types"
 import { api, download } from "common/services/api-fetch"
+import { download as downloadFile } from "common/services/api"
 import { formatOperation } from "accounting/utils/formatters"
+import { ModeEnum } from "api-schema"
 
 export const getOperationsFilters = (
   filter: string,
@@ -83,7 +85,6 @@ export const simulateMinMax = (
     customs_category,
     debited_entity,
     target_volume,
-    unit,
     from_depot,
     ges_bound_min,
     ges_bound_max,
@@ -99,7 +100,6 @@ export const simulateMinMax = (
       customs_category,
       debited_entity,
       target_volume,
-      unit,
       from_depot,
       ges_bound_min,
       ges_bound_max,
@@ -211,5 +211,34 @@ export const rejectOperation = (entity_id: number, operation_id: number) => {
 export function downloadOperations(query: OperationsQuery) {
   return download(`/tiruert/operations/export/`, {
     ...query,
+  })
+}
+
+export function downloadOperationDetails(
+  entity_id: number,
+  operation_id: number,
+  selected_entity_id?: number
+) {
+  return downloadFile(`/tiruert/operations/${operation_id}/export/`, {
+    entity_id,
+    selected_entity_id,
+  })
+}
+
+export const importOperationsFromExcel = async (
+  entityId: number,
+  file: File,
+  mode: ModeEnum
+) => {
+  return api.POST(`/tiruert/operations/import/`, {
+    params: {
+      query: {
+        entity_id: entityId,
+      },
+    },
+    body: {
+      file,
+      mode: mode,
+    },
   })
 }

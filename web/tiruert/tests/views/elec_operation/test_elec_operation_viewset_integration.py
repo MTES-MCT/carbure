@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
+from io import BytesIO
 
+import openpyxl
 from django.test import TestCase
 from django.urls import reverse
 
@@ -130,3 +132,41 @@ class ElecOperationViewSetIntegrationTest(TestCase):
         ids = {operation["id"] for operation in response.data["results"]}
         self.assertIn(old_operation.id, ids)
         self.assertNotIn(recent_operation.id, ids)
+
+    def test_export_operations_to_excel_uses_filters_and_ignores_pagination(self):
+        url = reverse("elec-operations-export-operations-to-excel")
+        response = self.client.get(
+            url,
+            query_params={
+                "entity_id": self.entity.id,
+                "status": ElecOperation.ACCEPTED,
+                "page": 99,
+                "page_size": 1,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/vnd.ms-excel")
+        self.assertIn("tiruert_elec_operations_", response["Content-Disposition"])
+
+        workbook = openpyxl.load_workbook(BytesIO(response.content), read_only=True)
+        rows = list(workbook.active.iter_rows(values_only=True))
+
+        self.assertEqual(
+            rows[0],
+            (
+                "Statut",
+                "Date de création",
+                "Type Opération",
+                "Expéditeur",
+                "Destinataire",
+                "Quantité (MJ)",
+                "Tonnes CO2 eq. évitées",
+            ),
+        )
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[1][0], ElecOperation.ACCEPTED)
+        self.assertEqual(rows[1][2], ElecOperation.ACQUISITION)
+        self.assertEqual(rows[1][3], self.counterparty.name)
+        self.assertEqual(rows[1][4], self.entity.name)
+        self.assertEqual(rows[1][5], self.credit_operation.quantity)

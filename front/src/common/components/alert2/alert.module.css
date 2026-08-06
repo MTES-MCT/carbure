@@ -1,0 +1,4 @@
+/* Overrides the reset p margin defined in reset.css*/
+.alert p {
+  margin: var(--text-spacing);
+}

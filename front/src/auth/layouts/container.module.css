@@ -1,7 +1,10 @@
+.dialog-container {
+  min-width: 588px;
+}
+
 .container {
-  background-color: var(--background-alt-grey-hover);
-  opacity: 1;
-  z-index: 1;
+  margin: auto;
+  padding: var(--spacing-8w);
 }
 
 .logo {
@@ -22,7 +25,7 @@
   font-size: 2.5em;
 }
 
-.content {
+.container-content {
   padding: var(--spacing-5w);
   background-color: var(--white);
   display: flex;
@@ -31,4 +34,34 @@
   gap: var(--spacing-2w);
   width: min-content;
   min-width: 490px;
+}
+
+.footer-auth {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-2w);
+}
+
+.footer-auth--aside-x {
+  justify-content: flex-end;
+}
+
+.content,
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5w);
+}
+
+.section--gap-md {
+  gap: var(--spacing-2w);
+}
+
+.section--gap-lg {
+  gap: var(--spacing-3w);
+}
+
+.dialog-container-success-icon {
+  margin-right: var(--spacing-1w);
+  color: var(--text-default-success);
 }

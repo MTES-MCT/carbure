@@ -21,6 +21,7 @@ import { MissingFields } from "biomethane/components/missing-fields"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { DownloadSupplyPlan } from "./components/download-supply-plan"
 import { SupplyPlanTable } from "./components/supply-plan-table"
+import { SupplyPlanProportionsAlerts } from "./components/supply-plan-proportions-alerts"
 
 export const SupplyPlan = () => {
   const { t } = useTranslation()
@@ -31,6 +32,7 @@ export const SupplyPlan = () => {
   const { selectedYear, canEditDeclaration } = useAnnualDeclaration()
 
   const { hasSelectedEntity } = useSelectedEntity()
+  const isAdminView = hasSelectedEntity
 
   const { queryBuilder, filterOptions, supplyPlan } =
     useSupplyPlanQuery(selectedYear)
@@ -44,7 +46,8 @@ export const SupplyPlan = () => {
   return (
     <>
       <MissingFields />
-      {!hasSelectedEntity && (
+
+      {!isAdminView && (
         <Button
           onClick={() =>
             navigate(
@@ -66,7 +69,7 @@ export const SupplyPlan = () => {
             onChange={queryBuilder.actions.setSearch}
           />
         </ActionBar.Grow>
-        {!hasSelectedEntity && (
+        {!isAdminView && (
           <Button
             onClick={() =>
               navigate(
@@ -90,6 +93,10 @@ export const SupplyPlan = () => {
         getFilterOptions={filterOptions.getFilterOptions}
         normalizers={filterOptions.normalizers}
       />
+      {isAdminView && (
+        <SupplyPlanProportionsAlerts query={queryBuilder.query} />
+      )}
+
       <SupplyPlanTable
         supplyPlan={supplyPlan}
         queryBuilder={queryBuilder}

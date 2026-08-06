@@ -20,10 +20,15 @@ import {
   formatOperationStatus,
   formatOperationType,
   formatSector,
+  formatTCO2Number,
 } from "accounting/utils/formatters"
 import styles from "../operations.module.css"
 import cl from "clsx"
 import { useUnit } from "common/hooks/unit"
+import {
+  DEFAULT_UNIT_OPERATION,
+  FRACTION_DIGITS_LITERS,
+} from "accounting/config"
 
 type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
@@ -66,7 +71,7 @@ export const useOperationsBiofuelsColumns = ({
   onClickSector,
 }: UseOperationsColumnsProps) => {
   const { t } = useTranslation()
-  const { unit } = useUnit()
+  const { unit } = useUnit(DEFAULT_UNIT_OPERATION)
   const columns: Column<OperationList>[] = [
     {
       header: t("Statut"),
@@ -95,7 +100,7 @@ export const useOperationsBiofuelsColumns = ({
     },
     {
       header: t("Biocarburant"),
-      cell: (item) => <Cell text={item.biofuel} />,
+      cell: (item) => <Cell text={item.biofuel?.code} />,
       key: OperationOrder.biofuel,
     },
     {
@@ -128,19 +133,19 @@ export const useOperationsBiofuelsColumns = ({
       key: OperationOrder.from_to,
     },
     {
-      key: OperationOrder.quantity,
+      key: OperationOrder.volume,
       header: `${t("Quantité")} (${unit.toUpperCase()})`,
       style: {
         minWidth: "140px",
       },
       cell: (item) => {
-        const calculatedQuantity = Math.abs(formatValue(item, item.quantity))
+        const calculatedQuantity = Math.abs(formatValue(item, item.volume))
         const formattedQuantity = formatNumber(calculatedQuantity, {
-          fractionDigits: 0,
+          fractionDigits: FRACTION_DIGITS_LITERS,
         })
         return displayValueDebitOrCredit(
           formattedQuantity,
-          isSendingOperation(item.quantity),
+          isSendingOperation(item.volume),
           item.status === OperationsStatus.REJECTED
         )
       },
@@ -151,15 +156,12 @@ export const useOperationsBiofuelsColumns = ({
         const calculatedAvoidedEmissions = Math.abs(
           formatValue(item, item.avoided_emissions)
         )
-        const formattedAvoidedEmissions = formatNumber(
-          calculatedAvoidedEmissions,
-          {
-            fractionDigits: 0,
-          }
+        const formattedAvoidedEmissions = formatTCO2Number(
+          calculatedAvoidedEmissions
         )
         return displayValueDebitOrCredit(
           formattedAvoidedEmissions,
-          isSendingOperation(item.quantity),
+          isSendingOperation(item.volume),
           item.status === OperationsStatus.REJECTED
         )
       },

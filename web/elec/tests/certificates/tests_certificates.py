@@ -21,9 +21,10 @@ class ElecCPOTest(TestCase, FiltersActionTestMixin):
         )
 
         self.operator = Entity.objects.create(
-            name="OPERATOR",
-            entity_type=Entity.OPERATOR,
+            name="PRODUCER",
+            entity_type=Entity.PRODUCER,
             has_elec=True,
+            is_tiruert_liable=True,
         )
 
         self.user = setup_current_user(

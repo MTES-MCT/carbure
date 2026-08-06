@@ -2611,6 +2611,42 @@ paths:
                     - tariff_reference
                   summary: Example of filters response.
           description: ""
+  /api/biomethane/supply-input/tariff-coefficient-proportions/:
+    get:
+      operationId: biomethane_supply_input_tariff_coefficient_proportions_retrieve
+      description: Volume-weighted P1/P2/P3/P/Pef shares for the filtered supply plan
+        inputs.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: producer_id
+          schema:
+            type: integer
+          description: Producer entity ID (optional, used by DREAL to filter specific
+            producer).
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Year of the supply plan.
+          required: true
+      tags:
+        - biomethane
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TariffCoefficientProportions"
+          description: ""
   /api/biomethane/supply-plan/download-template/:
     get:
       operationId: biomethane_supply_plan_download_template_retrieve
@@ -9855,6 +9891,145 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedElecBalanceList"
           description: ""
+  /api/tiruert/elec-operations/export/:
+    get:
+      operationId: tiruert_elec_operations_export_retrieve
+      parameters:
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: from_to
+          schema:
+            type: string
+        - in: query
+          name: operation
+          schema:
+            type: array
+            items:
+              enum:
+                - ACQUISITION_FROM_CPO
+                - CESSION
+                - TENEUR
+                - ACQUISITION
+              type: string
+              description: |-
+                * `ACQUISITION_FROM_CPO` - ACQUISITION_FROM_CPO
+                * `CESSION` - CESSION
+                * `TENEUR` - TENEUR
+                * `ACQUISITION` - ACQUISITION
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -created_at
+                - -from_to
+                - -operation
+                - -period
+                - -quantity
+                - -status
+                - created_at
+                - from_to
+                - operation
+                - period
+                - quantity
+                - status
+          description: |-
+            Ordre
+
+            * `created_at` - Created at
+            * `-created_at` - Created at (décroissant)
+            * `operation` - Operation
+            * `-operation` - Operation (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
+            * `period` - Period
+            * `-period` - Period (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `from_to` - From to
+            * `-from_to` - From to (décroissant)
+          explode: false
+          style: form
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+              minLength: 1
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: integer
+          description: Entity whose operations are exported when acting as an administrator.
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              enum:
+                - PENDING
+                - ACCEPTED
+                - REJECTED
+                - CANCELED
+                - DECLARED
+              type: string
+              description: |-
+                * `PENDING` - PENDING
+                * `ACCEPTED` - ACCEPTED
+                * `REJECTED` - REJECTED
+                * `CANCELED` - CANCELED
+                * `DECLARED` - DECLARED
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              enum:
+                - CREDIT
+                - DEBIT
+              type: string
+              description: |-
+                * `CREDIT` - CREDIT
+                * `DEBIT` - DEBIT
+        - in: query
+          name: years
+          schema:
+            type: array
+            items:
+              type: number
+          explode: true
+          style: form
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+          description: Excel file download
   /api/tiruert/elec-operations/filters/:
     get:
       operationId: filter_elec_operations
@@ -10248,23 +10423,6 @@ paths:
   /api/tiruert/operations/:
     get:
       operationId: tiruert_operations_list
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: biofuel
@@ -10380,11 +10538,11 @@ paths:
                 - -durability_period
                 - -from_to
                 - -pending_operations
-                - -quantity
                 - -saved_emissions
                 - -sector
                 - -status
                 - -type
+                - -volume
                 - available_balance
                 - biofuel
                 - created_at
@@ -10393,11 +10551,11 @@ paths:
                 - durability_period
                 - from_to
                 - pending_operations
-                - quantity
                 - saved_emissions
                 - sector
                 - status
                 - type
+                - volume
           description: |-
             Ordre
 
@@ -10417,8 +10575,8 @@ paths:
             * `-depot` - Depot (décroissant)
             * `from_to` - From to
             * `-from_to` - From to (décroissant)
-            * `quantity` - Quantity
-            * `-quantity` - Quantity (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
             * `durability_period` - Durability period
             * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
@@ -10529,16 +10687,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
-        - in: query
           name: years
           schema:
             type: array
@@ -10558,23 +10706,6 @@ paths:
           description: ""
     post:
       operationId: tiruert_operations_create
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -10582,16 +10713,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -10619,23 +10740,6 @@ paths:
   /api/tiruert/operations/{id}/:
     get:
       operationId: tiruert_operations_retrieve
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -10649,16 +10753,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -10673,23 +10767,6 @@ paths:
           description: ""
     patch:
       operationId: tiruert_operations_partial_update
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -10703,16 +10780,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -10738,23 +10805,6 @@ paths:
           description: ""
     delete:
       operationId: tiruert_operations_destroy
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -10768,16 +10818,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -10803,16 +10843,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -10855,16 +10885,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -10895,6 +10915,35 @@ paths:
               schema:
                 error: NOT_ENOUGH_VOLUME
           description: Error message
+  /api/tiruert/operations/{id}/export/:
+    get:
+      operationId: export_tiruert_operation_details_excel
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Opération.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+          description: ""
   /api/tiruert/operations/{id}/reject/:
     post:
       operationId: reject_operation
@@ -10912,16 +10961,6 @@ paths:
             type: integer
           description: A unique integer value identifying this Opération.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -10943,8 +10982,7 @@ paths:
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
-      description: Retrieve balances grouped by mp category / biofuel or by sector or
-        by depot
+      description: Retrieve balances grouped by mp category / biofuel or by sector
       parameters:
         - in: query
           name: biofuel
@@ -11030,11 +11068,10 @@ paths:
           schema:
             type: string
             enum:
-              - depot
               - lot
               - sector
             default: ""
-          description: Group by sector, lot or depot.
+          description: Group by sector, lot.
         - in: query
           name: operation
           schema:
@@ -11084,11 +11121,11 @@ paths:
                 - -durability_period
                 - -from_to
                 - -pending_operations
-                - -quantity
                 - -saved_emissions
                 - -sector
                 - -status
                 - -type
+                - -volume
                 - available_balance
                 - biofuel
                 - created_at
@@ -11097,11 +11134,11 @@ paths:
                 - durability_period
                 - from_to
                 - pending_operations
-                - quantity
                 - saved_emissions
                 - sector
                 - status
                 - type
+                - volume
           description: |-
             Ordre
 
@@ -11121,8 +11158,8 @@ paths:
             * `-depot` - Depot (décroissant)
             * `from_to` - From to
             * `-from_to` - From to (décroissant)
-            * `quantity` - Quantity
-            * `-quantity` - Quantity (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
             * `durability_period` - Durability period
             * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
@@ -11232,16 +11269,6 @@ paths:
             * `DEBIT` - DEBIT
           explode: true
           style: form
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -11386,11 +11413,11 @@ paths:
                 - -durability_period
                 - -from_to
                 - -pending_operations
-                - -quantity
                 - -saved_emissions
                 - -sector
                 - -status
                 - -type
+                - -volume
                 - available_balance
                 - biofuel
                 - created_at
@@ -11399,11 +11426,11 @@ paths:
                 - durability_period
                 - from_to
                 - pending_operations
-                - quantity
                 - saved_emissions
                 - sector
                 - status
                 - type
+                - volume
           description: |-
             Ordre
 
@@ -11423,8 +11450,8 @@ paths:
             * `-depot` - Depot (décroissant)
             * `from_to` - From to
             * `-from_to` - From to (décroissant)
-            * `quantity` - Quantity
-            * `-quantity` - Quantity (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
             * `durability_period` - Durability period
             * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
@@ -11523,16 +11550,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
-        - in: query
           name: years
           schema:
             type: array
@@ -11564,23 +11581,6 @@ paths:
   /api/tiruert/operations/export/:
     get:
       operationId: tiruert_operations_export_retrieve
-      description: >-
-        Mixin to manage the unit of measurement (L, MJ, KG) in views.
-
-
-        This mixin automatically adds the unit to the request via
-        `initialize_request()`
-
-        and to the serializer context via `get_serializer_context()`.
-
-
-        The unit is determined in the following order:
-
-        1. 'unit' parameter from the request (POST or GET)
-
-        2. Entity's preferred unit (entity.preferred_unit)
-
-        3. Default value: 'l' (liters)
       parameters:
         - in: query
           name: entity_id
@@ -11588,16 +11588,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -11747,11 +11737,11 @@ paths:
                 - -durability_period
                 - -from_to
                 - -pending_operations
-                - -quantity
                 - -saved_emissions
                 - -sector
                 - -status
                 - -type
+                - -volume
                 - available_balance
                 - biofuel
                 - created_at
@@ -11760,11 +11750,11 @@ paths:
                 - durability_period
                 - from_to
                 - pending_operations
-                - quantity
                 - saved_emissions
                 - sector
                 - status
                 - type
+                - volume
           description: |-
             Ordre
 
@@ -11784,8 +11774,8 @@ paths:
             * `-depot` - Depot (décroissant)
             * `from_to` - From to
             * `-from_to` - From to (décroissant)
-            * `quantity` - Quantity
-            * `-quantity` - Quantity (décroissant)
+            * `volume` - Volume
+            * `-volume` - Volume (décroissant)
             * `durability_period` - Durability period
             * `-durability_period` - Durability period (décroissant)
             * `available_balance` - available_balance
@@ -11884,16 +11874,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
-        - in: query
           name: years
           schema:
             type: array
@@ -11922,6 +11902,65 @@ paths:
                     - TERF SAF
                   summary: Example of filters response.
           description: ""
+  /api/tiruert/operations/import/:
+    post:
+      operationId: import_operations_from_excel
+      description: Validate or create TIRUERT operations from an Excel file
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationExcelImportRequestRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/OperationExcelImportRequestRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/OperationExcelImportRequestRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OperationImportResponse"
+          description: ""
+  /api/tiruert/operations/import/template/:
+    get:
+      operationId: download_operations_import_template
+      description: Download the TIRUERT operation import template
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Fichier Excel généré
   /api/tiruert/operations/simulate/:
     post:
       operationId: simulate
@@ -11933,16 +11972,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -11978,16 +12007,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       requestBody:
@@ -12023,16 +12042,6 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
-        - in: query
-          name: unit
-          schema:
-            type: string
-            enum:
-              - MJ
-              - gj
-              - kg
-              - l
-          description: Specify the volume unit.
       tags:
         - tiruert
       security:
@@ -12394,8 +12403,8 @@ components:
         available_balance:
           type: number
           format: double
-        quantity:
-          $ref: "#/components/schemas/BalanceQuantity"
+        volume:
+          $ref: "#/components/schemas/BalanceVolume"
         pending_teneur:
           type: number
           format: double
@@ -12404,8 +12413,6 @@ components:
           format: double
         pending_operations:
           type: integer
-        unit:
-          type: string
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
@@ -12429,10 +12436,9 @@ components:
         - initial_balance
         - pending_operations
         - pending_teneur
-        - quantity
         - saved_emissions
         - sector
-        - unit
+        - volume
     BalanceBiofuel:
       type: object
       properties:
@@ -12443,25 +12449,18 @@ components:
         renewable_energy_share:
           type: number
           format: double
+        pci_litre:
+          type: number
+          format: double
+        masse_volumique:
+          type: number
+          format: double
       required:
         - code
         - id
+        - masse_volumique
+        - pci_litre
         - renewable_energy_share
-    BalanceByDepot:
-      type: object
-      properties:
-        customs_category:
-          type: string
-        biofuel:
-          $ref: "#/components/schemas/BalanceBiofuel"
-        depots:
-          type: array
-          items:
-            $ref: "#/components/schemas/BalanceDepot"
-      required:
-        - biofuel
-        - customs_category
-        - depots
     BalanceBySector:
       type: object
       properties:
@@ -12474,8 +12473,8 @@ components:
         available_balance:
           type: number
           format: double
-        quantity:
-          $ref: "#/components/schemas/BalanceQuantity"
+        volume:
+          $ref: "#/components/schemas/BalanceVolume"
         pending_teneur:
           type: number
           format: double
@@ -12484,32 +12483,14 @@ components:
           format: double
         pending_operations:
           type: integer
-        unit:
-          type: string
       required:
         - available_balance
         - declared_teneur
         - initial_balance
         - pending_operations
         - pending_teneur
-        - quantity
         - sector
-        - unit
-    BalanceDepot:
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        quantity:
-          $ref: "#/components/schemas/BalanceQuantity"
-        unit:
-          type: string
-      required:
-        - id
-        - name
-        - quantity
+        - volume
     BalanceQuantity:
       type: object
       properties:
@@ -12524,8 +12505,18 @@ components:
     BalanceResponse:
       oneOf:
         - $ref: "#/components/schemas/Balance"
-        - $ref: "#/components/schemas/BalanceByDepot"
         - $ref: "#/components/schemas/BalanceBySector"
+    BalanceVolume:
+      type: object
+      properties:
+        credit:
+          type: number
+          format: double
+          default: 0
+        debit:
+          type: number
+          format: double
+          default: 0
     BaseUser:
       type: object
       properties:
@@ -14538,6 +14529,7 @@ components:
         - REDCERT
         - 2BS
         - KZR_INIG
+        - CERTIFHY
       type: string
       description: |-
         * `SYSTEME_NATIONAL` - SYSTEME_NATIONAL
@@ -14545,6 +14537,7 @@ components:
         * `REDCERT` - REDCERT
         * `2BS` - 2BS
         * `KZR_INIG` - KZR_INIG
+        * `CERTIFHY` - CERTIFHY
     ChangePasswordError:
       type: object
       properties:
@@ -14622,18 +14615,26 @@ components:
         subcategory:
           type: string
           maxLength: 128
+        crop_type:
+          allOf:
+            - $ref: "#/components/schemas/CropTypeEnum"
+          nullable: true
+          readOnly: true
       required:
         - category
+        - crop_type
         - group
         - subcategory
     CollectionTypeEnum:
       enum:
         - PRIVATE
         - LOCAL
+        - IAA
       type: string
       description: |-
         * `PRIVATE` - Issus de collecteurs privés
         * `LOCAL` - Issus de collectivités locales
+        * `IAA` - Issus d'IAA
     CommentRequest:
       type: object
       properties:
@@ -14913,6 +14914,14 @@ components:
           maxLength: 14
       required:
         - name
+    CropTypeEnum:
+      enum:
+        - PRIMARY
+        - INTERMEDIATE
+      type: string
+      description: |-
+        * `PRIMARY` - PRIMARY
+        * `INTERMEDIATE` - INTERMEDIATE
     DeleteCertificateRequest:
       type: object
       properties:
@@ -17075,7 +17084,7 @@ components:
       properties:
         certificate_id:
           type: string
-          maxLength: 64
+          maxLength: 96
         certificate_type:
           $ref: "#/components/schemas/CertificateTypeEnum"
         certificate_holder:
@@ -17396,6 +17405,14 @@ components:
         * `CONTINUOUS_INFINITELY_MIXED` - Continu (infiniment mélangé)
         * `PLUG_FLOW_SEMI_CONTINUOUS` - En piston (semi-continu)
         * `BATCH_SILOS` - En silos (batch)
+    ModeEnum:
+      enum:
+        - validate
+        - create
+      type: string
+      description: |-
+        * `validate` - validate
+        * `create` - create
     MonthlyReportDataRequest:
       type: object
       properties:
@@ -17576,7 +17593,8 @@ components:
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/BalanceBiofuel"
           readOnly: true
         renewable_energy_share:
           type: number
@@ -17616,20 +17634,17 @@ components:
           type: string
           nullable: true
           maxLength: 6
-        quantity:
+        volume:
           type: number
           format: double
           readOnly: true
-        quantity_mj:
+        energy:
           type: number
           format: double
           readOnly: true
         avoided_emissions:
           type: number
           format: double
-          readOnly: true
-        unit:
-          type: string
           readOnly: true
         year:
           type: integer
@@ -17642,16 +17657,14 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - energy
         - export_country
         - from_depot
         - id
-        - quantity
-        - quantity_mj
-        - renewable_energy_share
         - sector
         - to_depot
         - type
-        - unit
+        - volume
         - year
     OperationCorrectionRequest:
       type: object
@@ -17681,6 +17694,73 @@ components:
       required:
         - id
         - name
+    OperationExcelImportRequestRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+        mode:
+          allOf:
+            - $ref: "#/components/schemas/ModeEnum"
+          default: validate
+      required:
+        - file
+    OperationImportGroup:
+      type: object
+      properties:
+        operation_id:
+          type: integer
+          nullable: true
+        status:
+          type: string
+        type:
+          type: string
+        sector:
+          type: string
+        customs_category:
+          type: string
+        biofuel:
+          type: string
+        debited_entity:
+          $ref: "#/components/schemas/OperationEntity"
+        credited_entity:
+          allOf:
+            - $ref: "#/components/schemas/OperationEntity"
+          nullable: true
+        lot_count:
+          type: integer
+        total_volume:
+          type: number
+          format: double
+        rows:
+          type: array
+          items:
+            type: integer
+      required:
+        - biofuel
+        - credited_entity
+        - customs_category
+        - debited_entity
+        - lot_count
+        - operation_id
+        - rows
+        - sector
+        - status
+        - total_volume
+        - type
+    OperationImportResponse:
+      type: object
+      properties:
+        mode:
+          $ref: "#/components/schemas/ModeEnum"
+        operations:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationImportGroup"
+      required:
+        - mode
+        - operations
     OperationInput:
       type: object
       properties:
@@ -17791,7 +17871,8 @@ components:
         customs_category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/BalanceBiofuel"
           readOnly: true
         renewable_energy_share:
           type: number
@@ -17819,12 +17900,13 @@ components:
           type: string
           format: date-time
           readOnly: true
-        quantity:
+        volume:
           type: number
           format: double
           readOnly: true
-        unit:
-          type: string
+        energy:
+          type: number
+          format: double
           readOnly: true
         avoided_emissions:
           type: number
@@ -17841,14 +17923,13 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - energy
         - from_depot
         - id
-        - quantity
-        - renewable_energy_share
         - sector
         - to_depot
         - type
-        - unit
+        - volume
         - year
     OperationLot:
       type: object
@@ -17987,7 +18068,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BalanceResponse"
-        total_quantity:
+        total_volume:
           type: number
     PaginatedBiomethaneAdminAnnualDeclarationList:
       type: object
@@ -18279,7 +18360,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OperationList"
-        total_quantity:
+        total_volume:
           type: number
     PaginatedSafTicketPreviewList:
       type: object
@@ -19754,6 +19835,51 @@ components:
       description: |-
         * `REACH` - Objectif à atteindre
         * `CAP` - Plafond à ne pas dépasser
+    TariffCoefficientProportions:
+      type: object
+      properties:
+        tariff_coefficients:
+          allOf:
+            - $ref: "#/components/schemas/TariffCoefficients"
+          readOnly: true
+          nullable: true
+        primary_crop:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - primary_crop
+        - tariff_coefficients
+    TariffCoefficients:
+      type: object
+      description: P1 / P2 / P3 / P / Pef shares from the tariff decree referential.
+      properties:
+        p1:
+          type: number
+          format: double
+          readOnly: true
+        p2:
+          type: number
+          format: double
+          readOnly: true
+        p3:
+          type: number
+          format: double
+          readOnly: true
+        p:
+          type: number
+          format: double
+          readOnly: true
+        pef:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - p
+        - p1
+        - p2
+        - p3
+        - pef
     TariffReferenceEnum:
       enum:
         - "2011"

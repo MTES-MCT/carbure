@@ -17,12 +17,35 @@ data = {
         {
             "registration_id": "123456789",
             "name": "CARBURE",
-            "certificate": {"id": "EU-ISCC-Cert-Test-FR004", "valid_from": "2025-08-01", "valid_until": "2026-08-01"},
+            "certificate": {
+                "id": "EU-ISCC-Cert-Test-FR004",
+                "type": GenericCertificate.ISCC,
+                "issuer": "",
+                "valid_from": "2025-08-01",
+                "valid_until": "2026-08-01",
+            },
         },
         {
             "registration_id": "000000011",
             "name": "CARBURE_FR_FAME_PRODUCER",
-            "certificate": {"id": "EU-ISCC-Cert-FR999-00000011", "valid_from": "2026-01-08", "valid_until": "2028-01-08"},
+            "certificate": {
+                "id": "EU-ISCC-Cert-FR999-00000011",
+                "type": GenericCertificate.ISCC,
+                "issuer": "",
+                "valid_from": "2026-01-08",
+                "valid_until": "2028-01-08",
+            },
+        },
+        {
+            "registration_id": "000004807",
+            "name": "CARBURE_EO_THROUGH_API",
+            "certificate": {
+                "id": "SN_UN_2026_0179",
+                "type": GenericCertificate.SYSTEME_NATIONAL,
+                "issuer": "Control Union",
+                "valid_from": "2026-01-08",
+                "valid_until": "2028-01-08",
+            },
         },
     ],
 }
@@ -47,9 +70,11 @@ if settings.WITH_UDB_ACCEPTANCE_DATA:
         certificate_data = producer_data["certificate"]
         certificate, _ = GenericCertificate.objects.update_or_create(
             certificate_id=certificate_data["id"],
+            certificate_type=certificate_data["type"],
             defaults={
-                "certificate_type": GenericCertificate.ISCC,
                 "certificate_holder": producer_data["name"],
+                "certificate_issuer": certificate_data["issuer"],
+                "status": GenericCertificate.VALID,
                 "valid_from": certificate_data["valid_from"],
                 "valid_until": certificate_data["valid_until"],
                 "last_status_update": certificate_data["valid_from"],

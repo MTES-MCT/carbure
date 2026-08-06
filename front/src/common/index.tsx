@@ -139,7 +139,7 @@ const Org = () => {
     isExternal && entity.hasAdminRight(ExternalAdminPages.AIRLINE)
   const isElecAdmin =
     isExternal && entity.hasAdminRight(ExternalAdminPages.ELEC)
-  const isElecOperator = isOperator && entity.has_elec
+  const isElecLiable = entity.is_tiruert_liable && entity.has_elec
   const isTransferElecAdmin =
     isExternal && entity.hasAdminRight(ExternalAdminPages.TRANSFERRED_ELEC)
   const isBiofuelAdmin =
@@ -189,7 +189,7 @@ const Org = () => {
       {(isOperator || isProducer) && <Route path="stats" element={<Stats />} />}
 
       {(isCPO ||
-        isElecOperator ||
+        isElecLiable ||
         isAdmin ||
         isElecAdmin ||
         isTransferElecAdmin) && (

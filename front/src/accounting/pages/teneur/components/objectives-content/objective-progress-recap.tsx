@@ -1,55 +1,80 @@
 import { RecapData } from "../recap-data"
-import { BaseObjective } from "../../types"
-import { formatObjectiveCO2, formatObjectiveGJ } from "../../utils/formatters"
+import { EnergyObjective, MainObjective } from "../../types"
+import { formatObjectiveCO2, formatObjectiveGJ } from "../../utils/objectives"
 import { ExtendedUnit } from "common/types"
-import { useCallback } from "react"
 
-type ObjectiveProgressRecapProps = {
-  objective: Pick<
-    BaseObjective,
-    "pending_teneur" | "quantity_available" | "progress"
-  >
+type EnergyObjectiveProgressRecapProps = {
+  objective: Pick<EnergyObjective, "progress">
   remainingType?: "limit" | "objective"
-  unit?: ExtendedUnit
+  unit?: ExtendedUnit.GJ
 }
 
-export const ObjectiveProgressRecap = ({
-  objective,
-  remainingType,
-  unit = ExtendedUnit.GJ,
-}: ObjectiveProgressRecapProps) => {
+type Co2ObjectiveProgressRecapProps = {
+  objective: Pick<
+    MainObjective,
+    "pending_teneur" | "quantity_available" | "remaining_energy"
+  >
+  remainingType?: "limit" | "objective"
+  unit: ExtendedUnit.tCO2ev
+}
+
+type ObjectiveProgressRecapProps =
+  | EnergyObjectiveProgressRecapProps
+  | Co2ObjectiveProgressRecapProps
+
+export const ObjectiveProgressRecap = (props: ObjectiveProgressRecapProps) => {
+  const { remainingType } = props
+
   const RemainingQuantity =
     remainingType === "limit"
       ? RecapData.RemainingQuantityBeforeLimit
       : RecapData.RemainingQuantityBeforeObjective
 
-  const formatValue = useCallback(
-    (value: number) => {
-      if (unit === ExtendedUnit.tCO2ev) {
-        return formatObjectiveCO2(value)
-      }
-      return formatObjectiveGJ(value)
-    },
-    [unit]
-  )
+  if (props.unit === ExtendedUnit.tCO2ev) {
+    const { objective } = props
+
+    return (
+      <ul>
+        <li>
+          <RecapData.TeneurDeclaredMonth
+            value={formatObjectiveCO2(objective.pending_teneur)}
+          />
+        </li>
+        {remainingType !== undefined && (
+          <li>
+            <RemainingQuantity
+              value={formatObjectiveCO2(objective.remaining_energy)}
+            />
+          </li>
+        )}
+        <li>
+          <RecapData.QuantityAvailable
+            value={formatObjectiveCO2(objective.quantity_available)}
+          />
+        </li>
+      </ul>
+    )
+  }
+
+  const { progress } = props.objective
 
   return (
     <ul>
       <li>
         <RecapData.TeneurDeclaredMonth
-          value={formatValue(objective.pending_teneur)}
+          value={formatObjectiveGJ(progress.pending_teneur)}
         />
       </li>
       {remainingType !== undefined && (
         <li>
           <RemainingQuantity
-            value={formatValue(objective.progress.remaining_energy)}
+            value={formatObjectiveGJ(progress.remaining_energy)}
           />
         </li>
       )}
       <li>
         <RecapData.QuantityAvailable
-          value={formatValue(objective.quantity_available)}
+          value={formatObjectiveGJ(progress.quantity_available)}
         />
       </li>
     </ul>

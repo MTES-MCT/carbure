@@ -1,6 +1,51 @@
+from os import environ
 from unittest import TestCase
+from unittest.mock import patch
 
-from edelivery.ebms.converters import MaterialConverter, QuantityConverter, StatusConverter, UDBConversionError
+from edelivery.ebms.converters import (
+    CertificateIssuerConverter,
+    CertificateStatusConverter,
+    MaterialConverter,
+    QuantityConverter,
+    TransactionStatusConverter,
+    UDBConversionError,
+)
+
+
+class CertificateIssuerConverterTest(TestCase):
+    def test_converts_carbure_certificate_issuer_to_udb_certificate_body_number(self):
+        conversion_mapping = {"UDB_CERTIFICATE_BODY_NUMBER": "CARBURE_CERTIFICATE_ISSUER"}
+        converter = CertificateIssuerConverter(conversion_mapping)
+        self.assertEqual("UDB_CERTIFICATE_BODY_NUMBER", converter.to_udb("CARBURE_CERTIFICATE_ISSUER"))
+
+    def test_raises_carbure_conversion_error_if_issuer_unknown(self):
+        conversion_mapping = {}
+        converter = CertificateIssuerConverter(conversion_mapping)
+        with self.assertRaises(UDBConversionError) as context:
+            converter.to_udb("UNKNOWN_ISSUER")
+
+        self.assertEqual("Unknown Carbure Certificate Issuer: UNKNOWN_ISSUER", context.exception.message)
+
+    @patch.dict("os.environ", {}, clear=True)
+    def test_plays_nice_when_env_variable_not_present(self):
+        self.assertNotIn("CERTIFICATE_ISSUER_CONVERSION_MAPPING", environ)
+        converter = CertificateIssuerConverter()
+        self.assertEqual(0, len(converter.conversion_mapping))
+
+
+class CertificateStatusConverterTest(TestCase):
+    def test_converts_carbure_certificate_status_to_udb_status(self):
+        conversion_mapping = {"UDB_STATUS": "CARBURE_STATUS"}
+        converter = CertificateStatusConverter(conversion_mapping)
+        self.assertEqual("UDB_STATUS", converter.to_udb("CARBURE_STATUS"))
+
+    def test_raises_carbure_conversion_error_if_status_unknown(self):
+        conversion_mapping = {}
+        converter = CertificateStatusConverter(conversion_mapping)
+        with self.assertRaises(UDBConversionError) as context:
+            converter.to_udb("UNKNOWN_STATUS")
+
+        self.assertEqual("Unknown Carbure Status: UNKNOWN_STATUS", context.exception.message)
 
 
 class MaterialConverterTest(TestCase):
@@ -37,15 +82,15 @@ class QuantityConverterTest(TestCase):
         self.assertEqual("Unknown UDB Unit: UNKNOWN_UNIT", context.exception.message)
 
 
-class StatusConverterTest(TestCase):
+class TransactionStatusConverterTest(TestCase):
     def test_converts_udb_transaction_status_to_carbure_lot_status(self):
         conversion_mapping = {"UDB_STATUS": "CARBURE_STATUS"}
-        converter = StatusConverter(conversion_mapping)
+        converter = TransactionStatusConverter(conversion_mapping)
         self.assertEqual("CARBURE_STATUS", converter.from_udb("UDB_STATUS"))
 
     def test_raises_udb_conversion_error_if_status_unknown(self):
         conversion_mapping = {}
-        converter = StatusConverter(conversion_mapping)
+        converter = TransactionStatusConverter(conversion_mapping)
         with self.assertRaises(UDBConversionError) as context:
             converter.from_udb("UNKNOWN_STATUS")
 

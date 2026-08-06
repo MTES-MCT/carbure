@@ -2,4 +2,12 @@
   grid-template-columns: repeat(3, 1fr);
   row-gap: var(--spacing-2w);
   column-gap: var(--spacing-1w);
+
+  @media (max-width: 1400px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
 }
