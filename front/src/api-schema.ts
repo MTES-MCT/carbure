@@ -15192,7 +15192,9 @@ export interface operations {
     };
     traceability_actions_list: {
         parameters: {
-            query?: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
                 holder?: string[];
                 /** @description * `H2` - Hydrogène */
                 industry?: PathsApiTraceabilityActionsGetParametersQueryIndustry[];
@@ -15232,6 +15234,15 @@ export interface operations {
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
+                /**
+                 * @description * `CREATED` - CREATED
+                 *     * `PENDING` - PENDING
+                 *     * `ACCEPTED` - ACCEPTED
+                 *     * `REJECTED` - REJECTED
+                 *     * `BLOCKED` - BLOCKED
+                 *     * `DELETED` - DELETED
+                 */
+                status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /** @description * `INIT` - INIT */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 working_year?: string[];
@@ -15254,7 +15265,10 @@ export interface operations {
     };
     traceability_actions_create: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -15279,7 +15293,10 @@ export interface operations {
     };
     traceability_actions_retrieve: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
             header?: never;
             path: {
                 /** @description A unique integer value identifying this Action. */
@@ -15301,7 +15318,10 @@ export interface operations {
     };
     traceability_actions_update: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
             header?: never;
             path: {
                 /** @description A unique integer value identifying this Action. */
@@ -15329,7 +15349,10 @@ export interface operations {
     };
     traceability_actions_destroy: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
             header?: never;
             path: {
                 /** @description A unique integer value identifying this Action. */
@@ -15350,7 +15373,10 @@ export interface operations {
     };
     traceability_actions_partial_update: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
             header?: never;
             path: {
                 /** @description A unique integer value identifying this Action. */
@@ -15379,6 +15405,8 @@ export interface operations {
     traceability_actions_filters_retrieve: {
         parameters: {
             query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
                 /** @description Filter string to apply */
                 filter: PathsApiTraceabilityActionsFiltersGetParametersQueryFilter;
                 holder?: string[];
@@ -15416,6 +15444,15 @@ export interface operations {
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
+                /**
+                 * @description * `CREATED` - CREATED
+                 *     * `PENDING` - PENDING
+                 *     * `ACCEPTED` - ACCEPTED
+                 *     * `REJECTED` - REJECTED
+                 *     * `BLOCKED` - BLOCKED
+                 *     * `DELETED` - DELETED
+                 */
+                status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /** @description * `INIT` - INIT */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 working_year?: string[];
@@ -15939,6 +15976,14 @@ export enum PathsApiTraceabilityActionsGetParametersQueryShipping_method {
     ROAD = "ROAD",
     SEA = "SEA"
 }
+export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
+    ACCEPTED = "ACCEPTED",
+    BLOCKED = "BLOCKED",
+    CREATED = "CREATED",
+    DELETED = "DELETED",
+    PENDING = "PENDING",
+    REJECTED = "REJECTED"
+}
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
     INIT = "INIT"
 }
@@ -15949,6 +15994,7 @@ export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     order_by = "order_by",
     shipping_method = "shipping_method",
     site = "site",
+    status = "status",
     type = "type",
     working_year = "working_year"
 }

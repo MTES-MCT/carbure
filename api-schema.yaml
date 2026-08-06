@@ -12529,6 +12529,12 @@ paths:
       operationId: traceability_actions_list
       parameters:
         - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
           name: holder
           schema:
             type: array
@@ -12648,6 +12654,28 @@ paths:
           explode: true
           style: form
         - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - BLOCKED
+                - CREATED
+                - DELETED
+                - PENDING
+                - REJECTED
+          description: |-
+            * `CREATED` - CREATED
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `BLOCKED` - BLOCKED
+            * `DELETED` - DELETED
+          explode: true
+          style: form
+        - in: query
           name: type
           schema:
             type: array
@@ -12681,6 +12709,13 @@ paths:
           description: ""
     post:
       operationId: traceability_actions_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
       tags:
         - traceability
       requestBody:
@@ -12709,6 +12744,12 @@ paths:
     get:
       operationId: traceability_actions_retrieve
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -12730,6 +12771,12 @@ paths:
     put:
       operationId: traceability_actions_update
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -12763,6 +12810,12 @@ paths:
     patch:
       operationId: traceability_actions_partial_update
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -12795,6 +12848,12 @@ paths:
     delete:
       operationId: traceability_actions_destroy
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
         - in: path
           name: id
           schema:
@@ -12814,6 +12873,12 @@ paths:
       operationId: traceability_actions_filters_retrieve
       parameters:
         - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
           name: filter
           schema:
             type: string
@@ -12824,6 +12889,7 @@ paths:
               - order_by
               - shipping_method
               - site
+              - status
               - type
               - working_year
           description: Filter string to apply
@@ -12933,6 +12999,28 @@ paths:
             type: array
             items:
               type: string
+          explode: true
+          style: form
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - BLOCKED
+                - CREATED
+                - DELETED
+                - PENDING
+                - REJECTED
+          description: |-
+            * `CREATED` - CREATED
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `BLOCKED` - BLOCKED
+            * `DELETED` - DELETED
           explode: true
           style: form
         - in: query

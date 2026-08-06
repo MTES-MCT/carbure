@@ -1,4 +1,5 @@
 from django.db.models import Q
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import viewsets
 
 from core.filters import FiltersActionFactory
@@ -8,6 +9,17 @@ from traceability.models import Action
 from traceability.serializers import ActionInputSerializer, ActionSerializer
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="entity_id",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Authorised entity ID.",
+            required=True,
+        ),
+    ]
+)
 class ActionViewset(FiltersActionFactory(), viewsets.ModelViewSet):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
