@@ -4,8 +4,10 @@ import { getDeclarationStatusLabel } from "biomethane/utils"
 
 export const AnnualDeclarationStatusBadge = ({
   status,
+  submissionDate,
 }: {
   status: AnnualDeclarationStatus
+  submissionDate?: string | null
 }) => {
   const severityMapping: Record<
     AnnualDeclarationStatus,
@@ -19,7 +21,18 @@ export const AnnualDeclarationStatusBadge = ({
 
   return (
     <Badge severity={severityMapping[status]}>
-      {getDeclarationStatusLabel(status)}
+      {/* SI on a une date ET que le statut est DECLARED ? */}
+      {submissionDate && status === AnnualDeclarationStatus.DECLARED ? (
+
+        /* ALORS on écrit notre texte à la mano avec la date formatée */
+        `Déclaration transmise le ${new Date(submissionDate).toLocaleDateString("fr-FR")}`
+
+      ) : (
+
+        /* SINON on utilise l'ancien fonctionnement standard */
+        getDeclarationStatusLabel(status)
+
+      )}
     </Badge>
   )
 }

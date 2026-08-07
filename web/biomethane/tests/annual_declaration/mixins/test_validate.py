@@ -33,12 +33,13 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         "biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.is_declaration_complete",
         return_value=True,
     )
-    def test_validate_digestate_endpoint_success(self, mock_is_complete):
+    def test_validate_endpoint_success(self, mock_is_complete):
         """Test successful validation via API endpoint."""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=BiomethaneAnnualDeclarationService.get_current_declaration_year(),
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+            submission_date=None,
         )
 
         response = self.client.post(self.validate_url, query_params=self.base_params)
@@ -50,17 +51,19 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         # Verify declaration status was updated
         declaration.refresh_from_db()
         self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.DECLARED)
+        self.assertIsNotNone(declaration.submission_date)
 
     @mock.patch(
         "biomethane.services.annual_declaration.BiomethaneAnnualDeclarationService.is_declaration_complete",
         return_value=False,
     )
-    def test_validate_digestate_endpoint_incomplete(self, mock_is_complete):
+    def test_validate_endpoint_incomplete(self, mock_is_complete):
         """Test validation when declaration is incomplete."""
         declaration = BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_entity,
             year=BiomethaneAnnualDeclarationService.get_current_declaration_year(),
             status=BiomethaneAnnualDeclaration.IN_PROGRESS,
+            submission_date=None,
         )
 
         response = self.client.post(self.validate_url, query_params=self.base_params)
@@ -72,8 +75,9 @@ class ValidateAnnualDeclarationAPITests(TestCase):
         # Verify declaration status was not updated
         declaration.refresh_from_db()
         self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
+        self.assertIsNone(declaration.submission_date)
 
-    def test_validate_digestate_endpoint_not_found(self):
+    def test_validate_endpoint_not_found(self):
         """Test validation when declaration doesn't exist."""
         response = self.client.post(self.validate_url, query_params=self.base_params)
 
