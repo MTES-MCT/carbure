@@ -3,7 +3,7 @@ from io import BufferedReader
 import xlsxwriter
 from django.db.models import Q
 
-from core.models import CarbureLot, Entity
+from core.models import Biocarburant, CarbureLot, Entity
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
@@ -37,6 +37,7 @@ TABLE_HEADERS = [
 
 MAIN_SHEET_NAME = "Import d'opérations"
 ENTITIES_SHEET_NAME = "Entités"
+BIOFUELS_SHEET_NAME = "Biocarburants"
 HEADER_ROW = 0
 KEY_ROW = 1
 FIRST_DATA_ROW = 2
@@ -119,6 +120,7 @@ def create_operation_import_template(entity_id: int) -> BufferedReader:
         lots,
     )
     _create_entities_sheet(workbook, entities)
+    _create_biofuels_sheet(workbook)
 
     workbook.close()
     return open(location, "rb")
@@ -256,7 +258,22 @@ def _create_entities_sheet(workbook, entities):
         sheet.write(row, 0, entity.name)
         sheet.write(row, 1, entity.id)
 
+    sheet.set_column(0, 0, 25)
     sheet.set_column(1, 1, None, None, {"hidden": True})
 
     sheet.protect()
-    sheet.hide()
+
+
+def _create_biofuels_sheet(workbook):
+    sheet = workbook.add_worksheet(BIOFUELS_SHEET_NAME)
+
+    sheet.write(0, 0, "Biocarburant")
+    sheet.write(0, 1, "PCI/L")
+
+    for row, (code, pci_litre) in enumerate(Biocarburant.objects.order_by("name").values_list("code", "pci_litre"), start=1):
+        sheet.write(row, 0, code or "")
+        sheet.write_number(row, 1, float(pci_litre or 0))
+
+    sheet.set_column(0, 0, 12)
+
+    sheet.protect()
