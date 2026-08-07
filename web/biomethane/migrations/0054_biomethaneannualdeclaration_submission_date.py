@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('biomethane', '0053_alter_biomethanesupplyinput_collection_type'),
+        ("biomethane", "0053_alter_biomethanesupplyinput_collection_type"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='biomethaneannualdeclaration',
-            name='submission_date',
+            model_name="biomethaneannualdeclaration",
+            name="submission_date",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]
