@@ -62,31 +62,31 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
         >
           {status === AnnualDeclarationStatus.OVERDUE
             ? t(
-              "Vous avez dépassé les délais de déclaration pour {{year}}, l'administration se réserve le droit de la refuser.",
-              {
-                year: selectedYear,
-              }
-            )
+                "Vous avez dépassé les délais de déclaration pour {{year}}, l'administration se réserve le droit de la refuser.",
+                {
+                  year: selectedYear,
+                }
+              )
             : t(
-              "A déclarer et mettre à jour une fois par an, avant le {{date}}",
-              {
-                date: `31/03/${selectedYear + 1}`,
-              }
-            )}
+                "A déclarer et mettre à jour une fois par an, avant le {{date}}",
+                {
+                  date: `31/03/${selectedYear + 1}`,
+                }
+              )}
           {(status === AnnualDeclarationStatus.IN_PROGRESS ||
             status === AnnualDeclarationStatus.OVERDUE) && (
-              <Button
-                onClick={
-                  annualDeclaration?.is_complete
-                    ? openValidateDeclarationDialog
-                    : openMissingFieldsDialog
-                }
-                iconId="ri-file-text-line"
-                asideX
-              >
-                {t("Transmettre mes informations annuelles")}
-              </Button>
-            )}
+            <Button
+              onClick={
+                annualDeclaration?.is_complete
+                  ? openValidateDeclarationDialog
+                  : openMissingFieldsDialog
+              }
+              iconId="ri-file-text-line"
+              asideX
+            >
+              {t("Transmettre mes informations annuelles")}
+            </Button>
+          )}
           {status === AnnualDeclarationStatus.DECLARED &&
             isDeclarationInCurrentPeriod && (
               <Button
