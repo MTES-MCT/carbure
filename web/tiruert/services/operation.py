@@ -279,7 +279,7 @@ class OperationService:
         return [
             {
                 "lot_id": lot_id,
-                "volume": round(volume, 2),
+                "volume": truncate(volume, 2),
                 "emission_rate_per_mj": emissions_by_lot.get(lot_id, 0),
             }
             for lot_id, volume in lot_volume_items
