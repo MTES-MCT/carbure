@@ -18,6 +18,18 @@ def accept_rfc(request, *args, **kwargs):
     context = kwargs["context"]
     entity_id = context["entity_id"]
     status = request.POST.get("status", False)
+    usage = request.POST.get("usage", "").strip()
+    usage_precision = request.POST.get("usage_precision", "").strip()
+
+    valid_usages = {choice[0] for choice in CarbureLot.USAGE_CHOICES}
+    if not usage:
+        return JsonResponse({"status": "error", "message": "Usage is required for RFC"}, status=400)
+
+    if usage not in valid_usages:
+        return JsonResponse({"status": "error", "message": "Invalid usage"}, status=400)
+
+    if usage == CarbureLot.USAGE_OTHER and not usage_precision:
+        return JsonResponse({"status": "error", "message": "Usage precision is required when usage is OTHER"}, status=400)
 
     entity = Entity.objects.get(id=entity_id)
     lots = get_entity_lots_by_status(entity, status)
@@ -50,6 +62,8 @@ def accept_rfc(request, *args, **kwargs):
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.RFC
+        lot.usage = usage
+        lot.usage_precision = usage_precision if usage == CarbureLot.USAGE_OTHER else ""
         lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.ACCEPTED

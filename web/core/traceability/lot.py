@@ -99,6 +99,8 @@ class LotNode(Node):
         "unknown_client",
         "client",
         "delivery_type",
+        "usage",
+        "usage_precision",
         "free_field",
     ]
 

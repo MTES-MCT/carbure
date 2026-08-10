@@ -72,11 +72,12 @@ def check_mac_bc_wrong(lot: CarbureLot):
 
 
 def check_mac_not_efpe(lot: CarbureLot):
-    if lot.delivery_type == CarbureLot.RFC and lot.carbure_delivery_site and lot.carbure_delivery_site.depot_type != "EFPE":
+    if lot.delivery_type == CarbureLot.RFC and lot.carbure_delivery_site and lot.carbure_delivery_site.site_type != "EFPE":
         return generic_error(
             error=CarbureSanityCheckErrors.MAC_NOT_EFPE,
             lot=lot,
-            fields=["delivery_type"],
+            field="delivery_site",
+            is_blocking=True,
         )
 
 

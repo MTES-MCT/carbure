@@ -168,3 +168,27 @@ def check_missing_vendor_certificate(lot: CarbureLot):
                 field="vendor_certificate",
                 is_blocking=True,
             )
+
+
+def check_missing_usage_for_rfc(lot: CarbureLot):
+    if lot.delivery_type == CarbureLot.RFC and not lot.usage:
+        return generic_error(
+            error=CarbureSanityCheckErrors.MISSING_USAGE,
+            lot=lot,
+            field="usage",
+            is_blocking=True,
+        )
+
+
+def check_missing_usage_precision_for_other_usage(lot: CarbureLot):
+    if (
+        lot.delivery_type == CarbureLot.RFC
+        and lot.usage == CarbureLot.USAGE_OTHER
+        and not (lot.usage_precision or "").strip()
+    ):
+        return generic_error(
+            error=CarbureSanityCheckErrors.MISSING_USAGE_PRECISION,
+            lot=lot,
+            field="usage_precision",
+            is_blocking=True,
+        )

@@ -80,7 +80,7 @@
   "WRONG_FORMAT": "Le format est incorrect",
   "WRONG_PRODUCTION_SITE_COUNTRY": "Le site de production est incorrect",
   "YEAR_LOCKED": "La date de livraison est trop ancienne. Il n'est plus possible de déclarer sur cette période.",
-  "MAC_NOT_EFPE": "Les mises à la consommations doivent être effectuées depuis un site EFPE.",
+  "MAC_NOT_EFPE": "Les mises à la consommation de biocarburants 100 % (B100, ED95, HVO100) ne sont autorisées que depuis un dépôt de type EFPE.",
   "PRODUCTION_SITE_ADDRESS_UNDEFINED": "L'adresse, la ville ou le code postal du site de production n'est pas renseignée. Veuillez l'ajouter dans les informations liées à la société.",
   "APPLICATION_ALREADY_RECEIVED": "Un dossier double compte pour la même année a déjà été validée.",
   "MISSING_VENDOR_CERTIFICATE": "Votre société n'est ni le fournisseur, ni le client de ce lot : vous devez renseigner votre certificat de négoce pour justifier votre place d'intermédiaire dans cette transaction.",
@@ -88,5 +88,7 @@
   "DELIVERY_DATE_VALIDITY": "La date de livraison du lot est antérieure à la date de réception su stock dont il est issu.",
   "MISSING_PRODUCTION_INFO": "Les informations de production ne sont pas renseignées",
   "INVALID_CERTIFICATE": "Le certificat du fournisseur est expiré ou pas encore actif à la date de livraison donnée",
-  "MISSING_DELIVERY_TYPE": "Le type de livraison est absent"
+  "MISSING_DELIVERY_TYPE": "Le type de livraison est absent",
+  "MISSING_USAGE": "L'usage du lot est absent",
+  "MISSING_USAGE_PRECISION": "La précision de l'usage du lot est absente"
 }
