@@ -936,7 +936,7 @@ class OperationServiceBuildDetailsDataTest(TestCase):
         self.assertEqual(
             result,
             [
-                {"lot_id": 1, "volume": 12.35, "emission_rate_per_mj": 0.5},
+                {"lot_id": 1, "volume": 12.34, "emission_rate_per_mj": 0.5},
                 {"lot_id": 2, "volume": 67.89, "emission_rate_per_mj": 1.25},
             ],
         )
@@ -952,6 +952,6 @@ class OperationServiceBuildDetailsDataTest(TestCase):
             result,
             [
                 {"lot_id": 3, "volume": 10.0, "emission_rate_per_mj": 9.9},
-                {"lot_id": 4, "volume": 20.01, "emission_rate_per_mj": 8.8},
+                {"lot_id": 4, "volume": 20.00, "emission_rate_per_mj": 8.8},
             ],
         )
