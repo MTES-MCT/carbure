@@ -16,7 +16,7 @@ DEFAULT_S3_PATH = "reliquats-2026/import_reliquat_operations.xlsx"
 
 
 class Command(BaseCommand):
-    help = "Create INCORPORATION operations from an Excel file stored on S3"
+    help = "Create REPORT operations from an Excel file stored on S3"
 
     def add_arguments(self, parser):
         parser.add_argument("--s3-path", default=DEFAULT_S3_PATH)
@@ -149,7 +149,7 @@ class Command(BaseCommand):
         ratio = self._calculate_ratio(operation_volume, total_lot_volume)
 
         operation_data = {
-            "type": Operation.INCORPORATION,
+            "type": Operation.REPORT,
             "status": Operation.ACCEPTED,
             "credited_entity": entity,
             "debited_entity": None,

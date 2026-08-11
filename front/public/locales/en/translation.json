@@ -2257,5 +2257,6 @@
   "<b>{{count}} lots</b> présentent des <b>incohérences</b>_other": "<b>{{count}} lots</b> present <b>inconsistencies</b>.",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lot</b> must be declared by <b>{{date}}</b>.",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> must be declared by <b>{{date}}</b>.",
-  "{{count}} options sélectionnées_many": "{{count}} options selected"
+  "{{count}} options sélectionnées_many": "{{count}} options selected",
+  "Report 2026": "Report 2026"
 }

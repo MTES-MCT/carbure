@@ -10512,6 +10512,7 @@ paths:
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
+                - REPORT
                 - TENEUR
                 - TRANSFERT
           description: |-
@@ -10526,6 +10527,7 @@ paths:
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
+            * `REPORT` - REPORT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11095,6 +11097,7 @@ paths:
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
+                - REPORT
                 - TENEUR
                 - TRANSFERT
           description: |-
@@ -11109,6 +11112,7 @@ paths:
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
+            * `REPORT` - REPORT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11387,6 +11391,7 @@ paths:
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
+                - REPORT
                 - TENEUR
                 - TRANSFERT
           description: |-
@@ -11401,6 +11406,7 @@ paths:
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
+            * `REPORT` - REPORT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11711,6 +11717,7 @@ paths:
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
+                - REPORT
                 - TENEUR
                 - TRANSFERT
           description: |-
@@ -11725,6 +11732,7 @@ paths:
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
+            * `REPORT` - REPORT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -17994,6 +18002,7 @@ components:
         - CUSTOMS_CORRECTION
         - TRANSFERT
         - EXPIRATION
+        - REPORT
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -18007,6 +18016,7 @@ components:
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
+        * `REPORT` - REPORT
     OperationUpdate:
       type: object
       properties:
