@@ -11,6 +11,7 @@ import {
   PathsApiTiruertOperationsGetParametersQueryCustoms_category as OperationBiofuelCategory,
   PathsApiTiruertOperationsGetParametersQueryOrder_by as OperationOrder,
   OperationTypeEnum as CreateOperationType,
+  DevaluationTypeEnum as DevaluationType,
   PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by as BalancesGroupBy,
   PathsApiTiruertOperationsBalanceFiltersGetParametersQueryFilter as BalancesFilter,
   PathsApiTiruertElecOperationsGetParametersQueryStatus as ElecOperationsStatus,
@@ -55,6 +56,7 @@ export {
   OperationSector,
   OperationType, // List of operation types including ACQUISITION which is just used for display
   CreateOperationType,
+  DevaluationType,
   OperationsFilter,
   OperationDebitOrCredit,
   OperationBiofuelCategory,

@@ -4,6 +4,7 @@ import {
   FRACTION_DIGITS_TCO2,
 } from "accounting/config"
 import {
+  DevaluationType,
   ElecOperationSector,
   ElecOperationsStatus,
   ElecOperationType,
@@ -61,7 +62,7 @@ export const formatOperationType = (type: string) => {
     case OperationType.EXPEDITION:
       return i18next.t("Expédition")
     case OperationType.DEVALUATION:
-      return i18next.t("Dévaluation")
+      return i18next.t("Dévalorisation")
     case OperationType.LIVRAISON_DIRECTE:
       return i18next.t("Livraison directe")
     case OperationType.ACQUISITION:
@@ -72,6 +73,24 @@ export const formatOperationType = (type: string) => {
       return i18next.t("Acquisition (aménageurs)")
     case OperationType.EXPIRATION:
       return i18next.t("Expiration")
+    default:
+      return i18next.t("Inconnu")
+  }
+}
+
+/**
+ * Return the i18n key for the devaluation type
+ * @param type the devaluation type sent by the API
+ * @returns the i18n key for the devaluation type
+ */
+export const formatDevaluationType = (type: string) => {
+  switch (type) {
+    case DevaluationType.LOSS:
+      return i18next.t("Perte")
+    case DevaluationType.DOWNGRADING:
+      return i18next.t("Déclassement")
+    case DevaluationType.OTHER:
+      return i18next.t("Autre")
     default:
       return i18next.t("Inconnu")
   }
