@@ -43,7 +43,7 @@ class ExcelExportActionMixin:
                     "rows": operations,
                     "columns": [
                         {"label": "Statut", "value": "status"},
-                        {"label": "Date de création", "value": "created_at"},
+                        {"label": "Date de création", "value": lambda o: o.created_at.strftime("%Y-%m-%d")},
                         {"label": "Type Opération", "value": "_operation"},
                         {"label": "Expéditeur", "value": "debited_entity.name"},
                         {"label": "Destinataire", "value": "credited_entity.name"},
