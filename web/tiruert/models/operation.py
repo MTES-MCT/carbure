@@ -93,8 +93,8 @@ class Operation(models.Model):
         (EXPIRATION, EXPIRATION),
     )
 
-    API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR]
-    API_DELETABLE_TYPES = [CESSION, TENEUR, TRANSFERT, EXPORTATION, EXPEDITION]
+    API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION]
+    API_DELETABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION, CESSION]
 
     # Types that generate initial credit volumes (from physical operations)
     CREDIT_TYPES = [INCORPORATION, MAC_BIO, LIVRAISON_DIRECTE]
@@ -146,6 +146,16 @@ class Operation(models.Model):
 
     # Allows overriding the sector objective, when the declared sector differs from the natural sector of the biofuel
     objective_sector = models.CharField(max_length=20, choices=SECTOR_CODE_CHOICES, null=True, blank=True)
+
+    LOSS = "LOSS"
+    DOWNGRADING = "DOWNGRADING"
+    OTHER = "OTHER"
+    DEVALUATION_TYPES = (
+        (LOSS, "Perte"),
+        (DOWNGRADING, "Déclassement"),
+        (OTHER, "Autre"),
+    )
+    devaluation_type = models.CharField(max_length=20, choices=DEVALUATION_TYPES, null=True, blank=True)
 
     objects = OperationManager()
 

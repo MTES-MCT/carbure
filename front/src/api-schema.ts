@@ -4314,6 +4314,8 @@ export interface components {
             unknown_delivery_site?: string | null;
             readonly delivery_site_country: components["schemas"]["Country"];
             delivery_type?: components["schemas"]["DeliveryTypeEnum"];
+            usage?: components["schemas"]["UsageEnum"];
+            usage_precision?: string;
             lot_status?: components["schemas"]["LotStatusEnum"];
             correction_status?: components["schemas"]["CorrectionStatusEnum"];
             /** Format: double */
@@ -4653,6 +4655,13 @@ export interface components {
             city?: string;
             certificates: components["schemas"]["ProductionSiteCertificateSertificate"][];
         };
+        /**
+         * @description * `LOSS` - Perte
+         *     * `DOWNGRADING` - Déclassement
+         *     * `OTHER` - Autre
+         * @enum {string}
+         */
+        DevaluationTypeEnum: DevaluationTypeEnum;
         /**
          * @description * `SPREADING_PLAN_ICPE` - Plan d'épandage (ICPE)
          *     * `AMM` - Autorisation de mise sur le marché (AMM)
@@ -5686,6 +5695,7 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -5736,6 +5746,7 @@ export interface components {
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLot"][];
             status?: components["schemas"]["OperationStatusEnum"];
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationInputRequest: {
             type: components["schemas"]["OperationTypeEnum"];
@@ -5750,6 +5761,7 @@ export interface components {
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationList: {
             readonly id: number;
@@ -6759,6 +6771,19 @@ export interface components {
         UpdatedQuotasRequest: {
             approved_quotas: number[][];
         };
+        /**
+         * @description * `ROAD` - ROAD
+         *     * `HEATING` - HEATING
+         *     * `AGRICULTURE` - AGRICULTURE
+         *     * `CONSTRUCTION` - CONSTRUCTION
+         *     * `MARITIME` - MARITIME
+         *     * `INLAND_WATERWAY` - INLAND_WATERWAY
+         *     * `RAIL` - RAIL
+         *     * `FISHING` - FISHING
+         *     * `OTHER` - OTHER
+         * @enum {string}
+         */
+        UsageEnum: UsageEnum;
         /**
          * @description Serializer for creating new users. Includes required fields
          *     and repeated password validation.
@@ -14980,6 +15005,11 @@ export enum DeliveryTypeEnum {
     FLUSHED = "FLUSHED",
     CONSUMPTION = "CONSUMPTION"
 }
+export enum DevaluationTypeEnum {
+    LOSS = "LOSS",
+    DOWNGRADING = "DOWNGRADING",
+    OTHER = "OTHER"
+}
 export enum DigestateSaleTypesEnum {
     SPREADING_PLAN_ICPE = "SPREADING_PLAN_ICPE",
     AMM = "AMM",
@@ -15202,6 +15232,17 @@ export enum UnitTypeEnum {
     HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE",
     STEP = "STEP",
     ISDND = "ISDND"
+}
+export enum UsageEnum {
+    ROAD = "ROAD",
+    HEATING = "HEATING",
+    AGRICULTURE = "AGRICULTURE",
+    CONSTRUCTION = "CONSTRUCTION",
+    MARITIME = "MARITIME",
+    INLAND_WATERWAY = "INLAND_WATERWAY",
+    RAIL = "RAIL",
+    FISHING = "FISHING",
+    OTHER = "OTHER"
 }
 export enum UserRightsRequestsStatusEnum {
     Pending = "PENDING",

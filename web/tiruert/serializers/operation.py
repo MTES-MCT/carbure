@@ -118,6 +118,7 @@ class OperationSerializer(BaseOperationSerializer):
             "avoided_emissions",
             "details",
             "year",
+            "devaluation_type",
         ]
 
     export_country = CountrySerializer(read_only=True)
@@ -208,6 +209,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "objective_sector",
             "lots",
             "status",
+            "devaluation_type",
         ]
         extra_kwargs = {
             "biofuel": {"required": True},

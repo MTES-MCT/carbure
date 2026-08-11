@@ -14348,6 +14348,11 @@ components:
           readOnly: true
         delivery_type:
           $ref: "#/components/schemas/DeliveryTypeEnum"
+        usage:
+          $ref: "#/components/schemas/UsageEnum"
+        usage_precision:
+          type: string
+          maxLength: 255
         lot_status:
           $ref: "#/components/schemas/LotStatusEnum"
         correction_status:
@@ -15092,6 +15097,16 @@ components:
         - country
         - id
         - name
+    DevaluationTypeEnum:
+      enum:
+        - LOSS
+        - DOWNGRADING
+        - OTHER
+      type: string
+      description: |-
+        * `LOSS` - Perte
+        * `DOWNGRADING` - Déclassement
+        * `OTHER` - Autre
     DigestateSaleTypesEnum:
       enum:
         - SPREADING_PLAN_ICPE
@@ -17657,6 +17672,10 @@ components:
         year:
           type: integer
           readOnly: true
+        devaluation_type:
+          allOf:
+            - $ref: "#/components/schemas/DevaluationTypeEnum"
+          nullable: true
       required:
         - _depot
         - _entity
@@ -17807,6 +17826,10 @@ components:
             $ref: "#/components/schemas/OperationLot"
         status:
           $ref: "#/components/schemas/OperationStatusEnum"
+        devaluation_type:
+          allOf:
+            - $ref: "#/components/schemas/DevaluationTypeEnum"
+          nullable: true
       required:
         - biofuel
         - customs_category
@@ -17852,6 +17875,10 @@ components:
             $ref: "#/components/schemas/OperationLotRequest"
         status:
           $ref: "#/components/schemas/OperationStatusEnum"
+        devaluation_type:
+          allOf:
+            - $ref: "#/components/schemas/DevaluationTypeEnum"
+          nullable: true
       required:
         - biofuel
         - customs_category
@@ -20114,6 +20141,28 @@ components:
             minItems: 2
       required:
         - approved_quotas
+    UsageEnum:
+      enum:
+        - ROAD
+        - HEATING
+        - AGRICULTURE
+        - CONSTRUCTION
+        - MARITIME
+        - INLAND_WATERWAY
+        - RAIL
+        - FISHING
+        - OTHER
+      type: string
+      description: |-
+        * `ROAD` - ROAD
+        * `HEATING` - HEATING
+        * `AGRICULTURE` - AGRICULTURE
+        * `CONSTRUCTION` - CONSTRUCTION
+        * `MARITIME` - MARITIME
+        * `INLAND_WATERWAY` - INLAND_WATERWAY
+        * `RAIL` - RAIL
+        * `FISHING` - FISHING
+        * `OTHER` - OTHER
     UserCreation:
       type: object
       description: |-
