@@ -13286,6 +13286,19 @@ components:
           items:
             $ref: "#/components/schemas/BiomethaneEnergyMonthlyReport"
           readOnly: true
+        consistency_warnings:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              level:
+                type: string
+              message:
+                type: string
+          description: List of consistency warnings for the energy data
+          readOnly: true
         year:
           type: integer
           maximum: 2147483647
@@ -13406,6 +13419,7 @@ components:
         producer:
           type: integer
       required:
+        - consistency_warnings
         - id
         - monthly_reports
         - producer

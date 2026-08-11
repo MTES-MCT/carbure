@@ -3791,6 +3791,12 @@ export interface components {
             energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
             readonly monthly_reports: components["schemas"]["BiomethaneEnergyMonthlyReport"][];
+            /** @description List of consistency warnings for the energy data */
+            readonly consistency_warnings: {
+                code?: string;
+                level?: string;
+                message?: string;
+            }[];
             /** Année */
             year: number;
             /**
