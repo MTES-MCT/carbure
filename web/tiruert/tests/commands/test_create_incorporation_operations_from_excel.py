@@ -9,11 +9,11 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
-from tiruert.management.commands.create_init_incorporation_operations_for_2027_period import Command
+from tiruert.management.commands.create_report_operations_for_2027_period import Command
 from tiruert.models import Operation
 
 
-class CreateIncorporationOperationsFromExcelCommandTest(TestCase):
+class CreateReportOperationsFromExcelCommandTest(TestCase):
     def setUp(self):
         """Create the shared entity, feedstock and biofuel fixtures used by the tests."""
         self.entity = Entity.objects.create(name="Entity A", entity_type=Entity.OPERATOR)
@@ -44,18 +44,18 @@ class CreateIncorporationOperationsFromExcelCommandTest(TestCase):
         """Invoke the management command against an in-memory Excel payload."""
         file_bytes = self._build_excel_bytes(rows)
         with patch(
-            "tiruert.management.commands.create_init_incorporation_operations_for_2027_period.private_storage.open",
+            "tiruert.management.commands.create_report_operations_for_2027_period.private_storage.open",
             return_value=io.BytesIO(file_bytes),
         ):
             return call_command(
-                "create_init_incorporation_operations_for_2027_period",
+                "create_report_operations_for_2027_period",
                 s3_path=path,
                 stdout=StringIO(),
                 stderr=StringIO(),
             )
 
-    def test_creates_incorporation_operation_and_details_from_excel(self):
-        """Create one incorporation operation and distribute the requested volume across eligible lots."""
+    def test_creates_report_operation_and_details_from_excel(self):
+        """Create one report operation and distribute the requested volume across eligible lots."""
         self.entity = Entity.objects.get(pk=self.entity.pk)
 
         lot1 = CarbureLot.objects.create(
@@ -88,7 +88,7 @@ class CreateIncorporationOperationsFromExcelCommandTest(TestCase):
 
         self._call_command(rows)
 
-        operation = Operation.objects.get(type=Operation.INCORPORATION)
+        operation = Operation.objects.get(type=Operation.REPORT)
         self.assertEqual(operation.credited_entity, self.entity)
         self.assertEqual(operation.details.count(), 2)
         self.assertEqual(operation.details.get(lot=lot1).volume, 100.0)
@@ -268,7 +268,7 @@ class CreateIncorporationOperationsFromExcelCommandTest(TestCase):
 
         self._call_command(rows)
 
-        operation = Operation.objects.get(type=Operation.INCORPORATION)
+        operation = Operation.objects.get(type=Operation.REPORT)
         details = operation.details.order_by("lot_id")
 
         # ratio = 150 / (100 + 100) = 0.75
