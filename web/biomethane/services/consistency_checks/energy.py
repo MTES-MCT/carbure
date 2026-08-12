@@ -12,7 +12,8 @@ class BiomethaneEnergyConsistencyChecksService:
         """Check if the injected biomethane CH4 rate percent is consistent with the expected value which is 95%"""
 
         injected_biomethane_ch4_rate_percent = getattr(instance, "injected_biomethane_ch4_rate_percent", None)
-
+        if injected_biomethane_ch4_rate_percent is None:
+            return None
         if injected_biomethane_ch4_rate_percent < 95.0:
             return {
                 "code": "INJECTED_BIOMETHANE_CH4_RATE_INCONSISTENT",
