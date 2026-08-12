@@ -21,9 +21,7 @@ export const AnnualDeclarationStatusBadge = ({
 
   return (
     <Badge severity={severityMapping[status]}>
-      {submissionDate && status === AnnualDeclarationStatus.DECLARED
-        ? `Déclaration transmise le ${new Date(submissionDate).toLocaleDateString("fr-FR")}`
-        : getDeclarationStatusLabel(status)}
+      {getDeclarationStatusLabel(status, submissionDate)}
     </Badge>
   )
 }

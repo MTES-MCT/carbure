@@ -699,6 +699,7 @@
   "Déclaration transmise": "Declaration sent",
   "Déclaration en retard": "Late declaration",
   "Non commencé": "Not started",
+  "Déclaré le {{date}}": "Declared on {{date}}",
   "Application indisponible": "Application unavailable",
   "L'application est actuellement indisponible.": "The application is currently unavailable.",
   "Veuillez réessayer plus tard.": "Please try again later.",

@@ -1,5 +1,6 @@
 import i18next from "i18next"
 import { AnnualDeclarationStatus } from "./types"
+import { formatDate } from "common/utils/formatters"
 
 /**
  * Determines the declaration interval based on the current system date.
@@ -45,7 +46,15 @@ export function getDeclarationInterval() {
 
 export const declarationInterval = getDeclarationInterval()
 
-export const getDeclarationStatusLabel = (status: AnnualDeclarationStatus) => {
+export const getDeclarationStatusLabel = (
+  status: AnnualDeclarationStatus,
+  submissionDate?: string | null
+) => {
+  if (submissionDate && status === AnnualDeclarationStatus.DECLARED) {
+    return i18next.t("Déclaré le {{date}}", {
+      date: formatDate(submissionDate),
+    })
+  }
   const labelMapping = {
     [AnnualDeclarationStatus.IN_PROGRESS]: i18next.t("Déclaration en cours"),
     [AnnualDeclarationStatus.DECLARED]: i18next.t("Déclaration transmise"),
