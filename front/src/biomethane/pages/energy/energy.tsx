@@ -24,6 +24,7 @@ import { InstallationEnergyNeeds } from "./components/installation-energy-needs"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { useDisplayConditionalSectionsEnergy } from "./energy.hooks"
 import { useBiomethaneBusinessRules } from "biomethane/providers/business-rules"
+import { ConsistencyWarnings } from "./components/consistency-warnings/consistency-warnings"
 
 const EnergyPage = () => {
   const { t } = useTranslation()
@@ -55,6 +56,8 @@ const EnergyPage = () => {
   return (
     <FormContext.Provider value={form}>
       <MissingFields />
+      <ConsistencyWarnings energy={energy} />
+
       <InjectedBiomethane energy={energy} contract={contract} />
 
       <BiogasProduction />

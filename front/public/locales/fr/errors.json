@@ -90,5 +90,6 @@
   "INVALID_CERTIFICATE": "Le certificat du fournisseur est expiré ou pas encore actif à la date de livraison donnée",
   "MISSING_DELIVERY_TYPE": "Le type de livraison est absent",
   "MISSING_USAGE": "L'usage du lot est absent",
-  "MISSING_USAGE_PRECISION": "La précision de l'usage du lot est absente"
+  "MISSING_USAGE_PRECISION": "La précision de l'usage du lot est absente",
+  "INJECTED_BIOMETHANE_CH4_RATE_INCONSISTENT": "Le taux de CH4 dans le biométhane injecté est inférieur à 95%"
 }
