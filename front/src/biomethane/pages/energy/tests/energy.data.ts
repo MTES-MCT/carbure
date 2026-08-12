@@ -9,4 +9,5 @@ export const energyData: BiomethaneEnergy = {
   produced_biogas_nm3_per_year: 100,
   producer: 1,
   monthly_reports: [],
+  consistency_warnings: [],
 }

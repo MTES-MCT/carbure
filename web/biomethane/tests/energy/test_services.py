@@ -8,6 +8,7 @@ from biomethane.factories.energy import BiomethaneEnergyMonthlyReportFactory
 from biomethane.models.biomethane_contract import BiomethaneContract
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.models.biomethane_production_unit import BiomethaneProductionUnit
+from biomethane.services.consistency_checks.energy import BiomethaneEnergyConsistencyChecksService
 from biomethane.services.energy import BiomethaneEnergyService, EnergyContext, _build_energy_rules
 from core.models import Entity
 
@@ -399,3 +400,42 @@ class BiomethaneEnergyMonthlyReportPropertyTests(TestCase):
         from biomethane.models.biomethane_energy import BiomethaneEnergy as EnergyModel
 
         self.assertIn("energy_monthly_report", EnergyModel.EXTRA_FIELDS)
+
+
+class BiomethaneEnergyConsistencyChecksServiceTests(TestCase):
+    """Unit tests for BiomethaneEnergyConsistencyChecksService."""
+
+    def setUp(self):
+        self.energy = BiomethaneEnergyFactory.create(
+            producer=Entity.objects.create(name="Test Producer", entity_type=Entity.BIOMETHANE_PRODUCER)
+        )
+
+    def test_warning_when_ch4_rate_is_below_95(self):
+        """Should return a warning dict when the CH4 rate is under 95%."""
+        self.energy.injected_biomethane_ch4_rate_percent = 94.9
+
+        warnings = BiomethaneEnergyConsistencyChecksService.get_consistency_warnings(self.energy)
+
+        expected_warning = {
+            "code": "INJECTED_BIOMETHANE_CH4_RATE_INCONSISTENT",
+            "level": "warning",
+            "message": "Le taux de CH4 dans le biométhane injecté est inférieur à 95%",
+        }
+        self.assertIn(expected_warning, warnings)
+
+    def test_no_warning_when_ch4_rate_is_above_95(self):
+        """Should not return the CH4 warning when the rate is 95% or above."""
+        self.energy.injected_biomethane_ch4_rate_percent = 95.1
+
+        warnings = BiomethaneEnergyConsistencyChecksService.get_consistency_warnings(self.energy)
+        warning_codes = [w["code"] for w in warnings]
+        self.assertNotIn("INJECTED_BIOMETHANE_CH4_RATE_INCONSISTENT", warning_codes)
+
+    def test_no_warning_when_ch4_rate_is_none_or_missing(self):
+        """Should handle gracefully when the CH4 rate is not provided yet."""
+        self.energy.injected_biomethane_ch4_rate_percent = None
+
+        warnings = BiomethaneEnergyConsistencyChecksService.get_consistency_warnings(self.energy)
+        warning_codes = [w["code"] for w in warnings]
+
+        self.assertNotIn("INJECTED_BIOMETHANE_CH4_RATE_INCONSISTENT", warning_codes)
