@@ -3245,8 +3245,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Add a years action based on an action's working date. */
         get: operations["traceability_actions_list"];
         put?: never;
+        /** @description Add a years action based on an action's working date. */
         post: operations["traceability_actions_create"];
         delete?: never;
         options?: never;
@@ -3261,12 +3263,16 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Add a years action based on an action's working date. */
         get: operations["traceability_actions_retrieve"];
+        /** @description Add a years action based on an action's working date. */
         put: operations["traceability_actions_update"];
         post?: never;
+        /** @description Add a years action based on an action's working date. */
         delete: operations["traceability_actions_destroy"];
         options?: never;
         head?: never;
+        /** @description Add a years action based on an action's working date. */
         patch: operations["traceability_actions_partial_update"];
         trace?: never;
     };
@@ -3277,7 +3283,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Add a years action based on an action's working date. */
         get: operations["traceability_actions_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/traceability/actions/years/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Add a years action based on an action's working date. */
+        get: operations["traceability_actions_years_retrieve"];
         put?: never;
         post?: never;
         delete?: never;
@@ -15469,6 +15493,75 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    traceability_actions_years_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                holder?: string[];
+                /** @description * `H2` - Hydrogène */
+                industry?: PathsApiTraceabilityActionsGetParametersQueryIndustry[];
+                material?: string[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `pos_id` - Pos id
+                 *     * `-pos_id` - Pos id (décroissant)
+                 *     * `holder` - Holder
+                 *     * `-holder` - Holder (décroissant)
+                 *     * `material` - Material
+                 *     * `-material` - Material (décroissant)
+                 *     * `quantity` - Quantity
+                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `site` - Site
+                 *     * `-site` - Site (décroissant)
+                 *     * `shipping_distance` - Shipping distance
+                 *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `working_date` - Working date
+                 *     * `-working_date` - Working date (décroissant)
+                 */
+                order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ROAD` - Transport routier
+                 *     * `PIPELINE` - Pipeline
+                 *     * `RAILROAD` - Rail
+                 *     * `SEA` - Transport maritime
+                 */
+                shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
+                site?: string[];
+                /**
+                 * @description * `CREATED` - CREATED
+                 *     * `PENDING` - PENDING
+                 *     * `ACCEPTED` - ACCEPTED
+                 *     * `REJECTED` - REJECTED
+                 *     * `BLOCKED` - BLOCKED
+                 *     * `DELETED` - DELETED
+                 */
+                status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
+                /** @description * `INIT` - INIT */
+                type?: PathsApiTraceabilityActionsGetParametersQueryType[];
+                working_year?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": number[];
                 };
             };
         };

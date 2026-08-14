@@ -12527,6 +12527,7 @@ paths:
   /api/traceability/actions/:
     get:
       operationId: traceability_actions_list
+      description: Add a years action based on an action's working date.
       parameters:
         - in: query
           name: entity_id
@@ -12709,6 +12710,7 @@ paths:
           description: ""
     post:
       operationId: traceability_actions_create
+      description: Add a years action based on an action's working date.
       parameters:
         - in: query
           name: entity_id
@@ -12743,6 +12745,7 @@ paths:
   /api/traceability/actions/{id}/:
     get:
       operationId: traceability_actions_retrieve
+      description: Add a years action based on an action's working date.
       parameters:
         - in: query
           name: entity_id
@@ -12770,6 +12773,7 @@ paths:
           description: ""
     put:
       operationId: traceability_actions_update
+      description: Add a years action based on an action's working date.
       parameters:
         - in: query
           name: entity_id
@@ -12809,6 +12813,7 @@ paths:
           description: ""
     patch:
       operationId: traceability_actions_partial_update
+      description: Add a years action based on an action's working date.
       parameters:
         - in: query
           name: entity_id
@@ -12847,6 +12852,7 @@ paths:
           description: ""
     delete:
       operationId: traceability_actions_destroy
+      description: Add a years action based on an action's working date.
       parameters:
         - in: query
           name: entity_id
@@ -12871,6 +12877,7 @@ paths:
   /api/traceability/actions/filters/:
     get:
       operationId: traceability_actions_filters_retrieve
+      description: Add a years action based on an action's working date.
       parameters:
         - in: query
           name: entity_id
@@ -13065,6 +13072,187 @@ paths:
                     - order_by
                     - shipping_method
                   summary: Example of filters response.
+          description: ""
+  /api/traceability/actions/years/:
+    get:
+      operationId: traceability_actions_years_retrieve
+      description: Add a years action based on an action's working date.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: holder
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: industry
+          schema:
+            type: array
+            items:
+              type: string
+              title: Filière
+              enum:
+                - H2
+          description: "* `H2` - Hydrogène"
+          explode: true
+          style: form
+        - in: query
+          name: material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -holder
+                - -material
+                - -pos_id
+                - -quantity
+                - -shipping_distance
+                - -site
+                - -working_date
+                - holder
+                - material
+                - pos_id
+                - quantity
+                - shipping_distance
+                - site
+                - working_date
+          description: |-
+            Ordre
+
+            * `pos_id` - Pos id
+            * `-pos_id` - Pos id (décroissant)
+            * `holder` - Holder
+            * `-holder` - Holder (décroissant)
+            * `material` - Material
+            * `-material` - Material (décroissant)
+            * `quantity` - Quantity
+            * `-quantity` - Quantity (décroissant)
+            * `site` - Site
+            * `-site` - Site (décroissant)
+            * `shipping_distance` - Shipping distance
+            * `-shipping_distance` - Shipping distance (décroissant)
+            * `working_date` - Working date
+            * `-working_date` - Working date (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: shipping_method
+          schema:
+            type: array
+            items:
+              type: string
+              title: Mode de transport
+              enum:
+                - PIPELINE
+                - RAILROAD
+                - ROAD
+                - SEA
+          description: |-
+            * `ROAD` - Transport routier
+            * `PIPELINE` - Pipeline
+            * `RAILROAD` - Rail
+            * `SEA` - Transport maritime
+          explode: true
+          style: form
+        - in: query
+          name: site
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: status
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ACCEPTED
+                - BLOCKED
+                - CREATED
+                - DELETED
+                - PENDING
+                - REJECTED
+          description: |-
+            * `CREATED` - CREATED
+            * `PENDING` - PENDING
+            * `ACCEPTED` - ACCEPTED
+            * `REJECTED` - REJECTED
+            * `BLOCKED` - BLOCKED
+            * `DELETED` - DELETED
+          explode: true
+          style: form
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              type: string
+              title: Type d'action
+              enum:
+                - INIT
+          description: "* `INIT` - INIT"
+          explode: true
+          style: form
+        - in: query
+          name: working_year
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+      tags:
+        - traceability
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+              examples:
+                ExampleOfYearsResponse.:
+                  value:
+                    - 2023
+                    - 2024
+                    - 2025
+                  summary: Example of years response.
           description: ""
   /api/user/:
     get:
