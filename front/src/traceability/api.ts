@@ -1,55 +1,29 @@
 import { api } from "common/services/api-fetch"
-import { ActionFilter, ActionFixedQuery, ActionQuery } from "traceability/types"
+import { ActionFilter, ActionQuery } from "traceability/types"
 
-const convertFixedQueryToPayload = ({
-  industry,
-  ...rest
-}: ActionFixedQuery) => {
-  return {
-    ...rest,
-    industry: [industry],
-  }
-}
-export function getActionYears(
-  entity_id: number,
-  fixedQuery: ActionFixedQuery
-) {
-  return api
-    .GET("/traceability/actions/filters/", {
-      params: {
-        query: {
-          entity_id,
-          filter: ActionFilter.working_year,
-          ...convertFixedQueryToPayload(fixedQuery),
-        },
+export function getActionYears(entity_id: number, query: Partial<ActionQuery>) {
+  return api.GET("/traceability/actions/years/", {
+    params: {
+      query: {
+        ...query,
+        entity_id,
       },
-    })
-    .then((res) => ({
-      ...res,
-      data: res.data?.map(Number) ?? [],
-    }))
+    },
+  })
 }
 
-export function getActionFilters(
-  filter: ActionFilter,
-  query: ActionQuery,
-  fixedQuery: ActionFixedQuery
-) {
+export function getActionFilters(filter: ActionFilter, query: ActionQuery) {
   return api
     .GET("/traceability/actions/filters/", {
       params: {
-        query: {
-          ...query,
-          ...convertFixedQueryToPayload(fixedQuery),
-          filter,
-        },
+        query: { ...query, filter },
       },
     })
     .then((res) => res.data ?? [])
 }
 
-export function getActions(query: ActionQuery, fixedQuery: ActionFixedQuery) {
+export function getActions(query: ActionQuery) {
   return api.GET("/traceability/actions/", {
-    params: { query: { ...query, ...convertFixedQueryToPayload(fixedQuery) } },
+    params: { query },
   })
 }

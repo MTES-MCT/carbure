@@ -1,21 +1,33 @@
 import {
-  PathsApiTraceabilityActionsGetParametersQueryOrder_by,
+  PathsApiTraceabilityActionsGetParametersQueryOrder_by as ActionOrderBy,
   PathsApiTraceabilityActionsGetParametersQueryIndustry as ActionIndustry,
+  PathsApiTraceabilityActionsGetParametersQueryStatus as ActionStatus,
+  PathsApiTraceabilityActionsFiltersGetParametersQueryFilter as ActionFilter,
+  PathsApiTraceabilityActionsGetParametersQueryShipping_method as ActionShippingMethod,
+  PathsApiTraceabilityActionsGetParametersQueryType as ActionType,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 
-export { PathsApiTraceabilityActionsFiltersGetParametersQueryFilter as ActionFilter } from "api-schema"
-
-export type ActionOrderBy =
-  PathsApiTraceabilityActionsGetParametersQueryOrder_by
 export type Action = apiTypes["Action"]
-export type ActionQueryBuilder = QueryBuilder<"", ActionOrderBy[]>
-export type ActionQuery = Omit<ActionQueryBuilder["query"], "status">
 
-export type ActionFixedQuery = {
-  industry: ActionIndustry
-  type?: apiTypes["ActionTypeEnum"][]
+export type ActionQueryBuilder = QueryBuilder<ActionStatus[], ActionOrderBy[]>
+
+export type ActionQuery = ActionQueryBuilder["query"] & {
+  [ActionFilter.holder]?: string[]
+  [ActionFilter.type]?: ActionType[]
+  [ActionFilter.industry]?: ActionIndustry[]
+  [ActionFilter.material]?: string[]
+  [ActionFilter.shipping_method]?: ActionShippingMethod[]
+  [ActionFilter.site]?: string[]
+  [ActionFilter.working_year]?: string[]
 }
 
-export { ActionIndustry }
+export {
+  ActionType,
+  ActionStatus,
+  ActionIndustry,
+  ActionShippingMethod,
+  ActionFilter,
+  ActionOrderBy,
+}
