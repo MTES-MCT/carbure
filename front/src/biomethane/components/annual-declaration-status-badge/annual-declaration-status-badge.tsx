@@ -4,8 +4,10 @@ import { getDeclarationStatusLabel } from "biomethane/utils"
 
 export const AnnualDeclarationStatusBadge = ({
   status,
+  submissionDate,
 }: {
   status: AnnualDeclarationStatus
+  submissionDate?: string | null
 }) => {
   const severityMapping: Record<
     AnnualDeclarationStatus,
@@ -19,7 +21,7 @@ export const AnnualDeclarationStatusBadge = ({
 
   return (
     <Badge severity={severityMapping[status]}>
-      {getDeclarationStatusLabel(status)}
+      {getDeclarationStatusLabel(status, submissionDate)}
     </Badge>
   )
 }

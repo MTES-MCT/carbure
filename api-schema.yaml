@@ -12671,10 +12671,16 @@ components:
           readOnly: true
         is_open:
           type: boolean
+        submission_date:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
       required:
         - is_complete
         - missing_fields
         - producer
+        - submission_date
         - year
     BiomethaneAnnualDeclarationRequest:
       type: object

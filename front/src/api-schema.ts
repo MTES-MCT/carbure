@@ -3430,6 +3430,8 @@ export interface components {
             };
             readonly is_complete: boolean;
             is_open?: boolean;
+            /** Format: date-time */
+            readonly submission_date: string | null;
         };
         BiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
