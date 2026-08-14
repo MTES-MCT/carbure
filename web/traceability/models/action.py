@@ -36,7 +36,7 @@ class Action(models.Model):
     type = models.CharField(verbose_name="Type d'action", choices=TYPES, max_length=16)
 
     parent = models.ForeignKey(
-        "self", verbose_name="Action parente", null=True, on_delete=models.PROTECT, related_name="children"
+        "self", verbose_name="Action parente", null=True, blank=True, on_delete=models.PROTECT, related_name="children"
     )
 
     material = models.ForeignKey("traceability.Material", on_delete=models.PROTECT, verbose_name="Matière")
