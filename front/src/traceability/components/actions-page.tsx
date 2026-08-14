@@ -9,64 +9,74 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { Normalizer } from "common/utils/normalize"
 
 import { getActionFilters, getActions, getActionYears } from "traceability/api"
 import {
   Action,
   ActionFilter,
-  ActionFixedQuery,
+  ActionQuery,
   ActionQueryBuilder,
 } from "traceability/types"
+import { ActionFilterDisplay } from "traceability/hooks/use-action-filters"
+import { ActionColumnDefinition } from "traceability/hooks/use-action-columns"
+import { useCombinedQuery } from "traceability/hooks/use-combined-query"
 
-import { ActionColumn, ActionLabelOverrides } from "./action-config"
-import { useActionDisplay } from "./use-action-display"
+export const QUERY_KEY = "traceability-actions"
 
 export type ActionsPageProps = {
   title: string
-  yearsRoot: string
-  fixedQuery: ActionFixedQuery
-  columns?: ActionColumn[]
-  filters?: ActionFilter[]
-  labels?: ActionLabelOverrides
-  filterNormalizers?: Partial<Record<ActionFilter, Normalizer<unknown, string>>>
-  queryKey?: string
+  subpath: string
+  fixedQuery: Partial<ActionQuery>
+  columns: ActionColumnDefinition[]
+  filters: ActionFilterDisplay[]
   onRowAction?: (action: Action, index: number) => void
 }
 
 export const ActionsPage = ({
   title,
-  yearsRoot,
+  subpath,
   fixedQuery,
   columns,
   filters,
-  labels,
-  filterNormalizers,
-  queryKey = "traceability-actions",
   onRowAction,
 }: ActionsPageProps) => {
   usePrivateNavigation(title)
 
   const entity = useEntity()
-  const { tableColumns, filterLabels } = useActionDisplay({
-    columns,
-    filters,
-    labels,
-  })
 
-  const years = useYears(yearsRoot, () => getActionYears(entity.id, fixedQuery))
+  const visibleColumns = columns.filter(
+    (column) => column.condition?.(entity) ?? true
+  )
+
+  const visibleFilters = filters.filter(
+    (filter) => filter.condition?.(entity) ?? true
+  )
+
+  const filterLabels = Object.fromEntries(
+    visibleFilters.map((filter) => [filter.key, filter.label])
+  ) as Partial<Record<ActionFilter, string>>
+
+  const filterNormalizers = Object.fromEntries(
+    visibleFilters
+      .filter((filter) => filter.normalizer)
+      .map((filter) => [filter.key, filter.normalizer])
+  )
+
+  const years = useYears(subpath, () => getActionYears(entity.id, fixedQuery))
 
   const { state, actions, query } =
     useQueryBuilder<ActionQueryBuilder["config"]>()
 
+  const combinedQuery = useCombinedQuery(fixedQuery, query)
+
   const { result, loading } = useQuery(getActions, {
-    key: queryKey,
-    params: [query, fixedQuery],
+    key: QUERY_KEY,
+    params: [combinedQuery],
   })
 
   const getFilterOptions = useCallback(
-    (filter: ActionFilter) => getActionFilters(filter, query, fixedQuery),
-    [query, fixedQuery]
+    (filter: ActionFilter) => getActionFilters(filter, combinedQuery),
+    [combinedQuery]
   )
 
   return (
@@ -88,7 +98,7 @@ export const ActionsPage = ({
 
         <Table
           loading={loading}
-          columns={tableColumns}
+          columns={visibleColumns}
           rows={result?.data?.results ?? []}
           order={state.order}
           onOrder={actions.setOrder}
@@ -98,6 +108,3 @@ export const ActionsPage = ({
     </Main>
   )
 }
-
-export type { ActionColumn, ActionLabelOverrides } from "./action-config"
-export { DEFAULT_ACTION_COLUMNS, DEFAULT_ACTION_FILTERS } from "./action-config"
