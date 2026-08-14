@@ -7,6 +7,7 @@ from core.permissions import HasEntityReadRights, HasEntityWriteRights
 from traceability.filters import ActionFilter
 from traceability.models import Action
 from traceability.serializers import ActionInputSerializer, ActionSerializer
+from traceability.views.mixins import YearsActionMixin
 
 
 @extend_schema(
@@ -20,7 +21,7 @@ from traceability.serializers import ActionInputSerializer, ActionSerializer
         ),
     ]
 )
-class ActionViewset(FiltersActionFactory(), viewsets.ModelViewSet):
+class ActionViewset(YearsActionMixin, FiltersActionFactory(), viewsets.ModelViewSet):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     permission_classes = [HasEntityReadRights]
