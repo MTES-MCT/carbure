@@ -8342,6 +8342,7 @@ paths:
                 - Charge Point Operator
                 - Compagnie aérienne
                 - Fournisseur de biométhane
+                - HRS
                 - Opérateur
                 - Power or Heat Producer
                 - Producteur
@@ -8363,6 +8364,7 @@ paths:
             * `SAF Trader` - Trader de SAF
             * `Producteur de biométhane` - Producteur de biométhane
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
         - in: query
@@ -8780,6 +8782,7 @@ paths:
                 - Charge Point Operator
                 - Compagnie aérienne
                 - Fournisseur de biométhane
+                - HRS
                 - Opérateur
                 - Power or Heat Producer
                 - Producteur
@@ -8801,6 +8804,7 @@ paths:
             * `SAF Trader` - Trader de SAF
             * `Producteur de biométhane` - Producteur de biométhane
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
         - in: query
@@ -9016,6 +9020,7 @@ paths:
                 - Charge Point Operator
                 - Compagnie aérienne
                 - Fournisseur de biométhane
+                - HRS
                 - Opérateur
                 - Power or Heat Producer
                 - Producteur
@@ -9037,6 +9042,7 @@ paths:
             * `SAF Trader` - Trader de SAF
             * `Producteur de biométhane` - Producteur de biométhane
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
         - in: query
@@ -10506,6 +10512,7 @@ paths:
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
+                - REPORT
                 - TENEUR
                 - TRANSFERT
           description: |-
@@ -10520,6 +10527,7 @@ paths:
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
+            * `REPORT` - REPORT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11089,6 +11097,7 @@ paths:
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
+                - REPORT
                 - TENEUR
                 - TRANSFERT
           description: |-
@@ -11103,6 +11112,7 @@ paths:
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
+            * `REPORT` - REPORT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11381,6 +11391,7 @@ paths:
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
+                - REPORT
                 - TENEUR
                 - TRANSFERT
           description: |-
@@ -11395,6 +11406,7 @@ paths:
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
+            * `REPORT` - REPORT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11705,6 +11717,7 @@ paths:
                 - INCORPORATION
                 - LIVRAISON_DIRECTE
                 - MAC_BIO
+                - REPORT
                 - TENEUR
                 - TRANSFERT
           description: |-
@@ -11719,6 +11732,7 @@ paths:
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
+            * `REPORT` - REPORT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12657,10 +12671,16 @@ components:
           readOnly: true
         is_open:
           type: boolean
+        submission_date:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
       required:
         - is_complete
         - missing_fields
         - producer
+        - submission_date
         - year
     BiomethaneAnnualDeclarationRequest:
       type: object
@@ -14634,7 +14654,7 @@ components:
       description: |-
         * `PRIVATE` - Issus de collecteurs privés
         * `LOCAL` - Issus de collectivités locales
-        * `IAA` - Issus d'IAA
+        * `IAA` - Issus de résidus d'IAA
     CommentRequest:
       type: object
       properties:
@@ -16792,6 +16812,7 @@ components:
         - SAF Trader
         - Producteur de biométhane
         - Fournisseur de biométhane
+        - HRS
       type: string
       description: |-
         * `Producteur` - Producteur
@@ -16807,6 +16828,7 @@ components:
         * `SAF Trader` - Trader de SAF
         * `Producteur de biométhane` - Producteur de biométhane
         * `Fournisseur de biométhane` - Fournisseur de biométhane
+        * `HRS` - Distributeur d'hydrogène pour la mobilité
       x-enum-varnames:
         - Producer
         - Operator
@@ -17986,6 +18008,7 @@ components:
         - CUSTOMS_CORRECTION
         - TRANSFERT
         - EXPIRATION
+        - REPORT
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -17999,6 +18022,7 @@ components:
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
+        * `REPORT` - REPORT
     OperationUpdate:
       type: object
       properties:

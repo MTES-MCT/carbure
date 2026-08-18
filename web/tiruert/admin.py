@@ -49,6 +49,7 @@ class ObjectiveAdmin(admin.ModelAdmin):
         "target_type",
         "penalty_",
     ]
+    list_filter = ["year", "type", "fuel_category", "customs_category"]
 
     def target_(self, obj):
         if obj.target is not None:

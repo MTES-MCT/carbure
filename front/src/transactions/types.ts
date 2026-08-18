@@ -38,6 +38,8 @@ export interface Lot {
   unknown_delivery_site: string | null
   delivery_site_country: Country | null
   delivery_type: DeliveryType
+  usage?: FuelUsage | null
+  usage_precision?: string | null
   lot_status: LotStatus
   correction_status: CorrectionStatus
   volume: number
@@ -235,6 +237,18 @@ export enum DeliveryType {
   Consumption = "CONSUMPTION",
 }
 
+export enum FuelUsage {
+  Road = "ROAD",
+  Heating = "HEATING",
+  Agriculture = "AGRICULTURE",
+  Construction = "CONSTRUCTION",
+  Maritime = "MARITIME",
+  InlandWaterway = "INLAND_WATERWAY",
+  Rail = "RAIL",
+  Fishing = "FISHING",
+  Other = "OTHER",
+}
+
 export enum TransportDocumentType {
   DAU = "DAU",
   DAE = "DAE",
@@ -339,6 +353,8 @@ export interface StockPayload {
   delivery_type: string | undefined
   carbure_client_id: number | undefined
   unknown_client: string | undefined
+  usage?: FuelUsage
+  usage_precision?: string
 }
 
 export interface TransformETBEPayload {

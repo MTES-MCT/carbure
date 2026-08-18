@@ -263,6 +263,40 @@ export function getEntityTypeLabel(type: EntityType) {
       return i18next.t("Producteur d'électricité ou de chaleur")
     case EntityType.Producteur_de_biom_thane:
       return i18next.t("Producteur de biométhane")
+    case EntityType.HRS:
+      return i18next.t("Distributeur d'hydrogène pour la mobilité")
+    case EntityType.Unknown:
+    default:
+      return i18next.t("Inconnu")
+  }
+}
+
+export function getEntityTypeShortLabel(type: EntityType) {
+  switch (type) {
+    case EntityType.Administration:
+      return i18next.t("Admin")
+    case EntityType.Operator:
+      return i18next.t("Opérateur")
+    case EntityType.Producer:
+      return i18next.t("Producteur")
+    case EntityType.Auditor:
+      return i18next.t("Auditeur")
+    case EntityType.Trader:
+      return i18next.t("Trader")
+    case EntityType.ExternalAdmin:
+      return i18next.t("Admin Externe")
+    case EntityType.Airline:
+      return i18next.t("Compagnie aérienne")
+    case EntityType.CPO:
+      return i18next.t("Aménageur")
+    case EntityType.PowerOrHeatProducer:
+      return i18next.t("Producteur")
+    case EntityType.SAF_Trader:
+      return i18next.t("Trader de SAF")
+    case EntityType.Producteur_de_biom_thane:
+      return i18next.t("Producteur de biométhane")
+    case EntityType.HRS:
+      return i18next.t("Distributeur H2 mobilité")
     case EntityType.Unknown:
     default:
       return i18next.t("Inconnu")

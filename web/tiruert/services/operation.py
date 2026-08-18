@@ -279,7 +279,7 @@ class OperationService:
         return [
             {
                 "lot_id": lot_id,
-                "volume": round(volume, 2),
+                "volume": truncate(volume, 2),
                 "emission_rate_per_mj": emissions_by_lot.get(lot_id, 0),
             }
             for lot_id, volume in lot_volume_items
@@ -348,9 +348,24 @@ class OperationService:
         Valid lots must have:
         - lot_status in ["ACCEPTED", "FROZEN"]
         - delivery_type in [RFC, BLENDING, DIRECT]
+        - if delivery_type is RFC, keep only some usage values or empty usage
         """
-        DELIVERY_TYPES_ACCEPTED = [CarbureLot.RFC, CarbureLot.BLENDING, CarbureLot.DIRECT]
-        return lots.filter(lot_status__in=["ACCEPTED", "FROZEN"], delivery_type__in=DELIVERY_TYPES_ACCEPTED)
+        DELIVERY_TYPES_ACCEPTED = [CarbureLot.BLENDING, CarbureLot.DIRECT]
+
+        USAGE_WHITELIST = [
+            CarbureLot.USAGE_ROAD,
+            CarbureLot.USAGE_AGRICULTURE,
+            CarbureLot.USAGE_CONSTRUCTION,
+            CarbureLot.USAGE_MARITIME,
+            CarbureLot.USAGE_INLAND_WATERWAY,
+            CarbureLot.USAGE_RAIL,
+        ]
+
+        return lots.filter(lot_status__in=["ACCEPTED", "FROZEN"]).filter(
+            Q(delivery_type=CarbureLot.RFC, usage__in=USAGE_WHITELIST)
+            | Q(delivery_type=CarbureLot.RFC, usage="")
+            | Q(delivery_type__in=DELIVERY_TYPES_ACCEPTED)
+        )
 
     @staticmethod
     def filter_fr_delivery_site(lots):

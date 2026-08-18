@@ -48,7 +48,10 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
 
           <DownloadDeclarationButton year={selectedYear} />
         </Row>
-        <AnnualDeclarationStatusBadge status={status} />
+        <AnnualDeclarationStatusBadge
+          status={annualDeclaration?.status}
+          submissionDate={annualDeclaration?.submission_date}
+        />
       </Row>
       {annualDeclaration?.is_open && entity.canWrite() && (
         <Notice

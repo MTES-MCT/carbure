@@ -76,6 +76,7 @@ class OperationServiceTestCase(TestCase):
             biofuel=cls.biofuel_eth,
             lot_status="ACCEPTED",
             delivery_type="RFC",
+            usage=CarbureLot.USAGE_ROAD,
             volume=4000,
             ghg_total=4.8,
             carbure_delivery_site=cls.depot,
@@ -87,6 +88,7 @@ class OperationServiceTestCase(TestCase):
             biofuel=cls.biofuel_emag,
             lot_status="ACCEPTED",
             delivery_type="RFC",
+            usage=CarbureLot.USAGE_AGRICULTURE,
             volume=5000,
             ghg_total=5.6,
             carbure_delivery_site=cls.depot,
@@ -236,11 +238,45 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
     """Test OperationService.filter_valid_lots() method."""
 
     def test_filter_valid_lots_returns_only_valid_lots(self):
-        """Should return exactly the 5 valid lots (ACCEPTED/FROZEN + RFC/BLENDING/DIRECT)."""
+        """Should apply RFC usage whitelist while still allowing empty RFC usage."""
+        excluded_rfc = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="RFC",
+            usage=CarbureLot.USAGE_HEATING,
+            volume=700,
+            carbure_delivery_site=self.depot,
+        )
+        included_rfc_empty_usage = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="RFC",
+            usage="",
+            volume=680,
+            carbure_delivery_site=self.depot,
+        )
+        included_blending = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="BLENDING",
+            usage=CarbureLot.USAGE_HEATING,
+            volume=650,
+            carbure_delivery_site=self.depot,
+        )
+
         valid_lots = OperationService.filter_valid_lots(self.entity_lots)
 
-        # Should return exactly 5 valid lots
-        self.assertEqual(valid_lots.count(), 5)
+        # 5 initial valid lots + 1 RFC lot with empty usage + 1 blending lot with non-whitelisted usage.
+        self.assertEqual(valid_lots.count(), 7)
+        self.assertNotIn(excluded_rfc.id, valid_lots.values_list("id", flat=True))
+        self.assertIn(included_rfc_empty_usage.id, valid_lots.values_list("id", flat=True))
+        self.assertIn(included_blending.id, valid_lots.values_list("id", flat=True))
 
         # Verify all returned lots have valid status
         for lot in valid_lots:
@@ -249,6 +285,21 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
         # Verify all returned lots have valid delivery_type
         for lot in valid_lots:
             self.assertIn(lot.delivery_type, ["RFC", "BLENDING", "DIRECT"])
+
+        # Verify RFC-specific usage whitelist constraint
+        for lot in valid_lots.filter(delivery_type="RFC"):
+            self.assertIn(
+                lot.usage,
+                [
+                    "",
+                    CarbureLot.USAGE_ROAD,
+                    CarbureLot.USAGE_AGRICULTURE,
+                    CarbureLot.USAGE_CONSTRUCTION,
+                    CarbureLot.USAGE_MARITIME,
+                    CarbureLot.USAGE_INLAND_WATERWAY,
+                    CarbureLot.USAGE_RAIL,
+                ],
+            )
 
     def test_filter_fr_delivery_site_keeps_fr_and_no_delivery_site_lots(self):
         """Should keep lots with a FR delivery site and lots with no delivery site."""
@@ -936,7 +987,7 @@ class OperationServiceBuildDetailsDataTest(TestCase):
         self.assertEqual(
             result,
             [
-                {"lot_id": 1, "volume": 12.35, "emission_rate_per_mj": 0.5},
+                {"lot_id": 1, "volume": 12.34, "emission_rate_per_mj": 0.5},
                 {"lot_id": 2, "volume": 67.89, "emission_rate_per_mj": 1.25},
             ],
         )
@@ -952,6 +1003,6 @@ class OperationServiceBuildDetailsDataTest(TestCase):
             result,
             [
                 {"lot_id": 3, "volume": 10.0, "emission_rate_per_mj": 9.9},
-                {"lot_id": 4, "volume": 20.01, "emission_rate_per_mj": 8.8},
+                {"lot_id": 4, "volume": 20.00, "emission_rate_per_mj": 8.8},
             ],
         )

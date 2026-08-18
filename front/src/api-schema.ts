@@ -3430,6 +3430,8 @@ export interface components {
             };
             readonly is_complete: boolean;
             is_open?: boolean;
+            /** Format: date-time */
+            readonly submission_date: string | null;
         };
         BiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
@@ -4442,7 +4444,7 @@ export interface components {
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
-         *     * `IAA` - Issus d'IAA
+         *     * `IAA` - Issus de résidus d'IAA
          * @enum {string}
          */
         CollectionTypeEnum: CollectionTypeEnum;
@@ -5322,6 +5324,7 @@ export interface components {
          *     * `SAF Trader` - Trader de SAF
          *     * `Producteur de biométhane` - Producteur de biométhane
          *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+         *     * `HRS` - Distributeur d'hydrogène pour la mobilité
          * @enum {string}
          */
         EntityTypeEnum: EntityTypeEnum;
@@ -5813,6 +5816,7 @@ export interface components {
          *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
          *     * `TRANSFERT` - TRANSFERT
          *     * `EXPIRATION` - EXPIRATION
+         *     * `REPORT` - REPORT
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -12428,6 +12432,7 @@ export interface operations {
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
                  */
                 client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
                 /**
@@ -12690,6 +12695,7 @@ export interface operations {
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
                  */
                 client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
                 /**
@@ -12781,6 +12787,7 @@ export interface operations {
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
                  */
                 client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
                 /**
@@ -13545,6 +13552,7 @@ export interface operations {
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
+                 *     * `REPORT` - REPORT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -13921,6 +13929,7 @@ export interface operations {
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
+                 *     * `REPORT` - REPORT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -14039,6 +14048,7 @@ export interface operations {
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
+                 *     * `REPORT` - REPORT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -14176,6 +14186,7 @@ export interface operations {
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
+                 *     * `REPORT` - REPORT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -14714,6 +14725,7 @@ export enum PathsApiSafTicketsGetParametersQueryClient_type {
     Charge_Point_Operator = "Charge Point Operator",
     Compagnie_a_rienne = "Compagnie a\u00E9rienne",
     Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane",
+    HRS = "HRS",
     Op_rateur = "Op\u00E9rateur",
     Power_or_Heat_Producer = "Power or Heat Producer",
     Producteur = "Producteur",
@@ -14831,6 +14843,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     INCORPORATION = "INCORPORATION",
     LIVRAISON_DIRECTE = "LIVRAISON_DIRECTE",
     MAC_BIO = "MAC_BIO",
+    REPORT = "REPORT",
     TENEUR = "TENEUR",
     TRANSFERT = "TRANSFERT"
 }
@@ -15033,7 +15046,8 @@ export enum EntityTypeEnum {
     PowerOrHeatProducer = "Power or Heat Producer",
     SAF_Trader = "SAF Trader",
     Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
-    Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane"
+    Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane",
+    HRS = "HRS"
 }
 export enum ExtAdminPagesEnum {
     DCA = "DCA",
@@ -15126,7 +15140,8 @@ export enum OperationTypeEnum {
     DEVALUATION = "DEVALUATION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     TRANSFERT = "TRANSFERT",
-    EXPIRATION = "EXPIRATION"
+    EXPIRATION = "EXPIRATION",
+    REPORT = "REPORT"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",

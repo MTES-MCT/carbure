@@ -33,8 +33,9 @@ class BiomethaneAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStatusSer
             "missing_fields",
             "is_complete",
             "is_open",
+            "submission_date",
         ]
-        read_only_fields = ["missing_fields", "is_complete"]
+        read_only_fields = ["missing_fields", "is_complete", "submission_date"]
 
     @extend_schema_field(
         {

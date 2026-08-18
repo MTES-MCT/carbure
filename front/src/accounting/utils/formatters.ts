@@ -72,6 +72,8 @@ export const formatOperationType = (type: string) => {
       return i18next.t("Acquisition (aménageurs)")
     case OperationType.EXPIRATION:
       return i18next.t("Expiration")
+    case OperationType.REPORT:
+      return i18next.t("Report 2026")
     default:
       return i18next.t("Inconnu")
   }

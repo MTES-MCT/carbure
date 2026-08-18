@@ -28,6 +28,8 @@ class BiomethaneAnnualDeclaration(models.Model):
     # Indique si la déclaration est modifiable ou non
     is_open = models.BooleanField(default=True)
 
+    submission_date = models.DateTimeField(blank=True, null=True)
+
     objects = models.Manager()
     annotated_objects = AnnotatedBiomethaneAnnualDeclarationManager()
 

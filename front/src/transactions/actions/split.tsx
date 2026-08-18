@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { Stock, StockPayload } from "../types"
+import { DeliveryType, FuelUsage, Stock, StockPayload } from "../types"
 import * as api from "../api"
 import useEntity from "common/hooks/entity"
 import { useMutation } from "common/hooks/async"
@@ -23,6 +23,8 @@ import { useMatomo } from "matomo"
 import Select from "common/components/select"
 import { formatNumber } from "common/utils/formatters"
 import { getDeliveryTypes } from "lot-add/components/delivery-fields"
+import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
+import { normalizeUsageFields } from "transactions/utils/usage-fields"
 
 export interface SplitOneButtonProps {
   disabled?: boolean
@@ -69,12 +71,21 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
           form.delivery_type = undefined
         }
 
+        Object.assign(form, normalizeUsageFields(form))
+
         return form
       },
     }
   )
 
   const deliveryTypes = getDeliveryTypes(entity, value.client)
+  const showUsageField = value.delivery_type === DeliveryType.RFC
+  const showUsagePrecisionField =
+    showUsageField && value.usage === FuelUsage.Other
+  const canSubmit =
+    !showUsageField ||
+    (value.usage !== undefined &&
+      (!showUsagePrecisionField || Boolean(value.usage_precision?.trim())))
 
   const splitStock = useMutation(api.splitStock, {
     invalidates: ["snapshot", "stock-details"],
@@ -147,6 +158,15 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
                 options={deliveryTypes}
               />
             )}
+            {showUsageField && <FuelUsageSelect required {...bind("usage")} />}
+            {showUsagePrecisionField && (
+              <TextInput
+                required
+                label={`${t("Précisions")}`}
+                placeholder={t("Préciser l'usage")}
+                {...bind("usage_precision")}
+              />
+            )}
             <Autocomplete
               label={t("Site de livraison")}
               getOptions={findDepots}
@@ -182,6 +202,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
           asideX
           submit="split-stock"
           loading={splitStock.loading}
+          disabled={!canSubmit}
           variant="primary"
           icon={Drop}
           label={t("Extraire lot")}
@@ -218,12 +239,16 @@ function formToStockPayload(form: SplitForm): StockPayload {
     carbure_client_id:
       form.client instanceof Object ? form.client.id : undefined,
     unknown_client: typeof form.client === "string" ? form.client : undefined,
+    usage: form.usage,
+    usage_precision: form.usage_precision?.trim(),
   }
 }
 
 const defaultSplit = {
   stock_id: undefined as string | undefined,
   delivery_type: undefined as string | undefined,
+  usage: undefined as FuelUsage | undefined,
+  usage_precision: undefined as string | undefined,
   volume: 0 as number | undefined,
   transport_document_reference: undefined as string | undefined,
   supplier_certificate: undefined as string | undefined,

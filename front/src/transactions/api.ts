@@ -110,11 +110,17 @@ export function sendLots(query: LotQuery, selection?: number[]) {
 
 export function acceptReleaseForConsumption(
   query: LotQuery,
-  selection?: number[]
+  selection?: number[],
+  usage?: string,
+  usage_precision?: string
 ) {
   return api.post<Api<void>>(
     "/transactions/lots/accept-release-for-consumption",
-    selectionOrQuery(query, selection)
+    {
+      ...selectionOrQuery(query, selection),
+      usage,
+      usage_precision,
+    }
   )
 }
 

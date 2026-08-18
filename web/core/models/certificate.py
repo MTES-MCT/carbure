@@ -30,7 +30,7 @@ class GenericCertificate(models.Model):
     valid_from = models.DateField(null=False, blank=False)
     valid_until = models.DateField(null=False, blank=False)
     download_link = models.CharField(max_length=512, default=None, null=True)
-    scope = models.JSONField(null=True)  # TODO turn into CharField
+    scope = models.TextField(null=True)
     input = models.JSONField(null=True)  # TODO check if we need this
     output = models.JSONField(null=True)
 
