@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 
 from core.excel import ExcelResponse, export_to_excel
 from core.utils import truncate
+from tiruert.models.elec_operation import ElecOperation
 
 
 class ExcelExportActionMixin:
@@ -45,7 +46,12 @@ class ExcelExportActionMixin:
                         {"label": "Statut", "value": "status"},
                         {"label": "Date de création", "value": lambda o: o.created_at.strftime("%Y-%m-%d")},
                         {"label": "Type Opération", "value": "_operation"},
-                        {"label": "Expéditeur", "value": "debited_entity.name"},
+                        {
+                            "label": "Expéditeur",
+                            "value": lambda o: o.debited_entity.name
+                            if o.debited_entity and o._operation != ElecOperation.TENEUR
+                            else "",
+                        },
                         {"label": "Destinataire", "value": "credited_entity.name"},
                         {"label": "Quantité (MJ)", "value": lambda o: truncate(o.quantity, 0)},
                         {"label": "Tonnes CO2 eq. évitées", "value": lambda o: truncate(o.avoided_emissions)},
