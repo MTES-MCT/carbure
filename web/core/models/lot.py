@@ -149,6 +149,30 @@ class CarbureLot(models.Model):
         (CONSUMPTION, CONSUMPTION),
     )
     delivery_type = models.CharField(max_length=64, choices=DELIVERY_TYPES, blank=False, null=False, default=UNKNOWN)
+
+    USAGE_ROAD = "ROAD"
+    USAGE_HEATING = "HEATING"
+    USAGE_AGRICULTURE = "AGRICULTURE"
+    USAGE_CONSTRUCTION = "CONSTRUCTION"
+    USAGE_MARITIME = "MARITIME"
+    USAGE_INLAND_WATERWAY = "INLAND_WATERWAY"
+    USAGE_RAIL = "RAIL"
+    USAGE_FISHING = "FISHING"
+    USAGE_OTHER = "OTHER"
+    USAGE_CHOICES = (
+        (USAGE_ROAD, USAGE_ROAD),
+        (USAGE_HEATING, USAGE_HEATING),
+        (USAGE_AGRICULTURE, USAGE_AGRICULTURE),
+        (USAGE_CONSTRUCTION, USAGE_CONSTRUCTION),
+        (USAGE_MARITIME, USAGE_MARITIME),
+        (USAGE_INLAND_WATERWAY, USAGE_INLAND_WATERWAY),
+        (USAGE_RAIL, USAGE_RAIL),
+        (USAGE_FISHING, USAGE_FISHING),
+        (USAGE_OTHER, USAGE_OTHER),
+    )
+    usage = models.CharField(max_length=64, choices=USAGE_CHOICES, blank=True, null=False, default="")
+    usage_precision = models.CharField(max_length=255, blank=True, null=False, default="")
+
     declared_by_supplier = models.BooleanField(default=False)
     declared_by_client = models.BooleanField(default=False)
 

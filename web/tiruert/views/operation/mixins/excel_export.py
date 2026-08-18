@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 
 from core.excel import ExcelResponse, export_to_excel
 from core.utils import truncate
+from tiruert.models.operation import Operation
 
 
 class ExcelExportActionMixin:
@@ -34,7 +35,12 @@ class ExcelExportActionMixin:
                         {"label": "Période de durabilité", "value": "durability_period"},
                         {"label": "Dépôt", "value": "_depot"},
                         {"label": "Type Opération", "value": "_type"},
-                        {"label": "Expéditeur", "value": "debited_entity.name"},
+                        {
+                            "label": "Expéditeur",
+                            "value": lambda o: o.debited_entity.name
+                            if o.debited_entity and o._type != Operation.TENEUR
+                            else "",
+                        },
                         {"label": "Destinataire", "value": "credited_entity.name"},
                         {"label": "Volume (L)", "value": lambda o: truncate(o._volume)},
                         {"label": "Énergie (MJ)", "value": lambda o: truncate(o._energy, 0)},

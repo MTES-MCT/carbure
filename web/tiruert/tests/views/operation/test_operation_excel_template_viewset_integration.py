@@ -8,7 +8,12 @@ from openpyxl import load_workbook
 from core.models import Entity
 from core.tests_utils import setup_current_user
 from entity.factories import EntityFactory
-from tiruert.services.operation_excel_template import ENTITIES_SHEET_NAME, MAIN_SHEET_NAME, TABLE_HEADERS
+from tiruert.services.operation_excel_template import (
+    BIOFUELS_SHEET_NAME,
+    ENTITIES_SHEET_NAME,
+    MAIN_SHEET_NAME,
+    TABLE_HEADERS,
+)
 
 
 class OperationExcelTemplateViewSetIntegrationTest(TestCase):
@@ -40,12 +45,15 @@ class OperationExcelTemplateViewSetIntegrationTest(TestCase):
         self.addCleanup(workbook.close)
         main_sheet = workbook[MAIN_SHEET_NAME]
         entities_sheet = workbook[ENTITIES_SHEET_NAME]
+        biofuels_sheet = workbook[BIOFUELS_SHEET_NAME]
 
-        self.assertEqual(workbook.sheetnames, [MAIN_SHEET_NAME, ENTITIES_SHEET_NAME])
+        self.assertEqual(workbook.sheetnames, [MAIN_SHEET_NAME, ENTITIES_SHEET_NAME, BIOFUELS_SHEET_NAME])
         self.assertEqual([cell.value for cell in main_sheet[1]], [label for label, _ in TABLE_HEADERS])
         self.assertEqual([cell.value for cell in main_sheet[2]], [key for _, key in TABLE_HEADERS])
         self.assertTrue(main_sheet.row_dimensions[2].hidden)
         self.assertEqual(entities_sheet[1][0].value, "Destinataire")
         self.assertEqual(entities_sheet[1][1].value, "Id")
         self.assertEqual(entities_sheet.max_row, 1)
+        self.assertEqual(biofuels_sheet[1][0].value, "Biocarburant")
+        self.assertEqual(biofuels_sheet[1][1].value, "PCI/L")
         self.assertEqual(len(main_sheet.data_validations.dataValidation), 3)

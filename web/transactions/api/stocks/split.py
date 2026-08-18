@@ -107,6 +107,8 @@ def stock_split(request, *args, **kwargs):
                 lot.delivery_site_country = None
         lot.transport_document_type = entry.get("transport_document_type", CarbureLot.OTHER)
         lot.delivery_type = entry.get("delivery_type", CarbureLot.UNKNOWN)
+        lot.usage = entry.get("usage", "")
+        lot.usage_precision = entry.get("usage_precision", "")
         lot.transport_document_reference = entry.get("transport_document_reference", lot.delivery_type)
         delivery_site_id = entry.get("carbure_delivery_site_id", None)
         try:

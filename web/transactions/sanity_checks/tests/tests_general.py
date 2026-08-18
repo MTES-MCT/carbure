@@ -10,7 +10,7 @@ from transactions.factories import CarbureLotFactory
 from transactions.models import Depot, EntitySite, YearConfig
 from transactions.sanity_checks.general import check_missing_delivery_type
 
-from ..helpers import enrich_lot, get_prefetched_data, has_error
+from ..helpers import enrich_lot, get_prefetched_data, has_blocking_errors, has_error
 from ..sanity_checks import sanity_checks
 
 
@@ -72,8 +72,18 @@ class GeneralSanityChecksTest(TestCase):
 
         error_list = self.run_checks(lot)
         assert has_error(error, error_list)
+        assert has_blocking_errors(error_list)
 
         lot.carbure_delivery_site = efpe
+
+        error_list = self.run_checks(lot)
+        assert not has_error(error, error_list)
+
+    def test_mac_not_efpe_only_for_rfc(self):
+        error = CarbureSanityCheckErrors.MAC_NOT_EFPE
+
+        efs = Depot.objects.filter(site_type=Depot.EFS).first()
+        lot = self.create_lot(delivery_type=CarbureLot.BLENDING, carbure_delivery_site=efs)
 
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)

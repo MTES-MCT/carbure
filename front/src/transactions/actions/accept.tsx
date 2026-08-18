@@ -3,7 +3,7 @@ import i18next from "i18next"
 import { useMatomo } from "matomo"
 import { useTranslation } from "react-i18next"
 import { EntityType, EntityDepot, EntityPreview } from "common/types"
-import { Lot, LotQuery } from "transactions/types"
+import { FuelUsage, Lot, LotQuery } from "transactions/types"
 import Menu from "common/components/menu"
 import { Check, Return } from "common/components/icons"
 import { useMutation, useQuery } from "common/hooks/async"
@@ -17,12 +17,14 @@ import { usePortal } from "common/components/portal"
 import useEntity from "common/hooks/entity"
 import Autocomplete from "common/components/autocomplete"
 import * as norm from "common/utils/normalizers"
+import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
 import {
   findBiofuelEntities,
   findMyCertificates,
   getDeliverySites,
 } from "common/api"
 import Select from "common/components/select"
+import { TextInput } from "common/components/input"
 import { compact } from "common/utils/collection"
 import Form from "common/components/form"
 
@@ -179,8 +181,14 @@ const ReleaseForConsumptionDialog = ({
   const notify = useNotify()
   const matomo = useMatomo()
   const entity = useEntity()
+  const [usage, setUsage] = useState<FuelUsage | undefined>()
+  const [usagePrecision, setUsagePrecision] = useState<string | undefined>()
 
   const v = variations(selection.length)
+  const requiresPrecision = usage === FuelUsage.Other
+  const canSubmit =
+    usage !== undefined &&
+    (!requiresPrecision || Boolean(usagePrecision?.trim()))
 
   const acceptLots = useMutation(api.acceptReleaseForConsumption, {
     invalidates: [
@@ -228,20 +236,42 @@ const ReleaseForConsumptionDialog = ({
       <main>
         <section>
           {t(
-            "En acceptant ces lots, vous indiquez réaliser des mises à consommation de B100 ou ED95."
+            "En acceptant ces lots, vous indiquez réaliser des mises à consommation de B100, ED95 ou HVO100."
           )}
+        </section>
+        <section>
+          <Form id="release-for-consumption">
+            <FuelUsageSelect
+              autoFocus
+              required
+              value={usage}
+              onChange={setUsage}
+            />
+
+            {requiresPrecision && (
+              <TextInput
+                required
+                label={`${t("Précisions")}`}
+                placeholder={t("Préciser l'usage")}
+                value={usagePrecision}
+                onChange={setUsagePrecision}
+              />
+            )}
+          </Form>
         </section>
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          autoFocus
+          submit="release-for-consumption"
           loading={acceptLots.loading}
+          disabled={!canSubmit}
           variant="success"
           icon={Check}
           label={t("Mise à consommation")}
           action={() => {
+            if (!usage || (requiresPrecision && !usagePrecision?.trim())) return
             matomo.push([
               "trackEvent",
               "lots-accept",
@@ -249,7 +279,7 @@ const ReleaseForConsumptionDialog = ({
               "",
               selection.length,
             ])
-            acceptLots.execute(query, selection)
+            acceptLots.execute(query, selection, usage, usagePrecision?.trim())
           }}
         />
         <Button

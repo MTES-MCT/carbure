@@ -3,12 +3,12 @@ import { useUser } from "common/hooks/user"
 import { Select } from "common/components/selects2"
 import { Text } from "common/components/text"
 import styles from "./entity-selector.module.css"
-import { EntityType } from "common/types"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useMatomo } from "matomo"
 import { useNavigate } from "react-router-dom"
 import { ROUTE_URLS } from "common/utils/routes"
+import { getEntityTypeShortLabel } from "common/utils/normalizers"
 
 export const EntitySelector = ({ className }: { className?: string }) => {
   const user = useUser()
@@ -31,35 +31,10 @@ export const EntitySelector = ({ className }: { className?: string }) => {
     ...options,
   ]
 
-  const shortName = useMemo(() => {
-    switch (entity.entity_type) {
-      case EntityType.Administration:
-        return t("Admin")
-      case EntityType.Operator:
-        return t("Opérateur")
-      case EntityType.Producer:
-        return t("Producteur")
-      case EntityType.Auditor:
-        return t("Auditeur")
-      case EntityType.Trader:
-        return t("Trader")
-      case EntityType.ExternalAdmin:
-        return t("Admin Externe")
-      case EntityType.Airline:
-        return t("Compagnie aérienne")
-      case EntityType.CPO:
-        return t("Aménageur")
-      case EntityType.PowerOrHeatProducer:
-        return t("Producteur")
-      case EntityType.SAF_Trader:
-        return t("Trader de SAF")
-      case EntityType.Producteur_de_biom_thane:
-        return t("Producteur de biométhane")
-      case EntityType.Unknown:
-      default:
-        return t("Inconnu")
-    }
-  }, [entity.entity_type, t])
+  const shortName = useMemo(
+    () => getEntityTypeShortLabel(entity.entity_type),
+    [entity.entity_type]
+  )
 
   return (
     <Select

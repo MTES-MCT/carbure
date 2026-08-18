@@ -470,6 +470,21 @@ def fill_delivery_type(lot, data):
             lot.delivery_type = CarbureLot.UNKNOWN
 
 
+def fill_usage_data(lot, data):
+    usage = (data.get("usage") or "").strip()
+    usage_precision = (data.get("usage_precision") or "").strip()
+
+    # Usage fields are only meaningful for RFC deliveries.
+    if lot.delivery_type != CarbureLot.RFC:
+        lot.usage = ""
+        lot.usage_precision = ""
+        return
+
+    usage_values = [value for value, _label in CarbureLot.USAGE_CHOICES]
+    lot.usage = usage if usage in usage_values else ""
+    lot.usage_precision = usage_precision if lot.usage == CarbureLot.USAGE_OTHER else ""
+
+
 def fill_delivery_data(lot, data, entity, prefetched_data):
     errors = []
     lot.transport_document_type = data.get("transport_document_type", None)
@@ -593,6 +608,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
 
     # common data
     fill_delivery_type(lot, data)
+    fill_usage_data(lot, data)
     errors += fill_client_data(lot, data, entity, prefetched_data)
     errors += fill_volume_info(lot, data)
     errors += fill_supplier_info(lot, data, entity)

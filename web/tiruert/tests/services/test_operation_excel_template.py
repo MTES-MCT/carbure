@@ -4,9 +4,10 @@ from unittest.mock import Mock, patch
 import openpyxl
 from django.test import TestCase
 
-from core.models import Entity
+from core.models import Biocarburant, Entity
 from entity.factories import EntityFactory
 from tiruert.services.operation_excel_template import (
+    BIOFUELS_SHEET_NAME,
     ENTITIES_SHEET_NAME,
     FIRST_DATA_ROW,
     KEY_ROW,
@@ -120,6 +121,14 @@ class OperationExcelTemplateServiceTest(TestCase):
             },
         ]
 
+        Biocarburant.objects.create(
+            name="Biofuel test",
+            name_en="Biofuel test EN",
+            description="Test biofuel",
+            code="TESTBIO",
+            pci_litre=12.5,
+        )
+
         fh = create_operation_import_template(self.allowed_entity_1.id)
         self.addCleanup(lambda: fh.close())
         self.addCleanup(lambda: os.path.exists(fh.name) and os.remove(fh.name))
@@ -127,8 +136,9 @@ class OperationExcelTemplateServiceTest(TestCase):
         workbook = openpyxl.load_workbook(fh.name)
         main_sheet = workbook[MAIN_SHEET_NAME]
         entities_sheet = workbook[ENTITIES_SHEET_NAME]
+        biofuels_sheet = workbook[BIOFUELS_SHEET_NAME]
 
-        self.assertEqual(workbook.sheetnames, [MAIN_SHEET_NAME, ENTITIES_SHEET_NAME])
+        self.assertEqual(workbook.sheetnames, [MAIN_SHEET_NAME, ENTITIES_SHEET_NAME, BIOFUELS_SHEET_NAME])
         self.assertEqual(main_sheet[1][0].value, TABLE_HEADERS[0][0])
         self.assertEqual(main_sheet[1][len(TABLE_HEADERS) - 1].value, TABLE_HEADERS[-1][0])
         self.assertEqual(main_sheet[2][0].value, TABLE_HEADERS[0][1])
@@ -142,7 +152,11 @@ class OperationExcelTemplateServiceTest(TestCase):
         self.assertEqual(entities_sheet[2][1].value, self.allowed_entity_1.id)
         self.assertEqual(entities_sheet[3][1].value, self.allowed_entity_2.id)
         self.assertEqual(main_sheet.sheet_state, "visible")
-        self.assertEqual(entities_sheet.sheet_state, "hidden")
+        self.assertEqual(entities_sheet.sheet_state, "visible")
+        self.assertEqual(biofuels_sheet[1][0].value, "Biocarburant")
+        self.assertEqual(biofuels_sheet[1][1].value, "PCI/L")
+        self.assertEqual(biofuels_sheet[2][0].value, "TESTBIO")
+        self.assertEqual(biofuels_sheet[2][1].value, 12.5)
         self.assertGreaterEqual(len(main_sheet.data_validations.dataValidation), 4)
         self.assertEqual(main_sheet.row_dimensions[KEY_ROW + 1].hidden, True)
         self.assertEqual(main_sheet.column_dimensions["B"].hidden, True)

@@ -50,7 +50,10 @@ export const DeclarationDetailHeader = ({
 
       {/* Only display the open badge if the declaration exists */}
       {annualDeclaration?.status && (
-        <AnnualDeclarationStatusBadge status={annualDeclaration.status} />
+        <AnnualDeclarationStatusBadge
+          status={annualDeclaration?.status}
+          submissionDate={annualDeclaration?.submission_date}
+        />
       )}
       {canEditDeclaration && <ToggleDeclarationButton />}
     </Row>

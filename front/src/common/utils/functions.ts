@@ -1,3 +1,10 @@
+export function applyNormalizers<T>(
+  value: T,
+  ...normalizers: Array<(value: T) => T>
+): T {
+  return normalizers.reduce((result, normalizer) => normalizer(result), value)
+}
+
 export function debounce<F extends (...args: any[]) => any>(
   fn: F,
   waitMs: number
