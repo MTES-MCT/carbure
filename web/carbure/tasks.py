@@ -44,10 +44,6 @@ def background_create_tiruert_operations_from_lots(lots: QuerySet) -> None:
 
 if env.get("IMAGE_TAG") == "prod":
 
-    @periodic_task(crontab(hour=23, minute=45))
-    def periodic_backup_prod_db() -> None:
-        subprocess.run(["bash", "/app/scripts/database/backup_prod_db.sh"])
-
     @db_periodic_task(crontab(day_of_week=7, hour=3, minute=0))
     def periodic_update_2bs_certificates() -> None:
         update_2bs_certificates(email=True)
@@ -104,7 +100,8 @@ if env.get("IMAGE_TAG") == "prod":
     # Read replica
     @periodic_task(crontab(hour=1, minute=45))
     def populate_read_replica() -> None:
-        subprocess.run(["bash", "/app/scripts/database/restore_db.sh", "carbure-prod", env.get("READ_REPLICA_DATABASE_URL")])
+        replica_url = env.get("READ_REPLICA_DATABASE_URL")
+        subprocess.run(["bash", "/app/backups/database/restore.sh", "scalingo", "carbure-prod", replica_url])
 
     # Anonymization
     @db_periodic_task(crontab(day=1, hour=1, minute=0))
@@ -147,4 +144,4 @@ if env.get("IMAGE_TAG") == "staging":
 
     @periodic_task(crontab(hour=0, minute=45))
     def restore_prod_db() -> None:
-        subprocess.run(["bash", "/app/scripts/database/restore_db.sh"])
+        subprocess.run(["bash", "/app/backups/database/restore.sh", "scalingo", "carbure-prod"])
