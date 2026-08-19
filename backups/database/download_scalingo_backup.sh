@@ -17,6 +17,11 @@ set -euo pipefail
 app="$1"
 output_dir="${2:-.}"
 
+if [[ -z "$app" ]]; then
+  echo "scalingo app must be provided as the first argument" >&2
+  exit 1
+fi
+
 mkdir -p "$output_dir"
 
 if ! command -v scalingo >/dev/null 2>&1; then

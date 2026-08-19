@@ -31,6 +31,16 @@ source_bucket=${USER_FILES_S3_BUCKET:-}
 destination_bucket=${SECURE_BACKUP_S3_BUCKET_USER_FILES:-}
 source_prefix=${USER_FILES_S3_PREFIX:-}
 
+if [[ -z "$source_bucket" ]]; then
+  echo "USER_FILES_S3_BUCKET must be provided" >&2
+  exit 1
+fi
+
+if [[ -z "$destination_bucket" ]]; then
+  echo "SECURE_BACKUP_S3_BUCKET_USER_FILES must be provided" >&2
+  exit 1
+fi
+
 configure_rclone_s3_remote source \
   "${USER_FILES_S3_ENDPOINT_URL:-}" \
   "${USER_FILES_S3_ACCESS_KEY_ID:-}" \

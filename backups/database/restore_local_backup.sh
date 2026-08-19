@@ -17,6 +17,16 @@ set -euo pipefail
 backup_path=$1
 DATABASE_URL=${2:-${DATABASE_URL:-}}
 
+if [[ -z "$backup_path" ]]; then
+  echo "backup_path must be provided as the first argument" >&2
+  exit 1
+fi
+
+if [[ -z "$DATABASE_URL" ]]; then
+  echo "DATABASE_URL is not defined" >&2
+  exit 1
+fi
+
 if [[ -d "$backup_path" ]]; then
   backup_files=("$backup_path"/*.tar.gz)
   backup_file=${backup_files[0]}

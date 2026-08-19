@@ -23,6 +23,16 @@ source "$script_dir/rclone_s3.sh"
 scalingo_app=$1
 destination_bucket=${SECURE_BACKUP_S3_BUCKET_DATABASE:-}
 
+if [[ -z "$scalingo_app" ]]; then
+  echo "scalingo_app must be provided as the first argument" >&2
+  exit 1
+fi
+
+if [[ -z "$destination_bucket" ]]; then
+  echo "SECURE_BACKUP_S3_BUCKET_DATABASE must be provided" >&2
+  exit 1
+fi
+
 configure_rclone_s3_remote destination \
   "${SECURE_BACKUP_S3_ENDPOINT_URL:-}" \
   "${SECURE_BACKUP_S3_ACCESS_KEY_ID:-}" \

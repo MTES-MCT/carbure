@@ -4,13 +4,13 @@
 # backup for a Scalingo MySQL addon, then apply the project's latest Django migrations.
 #
 # Usage:
-#   ./restore_backup.sh local <backup-dir|backup-file> [database-url]
-#   ./restore_backup.sh scalingo <scalingo-app> [database-url]
+#   ./restore.sh local <backup-dir|backup-file> [database-url]
+#   ./restore.sh scalingo <scalingo-app> [database-url]
 #
 # Example:
-#   ./restore_backup.sh local /tmp/backups
-#   ./restore_backup.sh local /tmp/backups/backup.tar.gz
-#   ./restore_backup.sh scalingo carbure-prod
+#   ./restore.sh local /tmp/backups
+#   ./restore.sh local /tmp/backups/backup.tar.gz
+#   ./restore.sh scalingo carbure-prod
 #
 # The database URL must be passed as an argument or set in $DATABASE_URL. If it has no password,
 # the restore script asks for one interactively. Avoid putting the password in a command-line URL.
@@ -20,6 +20,16 @@ set -euo pipefail
 backup_source=$1
 backup_location=$2
 database_url=${3:-${DATABASE_URL:-}}
+
+if [[ -z "$backup_source" ]]; then
+  echo "backup_source must be provided as the first argument" >&2
+  exit 1
+fi
+
+if [[ -z "$backup_location" ]]; then
+  echo "backup_location must be provided as the second argument" >&2
+  exit 1
+fi
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 project_root=$(cd -- "$script_dir/../../.." && pwd)
