@@ -37,6 +37,7 @@ RUN uv sync --frozen --no-install-project
 # Copy the rest of your application code
 COPY web web
 COPY scripts scripts
+COPY backups backups
 COPY bin bin
 
 # Set the default command to execute the application
