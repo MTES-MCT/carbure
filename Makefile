@@ -1,7 +1,7 @@
 .PHONY: \
 	up down restart logs-django_cmd open restart-backend restart-frontend \
 	test-backend test-frontend \
-	makemigrations migrate ipython \
+	makemigrations migrate seed ipython \
 	lint-fix translate translate-missing \
 	check-diff check-types generate-and-check-types
 
@@ -49,6 +49,9 @@ makemigrations:
 migrate:
 	$(django_cmd) migrate
 
+seed:
+	$(django_cmd) seed
+
 ipython:
 	$(django_cmd) shell --interface ipython
 
@@ -77,4 +80,3 @@ check-diff:
 
 check-types:
 	$(npm_cmd) run check-types
-
