@@ -1,7 +1,7 @@
 import { Api } from "common/services/api"
 import { AxiosResponse } from "axios"
 import { api as apiFetch } from "common/services/api-fetch"
-import { EntityType } from "./types"
+import { EntityType, SiteType } from "./types"
 
 export function getUserSettings() {
   return apiFetch.GET("/user/")
@@ -95,6 +95,22 @@ export async function findProductionSites(
 ) {
   const res = await apiFetch.GET("/resources/production-sites", {
     params: { query: { query, producer_id } },
+  })
+
+  return res.data ?? []
+}
+
+export async function findMaterials(query?: string) {
+  const res = await apiFetch.GET("/resources/materials", {
+    params: { query: { query } },
+  })
+
+  return res.data ?? []
+}
+
+export async function findSites(query?: string, site_type?: SiteType[]) {
+  const res = await apiFetch.GET("/resources/sites", {
+    params: { query: { query, site_type } },
   })
 
   return res.data ?? []
