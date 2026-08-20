@@ -7931,6 +7931,29 @@ paths:
                 items:
                   $ref: "#/components/schemas/FossilFuel"
           description: ""
+  /api/resources/materials:
+    get:
+      operationId: resources_materials_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name` and `code`
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Material"
+          description: ""
   /api/resources/production-sites:
     get:
       operationId: resources_production_sites_list
@@ -7958,6 +7981,36 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ProductionSite"
+          description: ""
+  /api/resources/sites:
+    get:
+      operationId: resources_sites_list
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          description: Search within the fields `name`, `site_siret` and `city`
+        - in: query
+          name: site_type
+          schema:
+            type: array
+            items:
+              type: string
+          description: Only keep specific site types
+      tags:
+        - resources
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActionSite"
           description: ""
   /api/resources/systeme-national:
     get:
@@ -13359,6 +13412,23 @@ components:
         status:
           type: string
           readOnly: true
+        holder:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        parent:
+          allOf:
+            - $ref: "#/components/schemas/ActionParent"
+          readOnly: true
+          nullable: true
+        material:
+          allOf:
+            - $ref: "#/components/schemas/Material"
+          readOnly: true
+        site:
+          allOf:
+            - $ref: "#/components/schemas/ActionSite"
+          readOnly: true
         pos_id:
           type: string
           title: N° de POS
@@ -13413,23 +13483,12 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        holder:
-          type: integer
-          title: Entité détentrice de la quantité de l'action
-        parent:
-          type: integer
-          nullable: true
-          title: Action parente
-        material:
-          type: integer
-          title: Matière
-        site:
-          type: integer
       required:
         - holder
         - id
         - industry
         - material
+        - parent
         - pos_id
         - quantity
         - shipping_date
@@ -13602,6 +13661,20 @@ components:
         - site
         - type
         - working_date
+    ActionParent:
+      type: object
+      description: Small representation used for the parent action relation.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        pos_id:
+          type: string
+          title: N° de POS
+          maxLength: 48
+      required:
+        - id
+        - pos_id
     ActionShippingMethodEnum:
       enum:
         - ROAD
@@ -13614,6 +13687,20 @@ components:
         * `PIPELINE` - Pipeline
         * `RAILROAD` - Rail
         * `SEA` - Transport maritime
+    ActionSite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 128
+        site_type:
+          $ref: "#/components/schemas/SiteTypeEnum"
+      required:
+        - id
+        - name
     ActionTypeEnum:
       enum:
         - INIT
@@ -19037,6 +19124,22 @@ components:
         * `INPUTS` - Intrants
 
         * `OTHER` - Autres (à préciser)
+    Material:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 8
+        name:
+          type: string
+          maxLength: 64
+      required:
+        - code
+        - id
+        - name
     MaterialUnitEnum:
       enum:
         - DRY

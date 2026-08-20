@@ -2382,6 +2382,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources/materials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["resources_materials_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/resources/production-sites": {
         parameters: {
             query?: never;
@@ -2390,6 +2406,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["resources_production_sites_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/resources/sites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["resources_sites_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3374,6 +3406,10 @@ export interface components {
         Action: {
             readonly id: number;
             readonly status: string;
+            readonly holder: components["schemas"]["EntityPreview"];
+            readonly parent: components["schemas"]["ActionParent"] | null;
+            readonly material: components["schemas"]["Material"];
+            readonly site: components["schemas"]["ActionSite"];
             /** N° de POS */
             pos_id: string;
             /** Filière */
@@ -3409,13 +3445,6 @@ export interface components {
             eu?: string;
             /** Format: decimal */
             eccs?: string;
-            /** Entité détentrice de la quantité de l'action */
-            holder: number;
-            /** Action parente */
-            parent?: number | null;
-            /** Matière */
-            material: number;
-            site: number;
         };
         ActionInput: {
             /** N° de POS */
@@ -3505,6 +3534,12 @@ export interface components {
             material: number;
             site: number;
         };
+        /** @description Small representation used for the parent action relation. */
+        ActionParent: {
+            readonly id: number;
+            /** N° de POS */
+            pos_id: string;
+        };
         /**
          * @description * `ROAD` - Transport routier
          *     * `PIPELINE` - Pipeline
@@ -3513,6 +3548,11 @@ export interface components {
          * @enum {string}
          */
         ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
+        ActionSite: {
+            readonly id: number;
+            name: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+        };
         /**
          * @description * `INIT` - INIT
          * @enum {string}
@@ -5953,6 +5993,11 @@ export interface components {
          * @enum {string}
          */
         MalfunctionTypesEnum: MalfunctionTypesEnum;
+        Material: {
+            readonly id: number;
+            code: string;
+            name: string;
+        };
         /**
          * @description * `DRY` - Sèche
          *     * `WET` - Brute
@@ -12770,6 +12815,28 @@ export interface operations {
             };
         };
     };
+    resources_materials_list: {
+        parameters: {
+            query?: {
+                /** @description Search within the fields `name` and `code` */
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Material"][];
+                };
+            };
+        };
+    };
     resources_production_sites_list: {
         parameters: {
             query?: {
@@ -12790,6 +12857,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProductionSite"][];
+                };
+            };
+        };
+    };
+    resources_sites_list: {
+        parameters: {
+            query?: {
+                /** @description Search within the fields `name`, `site_siret` and `city` */
+                query?: string;
+                /** @description Only keep specific site types */
+                site_type?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionSite"][];
                 };
             };
         };
