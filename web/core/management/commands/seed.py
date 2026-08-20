@@ -8,6 +8,9 @@ SEEDS = [
     "core.seeds.geography.setup_countries",
     "core.seeds.users.setup_users",
     "h2.seeds.hrs.setup_hrs_entity",
+    "h2.seeds.h2_materials.setup_h2_materials",
+    "h2.seeds.h2_stations.setup_h2_stations",
+    "h2.seeds.h2_lots_init.setup_h2_lots_init",
 ]
 
 

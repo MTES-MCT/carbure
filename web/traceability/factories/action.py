@@ -15,6 +15,7 @@ from .material import MaterialFactory
 class ActionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Action
+        django_get_or_create = ("pos_id",)
 
     pos_id = factory.Faker("lexify", text="POS-????????????")
     holder = factory.SubFactory(EntityFactory, entity_type=Entity.HRS)

@@ -16,4 +16,4 @@ def setup_hrs_entity():
 
 
 def get_hrs_entity():
-    return Entity.objects.get(name=HRS_ENTITY_NAME, type=Entity.HRS)
+    return Entity.objects.get(name=HRS_ENTITY_NAME, entity_type=Entity.HRS)
