@@ -19,34 +19,42 @@ export function useActionFilters() {
       key: ActionFilter.holder,
       label: t("Détenteur"),
     },
+
     industry: {
       key: ActionFilter.industry,
       label: t("Filière"),
     },
+
     material: {
       key: ActionFilter.material,
       label: t("Matière"),
     },
+
     order_by: {
       key: ActionFilter.order_by,
       label: t("Tri"),
     },
+
     shipping_method: {
       key: ActionFilter.shipping_method,
       label: t("Mode de transport"),
     },
+
     site: {
       key: ActionFilter.site,
       label: t("Site"),
     },
+
     status: {
       key: ActionFilter.status,
       label: t("Statut"),
     },
+
     type: {
       key: ActionFilter.type,
       label: t("Type"),
     },
+
     working_year: {
       key: ActionFilter.working_year,
       label: t("Année"),
