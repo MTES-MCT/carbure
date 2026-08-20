@@ -12,40 +12,30 @@ export function useActionColumns() {
   const { t } = useTranslation()
 
   return {
-    id: {
-      key: "id",
-      header: t("Id"),
-      cell: (action) => <Cell text={action.id} />,
-    },
-
     holder: {
       key: "holder",
       header: t("Détenteur"),
-      cell: (action) => <Cell text={action.holder} />,
-    },
-
-    industry: {
-      key: "industry",
-      header: t("Filière"),
-      cell: (action) => <Cell text={action.industry} />,
+      cell: (action) => (
+        <Cell text={action.holder.name} sub={action.holder.entity_type} />
+      ),
     },
 
     material: {
       key: "material",
       header: t("Matière"),
-      cell: (action) => <Cell text={action.material} />,
+      cell: (action) => <Cell text={action.material.name} />,
     },
 
     quantity: {
       key: "quantity",
-      header: t("Quantité de matière"),
+      header: t("Quantité"),
       cell: (action) => <Cell text={action.quantity} />,
     },
 
     site: {
       key: "site",
       header: t("Site"),
-      cell: (action) => <Cell text={action.site} />,
+      cell: (action) => <Cell text={action.site.name} />,
     },
   } satisfies Record<string, ActionColumn>
 }
