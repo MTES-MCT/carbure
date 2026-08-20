@@ -35,7 +35,11 @@ export const ActionForm = ({
       <Grid cols={2} gap="lg">
         {visibleFields?.map((field) => (
           <div key={field.key}>
-            {field.field({ form, readOnly, label: field.label })}
+            {field.field({
+              form,
+              props: { readOnly, label: field.label },
+              options: field.options,
+            })}
           </div>
         ))}
       </Grid>
