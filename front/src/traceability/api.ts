@@ -27,3 +27,12 @@ export function getActions(query: ActionQuery) {
     params: { query },
   })
 }
+
+export function getActionDetail(entity_id: number, id: number) {
+  return api.GET("/traceability/actions/{id}/", {
+    params: {
+      path: { id },
+      query: { entity_id },
+    },
+  })
+}
