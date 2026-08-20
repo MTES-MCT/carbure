@@ -14,6 +14,7 @@ import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 
 import { getActionFilters, getActions, getActionYears } from "traceability/api"
 import {
+  Action,
   ActionFilter,
   ActionQuery,
   ActionQueryBuilder,
@@ -23,16 +24,34 @@ import { ActionColumn } from "traceability/hooks/use-action-columns"
 import { useCombinedQuery } from "traceability/hooks/use-combined-query"
 import { ActionModal } from "traceability/components/action-modal"
 import { ActionField } from "traceability/hooks/use-action-fields"
+import { Button, ButtonProps } from "common/components/button2"
+import { FrIconClassName } from "@codegouvfr/react-dsfr"
 
 export const QUERY_KEY = "traceability-actions"
+
+export type MainAction = {
+  icon: FrIconClassName
+  label: string
+  onAction: () => void
+}
+
+export type DetailAction = {
+  icon: FrIconClassName
+  label: string
+  priority?: ButtonProps["priority"]
+  variant?: ButtonProps["customPriority"]
+  onAction: (action: Action) => void
+}
 
 export type ActionsPageProps = {
   listTitle: string
   detailTitle: string
   subpath: string
   fixedQuery: Partial<ActionQuery>
-  columns: ActionColumn[]
+  mainAction?: MainAction
+  detailActions?: DetailAction[]
   filters: ActionFilterDisplay[]
+  columns: ActionColumn[]
   fields?: ActionField[]
 }
 
@@ -41,8 +60,10 @@ export const ActionsPage = ({
   detailTitle,
   subpath,
   fixedQuery,
-  columns,
+  mainAction,
+  detailActions,
   filters,
+  columns,
   fields,
 }: ActionsPageProps) => {
   usePrivateNavigation(listTitle)
@@ -87,11 +108,26 @@ export const ActionsPage = ({
 
   return (
     <Main>
-      <Select
-        options={years.options}
-        value={years.selected}
-        onChange={years.setYear}
-      />
+      <header>
+        <section>
+          <Select
+            options={years.options}
+            value={years.selected}
+            onChange={years.setYear}
+          />
+
+          {mainAction && (
+            <Button
+              asideX
+              size="large"
+              iconId={mainAction.icon}
+              onClick={mainAction.onAction}
+            >
+              {mainAction.label}
+            </Button>
+          )}
+        </section>
+      </header>
 
       <Content marginTop>
         <FilterMultiSelect2
@@ -119,7 +155,13 @@ export const ActionsPage = ({
       {fields && (
         <HashRoute
           path="action/:id"
-          element={<ActionModal title={detailTitle} fields={fields} />}
+          element={
+            <ActionModal
+              title={detailTitle}
+              fields={fields}
+              detailActions={detailActions}
+            />
+          }
         />
       )}
     </Main>
