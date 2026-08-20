@@ -28,7 +28,9 @@ if [[ -z "$DATABASE_URL" ]]; then
 fi
 
 if [[ -d "$backup_path" ]]; then
+  shopt -s nullglob
   backup_files=("$backup_path"/*.tar.gz)
+  shopt -u nullglob
   backup_file=${backup_files[0]}
 else
   backup_file=$backup_path

@@ -46,13 +46,8 @@ trap 'rm -rf -- "$backup_dir"' EXIT
 shopt -s nullglob
 backup_files=("$backup_dir"/*.tar.gz)
 shopt -u nullglob
-
-if [[ ${#backup_files[@]} -ne 1 ]]; then
-  echo "Expected exactly one tar.gz backup in ${backup_dir}, found ${#backup_files[@]}" >&2
-  exit 1
-fi
-
 backup_file=${backup_files[0]}
+
 backup_path=$(date -u +%Y/%m/%d.tar.gz)
 
 echo "> Uploading database backup to ${destination_bucket}/${scalingo_app}/${backup_path}"
