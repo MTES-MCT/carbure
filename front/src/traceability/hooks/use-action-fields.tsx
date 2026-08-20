@@ -4,20 +4,17 @@ import { FormManager } from "common/components/form2"
 import { DateInput, NumberInput, TextInput } from "common/components/inputs2"
 import { Select } from "common/components/selects2"
 import { EntityManager } from "common/hooks/entity"
-import {
-  Action,
-  ActionIndustry,
-  ActionShippingMethod,
-  ActionType,
-} from "traceability/types"
+import { Action, ActionShippingMethod } from "traceability/types"
 
-export type ActionFieldOptions = FormManager<Partial<Action>> & {
+export type ActionFieldOptions = {
+  form: FormManager<Partial<Action>>
   readOnly?: boolean
+  label?: string
 }
 
 export type ActionField = {
   key: keyof Partial<Action>
-  fieldset?: string
+  label: string
   field: (options: ActionFieldOptions) => React.ReactNode
   condition?: (entity: EntityManager) => boolean
 }
@@ -26,144 +23,74 @@ export function useActionFields() {
   const { t } = useTranslation()
 
   return {
-    id: {
-      key: "id",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <NumberInput readOnly={readOnly} label={t("ID")} {...bind("id")} />
-      ),
-    },
-
     holder: {
       key: "holder",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <NumberInput
-          readOnly={readOnly}
-          label={t("Détenteur")}
-          {...bind("holder")}
-        />
-      ),
-    },
-
-    industry: {
-      key: "industry",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <Select
-          variant="form"
-          readOnly={readOnly}
-          label={t("Industrie")}
-          {...bind("industry")}
-          options={[{ value: ActionIndustry.H2, label: t("H2") }]}
-        />
+      label: t("Détenteur"),
+      field: ({ form, ...props }) => (
+        <NumberInput {...props} {...form.bind("holder")} />
       ),
     },
 
     material: {
       key: "material",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <NumberInput
-          readOnly={readOnly}
-          label={t("Matière")}
-          {...bind("material")}
-        />
+      label: t("Matière"),
+      field: ({ form, ...props }) => (
+        <NumberInput {...props} {...form.bind("material")} />
       ),
     },
 
     quantity: {
       key: "quantity",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <TextInput
-          readOnly={readOnly}
-          label={t("Quantité")}
-          {...bind("quantity")}
-        />
+      label: t("Quantité"),
+      field: ({ form, ...props }) => (
+        <TextInput {...props} {...form.bind("quantity")} />
       ),
     },
 
     site: {
       key: "site",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <NumberInput readOnly={readOnly} label={t("Site")} {...bind("site")} />
-      ),
-    },
-
-    status: {
-      key: "status",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <TextInput
-          readOnly={readOnly}
-          label={t("Statut")}
-          {...bind("status")}
-        />
+      label: t("Site"),
+      field: ({ form, ...props }) => (
+        <NumberInput {...props} {...form.bind("site")} />
       ),
     },
 
     pos_id: {
       key: "pos_id",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <TextInput
-          readOnly={readOnly}
-          label={t("N° de POS")}
-          {...bind("pos_id")}
-        />
-      ),
-    },
-
-    type: {
-      key: "type",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <Select
-          variant="form"
-          readOnly={readOnly}
-          label={t("Type d'action")}
-          {...bind("type")}
-          options={[{ value: ActionType.INIT, label: t("INIT") }]}
-        />
+      label: t("N° de POS"),
+      field: ({ form, ...props }) => (
+        <TextInput {...props} {...form.bind("pos_id")} />
       ),
     },
 
     shipping_date: {
       key: "shipping_date",
-      fieldset: t("Transport"),
-      field: ({ bind, readOnly }) => (
-        <DateInput
-          readOnly={readOnly}
-          label={t("Date d'expédition")}
-          {...bind("shipping_date")}
-        />
+      label: t("Date d'expédition"),
+      field: ({ form, ...props }) => (
+        <DateInput {...props} {...form.bind("shipping_date")} />
       ),
     },
 
     shipping_distance: {
       key: "shipping_distance",
-      fieldset: t("Transport"),
-      field: ({ bind, readOnly }) => (
+      label: t("Distance de livraison"),
+      field: ({ form, ...props }) => (
         <NumberInput
-          readOnly={readOnly}
-          label={t("Distance de livraison")}
           hintText={t("En km")}
-          {...bind("shipping_distance")}
+          {...props}
+          {...form.bind("shipping_distance")}
         />
       ),
     },
 
     shipping_method: {
       key: "shipping_method",
-      fieldset: t("Transport"),
-      field: ({ bind, readOnly }) => (
+      label: t("Mode de transport"),
+      field: ({ form, ...props }) => (
         <Select
+          {...props}
+          {...form.bind("shipping_method")}
           variant="form"
-          readOnly={readOnly}
-          label={t("Mode de transport")}
-          {...bind("shipping_method")}
           options={[
             { value: ActionShippingMethod.ROAD, label: t("Transport routier") },
             { value: ActionShippingMethod.PIPELINE, label: t("Pipeline") },
@@ -176,65 +103,49 @@ export function useActionFields() {
 
     working_date: {
       key: "working_date",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <DateInput
-          readOnly={readOnly}
-          label={t("Date de référence")}
-          {...bind("working_date")}
-        />
-      ),
-    },
-
-    parent: {
-      key: "parent",
-      fieldset: t("Informations générales"),
-      field: ({ bind, readOnly }) => (
-        <NumberInput
-          readOnly={readOnly}
-          label={t("Action parente")}
-          {...bind("parent")}
-        />
+      label: t("Date de référence"),
+      field: ({ form, ...props }) => (
+        <DateInput {...props} {...form.bind("working_date")} />
       ),
     },
 
     ei: {
       key: "ei",
-      fieldset: t("Émissions"),
-      field: ({ bind, readOnly }) => (
-        <TextInput readOnly={readOnly} label={t("EI")} {...bind("ei")} />
+      label: t("EI"),
+      field: ({ form, ...props }) => (
+        <TextInput {...props} {...form.bind("ei")} />
       ),
     },
 
     ep: {
       key: "ep",
-      fieldset: t("Émissions"),
-      field: ({ bind, readOnly }) => (
-        <TextInput readOnly={readOnly} label={t("EP")} {...bind("ep")} />
+      label: t("EP"),
+      field: ({ form, ...props }) => (
+        <TextInput {...props} {...form.bind("ep")} />
       ),
     },
 
     etd: {
       key: "etd",
-      fieldset: t("Émissions"),
-      field: ({ bind, readOnly }) => (
-        <TextInput readOnly={readOnly} label={t("ETD")} {...bind("etd")} />
+      label: t("ETD"),
+      field: ({ form, ...props }) => (
+        <TextInput {...props} {...form.bind("etd")} />
       ),
     },
 
     eu: {
       key: "eu",
-      fieldset: t("Émissions"),
-      field: ({ bind, readOnly }) => (
-        <TextInput readOnly={readOnly} label={t("EU")} {...bind("eu")} />
+      label: t("EU"),
+      field: ({ form, ...props }) => (
+        <TextInput {...props} {...form.bind("eu")} />
       ),
     },
 
     eccs: {
       key: "eccs",
-      fieldset: t("Émissions"),
-      field: ({ bind, readOnly }) => (
-        <TextInput readOnly={readOnly} label={t("ECCS")} {...bind("eccs")} />
+      label: t("ECCS"),
+      field: ({ form, ...props }) => (
+        <TextInput {...props} {...form.bind("eccs")} />
       ),
     },
   } satisfies Record<string, ActionField>

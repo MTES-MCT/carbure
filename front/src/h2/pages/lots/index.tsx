@@ -16,11 +16,13 @@ const LotsPage = () => {
 
   const filters = useActionFilters()
   const columns = useActionColumns()
+
   const fields = useActionFields()
 
   return (
     <ActionsPage
-      title={t("Lots")}
+      listTitle={t("Lots d'hydrogène")}
+      detailTitle={t("Lot d'hydrogène n˚")}
       subpath="lots"
       fixedQuery={H2_LOT_QUERY}
       filters={[
@@ -37,20 +39,14 @@ const LotsPage = () => {
         { ...columns.site, header: t("Station") },
       ]}
       fields={[
-        fields.id,
+        fields.pos_id,
         fields.holder,
-        fields.industry,
-        fields.material,
+        { ...fields.material, label: t("Nature d'hydrogène") },
         fields.quantity,
         fields.site,
-        fields.status,
-        fields.pos_id,
-        fields.type,
         fields.shipping_date,
         fields.shipping_distance,
         fields.shipping_method,
-        fields.working_date,
-        fields.parent,
         fields.ei,
         fields.ep,
         fields.etd,

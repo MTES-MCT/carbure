@@ -27,7 +27,8 @@ import { ActionField } from "traceability/hooks/use-action-fields"
 export const QUERY_KEY = "traceability-actions"
 
 export type ActionsPageProps = {
-  title: string
+  listTitle: string
+  detailTitle: string
   subpath: string
   fixedQuery: Partial<ActionQuery>
   columns: ActionColumn[]
@@ -36,14 +37,15 @@ export type ActionsPageProps = {
 }
 
 export const ActionsPage = ({
-  title,
+  listTitle,
+  detailTitle,
   subpath,
   fixedQuery,
   columns,
   filters,
   fields,
 }: ActionsPageProps) => {
-  usePrivateNavigation(title)
+  usePrivateNavigation(listTitle)
 
   const entity = useEntity()
   const location = useLocation()
@@ -114,7 +116,12 @@ export const ActionsPage = ({
         />
       </Content>
 
-      <HashRoute path="action/:id" element={<ActionModal fields={fields} />} />
+      {fields && (
+        <HashRoute
+          path="action/:id"
+          element={<ActionModal title={detailTitle} fields={fields} />}
+        />
+      )}
     </Main>
   )
 }

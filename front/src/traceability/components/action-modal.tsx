@@ -1,5 +1,4 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { useTranslation } from "react-i18next"
 
 import Dialog from "common/components/dialog2/dialog"
 import { useHashMatch } from "common/components/hash-route"
@@ -13,11 +12,11 @@ import { ActionField } from "traceability/hooks/use-action-fields"
 import { ActionForm } from "traceability/components/action-form"
 
 export type ActionModalProps = {
-  fields?: ActionField[]
+  title: string
+  fields: ActionField[]
 }
 
-export const ActionModal = ({ fields }: ActionModalProps) => {
-  const { t } = useTranslation()
+export const ActionModal = ({ title, fields }: ActionModalProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const entity = useEntity()
@@ -41,7 +40,7 @@ export const ActionModal = ({ fields }: ActionModalProps) => {
         onClose={closeDialog}
         header={
           <Dialog.Title>
-            {t("Action n°")}
+            {title}
             {action?.id ?? "..."}
           </Dialog.Title>
         }
