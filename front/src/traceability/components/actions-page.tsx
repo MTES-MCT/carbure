@@ -1,5 +1,7 @@
 import { useCallback } from "react"
+import { useLocation } from "react-router-dom"
 
+import HashRoute from "common/components/hash-route"
 import { Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { Table } from "common/components/table2"
@@ -12,14 +14,15 @@ import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 
 import { getActionFilters, getActions, getActionYears } from "traceability/api"
 import {
-  Action,
   ActionFilter,
   ActionQuery,
   ActionQueryBuilder,
 } from "traceability/types"
 import { ActionFilterDisplay } from "traceability/hooks/use-action-filters"
-import { ActionColumnDefinition } from "traceability/hooks/use-action-columns"
+import { ActionColumn } from "traceability/hooks/use-action-columns"
 import { useCombinedQuery } from "traceability/hooks/use-combined-query"
+import { ActionModal } from "traceability/components/action-modal"
+import { ActionField } from "traceability/hooks/use-action-fields"
 
 export const QUERY_KEY = "traceability-actions"
 
@@ -27,9 +30,9 @@ export type ActionsPageProps = {
   title: string
   subpath: string
   fixedQuery: Partial<ActionQuery>
-  columns: ActionColumnDefinition[]
+  columns: ActionColumn[]
   filters: ActionFilterDisplay[]
-  onRowAction?: (action: Action, index: number) => void
+  fields?: ActionField[]
 }
 
 export const ActionsPage = ({
@@ -38,11 +41,12 @@ export const ActionsPage = ({
   fixedQuery,
   columns,
   filters,
-  onRowAction,
+  fields,
 }: ActionsPageProps) => {
   usePrivateNavigation(title)
 
   const entity = useEntity()
+  const location = useLocation()
 
   const visibleColumns = columns.filter(
     (column) => column.condition?.(entity) ?? true
@@ -102,9 +106,15 @@ export const ActionsPage = ({
           rows={result?.data?.results ?? []}
           order={state.order}
           onOrder={actions.setOrder}
-          onAction={onRowAction}
+          rowLink={(action) => ({
+            pathname: location.pathname,
+            search: location.search,
+            hash: `action/${action.id}`,
+          })}
         />
       </Content>
+
+      <HashRoute path="action/:id" element={<ActionModal fields={fields} />} />
     </Main>
   )
 }
