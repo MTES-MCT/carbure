@@ -14,7 +14,7 @@ class ActionManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .select_related("holder", "material", "site")
+            .select_related("holder", "material", "site", "parent")
             .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
             .annotate(created_at=Subquery(first_status_subquery.values("created_at")[:1]))
             .annotate(updated_at=Subquery(latest_status_subquery.values("created_at")[:1]))
