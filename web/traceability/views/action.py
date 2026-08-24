@@ -3,10 +3,10 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import viewsets
 
 from core.filters import FiltersActionFactory
-from core.permissions import HasEntityReadRights, HasEntityWriteRights
 from traceability.filters import ActionFilter
+from traceability.handlers import get_action_handler
 from traceability.models import Action
-from traceability.serializers import ActionInputSerializer, ActionSerializer
+from traceability.serializers.action import ActionInputSerializer, ActionQuerySerializer, ActionSerializer
 from traceability.views.mixins import YearsActionMixin
 
 
@@ -19,22 +19,30 @@ from traceability.views.mixins import YearsActionMixin
             description="Authorised entity ID.",
             required=True,
         ),
+        ActionQuerySerializer,
     ]
 )
 class ActionViewset(YearsActionMixin, FiltersActionFactory(), viewsets.ModelViewSet):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
-    permission_classes = [HasEntityReadRights]
     filterset_class = ActionFilter
     search_fields = ["pos_id"]
 
+    def get_handler(self):
+        query = ActionQuerySerializer(data=self.request.query_params)
+        query.is_valid(raise_exception=True)
+        return get_action_handler(query.validated_data["industry"])
+
     def get_permissions(self):
-        if self.action in ["create", "update", "partial_update", "destroy"]:
-            return [HasEntityWriteRights()]
-        return super().get_permissions()
+        handler = self.get_handler()
+
+        return handler.get_permissions(self.action)
 
     def get_queryset(self):
-        return self.queryset.filter(Q(holder=self.request.entity) | Q(parent__holder=self.request.entity))
+        return self.queryset.filter(
+            Q(holder=self.request.entity) | Q(parent__holder=self.request.entity),
+            industry=self.get_handler().industry,
+        )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
