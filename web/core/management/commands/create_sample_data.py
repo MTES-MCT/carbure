@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 
 class Command(BaseCommand):
@@ -22,10 +23,12 @@ class Command(BaseCommand):
     def _create_sample_data(self, app_name, report_missing=False):
         try:
             module = __import__(f"{app_name}.factories.sample_data", fromlist=["create_sample_data"])
-            module.create_sample_data()
+            with transaction.atomic():
+                self.stdout.write(f"> Création des données pour l'app '{app_name}'...")
+                module.create_sample_data()
         except (ImportError, AttributeError) as e:
             if report_missing:
                 print(e)
                 self.stderr.write(f"L'app '{app_name}' n'a pas de create_sample_data()")
         else:
-            self.stdout.write(f"Données créées pour l'app '{app_name}'")
+            self.stdout.write(f"> Données créées pour l'app '{app_name}'")

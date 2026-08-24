@@ -50,7 +50,7 @@ migrate:
 	$(django_cmd) migrate
 
 seed:
-	$(django_cmd) create_sample_data
+	$(django_cmd) create_sample_data $(app)
 
 ipython:
 	$(django_cmd) shell --interface ipython
