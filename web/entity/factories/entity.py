@@ -9,6 +9,7 @@ User = get_user_model()
 class EntityFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Entity
+        django_get_or_create = ("name",)
 
     class Params:
         company_name = factory.Faker("first_name")

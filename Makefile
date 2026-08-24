@@ -26,6 +26,12 @@ down:
 restart:
 	$(docker_cmd) down && $(docker_cmd) up -d
 
+restart-backend:
+	$(docker_cmd) restart carbure-django
+
+restart-frontend:
+	$(docker_cmd) restart carbure-frontend
+
 open:
 	open http://carbure.local:8090/
 

@@ -128,6 +128,7 @@ INSTALLED_APPS = [
     "edelivery",
     "anonymization",
     "feedstocks",
+    "h2",
 ]
 
 AUTH_USER_MODEL = "authtools.User"
