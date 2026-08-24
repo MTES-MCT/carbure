@@ -61,7 +61,7 @@ const LotsPage = () => {
         fields.holder,
         { ...fields.material, label: t("Nature d'hydrogène") },
         fields.quantity,
-        { ...fields.site, options: H2_SITE_FIELD_OPTIONS },
+        { ...fields.site, label: t("Station"), options: H2_SITE_FIELD_OPTIONS },
         fields.shipping_date,
         fields.shipping_distance,
         fields.shipping_method,
