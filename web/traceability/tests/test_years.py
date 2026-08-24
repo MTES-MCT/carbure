@@ -6,6 +6,7 @@ from django.urls import reverse
 from core.models import Entity
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory
+from traceability.models import Action
 
 
 class ActionYearsTest(TestCase):
@@ -24,7 +25,7 @@ class ActionYearsTest(TestCase):
     def test_returns_sorted_years_for_the_current_entity(self):
         response = self.client.get(
             reverse("traceability-action-get-years"),
-            {"entity_id": self.entity.id},
+            {"entity_id": self.entity.id, "industry": Action.H2},
         )
 
         self.assertEqual(response.status_code, 200)
@@ -33,7 +34,7 @@ class ActionYearsTest(TestCase):
     def test_applies_action_filters(self):
         response = self.client.get(
             reverse("traceability-action-get-years"),
-            {"entity_id": self.entity.id, "working_year": ["2025"]},
+            {"entity_id": self.entity.id, "industry": Action.H2, "working_year": ["2025"]},
         )
 
         self.assertEqual(response.status_code, 200)

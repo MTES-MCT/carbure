@@ -6,7 +6,6 @@ from traceability.models import Action, ActionStatus
 
 class ActionFilter(FilterSet):
     working_year = MultiValueInFilter(field_name="working_date__year")
-    industry = MultipleChoiceFilter(field_name="industry", choices=Action.INDUSTRIES)
     type = MultipleChoiceFilter(field_name="type", choices=Action.TYPES)
     status = MultipleChoiceFilter(field_name="status", choices=ActionStatus.STATUSES)
     holder = MultiValueInFilter(field_name="holder__name")

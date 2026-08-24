@@ -30,3 +30,7 @@ class ActionInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         exclude = ["id"]
+
+
+class ActionQuerySerializer(serializers.Serializer):
+    industry = serializers.ChoiceField(choices=Action.INDUSTRIES)
