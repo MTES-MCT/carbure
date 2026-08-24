@@ -10,6 +10,7 @@ from entity.factories.entity import EntityFactory
 class BiomethaneProductionUnitFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneProductionUnit
+        django_get_or_create = ("producer",)
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
     # Site fields
@@ -40,4 +41,14 @@ class BiomethaneDigestateStorageFactory(factory.django.DjangoModelFactory):
 
 def create_production_unit(producer: Entity, **kwargs):
     BiomethaneProductionUnitFactory.create(producer=producer, **kwargs)
-    BiomethaneDigestateStorageFactory.create_batch(2, producer=producer)
+
+    BiomethaneDigestateStorage.objects.update_or_create(
+        producer=producer,
+        type="Béton",
+        defaults={"capacity": 5000},
+    )
+    BiomethaneDigestateStorage.objects.update_or_create(
+        producer=producer,
+        type="Cuve",
+        defaults={"capacity": 7500},
+    )

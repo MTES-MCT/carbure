@@ -13,6 +13,7 @@ faker = Faker()
 class BiomethaneInjectionSiteFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneInjectionSite
+        django_get_or_create = ("producer",)
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
 
