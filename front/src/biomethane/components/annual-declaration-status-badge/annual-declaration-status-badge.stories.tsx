@@ -17,6 +17,10 @@ export const AllStatuses: Story = {
         status={AnnualDeclarationStatus.IN_PROGRESS}
       />
       <AnnualDeclarationStatusBadge status={AnnualDeclarationStatus.DECLARED} />
+      <AnnualDeclarationStatusBadge
+        status={AnnualDeclarationStatus.DECLARED}
+        submissionDate="2025-01-01"
+      />
       <AnnualDeclarationStatusBadge status={AnnualDeclarationStatus.OVERDUE} />
       <AnnualDeclarationStatusBadge
         status={AnnualDeclarationStatus.NOT_STARTED}

@@ -49,6 +49,7 @@ class BiomethaneProductionUnitService:
         # Inherited Site fields
         "country",
         "gps_coordinates",
+        "commissioning_date",
         # Phase separation fields: optional regardless of has_digestate_phase_separation value.
         # They are cleared (set to None) when phase separation is disabled, but never strictly required.
         *PHASE_SEPARATION_FIELDS,
