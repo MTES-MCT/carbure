@@ -49,7 +49,7 @@ export const BiomethanePageHeader = ({ children }: PropsWithChildren) => {
           <DownloadDeclarationButton year={selectedYear} />
         </Row>
         <AnnualDeclarationStatusBadge
-          status={annualDeclaration?.status}
+          status={status}
           submissionDate={annualDeclaration?.submission_date}
         />
       </Row>

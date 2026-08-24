@@ -1,6 +1,6 @@
-import { AnnualDeclarationStatus } from "biomethane/types"
+import { AnnualDeclarationStatus, AnnualDeclaration } from "biomethane/types"
 
-export const annualDeclaration = {
+export const annualDeclaration: AnnualDeclaration = {
   year: 2025,
   status: AnnualDeclarationStatus.IN_PROGRESS,
   missing_fields: {
@@ -11,6 +11,7 @@ export const annualDeclaration = {
   is_complete: true,
   producer: 1,
   is_open: true,
+  submission_date: "2025-01-01",
 }
 
 export const annualDeclarationMissingFields = {
