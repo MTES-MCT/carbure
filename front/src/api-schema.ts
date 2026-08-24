@@ -4227,7 +4227,7 @@ export interface components {
             /** Précisez la culture */
             culture_details?: string | null;
             /** Type de collecte */
-            collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
+            collection_type?: components["schemas"]["CollectionTypeEnum"];
             /** Unité matière */
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /**
@@ -4380,6 +4380,8 @@ export interface components {
             unknown_delivery_site?: string | null;
             readonly delivery_site_country: components["schemas"]["Country"];
             delivery_type?: components["schemas"]["DeliveryTypeEnum"];
+            usage?: components["schemas"]["UsageEnum"];
+            usage_precision?: string;
             lot_status?: components["schemas"]["LotStatusEnum"];
             correction_status?: components["schemas"]["CorrectionStatusEnum"];
             /** Format: double */
@@ -5513,7 +5515,7 @@ export interface components {
             /** Format: date */
             valid_until: string;
             download_link?: string | null;
-            scope?: unknown;
+            scope?: string | null;
             input?: unknown;
             output?: unknown;
         };
@@ -6976,6 +6978,19 @@ export interface components {
         UpdatedQuotasRequest: {
             approved_quotas: number[][];
         };
+        /**
+         * @description * `ROAD` - ROAD
+         *     * `HEATING` - HEATING
+         *     * `AGRICULTURE` - AGRICULTURE
+         *     * `CONSTRUCTION` - CONSTRUCTION
+         *     * `MARITIME` - MARITIME
+         *     * `INLAND_WATERWAY` - INLAND_WATERWAY
+         *     * `RAIL` - RAIL
+         *     * `FISHING` - FISHING
+         *     * `OTHER` - OTHER
+         * @enum {string}
+         */
+        UsageEnum: UsageEnum;
         /**
          * @description Serializer for creating new users. Includes required fields
          *     and repeated password validation.
@@ -15695,6 +15710,17 @@ export enum UnitTypeEnum {
     HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE",
     STEP = "STEP",
     ISDND = "ISDND"
+}
+export enum UsageEnum {
+    ROAD = "ROAD",
+    HEATING = "HEATING",
+    AGRICULTURE = "AGRICULTURE",
+    CONSTRUCTION = "CONSTRUCTION",
+    MARITIME = "MARITIME",
+    INLAND_WATERWAY = "INLAND_WATERWAY",
+    RAIL = "RAIL",
+    FISHING = "FISHING",
+    OTHER = "OTHER"
 }
 export enum UserRightsRequestsStatusEnum {
     Pending = "PENDING",

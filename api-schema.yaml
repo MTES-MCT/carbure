@@ -14399,7 +14399,6 @@ components:
         collection_type:
           allOf:
             - $ref: "#/components/schemas/CollectionTypeEnum"
-          nullable: true
           title: Type de collecte
         material_unit:
           allOf:
@@ -14774,6 +14773,11 @@ components:
           readOnly: true
         delivery_type:
           $ref: "#/components/schemas/DeliveryTypeEnum"
+        usage:
+          $ref: "#/components/schemas/UsageEnum"
+        usage_precision:
+          type: string
+          maxLength: 255
         lot_status:
           $ref: "#/components/schemas/LotStatusEnum"
         correction_status:
@@ -17556,6 +17560,7 @@ components:
           nullable: true
           maxLength: 512
         scope:
+          type: string
           nullable: true
         input:
           nullable: true
@@ -20847,6 +20852,28 @@ components:
             minItems: 2
       required:
         - approved_quotas
+    UsageEnum:
+      enum:
+        - ROAD
+        - HEATING
+        - AGRICULTURE
+        - CONSTRUCTION
+        - MARITIME
+        - INLAND_WATERWAY
+        - RAIL
+        - FISHING
+        - OTHER
+      type: string
+      description: |-
+        * `ROAD` - ROAD
+        * `HEATING` - HEATING
+        * `AGRICULTURE` - AGRICULTURE
+        * `CONSTRUCTION` - CONSTRUCTION
+        * `MARITIME` - MARITIME
+        * `INLAND_WATERWAY` - INLAND_WATERWAY
+        * `RAIL` - RAIL
+        * `FISHING` - FISHING
+        * `OTHER` - OTHER
     UserCreation:
       type: object
       description: |-
