@@ -70,4 +70,3 @@ class Action(models.Model):
         db_table = "action"
         verbose_name = "Action"
         verbose_name_plural = "Actions"
-        ordering = ["id"]
