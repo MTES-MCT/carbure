@@ -20,5 +20,5 @@ class YearsActionMixin:
     )
     @action(detail=False, methods=["get"], url_path="years")
     def get_years(self, request):
-        years = self.filter_queryset(self.get_queryset()).values_list("working_date__year", flat=True).distinct()
+        years = self.filter_queryset(self.get_queryset()).order_by().values_list("working_date__year", flat=True).distinct()
         return Response(sorted(years))
