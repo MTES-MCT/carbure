@@ -2,30 +2,34 @@
 Import feedstock tariff coefficients from Excel.
 
 File: $CARBURE_HOME/web/biomethane/fixtures/import-feedstock-tariff-coefficients.xlsx
-Columns: Nom Intrant | Code | Référence AT 2011 | Référence AT 2020/21/23
+Columns: Nom Intrant | Code | Référence AT 2011 | Référence AT 2020/21/23 | Type de collecte
+Optional: Type de collecte (empty/missing = unconditional; LOCAL/IAA/PRIVATE for conditional primes).
+Duplicate Code rows with different Type de collecte for multiple primes.
 
   python web/manage.py import_feedstock_tariff_coefficients --dry-run=true
   python web/manage.py import_feedstock_tariff_coefficients --dry-run=false
 """
 
 import os
-import re
 
 import pandas as pd
 from django.core.management.base import BaseCommand
 
-from biomethane.models import BiomethaneFeedstockTariffCoefficient
+from biomethane.models import BiomethaneFeedstockTariffCoefficient, BiomethaneSupplyInput
 from core.models import MatierePremiere
 
 Coeff = BiomethaneFeedstockTariffCoefficient
 
 FILENAME = "import-feedstock-tariff-coefficients.xlsx"
 COL_CODE = "Code"
+COL_COLLECTION_TYPE = "Type de collecte"
 COL_AT_2011 = "Référence AT 2011"
 COL_AT_2020 = "Référence AT 2020/21/23"
 
+ALLOWED_COLLECTION_TYPES = {value for value, _ in BiomethaneSupplyInput.COLLECTION_TYPE_CHOICES}
+
 # (column name, regime, allowed coefficients)
-columns = (
+REGIME_COLUMNS = (
     (COL_AT_2011, Coeff.AT_2011, {Coeff.P1, Coeff.P2, Coeff.P3}),
     (COL_AT_2020, Coeff.AT_2020_PLUS, {Coeff.P, Coeff.PEF}),
 )
@@ -34,13 +38,25 @@ columns = (
 def parse_coefficient(value, allowed):
     if value is None or (isinstance(value, float) and pd.isna(value)):
         return None
-    text = str(value).strip()
+    text = str(value).strip().upper()
     if not text:
         return None
-    text = re.split(r"\s+si\s+", text, maxsplit=1, flags=re.IGNORECASE)[0].strip().upper()
+    if text == "PEFF":
+        text = Coeff.PEF
     if text in allowed:
         return text
-    raise ValueError(f"invalid coefficient '{value}' (expected one of {allowed})")
+    raise ValueError(f"invalid coefficient '{value}' (expected one of {sorted(allowed)})")
+
+
+def parse_collection_type(value):
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return ""
+    text = str(value).strip()
+    if not text:
+        return ""
+    if text not in ALLOWED_COLLECTION_TYPES:
+        raise ValueError(f"invalid collection_type '{value}' (expected one of {sorted(ALLOWED_COLLECTION_TYPES)})")
+    return text
 
 
 class Command(BaseCommand):
@@ -66,11 +82,13 @@ class Command(BaseCommand):
             return
 
         df = pd.read_excel(path)
-        for col in (COL_CODE, COL_AT_2011, COL_AT_2020):
+        required = (COL_CODE, COL_AT_2011, COL_AT_2020)
+        for col in required:
             if col not in df.columns:
                 self.stderr.write(f"Missing column: {col}")
                 return
 
+        has_collection_type_column = COL_COLLECTION_TYPE in df.columns
         by_code = {mp.code: mp for mp in MatierePremiere.biomethane.all()}
 
         created = 0
@@ -91,8 +109,14 @@ class Command(BaseCommand):
                 errors += 1
                 continue
 
-            # Import coefficients for each regime
-            for col, regime, allowed in columns:
+            try:
+                collection_type = parse_collection_type(row[COL_COLLECTION_TYPE]) if has_collection_type_column else ""
+            except ValueError as exc:
+                self.stderr.write(f"Row {index + 2} ({code}): {exc}")
+                errors += 1
+                continue
+
+            for col, regime, allowed in REGIME_COLUMNS:
                 try:
                     coefficient = parse_coefficient(row[col], allowed)
                 except ValueError as exc:
@@ -102,8 +126,14 @@ class Command(BaseCommand):
                 if not coefficient:
                     continue
 
+                lookup = {
+                    "feedstock": feedstock,
+                    "regime": regime,
+                    "collection_type": collection_type,
+                }
+
                 if dry_run:
-                    exists = Coeff.objects.filter(feedstock=feedstock, regime=regime).exists()
+                    exists = Coeff.objects.filter(**lookup).exists()
                     if exists:
                         updated += 1
                     else:
@@ -111,8 +141,7 @@ class Command(BaseCommand):
                     continue
 
                 _, was_created = Coeff.objects.update_or_create(
-                    feedstock=feedstock,
-                    regime=regime,
+                    **lookup,
                     defaults={"coefficient": coefficient},
                 )
                 if was_created:
