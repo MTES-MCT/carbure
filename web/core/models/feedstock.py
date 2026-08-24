@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+GPL_BIOFUEL_TYPES = ["HVOGPL", "HOGPL", "HCGPL"]
+
 
 class Biocarburant(models.Model):
     name = models.CharField(max_length=64)
