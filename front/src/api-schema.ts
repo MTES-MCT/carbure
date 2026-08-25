@@ -6118,6 +6118,7 @@ export interface components {
          * @description * `ESSENCE` - ESSENCE
          *     * `GAZOLE` - GAZOLE
          *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+         *     * `GPL_C` - GPL_C
          * @enum {string}
          */
         ObjectiveSectorCodeEnum: PathsApiTiruertOperationsGetParametersQuerySector;
@@ -14454,6 +14455,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+                 *     * `GPL_C` - GPL_C
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
                 selected_entity_id?: number;
@@ -14831,6 +14833,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+                 *     * `GPL_C` - GPL_C
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
                 selected_entity_id?: number;
@@ -14946,6 +14949,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+                 *     * `GPL_C` - GPL_C
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
                 selected_entity_id?: number;
@@ -15084,6 +15088,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
+                 *     * `GPL_C` - GPL_C
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
                 selected_entity_id?: number;
@@ -16103,7 +16108,8 @@ export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
 export enum PathsApiTiruertOperationsGetParametersQuerySector {
     CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
     ESSENCE = "ESSENCE",
-    GAZOLE = "GAZOLE"
+    GAZOLE = "GAZOLE",
+    GPL_C = "GPL_C"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {
     ACCEPTED = "ACCEPTED",
