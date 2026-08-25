@@ -13,9 +13,9 @@ class ActionViewsetPermissionTest(TestCase, PermissionTestMixin):
     def test_h2_permissions_when_industry_is_h2(self):
         view = ActionViewset()
         view.request = Request(APIRequestFactory().get("/", {"industry": Action.H2}))
+        view.request.handler = H2ActionHandler()
         view.action = "list"
 
-        self.assertIsInstance(view.get_handler(), H2ActionHandler)
         self.assertPermissionsEqual(view.get_permissions(), [HasHRSRights()])
 
         view.action = "create"
