@@ -8,6 +8,7 @@ COLUMNS = [
     {"key": "pos_id", "header": "N° de POS"},
     {"key": "material", "header": "Matière"},
     {"key": "quantity", "header": "Quantité"},
+    {"key": "site", "header": "Site"},
     {"key": "shipping_date", "header": "Date d'expédition"},
     {"key": "shipping_distance", "header": "Distance de livraison"},
     {

@@ -4,6 +4,7 @@ from traceability.factories import MaterialFactory
 from traceability.handlers import ActionIndustryHandler, get_action_handler
 from traceability.handlers.h2 import H2ActionHandler
 from traceability.models import Action
+from transactions.models import Site
 
 
 class ActionHandlerRegistryTest(TestCase):
@@ -30,3 +31,11 @@ class ActionHandlerRegistryTest(TestCase):
         materials = list(get_action_handler(Action.H2).lookup("material"))
 
         self.assertEqual(materials, [hydrogen])
+
+    def test_h2_handler_looks_up_refueling_stations(self):
+        station = Site.objects.create(name="Station Paris", site_type=Site.H2_REFUELING_STATION)
+        Site.objects.create(name="Dépôt Lyon", site_type=Site.EFS)
+
+        sites = get_action_handler(Action.H2).lookup("site")
+
+        self.assertEqual(list(sites.values_list("pk", flat=True)), [station.pk])

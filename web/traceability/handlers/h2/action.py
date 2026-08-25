@@ -10,6 +10,7 @@ class H2ActionHandler(ActionIndustryHandler):
     excel_column_labels = {
         "quantity": "Quantité (MJ)",
         "material": "Nature d'hydrogène",
+        "site": "Station",
     }
 
     @staticmethod

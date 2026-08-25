@@ -8,6 +8,7 @@ from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.h2 import H2ActionHandler
 from traceability.models import Action
 from traceability.services.action_excel import build_action_import_template
+from transactions.models import Site
 
 
 def load_template(handler, entity=None):
@@ -28,9 +29,11 @@ class ActionExcelTemplateTest(SimpleTestCase):
         self.assertEqual(headers[0], "N° de POS")
         self.assertEqual(headers[1], "Matière")
         self.assertEqual(headers[2], "Quantité")
+        self.assertEqual(headers[3], "Site")
         self.assertIsNone(references["B2"].value)
+        self.assertIsNone(references["D2"].value)
         self.assertEqual(
-            [references.cell(row=row, column=6).value for row in range(2, 6)],
+            [references.cell(row=row, column=7).value for row in range(2, 6)],
             [label for _, label in Action.SHIPPING_METHODS],
         )
 
@@ -44,6 +47,7 @@ class ActionExcelLookupColumnsTest(TestCase):
         self.assertEqual(headers[0], "N° de POS")
         self.assertEqual(headers[1], "Nature d'hydrogène")
         self.assertEqual(headers[2], "Quantité (MJ)")
+        self.assertEqual(headers[3], "Station")
 
     def test_h2_material_options_come_from_lookup(self):
         hydrogen = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux")
@@ -55,3 +59,14 @@ class ActionExcelLookupColumnsTest(TestCase):
 
         self.assertEqual(references["B2"].value, hydrogen.name)
         self.assertIsNone(references["B3"].value)
+
+    def test_h2_site_options_come_from_lookup(self):
+        station = Site.objects.create(name="Station Paris", site_type=Site.H2_REFUELING_STATION)
+        Site.objects.create(name="Dépôt Lyon", site_type=Site.EFS)
+
+        workbook = load_template(H2ActionHandler())
+        self.addCleanup(workbook.close)
+        references = workbook["References"]
+
+        self.assertEqual(references["D2"].value, station.name)
+        self.assertIsNone(references["D3"].value)
