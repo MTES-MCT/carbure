@@ -28,25 +28,25 @@ class ActionViewset(YearsActionMixin, FiltersActionFactory(), viewsets.ModelView
     filterset_class = ActionFilter
     search_fields = ["pos_id"]
 
-    def get_handler(self):
-        query = ActionQuerySerializer(data=self.request.query_params)
+    def initial(self, request, *args, **kwargs):
+        query = ActionQuerySerializer(data=request.query_params)
         query.is_valid(raise_exception=True)
-        return get_action_handler(query.validated_data["industry"])
+        request.handler = get_action_handler(query.validated_data["industry"])
+        super().initial(request, *args, **kwargs)
 
     def get_permissions(self):
-        handler = self.get_handler()
-
-        return handler.get_permissions(self.action)
+        return self.request.handler.get_permissions(self.action)
 
     def get_queryset(self):
         return self.queryset.filter(
             Q(holder=self.request.entity) | Q(parent__holder=self.request.entity),
-            industry=self.get_handler().industry,
+            industry=self.request.handler.industry,
         )
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
+        context["handler"] = self.request.handler
         return context
 
     def get_serializer_class(self):
