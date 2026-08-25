@@ -13,6 +13,7 @@ filename = "%s/web/fixtures/csv/biocarburants.csv" % (os.environ["CARBURE_HOME"]
 with open(filename, newline="", encoding="utf-8-sig") as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
+        print(row)
         code = row["code"]
         name = row["name"]
         name_en = row["name_en"]
@@ -25,6 +26,7 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
         renewable_energy_share = row["renewable_energy_share"]
         compatible_essence = row["compatible_essence"]
         compatible_diesel = row["compatible_diesel"]
+        compatible_gpl = row["compatible_gpl"]
         description = row["description"]
 
         obj, created = Biocarburant.objects.update_or_create(
@@ -41,6 +43,7 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
                 "renewable_energy_share": renewable_energy_share,
                 "compatible_essence": compatible_essence,
                 "compatible_diesel": compatible_diesel,
+                "compatible_gpl": compatible_gpl,
                 "description": description,
             },
         )
