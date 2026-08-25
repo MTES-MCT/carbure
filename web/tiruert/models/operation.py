@@ -110,10 +110,12 @@ class Operation(models.Model):
     ESSENCE = "ESSENCE"
     GAZOLE = "GAZOLE"
     CARBUREACTEUR = "CARBURÉACTEUR"
+    GPL_C = "GPL_C"
     SECTOR_CODE_CHOICES = (
         (ESSENCE, ESSENCE),
         (GAZOLE, GAZOLE),
         (CARBUREACTEUR, CARBUREACTEUR),
+        (GPL_C, GPL_C),
     )
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
