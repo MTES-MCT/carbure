@@ -20,6 +20,7 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
             certificate_id="",
             certificate_type="SYSTEME_NATIONAL",
             certificate_issuer="",
+            scope="PB",
             status="EXPIRED",
             valid_from=datetime(2026, 1, 31),
             valid_until=datetime(2027, 2, 17),
@@ -27,10 +28,10 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         self.entity_certificate = MagicMock(entity=self.entity, certificate=self.certificate)
 
         module_to_patch = "edelivery.ebms.requests.add_update_certificate_request"
-        self.patched_CertificateStatusConverter = patch(f"{module_to_patch}.CertificateStatusConverter").start()
-        self.patched_CertificateStatusConverter.return_value.to_udb.return_value = ""
         self.patched_CertificateIssuerConverter = patch(f"{module_to_patch}.CertificateIssuerConverter").start()
         self.patched_CertificateIssuerConverter.return_value.to_udb.return_value = ""
+        self.patched_CertificateStatusConverter = patch(f"{module_to_patch}.CertificateStatusConverter").start()
+        self.patched_CertificateStatusConverter.return_value.to_udb.return_value = ""
 
     def tearDown(self):
         patch.stopall()
@@ -112,3 +113,16 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
         group_certification_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/GROUP_CERTIFICATION")
         self.assertEqual("NO", group_certification_element.text)
+
+    def test_sets_eo_scope(self):
+        self.certificate.scope = "FSP"
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        scope = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/EO_SCOPE/ORGANISATION_SCOPE")
+        self.assertEqual("FSP", scope.text)
+
+    def test_handles_multiple_scopes(self):
+        self.certificate.scope = "PB, FSP"
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        scopes = root_xml_element.findall("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/EO_SCOPE")
+        organisation_scopes = [s.find("./ORGANISATION_SCOPE") for s in scopes]
+        self.assertEqual(["PB", "FSP"], [s.text for s in organisation_scopes])
