@@ -451,4 +451,6 @@ class OperationService:
             return Operation.GAZOLE
         elif biofuel.code in SAF_BIOFUEL_TYPES:
             return Operation.CARBUREACTEUR
+        elif biofuel.compatible_gpl:
+            return Operation.GPL_C
         return None

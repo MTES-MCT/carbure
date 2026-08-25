@@ -155,6 +155,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
                 When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
                 When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
+                When(biofuel__compatible_gpl=True, then=Value("GPL_C")),
                 default=Value(None),
                 output_field=CharField(),
             ),
