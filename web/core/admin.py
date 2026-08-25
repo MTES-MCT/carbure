@@ -7,6 +7,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordResetForm
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q, Sum
 from django.utils.crypto import get_random_string
@@ -39,6 +40,7 @@ from core.models import (
     UserRights,
     UserRightsRequests,
 )
+from core.models.certificate import valid_certificate_scope
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 
@@ -619,6 +621,12 @@ class GenericCertificateResource(resources.ModelResource):
         instance_loader_class = CachedInstanceLoader
         skip_unchanged = True
         report_skipped = True
+
+    def before_import_row(self, row, **kwargs):
+        super().before_import_row(row, **kwargs)
+        certificate_id, scheme, scope = row["certificate_id"], row["certificate_type"], row["scope"]
+        if not valid_certificate_scope(scheme, scope):
+            raise ValidationError(f"Scope '{scope}' for certificate '{certificate_id}' has an invalid format")
 
 
 @admin.register(GenericCertificate)
