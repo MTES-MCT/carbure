@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from traceability.handlers import get_action_handler
-from traceability.handlers.h2 import H2ActionHandler
+from h2.handlers import H2ActionHandler
+from traceability.handlers.registry import get_action_handler
 from traceability.models import Action
 
 

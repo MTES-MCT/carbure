@@ -4,7 +4,7 @@ from rest_framework import viewsets
 
 from core.filters import FiltersActionFactory
 from traceability.filters import ActionFilter
-from traceability.handlers import get_action_handler
+from traceability.handlers.registry import get_action_handler
 from traceability.models import Action
 from traceability.serializers.action import ActionInputSerializer, ActionQuerySerializer, ActionSerializer
 from traceability.views.mixins import YearsActionMixin

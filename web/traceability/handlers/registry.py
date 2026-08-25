@@ -1,7 +1,7 @@
+from h2.handlers import H2ActionHandler
 from traceability.models import Action
 
 from .action import ActionIndustryHandler
-from .h2 import H2ActionHandler
 
 ACTION_HANDLERS: dict[str, type[ActionIndustryHandler]] = {
     Action.H2: H2ActionHandler,
