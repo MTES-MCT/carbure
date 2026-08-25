@@ -15,6 +15,7 @@ User = get_user_model()
 class BiomethaneContractFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneContract
+        django_get_or_create = ("producer",)
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
     buyer = factory.LazyFunction(lambda: Entity.objects.filter(entity_type=Entity.OPERATOR).order_by("?").first())
@@ -73,6 +74,7 @@ class BiomethaneSignedContractFactory(BiomethaneContractFactory):
 class BiomethaneEntityConfigAmendmentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneContractAmendment
+        django_get_or_create = ("contract", "signature_date", "effective_date")
 
     contract = factory.SubFactory(BiomethaneContractFactory)
 
@@ -95,10 +97,24 @@ class BiomethaneEntityConfigAmendmentFactory(factory.django.DjangoModelFactory):
 
 
 def create_contract_with_amendments(entity):
-    contract = BiomethaneSignedContractFactory(producer=entity)
-    BiomethaneEntityConfigAmendmentFactory.create_batch(
-        2,
+    contract = BiomethaneSignedContractFactory(producer=entity, conditions_file=None)
+
+    signature_date = contract.signature_date or date(2024, 1, 1)
+    effective_date = contract.effective_date or date(2024, 1, 2)
+
+    BiomethaneEntityConfigAmendmentFactory.create(
         contract=contract,
+        signature_date=signature_date + timedelta(days=1),
+        effective_date=effective_date + timedelta(days=1),
+        amendment_object=[BiomethaneContractAmendment.CMAX_PAP_UPDATE],
+        amendment_file="",
+    )
+    BiomethaneEntityConfigAmendmentFactory.create(
+        contract=contract,
+        signature_date=signature_date + timedelta(days=2),
+        effective_date=effective_date + timedelta(days=2),
+        amendment_object=[BiomethaneContractAmendment.EFFECTIVE_DATE],
+        amendment_file="",
     )
 
     return contract

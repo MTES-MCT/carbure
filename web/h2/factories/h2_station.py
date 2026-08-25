@@ -11,6 +11,7 @@ from transactions.models.site import Site
 class H2StationFactory(SiteFactory):
     class Meta:
         model = H2Station
+        django_get_or_create = ("name",)
 
     site_type = Site.H2_REFUELING_STATION
     created_by = factory.SubFactory(EntityFactory, entity_type=Entity.HRS)
