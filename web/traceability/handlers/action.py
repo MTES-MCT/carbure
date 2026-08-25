@@ -1,6 +1,7 @@
 from typing import ClassVar
 
 from core.permissions import HasEntityReadRights, HasEntityWriteRights
+from traceability.handlers.excel import ACTION_EXCEL_COLUMNS, excel_column
 
 
 class ActionIndustryLookups:
@@ -11,8 +12,9 @@ class ActionIndustryHandler:
     """Per-industry plugin loaded from the `industry` query param."""
 
     industry: str | None = None
-    excel_column_labels: ClassVar[dict[str, str]] = {}
     lookups_class: ClassVar[type[ActionIndustryLookups]] = ActionIndustryLookups
+    excel_columns: ClassVar[list[dict]] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
+    write_actions = ("create", "update", "partial_update", "destroy", "import_actions")
 
     def __init__(self):
         self.lookups = self.lookups_class()
@@ -26,6 +28,6 @@ class ActionIndustryHandler:
 
     @staticmethod
     def get_permissions(action: str):
-        if action in ["create", "update", "partial_update", "destroy"]:
+        if action in ActionIndustryHandler.write_actions:
             return [HasEntityWriteRights()]
         return [HasEntityReadRights()]

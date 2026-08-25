@@ -20,3 +20,6 @@ class ActionViewsetPermissionTest(TestCase, PermissionTestMixin):
 
         view.action = "create"
         self.assertPermissionsEqual(view.get_permissions(), [HasHRSWriteRights()])
+
+        view.action = "import_actions"
+        self.assertPermissionsEqual(view.get_permissions(), [HasHRSWriteRights()])

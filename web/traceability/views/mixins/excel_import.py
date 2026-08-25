@@ -1,0 +1,50 @@
+from django.db import transaction
+from drf_spectacular.utils import extend_schema
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from core.excel_importer import ExcelImporter, ExcelValidationError
+from traceability.serializers.action import ActionExcelImportSerializer, ActionExcelUploadSerializer
+from traceability.services.action_excel import parse_action_import_file
+
+
+class ExcelImportActionMixin:
+    @extend_schema(
+        operation_id="import_actions_from_excel",
+        description="Create actions from an Excel import template.",
+        request=ActionExcelUploadSerializer,
+        responses={201: {"type": "object"}, 400: {"type": "object"}},
+    )
+    @action(detail=False, methods=["post"], url_path="import")
+    def import_actions(self, request, *args, **kwargs):
+        file_serializer = ActionExcelUploadSerializer(data=request.data)
+        if not file_serializer.is_valid():
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            rows = parse_action_import_file(file_serializer.validated_data["file"], request.handler)
+        except Exception:
+            return Response({"file": "Invalid Excel file."}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = ActionExcelImportSerializer(data=rows, many=True, context=self.get_serializer_context())
+        try:
+            serializer = ExcelImporter.validate_retrieved_data(
+                serializer,
+                config={"header_row": 0},
+                nb_rows=len(rows),
+            )
+        except ExcelValidationError as exc:
+            return Response(
+                {
+                    "validation_errors": exc.validation_errors,
+                    "total_errors": len(exc.validation_errors),
+                    "total_rows_processed": exc.total_rows_processed,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            serializer.save()
+
+        return Response({"rows_imported": len(rows)}, status=status.HTTP_201_CREATED)

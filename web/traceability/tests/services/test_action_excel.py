@@ -26,28 +26,25 @@ class ActionExcelTemplateTest(SimpleTestCase):
         references = workbook["References"]
         headers = [cell.value for cell in sheet[1]]
 
-        self.assertEqual(headers[0], "N° de POS")
-        self.assertEqual(headers[1], "Matière")
-        self.assertEqual(headers[2], "Quantité")
-        self.assertEqual(headers[3], "Site")
+        self.assertEqual(
+            headers,
+            [column["header"] for column in ActionIndustryHandler.excel_columns],
+        )
         self.assertIsNone(references["B2"].value)
         self.assertIsNone(references["D2"].value)
         self.assertEqual(
             [references.cell(row=row, column=7).value for row in range(2, 6)],
-            [label for _, label in Action.SHIPPING_METHODS],
+            [value for value, _ in Action.SHIPPING_METHODS],
         )
 
 
 class ActionExcelLookupColumnsTest(TestCase):
-    def test_h2_handler_overrides_labels(self):
+    def test_h2_template_uses_handler_columns(self):
         workbook = load_template(H2ActionHandler())
         self.addCleanup(workbook.close)
         headers = [cell.value for cell in workbook["Import actions H2"][1]]
 
-        self.assertEqual(headers[0], "N° de POS")
-        self.assertEqual(headers[1], "Nature d'hydrogène")
-        self.assertEqual(headers[2], "Quantité (MJ)")
-        self.assertEqual(headers[3], "Station")
+        self.assertEqual(headers, [column["header"] for column in H2ActionHandler.excel_columns])
 
     def test_h2_material_options_come_from_lookup(self):
         hydrogen = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux")

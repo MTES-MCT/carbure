@@ -7,7 +7,7 @@ from traceability.filters import ActionFilter
 from traceability.handlers import get_action_handler
 from traceability.models import Action
 from traceability.serializers.action import ActionInputSerializer, ActionQuerySerializer, ActionSerializer
-from traceability.views.mixins import ExcelTemplateActionMixin, YearsActionMixin
+from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
 
 @extend_schema(
@@ -22,7 +22,9 @@ from traceability.views.mixins import ExcelTemplateActionMixin, YearsActionMixin
         ActionQuerySerializer,
     ]
 )
-class ActionViewset(YearsActionMixin, ExcelTemplateActionMixin, FiltersActionFactory(), viewsets.ModelViewSet):
+class ActionViewset(
+    YearsActionMixin, ExcelTemplateActionMixin, ExcelImportActionMixin, FiltersActionFactory(), viewsets.ModelViewSet
+):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     filterset_class = ActionFilter
