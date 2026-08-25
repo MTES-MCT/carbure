@@ -5,6 +5,9 @@ from traceability.models import Action
 
 class H2ActionHandler(ActionIndustryHandler):
     industry = Action.H2
+    excel_column_labels = {
+        "quantity": "Quantité (MJ)",
+    }
 
     @staticmethod
     def get_permissions(action: str):
