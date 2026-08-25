@@ -1049,6 +1049,14 @@ class OperationServiceDefineSectorTest(TestCase):
 
         self.assertEqual(result, Operation.GAZOLE)
 
+    def test_define_sector_returns_gpl_for_compatible_gpl_biofuel(self):
+        """Should return GPL_C when the biofuel is GPL-compatible."""
+        biofuel = Mock(code="HCGPL", compatible_essence=False, compatible_diesel=False, compatible_gpl=True)
+
+        result = OperationService.define_sector(biofuel)
+
+        self.assertEqual(result, Operation.GPL_C)
+
     def test_define_sector_returns_carbureacteur_for_saf_biofuel(self):
         """Should return CARBUREACTEUR for SAF biofuel codes."""
         from saf.models.constants import SAF_BIOFUEL_TYPES
@@ -1061,7 +1069,7 @@ class OperationServiceDefineSectorTest(TestCase):
 
     def test_define_sector_returns_none_when_no_sector_matches(self):
         """Should return None when the biofuel matches no sector."""
-        biofuel = Mock(code="UNKNOWN", compatible_essence=False, compatible_diesel=False)
+        biofuel = Mock(code="UNKNOWN", compatible_essence=False, compatible_diesel=False, compatible_gpl=False)
 
         result = OperationService.define_sector(biofuel)
 

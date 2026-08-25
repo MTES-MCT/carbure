@@ -1,10 +1,15 @@
 from datetime import datetime
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.test import RequestFactory, TestCase
 from rest_framework.request import Request
 
+from core.models import Biocarburant, Entity, MatierePremiere
+from tiruert.models import Operation, OperationDetail
 from tiruert.views.operation.mixins.filter import FilterActionMixin
+from transactions.factories import CarbureLotFactory
+from transactions.models import Depot
 
 
 class DummyFilterView(FilterActionMixin):
@@ -200,3 +205,63 @@ class FilterBalanceEndpointTest(TestCase):
         response = self.view.filters_balance(request)
 
         self.assertEqual(set(response.data), {"value1", "value2"})
+
+
+class FilterBalanceSectorAnnotationTest(TestCase):
+    """Tests for sector annotations used by balance filters."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/entities.json",
+        "json/depots.json",
+        "json/entities_sites.json",
+    ]
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = DummyFilterView()
+
+    def test_balance_sector_filter_returns_gpl_for_gpl_compatible_biofuel(self):
+        """The balance sector annotation should include GPL_C."""
+        entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
+        feedstock = MatierePremiere.biofuel.filter(category=MatierePremiere.CONV).first()
+        biofuel = Biocarburant.objects.create(
+            code="GPLF",
+            name="Test GPL",
+            name_en="Test GPL",
+            description="Test GPL",
+            compatible_essence=False,
+            compatible_diesel=False,
+            compatible_gpl=True,
+        )
+        operation = Operation.objects.create(
+            type=Operation.INCORPORATION,
+            status=Operation.VALIDATED,
+            customs_category=MatierePremiere.CONV,
+            biofuel=biofuel,
+            credited_entity=entity,
+            to_depot=Depot.objects.first(),
+        )
+        lot = CarbureLotFactory.create(
+            carbure_client=entity,
+            carbure_supplier=entity,
+            carbure_producer=entity,
+            feedstock=feedstock,
+            biofuel=biofuel,
+            lot_status="ACCEPTED",
+            delivery_type="BLENDING",
+            carbure_delivery_site=Depot.objects.first(),
+        )
+        OperationDetail.objects.create(operation=operation, lot=lot, volume=100, emission_rate_per_mj=10)
+
+        queryset = Operation.objects.filter(id=operation.id)
+        self.view.queryset = queryset
+        self.view.filterset_class = lambda *args, **kwargs: SimpleNamespace(qs=queryset)
+        request = Request(self.factory.get("/operations/balance/filters/?filter=sector"))
+        self.view.request = request
+
+        response = self.view.filters_balance(request)
+
+        self.assertEqual(response.data, [Operation.GPL_C])
