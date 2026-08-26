@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 from openpyxl import load_workbook
 
 from h2.handlers import H2ActionHandler
@@ -18,7 +18,7 @@ def load_template(handler, entity=None):
     return workbook
 
 
-class ActionExcelTemplateTest(SimpleTestCase):
+class ActionExcelTemplateTest(TestCase):
     def test_default_columns_keep_generic_labels(self):
         workbook = load_template(ActionIndustryHandler())
         self.addCleanup(workbook.close)

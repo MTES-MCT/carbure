@@ -10,12 +10,13 @@ from rest_framework.test import APITestCase
 
 from core.models import Entity
 from core.tests_utils import setup_current_user
+from h2.factories.h2_station import H2StationFactory
 from h2.handlers import H2ActionHandler
 from traceability.factories import MaterialFactory
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
 from traceability.services.action_excel import build_action_import_template, parse_action_import_file
-from transactions.models import Site
+from transactions.models.site import Site
 
 
 def filled_h2_template(*, pos_id, material_name, site_name, extra_headers=None):
@@ -71,12 +72,21 @@ class ParseActionImportFileTest(TestCase):
 
 
 class ActionExcelImportViewTest(APITestCase):
+    fixtures = ["json/countries.json"]
+
     def setUp(self):
         self.entity = Entity.objects.create(name="HRS", entity_type=Entity.HRS)
         setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.entity, "RW")])
         self.url = reverse("traceability-action-import-actions")
         self.material = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux")
-        self.station = Site.objects.create(name="Station Paris", site_type=Site.H2_REFUELING_STATION)
+        self.station = H2StationFactory.create(
+            created_by=self.entity,
+        )
+        self.non_h2_station = Site.objects.create(
+            name="EFS",
+            site_type=Site.EFS,
+            created_by=self.entity,
+        )
 
     def _post(self, buffer):
         uploaded = SimpleUploadedFile(
@@ -108,7 +118,7 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertEqual(action.industry, Action.H2)
         self.assertEqual(action.type, Action.INIT)
         self.assertEqual(action.material, self.material)
-        self.assertEqual(action.site, self.station)
+        self.assertEqual(action.site.id, self.station.id)
         self.assertEqual(action.shipping_method, Action.ROAD)
         self.assertEqual(action.working_date, date(2026, 1, 15))
         self.assertEqual(action.action_statuses.get().status, ActionStatus.CREATED)
@@ -119,6 +129,34 @@ class ActionExcelImportViewTest(APITestCase):
                 pos_id="H2-001",
                 material_name="Bois",
                 site_name=self.station.name,
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertTrue(response.data["validation_errors"])
+
+    def test_import_rejects_material_from_another_industry(self):
+        MaterialFactory(code="BIO-WOOD", name="Bois")
+
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name="Bois",
+                site_name=self.station.name,
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertTrue(response.data["validation_errors"])
+
+    def test_import_rejects_site_from_another_industry(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.non_h2_station.name,
             )
         )
 

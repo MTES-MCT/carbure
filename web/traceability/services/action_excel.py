@@ -11,9 +11,8 @@ def build_action_import_template(handler: ActionIndustryHandler, entity=None) ->
     for spec in handler.excel_columns:
         column = {"header": spec["header"]}
         options = spec.get("options")
-        if options is None and spec.get("key"):
-            queryset = handler.lookup(spec["key"], entity)
-            options = list(queryset.values_list("name", flat=True)) if queryset is not None else None
+        if callable(options):
+            options = list(options(entity, handler))
         if options:
             column["options"] = options
         columns.append(column)

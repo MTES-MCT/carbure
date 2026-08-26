@@ -2,9 +2,15 @@ from traceability.models import Action
 
 ACTION_EXCEL_COLUMNS = {
     "pos_id": {"header": "N° de POS"},
-    "material": {"header": "Matière"},
+    "material": {
+        "header": "Matière",
+        "options": lambda entity, handler: list(handler.lookups.material(entity).values_list("name", flat=True)),
+    },
     "quantity": {"header": "Quantité"},
-    "site": {"header": "Site"},
+    "site": {
+        "header": "Site",
+        "options": lambda entity, handler: list(handler.lookups.site(entity).values_list("name", flat=True)),
+    },
     "shipping_date": {"header": "Date d'expédition"},
     "shipping_distance": {"header": "Distance de livraison"},
     "shipping_method": {

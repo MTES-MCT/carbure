@@ -1,3 +1,3 @@
-from .action import ActionIndustryHandler, ActionIndustryLookups
+from .action import ActionIndustryHandler
 
-__all__ = ["ActionIndustryHandler", "ActionIndustryLookups"]
+__all__ = ["ActionIndustryHandler"]
