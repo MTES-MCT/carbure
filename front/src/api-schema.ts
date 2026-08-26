@@ -3447,10 +3447,11 @@ export interface components {
             eccs?: string;
         };
         ActionInput: {
+            readonly id: number;
             /** N° de POS */
             pos_id: string;
             /** Filière */
-            industry: components["schemas"]["IndustryEnum"];
+            readonly industry: components["schemas"]["IndustryEnum"];
             /** Type d'action */
             type: components["schemas"]["ActionTypeEnum"];
             /**
@@ -3483,7 +3484,7 @@ export interface components {
             /** Format: decimal */
             eccs?: string;
             /** Entité détentrice de la quantité de l'action */
-            holder: number;
+            readonly holder: number;
             /** Action parente */
             parent?: number | null;
             /** Matière */
@@ -3493,8 +3494,6 @@ export interface components {
         ActionInputRequest: {
             /** N° de POS */
             pos_id: string;
-            /** Filière */
-            industry: components["schemas"]["IndustryEnum"];
             /** Type d'action */
             type: components["schemas"]["ActionTypeEnum"];
             /**
@@ -3526,8 +3525,6 @@ export interface components {
             eu?: string;
             /** Format: decimal */
             eccs?: string;
-            /** Entité détentrice de la quantité de l'action */
-            holder: number;
             /** Action parente */
             parent?: number | null;
             /** Matière */
@@ -6551,8 +6548,6 @@ export interface components {
         PatchedActionInputRequest: {
             /** N° de POS */
             pos_id?: string;
-            /** Filière */
-            industry?: components["schemas"]["IndustryEnum"];
             /** Type d'action */
             type?: components["schemas"]["ActionTypeEnum"];
             /**
@@ -6584,8 +6579,6 @@ export interface components {
             eu?: string;
             /** Format: decimal */
             eccs?: string;
-            /** Entité détentrice de la quantité de l'action */
-            holder?: number;
             /** Action parente */
             parent?: number | null;
             /** Matière */
@@ -15312,7 +15305,7 @@ export interface operations {
                 entity_id: number;
                 holder?: string[];
                 /** @description * `H2` - Hydrogène */
-                industry?: PathsApiTraceabilityActionsGetParametersQueryIndustry[];
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
                  * @description Ordre
@@ -15360,7 +15353,8 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /** @description * `INIT` - INIT */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
-                working_year?: string[];
+                /** @description Filter actions by working date year. */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -15383,6 +15377,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -15411,6 +15409,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
             };
             header?: never;
             path: {
@@ -15436,6 +15438,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
             };
             header?: never;
             path: {
@@ -15467,6 +15473,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
             };
             header?: never;
             path: {
@@ -15491,6 +15501,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
             };
             header?: never;
             path: {
@@ -15526,7 +15540,7 @@ export interface operations {
                 filter: PathsApiTraceabilityActionsFiltersGetParametersQueryFilter;
                 holder?: string[];
                 /** @description * `H2` - Hydrogène */
-                industry?: PathsApiTraceabilityActionsGetParametersQueryIndustry[];
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
                  * @description Ordre
@@ -15570,7 +15584,8 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /** @description * `INIT` - INIT */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
-                working_year?: string[];
+                /** @description Filter actions by working date year. */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -15595,7 +15610,7 @@ export interface operations {
                 entity_id: number;
                 holder?: string[];
                 /** @description * `H2` - Hydrogène */
-                industry?: PathsApiTraceabilityActionsGetParametersQueryIndustry[];
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
                  * @description Ordre
@@ -15639,7 +15654,8 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /** @description * `INIT` - INIT */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
-                working_year?: string[];
+                /** @description Filter actions by working date year. */
+                year?: number;
             };
             header?: never;
             path?: never;
@@ -16173,14 +16189,13 @@ export enum PathsApiTraceabilityActionsGetParametersQueryType {
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     holder = "holder",
-    industry = "industry",
     material = "material",
     order_by = "order_by",
     shipping_method = "shipping_method",
     site = "site",
     status = "status",
     type = "type",
-    working_year = "working_year"
+    year = "year"
 }
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",

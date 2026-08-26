@@ -1,38 +1,51 @@
 import { api } from "common/services/api-fetch"
-import { ActionFilter, ActionQuery } from "traceability/types"
+import { ActionFilter, ActionIndustry, ActionQuery } from "traceability/types"
 
-export function getActionYears(entity_id: number, query: Partial<ActionQuery>) {
+export function getActionYears(
+  entity_id: number,
+  industry: ActionIndustry,
+  query: Partial<ActionQuery>
+) {
   return api.GET("/traceability/actions/years/", {
     params: {
       query: {
         ...query,
         entity_id,
+        industry,
       },
     },
   })
 }
 
-export function getActionFilters(filter: ActionFilter, query: ActionQuery) {
+export function getActionFilters(
+  filter: ActionFilter,
+  industry: ActionIndustry,
+  query: ActionQuery
+) {
   return api
     .GET("/traceability/actions/filters/", {
       params: {
-        query: { ...query, filter },
+        query: { ...query, filter, industry },
       },
     })
     .then((res) => res.data ?? [])
 }
 
-export function getActions(query: ActionQuery) {
+export function getActions(industry: ActionIndustry, query: ActionQuery) {
   return api.GET("/traceability/actions/", {
-    params: { query },
+    params: { query: { ...query, industry } },
   })
 }
 
-export function getActionDetail(entity_id: number, id: number) {
+export function getActionDetail(
+  entity_id: number,
+  id: number,
+  industry: ActionIndustry
+) {
   return api.GET("/traceability/actions/{id}/", {
     params: {
       path: { id },
-      query: { entity_id },
+      query: { entity_id, industry },
     },
   })
 }

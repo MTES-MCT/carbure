@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -46,6 +48,17 @@ class ActionViewsetAccessTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([item["id"] for item in response.data["results"]], [self.own_action.id])
+
+    def test_list_filters_by_year(self):
+        in_2023 = ActionFactory.create(holder=self.entity, industry=Action.H2, working_date=date(2023, 1, 1))
+        in_2025 = ActionFactory.create(holder=self.entity, industry=Action.H2, working_date=date(2025, 6, 1))
+
+        response = self.client.get(self.list_url, {**self.base_params, "year": 2025})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [item["id"] for item in response.data["results"]]
+        self.assertIn(in_2025.id, ids)
+        self.assertNotIn(in_2023.id, ids)
 
     def test_retrieve_own_action(self):
         response = self.client.get(self._detail_url(self.own_action), self.base_params)

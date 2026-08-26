@@ -12,16 +12,19 @@ import { getActionDetail } from "traceability/api"
 import type { DetailAction } from "traceability/components/actions-page"
 import { ActionField } from "traceability/hooks/use-action-fields"
 import { ActionForm } from "traceability/components/action-form"
+import { ActionIndustry } from "traceability/types"
 
 export type ActionModalProps = {
   title: string
   fields: ActionField[]
+  industry: ActionIndustry
   detailActions?: DetailAction[]
 }
 
 export const ActionModal = ({
   title,
   fields,
+  industry,
   detailActions,
 }: ActionModalProps) => {
   const navigate = useNavigate()
@@ -31,7 +34,7 @@ export const ActionModal = ({
 
   const actionResponse = useQuery(getActionDetail, {
     key: "traceability-action-detail",
-    params: [entity.id, parseInt(match?.params.id ?? "", 10)],
+    params: [entity.id, parseInt(match?.params.id ?? "", 10), industry],
   })
 
   const action = actionResponse.result?.data

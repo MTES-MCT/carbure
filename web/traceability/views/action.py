@@ -20,6 +20,12 @@ from traceability.views.mixins import YearsActionMixin
             description="Authorised entity ID.",
             required=True,
         ),
+        OpenApiParameter(
+            name="year",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Filter actions by working date year.",
+        ),
         ActionQuerySerializer,
     ]
 )

@@ -5,11 +5,9 @@ const COMBINABLE_FILTERS = [
   "status",
   ActionFilter.holder,
   ActionFilter.type,
-  ActionFilter.industry,
   ActionFilter.material,
   ActionFilter.shipping_method,
   ActionFilter.site,
-  ActionFilter.working_year,
 ] as const
 
 export function useCombinedQuery(
