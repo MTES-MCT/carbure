@@ -1,7 +1,7 @@
+from h2.handlers.lookups import H2ActionLookups
 from h2.permissions import HasHRSRights, HasHRSWriteRights
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.excel import excel_column
-from traceability.handlers.h2.lookups import H2ActionLookups
 from traceability.models import Action
 
 

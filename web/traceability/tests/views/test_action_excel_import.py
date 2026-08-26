@@ -10,8 +10,8 @@ from rest_framework.test import APITestCase
 
 from core.models import Entity
 from core.tests_utils import setup_current_user
+from h2.handlers import H2ActionHandler
 from traceability.factories import MaterialFactory
-from traceability.handlers.h2 import H2ActionHandler
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
 from traceability.services.action_excel import build_action_import_template, parse_action_import_file

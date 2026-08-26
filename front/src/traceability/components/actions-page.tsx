@@ -16,6 +16,7 @@ import { getActionFilters, getActions, getActionYears } from "traceability/api"
 import {
   Action,
   ActionFilter,
+  ActionIndustry,
   ActionQuery,
   ActionQueryBuilder,
 } from "traceability/types"
@@ -53,6 +54,7 @@ export type ActionsPageProps = {
   filters: ActionFilterDisplay[]
   columns: ActionColumn[]
   fields?: ActionField[]
+  industry: ActionIndustry
 }
 
 export const ActionsPage = ({
@@ -65,6 +67,7 @@ export const ActionsPage = ({
   filters,
   columns,
   fields,
+  industry,
 }: ActionsPageProps) => {
   usePrivateNavigation(listTitle)
 
@@ -89,21 +92,24 @@ export const ActionsPage = ({
       .map((filter) => [filter.key, filter.normalizer])
   )
 
-  const years = useYears(subpath, () => getActionYears(entity.id, fixedQuery))
+  const years = useYears(subpath, () =>
+    getActionYears(entity.id, industry, fixedQuery)
+  )
 
-  const { state, actions, query } =
-    useQueryBuilder<ActionQueryBuilder["config"]>()
+  const { state, actions, query } = useQueryBuilder<
+    ActionQueryBuilder["config"]
+  >({ year: years.selected })
 
   const combinedQuery = useCombinedQuery(fixedQuery, query)
 
   const { result, loading } = useQuery(getActions, {
     key: QUERY_KEY,
-    params: [combinedQuery],
+    params: [industry, combinedQuery],
   })
 
   const getFilterOptions = useCallback(
-    (filter: ActionFilter) => getActionFilters(filter, combinedQuery),
-    [combinedQuery]
+    (filter: ActionFilter) => getActionFilters(filter, industry, combinedQuery),
+    [industry, combinedQuery]
   )
 
   return (
@@ -160,6 +166,7 @@ export const ActionsPage = ({
               title={detailTitle}
               fields={fields}
               detailActions={detailActions}
+              industry={industry}
             />
           }
         />

@@ -4,7 +4,8 @@ from rest_framework import viewsets
 
 from core.filters import FiltersActionFactory
 from traceability.filters import ActionFilter
-from traceability.handlers import get_action_handler
+from traceability.handlers.action import ActionIndustryHandler
+from traceability.handlers.registry import get_action_handler
 from traceability.models import Action
 from traceability.serializers.action import ActionInputSerializer, ActionQuerySerializer, ActionSerializer
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
@@ -18,6 +19,12 @@ from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActio
             location=OpenApiParameter.QUERY,
             description="Authorised entity ID.",
             required=True,
+        ),
+        OpenApiParameter(
+            name="year",
+            type=int,
+            location=OpenApiParameter.QUERY,
+            description="Filter actions by working date year.",
         ),
         ActionQuerySerializer,
     ]
@@ -37,7 +44,9 @@ class ActionViewset(
         super().initial(request, *args, **kwargs)
 
     def get_permissions(self):
-        return self.request.handler.get_permissions(self.action)
+        # prevent DRF from raising an exception when generating the schema
+        handler = getattr(self.request, "handler", None) or ActionIndustryHandler()
+        return handler.get_permissions(self.action)
 
     def get_queryset(self):
         return self.queryset.filter(

@@ -3,9 +3,9 @@ from io import BytesIO
 from django.test import SimpleTestCase, TestCase
 from openpyxl import load_workbook
 
+from h2.handlers import H2ActionHandler
 from traceability.factories import MaterialFactory
 from traceability.handlers.action import ActionIndustryHandler
-from traceability.handlers.h2 import H2ActionHandler
 from traceability.models import Action
 from traceability.services.action_excel import build_action_import_template
 from transactions.models import Site

@@ -20,11 +20,6 @@ export function useActionFilters() {
       label: t("Détenteur"),
     },
 
-    industry: {
-      key: ActionFilter.industry,
-      label: t("Filière"),
-    },
-
     material: {
       key: ActionFilter.material,
       label: t("Matière"),
@@ -55,8 +50,8 @@ export function useActionFilters() {
       label: t("Type"),
     },
 
-    working_year: {
-      key: ActionFilter.working_year,
+    year: {
+      key: ActionFilter.year,
       label: t("Année"),
     },
   } satisfies Record<ActionFilter, ActionFilterDisplay>
