@@ -13616,6 +13616,7 @@ components:
           title: Entité détentrice de la quantité de l'action
         parent:
           type: integer
+          readOnly: true
           nullable: true
           title: Action parente
         material:
@@ -13628,6 +13629,7 @@ components:
         - id
         - industry
         - material
+        - parent
         - pos_id
         - quantity
         - shipping_date
@@ -13690,10 +13692,6 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        parent:
-          type: integer
-          nullable: true
-          title: Action parente
         material:
           type: integer
           title: Matière
@@ -20330,10 +20328,6 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        parent:
-          type: integer
-          nullable: true
-          title: Action parente
         material:
           type: integer
           title: Matière

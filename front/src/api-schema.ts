@@ -3486,7 +3486,7 @@ export interface components {
             /** Entité détentrice de la quantité de l'action */
             readonly holder: number;
             /** Action parente */
-            parent?: number | null;
+            readonly parent: number | null;
             /** Matière */
             material: number;
             site: number;
@@ -3525,8 +3525,6 @@ export interface components {
             eu?: string;
             /** Format: decimal */
             eccs?: string;
-            /** Action parente */
-            parent?: number | null;
             /** Matière */
             material: number;
             site: number;
@@ -6579,8 +6577,6 @@ export interface components {
             eu?: string;
             /** Format: decimal */
             eccs?: string;
-            /** Action parente */
-            parent?: number | null;
             /** Matière */
             material?: number;
             site?: number;

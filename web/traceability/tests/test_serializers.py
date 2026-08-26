@@ -4,9 +4,7 @@ from django.forms.models import model_to_dict
 from django.test import TestCase
 
 from core.models import Entity
-from h2.factories.h2_station import H2StationFactory
 from traceability.factories import ActionFactory
-from traceability.factories.material import MaterialFactory
 from traceability.models import Action
 from traceability.serializers import ActionInputSerializer
 
@@ -17,18 +15,19 @@ class ActionInputSerializerTest(TestCase):
     def setUp(self):
         self.entity = Entity.objects.create(name="HRS", entity_type=Entity.HRS)
         self.other_entity = Entity.objects.create(name="Other HRS", entity_type=Entity.HRS)
-        self.template = model_to_dict(ActionFactory.build(holder=self.entity, industry=Action.H2))
         self.context = {
             "handler": SimpleNamespace(industry=Action.H2),
             "entity": self.entity,
         }
 
     def test_create_sets_industry_and_holder_from_context(self):
-        material = MaterialFactory.create()
-        site = H2StationFactory.create()
-        serializer = ActionInputSerializer(
-            data={**self.template, "material": material.id, "site": site.id}, context=self.context
+        payload = model_to_dict(
+            ActionFactory.create(holder=self.entity, industry=Action.H2),
+            exclude=ActionInputSerializer.Meta.read_only_fields,
         )
+        payload["pos_id"] = "POS-CREATE-001"
+
+        serializer = ActionInputSerializer(data=payload, context=self.context)
 
         self.assertTrue(serializer.is_valid(), serializer.errors)
         created = serializer.save()
