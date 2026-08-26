@@ -13183,6 +13183,99 @@ paths:
                     - site
                   summary: Example of filters response.
           description: ""
+  /api/traceability/actions/import/:
+    post:
+      operationId: import_actions_from_excel
+      description: Create actions from an Excel import template.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionExcelUploadRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionExcelUploadRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionExcelUploadRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ""
+  /api/traceability/actions/import/template/:
+    get:
+      operationId: download_actions_import_template
+      description: Download the action import Excel template for the given industry.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
+      tags:
+        - traceability
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Generated Excel file
   /api/traceability/actions/years/:
     get:
       operationId: traceability_actions_years_retrieve
@@ -13549,6 +13642,14 @@ components:
         - status
         - type
         - working_date
+    ActionExcelUploadRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
     ActionInput:
       type: object
       properties:

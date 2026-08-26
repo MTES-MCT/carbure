@@ -19,7 +19,7 @@ from traceability.services.action_excel import build_action_import_template, par
 from transactions.models.site import Site
 
 
-def filled_h2_template(*, pos_id, material_name, site_name, extra_headers=None):
+def filled_h2_template(*, pos_id, material_name, site_name, shipping_date=date(2026, 1, 15), extra_headers=None):
     file_handle = build_action_import_template(H2ActionHandler())
     workbook = load_workbook(filename=BytesIO(file_handle.read()))
     file_handle.close()
@@ -29,7 +29,7 @@ def filled_h2_template(*, pos_id, material_name, site_name, extra_headers=None):
         material_name,
         Decimal("120000.000"),
         site_name,
-        date(2026, 1, 15),
+        shipping_date,
         25,
         Action.ROAD,
         0,
@@ -122,6 +122,19 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertEqual(action.shipping_method, Action.ROAD)
         self.assertEqual(action.working_date, date(2026, 1, 15))
         self.assertEqual(action.action_statuses.get().status, ActionStatus.CREATED)
+
+    def test_import_accepts_shipping_date_as_day_month_year(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.station.name,
+                shipping_date="15/01/2026",
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="H2-001").shipping_date, date(2026, 1, 15))
 
     def test_import_rejects_unknown_material(self):
         response = self._post(

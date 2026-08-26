@@ -9,6 +9,7 @@ import {
 } from "traceability/hooks/use-action-fields"
 import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 import { SiteTypeEnum } from "api-schema"
+import { Text } from "common/components/text"
 
 const H2_LOT_QUERY: Partial<ActionQuery> = {
   type: [ActionType.INIT],
@@ -35,6 +36,15 @@ const LotsPage = () => {
         icon: "fr-icon-add-line",
         label: t("Importer des lots d'hydrogène"),
         onAction: () => {},
+      }}
+      excelImport={{
+        buttonLabel: t("Importer des lots"),
+        description: (
+          <Text>
+            Vous pouvez importer plusieurs lots à la fois en important un
+            fichier excel à travers le champ au bas de cette fenêtre.
+          </Text>
+        ),
       }}
       detailActions={[
         {

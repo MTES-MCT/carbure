@@ -97,6 +97,7 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         cache_key="site_cache",
         lookup="site",
     )
+    shipping_date = serializers.DateField(input_formats=["%d/%m/%Y"])
 
     class Meta:
         model = Action

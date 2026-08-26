@@ -9,12 +9,11 @@ from traceability.handlers.action import ActionIndustryHandler
 def build_action_import_template(handler: ActionIndustryHandler, entity=None) -> BufferedReader:
     columns = []
     for spec in handler.excel_columns:
-        column = {"header": spec["header"]}
-        options = spec.get("options")
+        column = {key: value for key, value in spec.items() if key != "key"}
+        options = column.get("options")
         if callable(options):
-            options = list(options(entity, handler))
-        if options:
-            column["options"] = options
+            column["options"] = list(options(entity, handler))
+
         columns.append(column)
 
     return create_import_template(

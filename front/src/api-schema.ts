@@ -3325,6 +3325,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/traceability/actions/import/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Create actions from an Excel import template. */
+        post: operations["import_actions_from_excel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/traceability/actions/import/template/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Download the action import Excel template for the given industry. */
+        get: operations["download_actions_import_template"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/traceability/actions/years/": {
         parameters: {
             query?: never;
@@ -3445,6 +3479,10 @@ export interface components {
             eu?: string;
             /** Format: decimal */
             eccs?: string;
+        };
+        ActionExcelUploadRequest: {
+            /** Format: binary */
+            file: File;
         };
         ActionInput: {
             readonly id: number;
@@ -15595,6 +15633,73 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    import_actions_from_excel: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionExcelUploadRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionExcelUploadRequest"];
+                "multipart/form-data": components["schemas"]["ActionExcelUploadRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    download_actions_import_template: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Generated Excel file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": File;
                 };
             };
         };
