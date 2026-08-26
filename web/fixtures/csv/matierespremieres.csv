@@ -71,3 +71,11 @@ RAFLES_DE_FRUITS_VIDES,Rafles de fruits vides,0,1,1,1,1,1,ANN-IX-A
 SUCRES_DECHETS_CONTENANT_DE_L_AMIDON,Sucres déchets contenant de l'amidon,1,0,1,1,1,1,ANN-IX-A
 FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE,Fraction lourde issue de la fabrication de farine,1,0,1,1,1,1,ANN-IX-A
 DECHETS_ALIMENTAIRES,Déchets alimentaires,1,1,1,0,1,1,ANN-IX-A
+DESALCOOLISATS_DE_BIERE,Désalcoolisats de bière,1,0,1,0,1,1,ANN-IX-A
+DISTILLATS_DE_DESODORISATION_DES_HUILES_VEGETALES,Distillats de désodorisation des huiles végétales,0,1,1,0,1,1,ANN-IX-A
+GERMES_DE_BLE_DEGRAISSES,Germes de blé dégraissés,1,0,1,0,1,1,ANN-IX-A
+ALCOOL_ISSU_DE_LA_DESALCOOLISATION_DU_VIN,Alcool issu de la désalcoolisation du vin,1,0,1,0,1,1,ANN-IX-A
+HUILES_OU_GRAISSES_ISSUES_DES_EAUX_USEES_PROVENANT_DU_TRANSPORT_MARITIME,Huiles ou graisses issues des eaux usées provenant du transport maritime,0,1,1,0,1,1,ANN-IX-A
+ETHANOL_CONTAMINE_UTILISE_POUR_L_EXTRACTION_DE_PROTEINES_DE_CEREALES,Ethanol contaminé utilisé pour l'extraction de protéines de céréales,1,0,1,0,1,1,ANN-IX-A
+DECHETS_DE_CRIBLAGE_DU_MAIS_DE_MOULIN_HUMIDE,Déchets de criblage du maïs de moulin humide,1,0,1,0,1,1,ANN-IX-A
+BOUES_ISSUES_DU_STOCKAGE_INDUSTRIEL,Boues issues du stockage industriel,0,1,1,0,1,1,ANN-IX-A
