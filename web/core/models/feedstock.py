@@ -72,7 +72,7 @@ class MatierePremiere(models.Model):
     name_en = models.CharField(max_length=256)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
-    code = models.CharField(max_length=64, unique=True)
+    code = models.CharField(max_length=128, unique=True)
     compatible_alcool = models.BooleanField(default=False)
     compatible_graisse = models.BooleanField(default=False)
     is_double_compte = models.BooleanField(default=False)
