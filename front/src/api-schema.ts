@@ -3791,11 +3791,11 @@ export interface components {
             energy_types?: components["schemas"]["EnergyTypesEnum"][];
             malfunction_types?: components["schemas"]["MalfunctionTypesEnum"][];
             readonly monthly_reports: components["schemas"]["BiomethaneEnergyMonthlyReport"][];
-            /** @description List of consistency warnings for the energy data */
             readonly consistency_warnings: {
-                code?: string;
-                level?: string;
-                message?: string;
+                code: string;
+                /** @enum {string} */
+                level: BiomethaneEnergyConsistency_warningsLevel;
+                message: string;
             }[];
             /** Année */
             year: number;
@@ -14928,6 +14928,12 @@ export enum AmendmentObjectEnum {
     PRODUCER_BUYER_INFO_CHANGE = "PRODUCER_BUYER_INFO_CHANGE",
     ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE = "ENERGY_ENVIRONMENTAL_EFFICIENCY_UPDATE",
     OTHER = "OTHER"
+}
+export enum BiomethaneEnergyConsistency_warningsLevel {
+    info = "info",
+    success = "success",
+    warning = "warning",
+    error = "error"
 }
 export enum CarbureNotificationTypeEnum {
     CORRECTION_REQUEST = "CORRECTION_REQUEST",

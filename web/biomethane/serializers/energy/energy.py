@@ -1,9 +1,9 @@
-from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from biomethane.models.biomethane_energy import BiomethaneEnergy
 from biomethane.serializers.energy.monthly_report import BiomethaneEnergyMonthlyReportSerializer
 from biomethane.services.consistency_checks import BiomethaneEnergyConsistencyChecksService
+from biomethane.services.consistency_checks.types import ConsistencyCheck
 
 
 class BaseBiomethaneEnergySerializer(serializers.ModelSerializer):
@@ -26,21 +26,7 @@ class BiomethaneEnergySerializer(BaseBiomethaneEnergySerializer):
 
     consistency_warnings = serializers.SerializerMethodField()
 
-    @extend_schema_field(
-        {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "code": {"type": "string"},
-                    "level": {"type": "string"},
-                    "message": {"type": "string"},
-                },
-            },
-            "description": "List of consistency warnings for the energy data",
-        }
-    )
-    def get_consistency_warnings(self, instance):
+    def get_consistency_warnings(self, instance) -> list[ConsistencyCheck]:
         return BiomethaneEnergyConsistencyChecksService.get_consistency_warnings(instance)
 
     class Meta(BaseBiomethaneEnergySerializer.Meta):

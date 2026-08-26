@@ -13,3 +13,6 @@ export type BiomethaneEnergyMonthlyReport =
   apiTypes["BiomethaneEnergyMonthlyReport"]
 export type BiomethaneEnergyMonthlyReportDataRequest =
   apiTypes["MonthlyReportDataRequest"]
+
+export type ConsistencyWarning =
+  BiomethaneEnergy["consistency_warnings"][number]

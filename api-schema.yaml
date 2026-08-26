@@ -13294,10 +13294,18 @@ components:
               code:
                 type: string
               level:
+                enum:
+                  - info
+                  - success
+                  - warning
+                  - error
                 type: string
               message:
                 type: string
-          description: List of consistency warnings for the energy data
+            required:
+              - code
+              - level
+              - message
           readOnly: true
         year:
           type: integer
