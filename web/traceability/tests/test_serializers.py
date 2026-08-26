@@ -1,48 +1,59 @@
+from types import SimpleNamespace
+
+from django.forms.models import model_to_dict
 from django.test import TestCase
 
 from core.models import Entity
 from traceability.factories import ActionFactory
-from traceability.serializers import ActionInputSerializer, ActionSerializer
+from traceability.models import Action
+from traceability.serializers import ActionInputSerializer
 
 
-class ActionSerializerTest(TestCase):
+class ActionInputSerializerTest(TestCase):
     fixtures = ["json/countries.json"]
 
-    def test_relations_are_nested_when_reading_an_action(self):
-        holder = Entity.objects.create(name="Holder", entity_type=Entity.HRS)
-        parent = ActionFactory.create(holder=holder)
-        action = ActionFactory.create(holder=holder, parent=parent)
+    def setUp(self):
+        self.entity = Entity.objects.create(name="HRS", entity_type=Entity.HRS)
+        self.other_entity = Entity.objects.create(name="Other HRS", entity_type=Entity.HRS)
+        self.context = {
+            "handler": SimpleNamespace(industry=Action.H2),
+            "entity": self.entity,
+        }
 
-        data = ActionSerializer(action).data
+    def test_create_sets_industry_and_holder_from_context(self):
+        payload = model_to_dict(
+            ActionFactory.create(holder=self.entity, industry=Action.H2),
+            exclude=ActionInputSerializer.Meta.read_only_fields,
+        )
+        payload["pos_id"] = "POS-CREATE-001"
 
-        self.assertEqual(
-            data["holder"],
-            {
-                "id": holder.id,
-                "name": holder.name,
-                "entity_type": holder.entity_type,
-                "registration_id": holder.registration_id,
+        serializer = ActionInputSerializer(data=payload, context=self.context)
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        created = serializer.save()
+        self.assertEqual(created.holder, self.entity)
+        self.assertEqual(created.industry, Action.H2)
+
+    def test_read_only_fields_cannot_be_updated(self):
+        action = ActionFactory.create(holder=self.entity, industry=Action.H2)
+        parent_action = ActionFactory.create(holder=self.entity, industry=Action.H2)
+
+        serializer = ActionInputSerializer(
+            action,
+            data={
+                "id": 99999,
+                "industry": "BIOMASS",
+                "holder": self.other_entity.id,
+                "parent": parent_action.id,
             },
-        )
-        self.assertEqual(
-            data["parent"],
-            {"id": parent.id, "pos_id": parent.pos_id},
-        )
-        self.assertEqual(
-            data["material"],
-            {"id": action.material.id, "code": action.material.code, "name": action.material.name},
-        )
-        self.assertEqual(
-            data["site"],
-            {"id": action.site.id, "name": action.site.name, "site_type": action.site.site_type},
+            partial=True,
+            context=self.context,
         )
 
-    def test_relations_remain_ids_when_writing_an_action(self):
-        action = ActionFactory.create()
-
-        data = ActionInputSerializer(action).data
-
-        self.assertEqual(data["holder"], action.holder.id)
-        self.assertEqual(data["parent"], action.parent_id)
-        self.assertEqual(data["material"], action.material.id)
-        self.assertEqual(data["site"], action.site.id)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        serializer.save()
+        action.refresh_from_db()
+        self.assertNotEqual(action.id, 99999)
+        self.assertEqual(action.industry, Action.H2)
+        self.assertEqual(action.holder, self.entity)
+        self.assertIsNone(action.parent_id)

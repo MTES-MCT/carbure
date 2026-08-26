@@ -1,12 +1,11 @@
-from django_filters import FilterSet, MultipleChoiceFilter, OrderingFilter
+from django_filters import FilterSet, MultipleChoiceFilter, NumberFilter, OrderingFilter
 
 from core.filters import MultiValueInFilter
 from traceability.models import Action, ActionStatus
 
 
 class ActionFilter(FilterSet):
-    working_year = MultiValueInFilter(field_name="working_date__year")
-    industry = MultipleChoiceFilter(field_name="industry", choices=Action.INDUSTRIES)
+    year = NumberFilter(field_name="working_date__year")
     type = MultipleChoiceFilter(field_name="type", choices=Action.TYPES)
     status = MultipleChoiceFilter(field_name="status", choices=ActionStatus.STATUSES)
     holder = MultiValueInFilter(field_name="holder__name")

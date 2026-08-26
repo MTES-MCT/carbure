@@ -11,7 +11,6 @@ import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 import { SiteTypeEnum } from "api-schema"
 
 const H2_LOT_QUERY: Partial<ActionQuery> = {
-  industry: [ActionIndustry.H2],
   type: [ActionType.INIT],
 }
 
@@ -71,6 +70,7 @@ const LotsPage = () => {
         fields.eu,
         fields.eccs,
       ]}
+      industry={ActionIndustry.H2}
     />
   )
 }

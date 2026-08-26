@@ -156,13 +156,13 @@ export const ROUTE_URLS = {
     }
   },
 
-  HYDROGEN: (entity_id: number) => {
+  HYDROGEN: (entity_id: number, year: number) => {
     const baseUrl = urlWithOrgId(entity_id, "/h2")
 
     return {
       ROOT: baseUrl,
       STATIONS: `${baseUrl}/stations`,
-      LOTS: `${baseUrl}/lots`,
+      LOTS: `${baseUrl}/lots/${year}`,
       CERTIFICATES: `${baseUrl}/certificates`,
     }
   },

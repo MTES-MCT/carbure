@@ -12599,15 +12599,12 @@ paths:
         - in: query
           name: industry
           schema:
-            type: array
-            items:
-              type: string
-              title: Filière
-              enum:
-                - H2
+            enum:
+              - H2
+            type: string
+            minLength: 1
           description: "* `H2` - Hydrogène"
-          explode: true
-          style: form
+          required: true
         - in: query
           name: material
           schema:
@@ -12742,13 +12739,10 @@ paths:
           explode: true
           style: form
         - in: query
-          name: working_year
+          name: year
           schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
+            type: integer
+          description: Filter actions by working date year.
       tags:
         - traceability
       security:
@@ -12771,6 +12765,20 @@ paths:
             type: integer
           description: Authorised entity ID.
           required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
       tags:
         - traceability
       requestBody:
@@ -12812,6 +12820,20 @@ paths:
             type: integer
           description: A unique integer value identifying this Action.
           required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
       tags:
         - traceability
       security:
@@ -12840,6 +12862,20 @@ paths:
             type: integer
           description: A unique integer value identifying this Action.
           required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
       tags:
         - traceability
       requestBody:
@@ -12880,6 +12916,20 @@ paths:
             type: integer
           description: A unique integer value identifying this Action.
           required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
       tags:
         - traceability
       requestBody:
@@ -12919,6 +12969,20 @@ paths:
             type: integer
           description: A unique integer value identifying this Action.
           required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
       tags:
         - traceability
       security:
@@ -12944,14 +13008,13 @@ paths:
             type: string
             enum:
               - holder
-              - industry
               - material
               - order_by
               - shipping_method
               - site
               - status
               - type
-              - working_year
+              - year
           description: Filter string to apply
           required: true
         - in: query
@@ -12965,15 +13028,12 @@ paths:
         - in: query
           name: industry
           schema:
-            type: array
-            items:
-              type: string
-              title: Filière
-              enum:
-                - H2
+            enum:
+              - H2
+            type: string
+            minLength: 1
           description: "* `H2` - Hydrogène"
-          explode: true
-          style: form
+          required: true
         - in: query
           name: material
           schema:
@@ -13096,13 +13156,10 @@ paths:
           explode: true
           style: form
         - in: query
-          name: working_year
+          name: year
           schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
+            type: integer
+          description: Filter actions by working date year.
       tags:
         - traceability
       security:
@@ -13120,10 +13177,10 @@ paths:
                 ExampleOfFiltersResponse.:
                   value:
                     - holder
-                    - industry
                     - material
                     - order_by
                     - shipping_method
+                    - site
                   summary: Example of filters response.
           description: ""
   /api/traceability/actions/years/:
@@ -13148,15 +13205,12 @@ paths:
         - in: query
           name: industry
           schema:
-            type: array
-            items:
-              type: string
-              title: Filière
-              enum:
-                - H2
+            enum:
+              - H2
+            type: string
+            minLength: 1
           description: "* `H2` - Hydrogène"
-          explode: true
-          style: form
+          required: true
         - in: query
           name: material
           schema:
@@ -13279,13 +13333,10 @@ paths:
           explode: true
           style: form
         - in: query
-          name: working_year
+          name: year
           schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
+            type: integer
+          description: Filter actions by working date year.
       tags:
         - traceability
       security:
@@ -13501,6 +13552,9 @@ components:
     ActionInput:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         pos_id:
           type: string
           title: N° de POS
@@ -13508,6 +13562,7 @@ components:
         industry:
           allOf:
             - $ref: "#/components/schemas/IndustryEnum"
+          readOnly: true
           title: Filière
         type:
           allOf:
@@ -13557,9 +13612,11 @@ components:
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
         holder:
           type: integer
+          readOnly: true
           title: Entité détentrice de la quantité de l'action
         parent:
           type: integer
+          readOnly: true
           nullable: true
           title: Action parente
         material:
@@ -13569,8 +13626,10 @@ components:
           type: integer
       required:
         - holder
+        - id
         - industry
         - material
+        - parent
         - pos_id
         - quantity
         - shipping_date
@@ -13587,10 +13646,6 @@ components:
           minLength: 1
           title: N° de POS
           maxLength: 48
-        industry:
-          allOf:
-            - $ref: "#/components/schemas/IndustryEnum"
-          title: Filière
         type:
           allOf:
             - $ref: "#/components/schemas/ActionTypeEnum"
@@ -13637,21 +13692,12 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        holder:
-          type: integer
-          title: Entité détentrice de la quantité de l'action
-        parent:
-          type: integer
-          nullable: true
-          title: Action parente
         material:
           type: integer
           title: Matière
         site:
           type: integer
       required:
-        - holder
-        - industry
         - material
         - pos_id
         - quantity
@@ -20236,10 +20282,6 @@ components:
           minLength: 1
           title: N° de POS
           maxLength: 48
-        industry:
-          allOf:
-            - $ref: "#/components/schemas/IndustryEnum"
-          title: Filière
         type:
           allOf:
             - $ref: "#/components/schemas/ActionTypeEnum"
@@ -20286,13 +20328,6 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        holder:
-          type: integer
-          title: Entité détentrice de la quantité de l'action
-        parent:
-          type: integer
-          nullable: true
-          title: Action parente
         material:
           type: integer
           title: Matière
