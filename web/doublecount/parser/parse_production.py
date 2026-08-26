@@ -4,7 +4,7 @@ from openpyxl import Workbook
 from pyparsing import Any
 
 from doublecount.parser.excel_to_carbure_convertor import get_biofuel_from_dc_biofuel, get_feedstock_from_dc_feedstock
-from doublecount.parser.helpers import extract_year, intOrZero
+from doublecount.parser.helpers import extract_year, intOrZero, is_subtotal_row
 from doublecount.parser.types import ProductionForecastRow, ProductionMaxRow, RequestedQuotaRow
 
 
@@ -18,6 +18,8 @@ def parse_production_max(excel_file: Workbook, start_year) -> List[ProductionMax
         feedstock_index=3,
         other_name="max_production_capacity",
         other_index=4,
+        subtotal_start=2,
+        subtotal_end=4,
     )
     return production_max_rows
 
@@ -32,6 +34,8 @@ def parse_production_forecast(excel_file: Workbook, start_year) -> List[Producti
         feedstock_index=8,
         other_name="estimated_production",
         other_index=9,
+        subtotal_start=7,
+        subtotal_end=9,
     )
     return production_forecast_rows
 
@@ -48,6 +52,8 @@ def parse_requested_quota(excel_file: Workbook) -> List[RequestedQuotaRow]:
         other_index=4,
         other_required=True,
         other_alternative_index=10,  # outside of france production
+        subtotal_start=2,
+        subtotal_end=4,
     )
     return requested_quota_rows
 
@@ -61,6 +67,8 @@ def parse_production_data(
     biofuel_index: int,
     other_name: str,  # column to get data like "max_production_capacity" or "estimated_production" or "requested_quota"
     other_index: int,  # index of the column in the excel file
+    subtotal_start: int,
+    subtotal_end: int,
     other_required: bool = False,  # if the other value is required
     other_alternative_index: int = None,  # alternative index of the other_column in the excel file to allow the first one is zero (ex : outside of france production)  # noqa: E501
 ) -> List[Any]:
@@ -72,7 +80,10 @@ def parse_production_data(
         if current_year < start_year:
             continue
 
-        biofuel_name = None if "SOMME :" == row[biofuel_index].value else row[biofuel_index].value
+        if is_subtotal_row(row, start=subtotal_start, end=subtotal_end):
+            continue
+
+        biofuel_name = row[biofuel_index].value
         feedstock_name = row[feedstock_index].value
         elem_data = intOrZero(row[other_index].value)
         elem_alternative_data = 0
