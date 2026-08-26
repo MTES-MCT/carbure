@@ -43,6 +43,7 @@ class ActionSerializerTest(TestCase):
         data = ActionInputSerializer(action).data
 
         self.assertEqual(data["holder"], action.holder.id)
+        self.assertEqual(data["industry"], action.industry)
         self.assertEqual(data["parent"], action.parent_id)
         self.assertEqual(data["material"], action.material.id)
         self.assertEqual(data["site"], action.site.id)

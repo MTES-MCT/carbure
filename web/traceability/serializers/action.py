@@ -29,7 +29,13 @@ class ActionSerializer(serializers.ModelSerializer):
 class ActionInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        exclude = ["id"]
+        fields = "__all__"
+        read_only_fields = ["id", "industry", "holder", "parent"]
+
+    def create(self, validated_data):
+        validated_data["industry"] = self.context["handler"].industry
+        validated_data["holder"] = self.context["entity"]
+        return super().create(validated_data)
 
 
 class ActionQuerySerializer(serializers.Serializer):
