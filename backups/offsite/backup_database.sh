@@ -46,7 +46,8 @@ trap 'rm -rf -- "$backup_dir"' EXIT
 shopt -s nullglob
 backup_files=("$backup_dir"/*.tar.gz)
 shopt -u nullglob
-backup_file=${backup_files[0]}
+last_file_index=$((${#backup_files[@]}-1))
+backup_file=${backup_files[$last_file_index]}
 
 backup_path=$(date -u +%Y/%m/%d.tar.gz)
 

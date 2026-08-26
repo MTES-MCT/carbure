@@ -31,7 +31,8 @@ if [[ -d "$backup_path" ]]; then
   shopt -s nullglob
   backup_files=("$backup_path"/*.tar.gz)
   shopt -u nullglob
-  backup_file=${backup_files[0]}
+  last_file_index=$((${#backup_files[@]}-1))
+  backup_file=${backup_files[$last_file_index]}
 else
   backup_file=$backup_path
 fi
