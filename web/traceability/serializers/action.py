@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.serializer_fields import CachedSlugRelatedField
@@ -90,14 +91,18 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         queryset=Material.objects.all(),
         cache_key="material_cache",
         lookup="material",
+        error_messages={"does_not_exist": _("Matière inconnue")},
     )
     site = HandlerLookupSlugRelatedField(
         slug_field="name",
         queryset=Site.objects.all(),
         cache_key="site_cache",
         lookup="site",
+        error_messages={"does_not_exist": _("Site inconnu")},
     )
-    shipping_date = serializers.DateField(input_formats=["%d/%m/%Y"])
+    shipping_date = serializers.DateField(
+        input_formats=["%d/%m/%Y"], error_messages={"invalid": _("La date doit être au format jour/mois/année.")}
+    )
 
     class Meta:
         model = Action

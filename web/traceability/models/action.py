@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db import models
 from django.db.models import OuterRef, Subquery
+from django.utils.translation import gettext_lazy as _
 
 from .action_status import ActionStatus
 
@@ -22,7 +23,10 @@ class ActionManager(models.Manager):
 
 
 class Action(models.Model):
-    pos_id = models.CharField(verbose_name="N° de POS", max_length=48, unique=True)
+    pos_id = models.CharField(
+        verbose_name="N° de POS", max_length=48, unique=True, error_messages={"unique": _("Ce N° de POS existe déjà.")}
+    )
+
     holder = models.ForeignKey(
         "core.Entity", on_delete=models.PROTECT, verbose_name="Entité détentrice de la quantité de l'action"
     )
