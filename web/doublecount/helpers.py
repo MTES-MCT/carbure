@@ -118,7 +118,7 @@ def load_dc_sourcing_data(dca: DoubleCountingApplication, sourcing_rows: List[So
         line = row["line"]
         meta = {"year": row["year"]}
 
-        errors = check_sourcing_row(row)
+        errors = check_sourcing_row(row, feedstocks)
         if len(errors) > 0:
             sourcing_errors += errors
             continue
@@ -707,7 +707,7 @@ def load_dc_sourcing_history_data(dca: DoubleCountingApplication, sourcing_histo
     feedstocks = {feedstock.code: feedstock for feedstock in MatierePremiere.biofuel.all()}
 
     for row in sourcing_history_rows:
-        errors = check_sourcing_row(row)
+        errors = check_sourcing_row(row, feedstocks)
         if len(errors) > 0:
             sourcing_errors += errors
             continue
