@@ -11,7 +11,8 @@ def valid_certificate_scope(scheme, scope):
     if scheme != GenericCertificate.SYSTEME_NATIONAL:
         return True
 
-    possible_scopes = "([1-7]|6a|6b)"
+    iscc_accepted_scopes_for_national_scheme = ["BP", "EP", "FSP", "HEFA", "HVO", "PB", "TR", "TRS"]
+    possible_scopes = f"({'|'.join(iscc_accepted_scopes_for_national_scheme)})"
     return not not re.fullmatch(f"{possible_scopes}(, {possible_scopes})*", scope)
 
 
