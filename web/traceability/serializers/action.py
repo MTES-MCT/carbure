@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -9,6 +11,30 @@ from traceability.models.action_status import ActionStatus
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
 from transactions.models import Site
+
+
+class HandlerLookupSlugRelatedField(CachedSlugRelatedField):
+    """
+    Slug related field that overrides the get_queryset method to use the handler lookups.
+    """
+
+    def __init__(self, *args, lookup, **kwargs):
+        self.lookup = lookup
+        super().__init__(*args, **kwargs)
+
+    def get_queryset(self):
+        return getattr(self.context["handler"].lookups, self.lookup)(self.context.get("entity"))
+
+
+class ExcelDateField(serializers.DateField):
+    """
+    Excel reader converts dates to datetime objects so we need to convert them back to date objects.
+    """
+
+    def to_internal_value(self, value):
+        if isinstance(value, datetime):
+            value = value.date()
+        return super().to_internal_value(value)
 
 
 class ActionParentSerializer(serializers.ModelSerializer):
@@ -51,15 +77,6 @@ class ActionExcelUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
 
 
-class HandlerLookupSlugRelatedField(CachedSlugRelatedField):
-    def __init__(self, *args, lookup, **kwargs):
-        self.lookup = lookup
-        super().__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return getattr(self.context["handler"].lookups, self.lookup)(self.context.get("entity"))
-
-
 class ActionExcelImportListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
         holder = self.context["entity"]
@@ -100,7 +117,7 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         lookup="site",
         error_messages={"does_not_exist": _("Site inconnu")},
     )
-    shipping_date = serializers.DateField(
+    shipping_date = ExcelDateField(
         input_formats=["%d/%m/%Y"], error_messages={"invalid": _("La date doit être au format jour/mois/année.")}
     )
 

@@ -1,4 +1,3 @@
-from datetime import datetime
 from io import BufferedReader
 
 from core.excel_importer import ExcelImporter
@@ -28,11 +27,7 @@ def parse_action_import_file(file, handler: ActionIndustryHandler) -> list[dict]
 
     rows = []
     for record in records:
-        row = {
-            header_to_key[header]: value.date() if isinstance(value, datetime) else value
-            for header, value in record.items()
-            if header in header_to_key
-        }
-        if any(value not in (None, "") for value in row.values()):
-            rows.append(row)
+        row = {header_to_key[header]: value for header, value in record.items() if header in header_to_key}
+
+        rows.append(row)
     return rows
