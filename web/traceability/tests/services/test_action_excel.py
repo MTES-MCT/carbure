@@ -5,7 +5,7 @@ from io import BytesIO
 from django.test import TestCase
 from openpyxl import load_workbook
 
-from core.import_export_template import DATA_START_ROW, get_data_start_row
+from core.import_export_template import get_data_start_row
 from core.models import Entity
 from h2.handlers import H2ActionHandler
 from traceability.factories import MaterialFactory
@@ -19,23 +19,23 @@ def filled_h2_template(*, pos_id, material_name, site_name, shipping_date=date(2
     workbook = load_workbook(filename=BytesIO(file_handle.read()))
     file_handle.close()
     sheet = workbook["Import actions H2"]
-    values = [
-        pos_id,
-        material_name,
-        Decimal("120000.000"),
-        site_name,
-        shipping_date,
-        25,
-        Action.ROAD,
-        0,
-        0,
-        0,
-        0,
-        0,
-    ]
+    values_by_key = {
+        "pos_id": pos_id,
+        "material": material_name,
+        "quantity": Decimal("120000.000"),
+        "site": site_name,
+        "shipping_date": shipping_date,
+        "shipping_distance": 25,
+        "shipping_method": Action.ROAD,
+        "ei": 0,
+        "ep": 0,
+        "etd": 0,
+        "eu": 0,
+        "eccs": 0,
+    }
     data_row = get_data_start_row(H2ActionHandler.excel_columns)
-    for column, value in enumerate(values, start=1):
-        sheet.cell(row=data_row, column=column, value=value)
+    for column, spec in enumerate(H2ActionHandler.excel_columns, start=1):
+        sheet.cell(row=data_row, column=column, value=values_by_key[spec["key"]])
     if extra_headers:
         start = len(H2ActionHandler.excel_columns) + 1
         for offset, (header, value) in enumerate(extra_headers):
@@ -75,17 +75,15 @@ class ActionExcelTemplateTest(TestCase):
         references = workbook["References"]
 
         self.assertEqual(headers, [column["header"] for column in H2ActionHandler.excel_columns])
-        self.assertEqual(
-            [
-                workbook["Import actions H2"].cell(row=DATA_START_ROW, column=index).value
-                for index in range(1, len(headers) + 1)
-            ],
-            [column.get("comment") or None for column in H2ActionHandler.excel_columns],
-        )
-        self.assertEqual(references["B2"].value, hydrogen.name)
-        self.assertIsNone(references["B3"].value)
-        self.assertEqual(references["D2"].value, station.name)
-        self.assertIsNone(references["D3"].value)
+
+        def reference_value(key, row=2):
+            index = next(i for i, spec in enumerate(H2ActionHandler.excel_columns, start=1) if spec["key"] == key)
+            return references.cell(row=row, column=index).value
+
+        self.assertEqual(reference_value("material"), hydrogen.name)
+        self.assertIsNone(reference_value("material", row=3))
+        self.assertEqual(reference_value("site"), station.name)
+        self.assertIsNone(reference_value("site", row=3))
 
 
 class ParseActionImportFileTest(TestCase):

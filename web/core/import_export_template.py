@@ -18,6 +18,7 @@ class TemplateColumns(TypedDict):
     header: str
     options: NotRequired[list]
     comment: NotRequired[str]
+    color: NotRequired[str]
 
 
 class ImportExportWithTemplateModelAdmin(ImportExportModelAdmin):
@@ -107,55 +108,69 @@ def get_data_start_row(columns: list[TemplateColumns]) -> int:
     return DATA_START_ROW
 
 
+def _cell_format(workbook, color=None, **props):
+    # Excel hides gridlines on filled cells; a thin border keeps the rows visible.
+    if color:
+        props["bg_color"] = color
+        props.setdefault("border", 1)
+        props.setdefault("border_color", "#B4B4B4")
+    return workbook.add_format(props)
+
+
+def _formats_for_column(workbook, color=None):
+    """Header, hint row and data cells of a column share the same fill color."""
+    return {
+        "header": _cell_format(workbook, color, bold=True, text_wrap=True, valign="vcenter"),
+        "comment": _cell_format(workbook, color, italic=True, font_color="#000000", text_wrap=True),
+        "column": _cell_format(workbook, color) if color else None,
+    }
+
+
+def _write_column(sheet, col, spec, formats, has_comments):
+    sheet.write(HEADER_ROW - 1, col, spec["header"], formats["header"])
+    sheet.set_column(col, col, 35, formats["column"])
+    if has_comments:
+        sheet.write(DATA_START_ROW - 1, col, spec.get("comment", ""), formats["comment"])
+
+
+def _add_dropdown(main_sheet, reference_sheet, col, spec, first_data_row):
+    """List options live on the hidden References sheet and feed the column dropdown."""
+    options = spec.get("options") or []
+    reference_sheet.write(0, col, spec["header"])
+    for row, value in enumerate(options, start=1):
+        reference_sheet.write(row, col, value)
+
+    if not options:
+        return
+
+    column_letter = chr(ord("A") + col)
+    main_sheet.data_validation(
+        f"{column_letter}{first_data_row}:{column_letter}1000",
+        {
+            "validate": "list",
+            "source": f"=References!${column_letter}$2:${column_letter}${len(options) + 1}",
+        },
+    )
+
+
 def create_import_template(title: str, columns: list[TemplateColumns]):
     path = f"/tmp/{to_snake_case(title)}_import_template.xlsx"
     workbook = xlsxwriter.Workbook(path)
-
-    # Create the main sheet
     main_sheet = workbook.add_worksheet(title)
-
-    headers = [c["header"] for c in columns]
-    header_format = workbook.add_format({"bold": True, "text_wrap": True, "valign": "vcenter"})
-
-    main_sheet.set_row(HEADER_ROW - 1, 24)
-    for col, header in enumerate(headers):
-        main_sheet.write(HEADER_ROW - 1, col, header, header_format)
-        main_sheet.set_column(col, col, 35)
-
-    first_data_row = get_data_start_row(columns)
-    if first_data_row == DATA_START_ROW_WITH_COMMENTS:
-        comment_format = workbook.add_format({"italic": True, "font_color": "#666666", "text_wrap": True})
-        main_sheet.set_row(DATA_START_ROW - 1, 36)
-        for col, spec in enumerate(columns):
-            main_sheet.write(DATA_START_ROW - 1, col, spec.get("comment", ""), comment_format)
-
-    # Create the reference sheet for dropdowns
     reference_sheet = workbook.add_worksheet("References")
-    for col, spec in enumerate(columns):
-        reference_sheet.write(0, col, spec["header"])
-        options = spec.get("options", [])
-        for row, value in enumerate(options, start=1):
-            reference_sheet.write(row, col, value)
-
     reference_sheet.hide()
     reference_sheet.protect()
 
-    # Add the validation rules to enable dropdowns
+    first_data_row = get_data_start_row(columns)
+    has_comments = first_data_row == DATA_START_ROW_WITH_COMMENTS
+    main_sheet.set_row(HEADER_ROW - 1, 24)
+    if has_comments:
+        main_sheet.set_row(DATA_START_ROW - 1, 36)
+
     for col, spec in enumerate(columns):
-        options = spec.get("options", [])
-        if not options:
-            continue
-
-        column_letter = chr(ord("A") + col)  # get the column letter based on index
-        max_row = len(options) + 1
-
-        main_sheet.data_validation(
-            f"{column_letter}{first_data_row}:{column_letter}1000",
-            {
-                "validate": "list",
-                "source": f"=References!${column_letter}$2:${column_letter}${max_row}",
-            },
-        )
+        formats = _formats_for_column(workbook, spec.get("color"))
+        _write_column(main_sheet, col, spec, formats, has_comments)
+        _add_dropdown(main_sheet, reference_sheet, col, spec, first_data_row)
 
     workbook.close()
     return open(path, "rb")

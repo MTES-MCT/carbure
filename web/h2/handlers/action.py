@@ -9,18 +9,18 @@ class H2ActionHandler(ActionIndustryHandler):
     industry = Action.H2
     lookups = lookups
     excel_columns = [
-        excel_column("pos_id"),
-        excel_column("material", header="Nature d'hydrogène"),
-        excel_column("quantity", header="Quantité (MJ)"),
-        excel_column("site", header="Station"),
-        excel_column("shipping_date"),
-        excel_column("shipping_distance"),
-        excel_column("shipping_method"),
-        excel_column("ei"),
-        excel_column("ep"),
-        excel_column("etd"),
-        excel_column("eu"),
-        excel_column("eccs"),
+        excel_column("pos_id", color="#D9EAF7"),
+        excel_column("material", header="Nature d'hydrogène", color="#D9EAF7"),
+        excel_column("quantity", header="Quantité (MJ)", color="#D9EAF7"),
+        excel_column("ei", color="#D9EAF7"),
+        excel_column("ep", color="#D9EAF7"),
+        excel_column("shipping_date", color="#FCE4D6"),
+        excel_column("shipping_distance", color="#FCE4D6"),
+        excel_column("shipping_method", color="#FCE4D6"),
+        excel_column("etd", color="#FCE4D6"),
+        excel_column("site", header="Station", color="#E2F0D9", comment="Liste de choix - Nom de la station dans carbure"),
+        excel_column("eu", color="#E2F0D9"),
+        excel_column("eccs", color="#E2F0D9"),
     ]
 
     @staticmethod
