@@ -3,6 +3,7 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import viewsets
 
 from core.filters import FiltersActionFactory
+from core.pagination import TotalCountPagination
 from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.registry import get_action_handler
@@ -35,6 +36,7 @@ class ActionViewset(
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     filterset_class = ActionFilter
+    pagination_class = TotalCountPagination
     search_fields = ["pos_id"]
 
     def initial(self, request, *args, **kwargs):

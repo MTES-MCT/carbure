@@ -31,21 +31,3 @@ class CachedPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
             return cache[pk]
         except KeyError:
             self.fail("does_not_exist", pk_value=data)
-
-
-class CachedSlugRelatedField(serializers.SlugRelatedField):
-    """SlugRelatedField resolving instances from a pre-fetched `{slug: instance}` cache."""
-
-    def __init__(self, *args, cache_key, **kwargs):
-        self.cache_key = cache_key
-        super().__init__(*args, **kwargs)
-
-    def to_internal_value(self, data):
-        cache = self.context.get(self.cache_key)
-        if cache is None:
-            return super().to_internal_value(data)
-
-        try:
-            return cache[data]
-        except KeyError:
-            self.fail("does_not_exist", slug_name=self.slug_field, value=data)

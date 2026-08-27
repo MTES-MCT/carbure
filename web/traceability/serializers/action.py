@@ -4,26 +4,12 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from core.serializer_fields import CachedSlugRelatedField
 from core.serializers import EntityPreviewSerializer
-from traceability.models import Action, Material
+from traceability.models import Action
 from traceability.models.action_status import ActionStatus
+from traceability.serializers.fields import LookupSlugRelatedField
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
-from transactions.models import Site
-
-
-class HandlerLookupSlugRelatedField(CachedSlugRelatedField):
-    """
-    Slug related field that overrides the get_queryset method to use the handler lookups.
-    """
-
-    def __init__(self, *args, lookup, **kwargs):
-        self.lookup = lookup
-        super().__init__(*args, **kwargs)
-
-    def get_queryset(self):
-        return getattr(self.context["handler"].lookups, self.lookup)(self.context.get("entity"))
 
 
 class ExcelDateField(serializers.DateField):
@@ -103,17 +89,13 @@ class ActionExcelImportListSerializer(serializers.ListSerializer):
 
 
 class ActionExcelImportSerializer(serializers.ModelSerializer):
-    material = HandlerLookupSlugRelatedField(
+    material = LookupSlugRelatedField(
         slug_field="name",
-        queryset=Material.objects.all(),
-        cache_key="material_cache",
         lookup="material",
         error_messages={"does_not_exist": _("Matière inconnue")},
     )
-    site = HandlerLookupSlugRelatedField(
+    site = LookupSlugRelatedField(
         slug_field="name",
-        queryset=Site.objects.all(),
-        cache_key="site_cache",
         lookup="site",
         error_messages={"does_not_exist": _("Site inconnu")},
     )

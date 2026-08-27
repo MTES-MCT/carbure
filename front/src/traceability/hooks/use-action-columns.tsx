@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 import { Cell, Column } from "common/components/table2"
 import { EntityManager } from "common/hooks/entity"
 import { Action } from "traceability/types"
+import { formatActionDecimal } from "traceability/utils"
 
 export type ActionColumn = Column<Action> & {
   condition?: (entity: EntityManager) => boolean
@@ -29,7 +30,9 @@ export function useActionColumns() {
     quantity: {
       key: "quantity",
       header: t("Quantité"),
-      cell: (action) => <Cell text={action.quantity} />,
+      cell: (action) => (
+        <Cell text={formatActionDecimal(action.quantity)} sub="MJ" />
+      ),
     },
 
     site: {
