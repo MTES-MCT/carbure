@@ -3,7 +3,13 @@ import os
 from django.test import SimpleTestCase
 from openpyxl import load_workbook
 
-from core.import_export_template import create_import_template, to_snake_case
+from core.import_export_template import (
+    DATA_START_ROW,
+    DATA_START_ROW_WITH_COMMENTS,
+    HEADER_ROW,
+    create_import_template,
+    to_snake_case,
+)
 
 
 class ImportExportTemplateTests(SimpleTestCase):
@@ -31,7 +37,7 @@ class ImportExportTemplateTests(SimpleTestCase):
         main_sheet = workbook["My Template"]
         reference_sheet = workbook["References"]
 
-        self.assertEqual([cell.value for cell in main_sheet[1]], ["Name", "Status", "Type"])
+        self.assertEqual([cell.value for cell in main_sheet[HEADER_ROW]], ["Name", "Status", "Type"])
         self.assertEqual(reference_sheet.sheet_state, "hidden")
         self.assertTrue(reference_sheet.protection.sheet)
         self.assertEqual([cell.value for cell in reference_sheet[1]], ["Name", "Status", "Type"])
@@ -52,10 +58,27 @@ class ImportExportTemplateTests(SimpleTestCase):
         self.assertEqual(
             validation_data,
             {
-                ("=References!$B$2:$B$3", "B2:B1000"),
-                ("=References!$C$2:$C$4", "C2:C1000"),
+                ("=References!$B$2:$B$3", f"B{DATA_START_ROW}:B1000"),
+                ("=References!$C$2:$C$4", f"C{DATA_START_ROW}:C1000"),
             },
         )
+
+    def test_create_import_template_writes_comment_row_and_shifts_validation(self):
+        columns = [
+            {"header": "Name", "comment": "obligatoire"},
+            {"header": "Status", "options": ["Active", "Inactive"]},
+        ]
+
+        workbook = self._load_workbook("With Comments", columns)
+        self.addCleanup(workbook.close)
+        main_sheet = workbook["With Comments"]
+
+        self.assertEqual([cell.value for cell in main_sheet[HEADER_ROW]], ["Name", "Status"])
+        self.assertEqual([cell.value for cell in main_sheet[DATA_START_ROW]], ["obligatoire", None])
+
+        validations = main_sheet.data_validations.dataValidation
+        self.assertEqual(len(validations), 1)
+        self.assertEqual(str(validations[0].sqref), f"B{DATA_START_ROW_WITH_COMMENTS}:B1000")
 
     def test_create_import_template_skips_validation_when_no_options(self):
         columns = [{"header": "Name"}]

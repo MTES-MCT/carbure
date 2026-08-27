@@ -11,7 +11,7 @@ ACTION_EXCEL_COLUMNS = {
         "header": "Site",
         "options": lambda entity, handler: list(handler.lookups.site(entity).values_list("name", flat=True)),
     },
-    "shipping_date": {"header": "Date d'expédition"},
+    "shipping_date": {"header": "Date d'expédition", "comment": "jj/mm/aaaa"},
     "shipping_distance": {"header": "Distance de livraison"},
     "shipping_method": {
         "header": "Mode de transport",

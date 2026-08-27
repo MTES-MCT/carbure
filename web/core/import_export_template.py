@@ -9,10 +9,15 @@ from import_export.admin import ImportExportModelAdmin
 
 from core.excel import ExcelResponse
 
+HEADER_ROW = 1
+DATA_START_ROW = 2
+DATA_START_ROW_WITH_COMMENTS = 3
+
 
 class TemplateColumns(TypedDict):
     header: str
     options: NotRequired[list]
+    comment: NotRequired[str]
 
 
 class ImportExportWithTemplateModelAdmin(ImportExportModelAdmin):
@@ -96,6 +101,12 @@ class ImportExportWithTemplateModelAdmin(ImportExportModelAdmin):
         )
 
 
+def get_data_start_row(columns: list[TemplateColumns]) -> int:
+    if any(spec.get("comment") for spec in columns):
+        return DATA_START_ROW_WITH_COMMENTS
+    return DATA_START_ROW
+
+
 def create_import_template(title: str, columns: list[TemplateColumns]):
     path = f"/tmp/{to_snake_case(title)}_import_template.xlsx"
     workbook = xlsxwriter.Workbook(path)
@@ -106,10 +117,17 @@ def create_import_template(title: str, columns: list[TemplateColumns]):
     headers = [c["header"] for c in columns]
     header_format = workbook.add_format({"bold": True, "text_wrap": True, "valign": "vcenter"})
 
-    main_sheet.set_row(0, 24)
+    main_sheet.set_row(HEADER_ROW - 1, 24)
     for col, header in enumerate(headers):
-        main_sheet.write(0, col, header, header_format)
+        main_sheet.write(HEADER_ROW - 1, col, header, header_format)
         main_sheet.set_column(col, col, 35)
+
+    first_data_row = get_data_start_row(columns)
+    if first_data_row == DATA_START_ROW_WITH_COMMENTS:
+        comment_format = workbook.add_format({"italic": True, "font_color": "#666666", "text_wrap": True})
+        main_sheet.set_row(DATA_START_ROW - 1, 36)
+        for col, spec in enumerate(columns):
+            main_sheet.write(DATA_START_ROW - 1, col, spec.get("comment", ""), comment_format)
 
     # Create the reference sheet for dropdowns
     reference_sheet = workbook.add_worksheet("References")
@@ -132,7 +150,7 @@ def create_import_template(title: str, columns: list[TemplateColumns]):
         max_row = len(options) + 1
 
         main_sheet.data_validation(
-            f"{column_letter}2:{column_letter}1000",
+            f"{column_letter}{first_data_row}:{column_letter}1000",
             {
                 "validate": "list",
                 "source": f"=References!${column_letter}$2:${column_letter}${max_row}",

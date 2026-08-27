@@ -1,7 +1,7 @@
 from io import BufferedReader
 
 from core.excel_importer import ExcelImporter
-from core.import_export_template import create_import_template
+from core.import_export_template import DATA_START_ROW, create_import_template, get_data_start_row
 from traceability.handlers.action import ActionIndustryHandler
 
 
@@ -30,4 +30,4 @@ def parse_action_import_file(file, handler: ActionIndustryHandler) -> list[dict]
         row = {header_to_key[header]: value for header, value in record.items() if header in header_to_key}
 
         rows.append(row)
-    return rows
+    return rows[get_data_start_row(handler.excel_columns) - DATA_START_ROW :]

@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from core.excel_importer import ExcelImporter, ExcelValidationError
+from core.import_export_template import DATA_START_ROW, get_data_start_row
 from traceability.serializers.action import ActionExcelImportSerializer, ActionExcelUploadSerializer
 from traceability.services.action_excel import parse_action_import_file
 
@@ -31,7 +32,7 @@ class ExcelImportActionMixin:
         try:
             serializer = ExcelImporter.validate_retrieved_data(
                 serializer,
-                config={"header_row": 0},
+                config={"header_row": get_data_start_row(request.handler.excel_columns) - DATA_START_ROW},
                 nb_rows=len(rows),
             )
         except ExcelValidationError as exc:

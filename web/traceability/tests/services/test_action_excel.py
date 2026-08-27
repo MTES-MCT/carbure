@@ -5,6 +5,7 @@ from io import BytesIO
 from django.test import TestCase
 from openpyxl import load_workbook
 
+from core.import_export_template import DATA_START_ROW, get_data_start_row
 from core.models import Entity
 from h2.handlers import H2ActionHandler
 from traceability.factories import MaterialFactory
@@ -32,13 +33,14 @@ def filled_h2_template(*, pos_id, material_name, site_name, shipping_date=date(2
         0,
         0,
     ]
+    data_row = get_data_start_row(H2ActionHandler.excel_columns)
     for column, value in enumerate(values, start=1):
-        sheet.cell(row=2, column=column, value=value)
+        sheet.cell(row=data_row, column=column, value=value)
     if extra_headers:
         start = len(H2ActionHandler.excel_columns) + 1
         for offset, (header, value) in enumerate(extra_headers):
             sheet.cell(row=1, column=start + offset, value=header)
-            sheet.cell(row=2, column=start + offset, value=value)
+            sheet.cell(row=data_row, column=start + offset, value=value)
 
     buffer = BytesIO()
     workbook.save(buffer)
@@ -73,6 +75,13 @@ class ActionExcelTemplateTest(TestCase):
         references = workbook["References"]
 
         self.assertEqual(headers, [column["header"] for column in H2ActionHandler.excel_columns])
+        self.assertEqual(
+            [
+                workbook["Import actions H2"].cell(row=DATA_START_ROW, column=index).value
+                for index in range(1, len(headers) + 1)
+            ],
+            [column.get("comment") or None for column in H2ActionHandler.excel_columns],
+        )
         self.assertEqual(references["B2"].value, hydrogen.name)
         self.assertIsNone(references["B3"].value)
         self.assertEqual(references["D2"].value, station.name)
