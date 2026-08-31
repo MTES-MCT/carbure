@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "first-deploy": "bash scripts/database/restore_db.sh carbure-dev"
+    "first-deploy": "bash backups/database/restore.sh scalingo carbure-dev"
   },
   "env": {
     "BASE_URL": {

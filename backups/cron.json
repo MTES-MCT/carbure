@@ -1,0 +1,16 @@
+{
+  "jobs": [
+    {
+      "command": "0 1 * * * bash offsite/backup_database.sh carbure-prod",
+      "size": "M"
+    },
+    {
+      "command": "0 3 * * 0 bash offsite/backup_database.sh carbure-metabase",
+      "size": "M"
+    },
+    {
+      "command": "0 2 * * * bash offsite/backup_user_files.sh",
+      "size": "M"
+    }
+  ]
+}
