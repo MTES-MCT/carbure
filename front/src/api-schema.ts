@@ -4981,6 +4981,13 @@ export interface components {
             certificates: components["schemas"]["ProductionSiteCertificateSertificate"][];
         };
         /**
+         * @description * `LOSS` - Perte
+         *     * `DOWNGRADING` - Déclassement
+         *     * `OTHER` - Autre
+         * @enum {string}
+         */
+        DevaluationTypeEnum: DevaluationTypeEnum;
+        /**
          * @description * `SPREADING_PLAN_ICPE` - Plan d'épandage (ICPE)
          *     * `AMM` - Autorisation de mise sur le marché (AMM)
          *     * `MANDATORY_STANDARD` - Norme rendue d'application obligatoire
@@ -6122,6 +6129,7 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -6172,6 +6180,7 @@ export interface components {
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLot"][];
             status?: components["schemas"]["OperationStatusEnum"];
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationInputRequest: {
             type: components["schemas"]["OperationTypeEnum"];
@@ -6186,6 +6195,7 @@ export interface components {
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationList: {
             readonly id: number;
@@ -16265,6 +16275,11 @@ export enum DeliveryTypeEnum {
     DIRECT = "DIRECT",
     FLUSHED = "FLUSHED",
     CONSUMPTION = "CONSUMPTION"
+}
+export enum DevaluationTypeEnum {
+    LOSS = "LOSS",
+    DOWNGRADING = "DOWNGRADING",
+    OTHER = "OTHER"
 }
 export enum DigestateSaleTypesEnum {
     SPREADING_PLAN_ICPE = "SPREADING_PLAN_ICPE",

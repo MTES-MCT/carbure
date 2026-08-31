@@ -41,11 +41,12 @@ class CancelClosedPeriodOperationsCommandTest(TestCase):
         self.assertEqual(
             Operation.API_DELETABLE_TYPES,
             [
-                Operation.CESSION,
-                Operation.TENEUR,
                 Operation.TRANSFERT,
                 Operation.EXPORTATION,
                 Operation.EXPEDITION,
+                Operation.TENEUR,
+                Operation.DEVALUATION,
+                Operation.CESSION,
             ],
         )
 

@@ -3,24 +3,18 @@ import {
   fromDepotFiltersStep,
   fromDepotFiltersStepKey,
   FromDepotFiltersSummary,
-} from "./from-depot-filters-form"
-import {
-  RecapOperation,
-  RecapOperationGrid,
-} from "accounting/components/recap-operation"
+} from "../components/from-depot-filters-form"
 import { Balance, CreateOperationType } from "accounting/types"
-import Dialog from "common/components/dialog2/dialog"
 import { FormManager, useForm } from "common/components/form2"
-import { Box, Main } from "common/components/scaffold"
-import { Stepper, StepperProvider, useStepper } from "common/components/stepper"
-import { Trans, useTranslation } from "react-i18next"
+import { Box } from "common/components/scaffold"
+import { StepperProvider } from "common/components/stepper"
+import { useTranslation } from "react-i18next"
 import {
   CountryForm,
   countryFormStep,
   countryFormStepKey,
   CountryFormSummary,
 } from "./country-form"
-import { Button } from "common/components/button2"
 import { ExportationDialogForm } from "./exportation-dialog.types"
 import { useExportationDialog } from "./exportation-dialog.hooks"
 import {
@@ -29,6 +23,7 @@ import {
   QuantitySummary,
   useQuantityFormStep,
 } from "accounting/components/quantity-form"
+import { DebitOperationStepperDialog } from "../components/debit-operation-stepper-dialog"
 
 interface ExportationDialogProps {
   onClose: () => void
@@ -45,7 +40,6 @@ export const ExportationDialogContent = ({
   balance,
   onOperationCreated,
 }: ExportationDialogContentProps) => {
-  const { currentStep, currentStepIndex } = useStepper()
   const { t } = useTranslation()
 
   const mutation = useExportationDialog({
@@ -56,75 +50,45 @@ export const ExportationDialogContent = ({
   })
 
   return (
-    <Dialog
-      fullWidth
+    <DebitOperationStepperDialog
       onClose={onClose}
-      header={
-        <Dialog.Title>
-          <Trans>Réaliser une exportation</Trans>
-        </Dialog.Title>
-      }
-      footer={
+      balance={balance}
+      title={t("Réaliser une exportation")}
+      submitLabel={t("Exporter")}
+      form={form}
+      formId="exportation-dialog"
+      mutation={mutation}
+      renderSummaries={(currentStepIndex) => (
         <>
-          <Stepper.Previous />
-          <Stepper.Next nativeButtonProps={{ form: "exportation-dialog" }} />
-          {currentStep?.key === "recap" && (
-            <>
-              <Button
-                priority="secondary"
-                onClick={() => mutation.execute({ draft: true })}
-                loading={mutation.loading}
-              >
-                {t("Sauvegarder")}
-              </Button>
-
-              <Button
-                priority="primary"
-                onClick={() => mutation.execute({ draft: false })}
-                loading={mutation.loading}
-              >
-                {t("Exporter")}
-              </Button>
-            </>
+          {currentStepIndex > 1 && (
+            <FromDepotFiltersSummary values={form.value} />
+          )}
+          {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
+          {currentStepIndex > 3 && <CountryFormSummary values={form.value} />}
+        </>
+      )}
+      renderStepContent={(currentStepKey) => (
+        <>
+          {currentStepKey === fromDepotFiltersStepKey && (
+            <FromDepotFiltersForm balance={balance} />
+          )}
+          {currentStepKey === quantityFormStepKey && (
+            <Box>
+              <QuantityForm
+                balance={balance}
+                quantityMax={form.value.availableBalance ?? 0}
+                type={CreateOperationType.EXPORTATION}
+              />
+            </Box>
+          )}
+          {currentStepKey === countryFormStepKey && (
+            <Box>
+              <CountryForm />
+            </Box>
           )}
         </>
-      }
-    >
-      <Main>
-        <Stepper />
-        <Box>
-          <RecapOperationGrid>
-            <RecapOperation balance={balance} />
-            {currentStepIndex > 1 && (
-              <FromDepotFiltersSummary values={form.value} />
-            )}
-            {currentStepIndex > 2 && <QuantitySummary values={form.value} />}
-            {currentStepIndex > 3 && <CountryFormSummary values={form.value} />}
-          </RecapOperationGrid>
-        </Box>
-        {currentStep?.key !== "recap" && (
-          <Stepper.Form form={form} id="exportation-dialog">
-            {currentStep?.key === fromDepotFiltersStepKey && (
-              <FromDepotFiltersForm balance={balance} />
-            )}
-            {currentStep?.key === quantityFormStepKey && (
-              <Box>
-                <QuantityForm
-                  balance={balance}
-                  quantityMax={form.value.availableBalance ?? 0}
-                  type={CreateOperationType.EXPORTATION}
-                />
-              </Box>
-            )}
-            {currentStep?.key === countryFormStepKey && (
-              <Box>
-                <CountryForm />
-              </Box>
-            )}
-          </Stepper.Form>
-        )}
-      </Main>
-    </Dialog>
+      )}
+    />
   )
 }
 
