@@ -11,6 +11,14 @@
     {
       "command": "0 2 * * * bash offsite/backup_user_files.sh",
       "size": "M"
+    },
+    {
+      "command": "45 1 * * * bash database/restore.sh scalingo carbure-prod \"$READ_REPLICA_DATABASE_URL\"",
+      "size": "M"
+    },
+    {
+      "command": "45 0 * * * bash database/restore.sh scalingo carbure-prod \"$STAGING_DATABASE_URL\"",
+      "size": "M"
     }
   ]
 }
