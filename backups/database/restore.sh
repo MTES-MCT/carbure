@@ -32,7 +32,7 @@ if [[ -z "$backup_location" ]]; then
 fi
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-project_root=$(cd -- "$script_dir/../../.." && pwd)
+project_root=$(cd -- "$script_dir/../.." && pwd)
 
 if [[ "$backup_source" == "local" ]]; then
   backup_path=$backup_location
