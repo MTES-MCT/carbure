@@ -11,6 +11,7 @@ from transactions.models.production_site import ProductionSite
 class CarbureLotFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = CarbureLot
+        django_get_or_create = ("carbure_id",)
 
     carbure_id = factory.Faker("lexify", text="????????????")
     created_at = factory.Faker("date_time_this_year")
