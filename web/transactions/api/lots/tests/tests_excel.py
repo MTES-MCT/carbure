@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from core.models import CarbureLot, Entity, Pays
 from core.tests_utils import setup_current_user
+from transactions.helpers import INVALID_DISPATCH_SITE, fill_dispatch_data
 from transactions.models import Depot, ProductionSite
 from transactions.models.entity_site import EntitySite
 from transactions.models.site import Site
@@ -138,6 +139,26 @@ class LotsExcelImportTest(TestCase):
 
         assert lots.filter(carbure_delivery_site=self.owner_depot).count() == 1
         assert lots.filter(carbure_delivery_site=self.other_depot).count() == 5
+
+    def test_invalid_dispatch_site_type_is_blocking(self):
+        invalid_dispatch_site = Site.objects.create(
+            name="Invalid Dispatch Site",
+            site_type=Site.POWER_PLANT,
+            country=self.FR,
+        )
+        lot = CarbureLot()
+
+        errors = fill_dispatch_data(
+            lot,
+            {"carbure_dispatch_site_id": invalid_dispatch_site.id},
+            {"sites": {invalid_dispatch_site.id: invalid_dispatch_site}, "countries": {}},
+        )
+
+        assert lot.carbure_dispatch_site is None
+        assert len(errors) == 1
+        assert errors[0].error == INVALID_DISPATCH_SITE
+        assert errors[0].field == "dispatch_site"
+        assert errors[0].is_blocking is True
 
     def test_producer_trader_excel(self):
         self.owner.entity_type = Entity.PRODUCER
