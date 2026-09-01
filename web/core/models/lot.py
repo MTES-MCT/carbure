@@ -4,6 +4,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from transactions.models import Depot, ProductionSite
+from transactions.models.site import Site
 
 from .certificate import GenericCertificate
 from .entity import Entity
@@ -89,7 +90,7 @@ class CarbureLot(models.Model):
     unknown_client = models.CharField(max_length=64, blank=True, null=True, default=None)
     dispatch_date = models.DateField(blank=True, null=True)
     carbure_dispatch_site = models.ForeignKey(
-        Depot, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="carbure_dispatch_site"
+        Site, null=True, blank=True, default=None, on_delete=models.SET_NULL, related_name="dispatched_biofuel_lots"
     )
     unknown_dispatch_site = models.CharField(max_length=64, blank=True, null=True, default=None)
     dispatch_site_country = models.ForeignKey(
