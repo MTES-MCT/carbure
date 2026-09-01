@@ -3,6 +3,16 @@ from django import forms
 from core.carburetypes import CarbureUnit
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from transactions.models import Depot, ProductionSite
+from transactions.models.site import Site
+
+DISPATCH_SITE_TYPES = [
+    Site.EFS,
+    Site.EFPE,
+    Site.OILDEPOT,
+    Site.BIOFUELDEPOT,
+    Site.PRODUCTION_BIOLIQUID,
+    Site.EFCA,
+]
 
 
 class LotForm(forms.Form):
@@ -16,6 +26,7 @@ class LotForm(forms.Form):
     COUNTRIES = Pays.objects.all()
     PRODUCTION_SITES = ProductionSite.objects.all()
     DEPOTS = Depot.objects.all()
+    DISPATCH_SITES = Site.objects.filter(site_type__in=DISPATCH_SITE_TYPES)
 
     # lot fields
     transport_document_type = forms.CharField(required=False)
@@ -60,6 +71,10 @@ class LotForm(forms.Form):
     supplier_certificate_type = forms.CharField(required=False)
     vendor_certificate = forms.CharField(required=False)
     vendor_certificate_type = forms.CharField(required=False)
+    carbure_dispatch_site_id = forms.ModelChoiceField(queryset=DISPATCH_SITES, required=False)
+    unknown_dispatch_site = forms.CharField(required=False)
+    dispatch_date = forms.DateField(required=False)
+    dispatch_site_country_code = forms.ModelChoiceField(queryset=COUNTRIES, to_field_name="code_pays", required=False)
     delivery_type = forms.CharField(required=False)
     usage = forms.CharField(required=False)
     usage_precision = forms.CharField(required=False)
@@ -116,6 +131,8 @@ FORM_TO_LOT_FIELD = {
     "production_country_code": "production_country",
     "carbure_supplier_id": "carbure_supplier",
     "carbure_client_id": "carbure_client",
+    "carbure_dispatch_site_id": "carbure_dispatch_site",
     "carbure_delivery_site_depot_id": "carbure_delivery_site",
+    "dispatch_site_country_code": "dispatch_site_country",
     "delivery_site_country_code": "delivery_site_country",
 }
