@@ -9,12 +9,14 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
+  Site,
   Unit,
   EntityPreview,
 } from "common/types"
 import Form, { FormErrors, FormManager, useForm } from "common/components/form"
 import LotFields from "./lot-fields"
 import ProductionFields from "./production-fields"
+import DispatchFields from "./dispatch-fields"
 import DeliveryFields from "./delivery-fields"
 import { EmissionFields, ReductionFields } from "./ghg-fields"
 import { LotCertificates } from "transaction-details/types"
@@ -45,6 +47,7 @@ export const LotForm = ({
   >
     <LotFields {...props} />
     <ProductionFields {...props} />
+    <DispatchFields {...props} />
     <DeliveryFields {...props} />
     <EmissionFields {...props} />
     <ReductionFields {...props} />
@@ -168,9 +171,16 @@ const BATCH_PRODUCTION = [
   "production_site_commissioning_date",
 ]
 
-const BATCH_DELIVERY = [
+const BATCH_DISPATCH = [
   "supplier",
   "supplier_certificate",
+  "vendor_certificate",
+  "dispatch_site",
+  "dispatch_site_country",
+  "dispatch_date",
+]
+
+const BATCH_DELIVERY = [
   "client",
   "delivery_type",
   "usage",
@@ -192,7 +202,12 @@ const BATCH_EMISSIONS = [
   "eu",
 ]
 
-export type FieldGroup = "batch" | "production" | "delivery" | "emissions"
+export type FieldGroup =
+  | "batch"
+  | "production"
+  | "dispatch"
+  | "delivery"
+  | "emissions"
 const disabledFieldsGroup = (
   form: FormManager<LotFormValue>,
   fieldGroups: FieldGroup[]
@@ -201,6 +216,7 @@ const disabledFieldsGroup = (
 
   if (fieldGroups.includes("batch")) values.push(...BATCH_VALUES)
   if (fieldGroups.includes("production")) values.push(...BATCH_PRODUCTION)
+  if (fieldGroups.includes("dispatch")) values.push(...BATCH_DISPATCH)
   if (fieldGroups.includes("delivery")) values.push(...BATCH_DELIVERY)
   if (fieldGroups.includes("emissions")) values.push(...BATCH_EMISSIONS)
 
@@ -267,6 +283,9 @@ export const defaultLot = {
   supplier: undefined as EntityPreview | string | undefined,
   supplier_certificate: undefined as string | undefined,
   vendor_certificate: undefined as string | undefined,
+  dispatch_site: undefined as Site | string | undefined,
+  dispatch_site_country: undefined as Country | undefined,
+  dispatch_date: undefined as string | undefined,
   client: undefined as EntityPreview | string | undefined,
   delivery_type: undefined as DeliveryType | undefined,
   usage: undefined as FuelUsage | undefined,
@@ -332,6 +351,10 @@ export const lotToFormValue: LotToFormValue = (lot, entity, certificates) => {
     supplier: lot?.carbure_supplier ?? lot?.unknown_supplier ?? undefined,
     supplier_certificate: lot?.supplier_certificate ?? undefined,
     vendor_certificate: lot?.vendor_certificate ?? undefined,
+    dispatch_site:
+      lot?.carbure_dispatch_site ?? lot?.unknown_dispatch_site ?? undefined,
+    dispatch_site_country: lot?.dispatch_site_country ?? undefined,
+    dispatch_date: lot?.dispatch_date ?? undefined,
     client: lot?.carbure_client ?? lot?.unknown_client ?? undefined,
     delivery_type:
       lot?.delivery_type === "UNKNOWN" ? undefined : lot?.delivery_type,
@@ -430,6 +453,14 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
     vendor_certificate: lot.vendor_certificate,
     vendor_certificate_type: undefined,
 
+    // dispatch
+    carbure_dispatch_site_id:
+      lot.dispatch_site instanceof Object ? lot.dispatch_site.id : undefined,
+    unknown_dispatch_site:
+      typeof lot.dispatch_site === "string" ? lot.dispatch_site : undefined,
+    dispatch_site_country_code: lot.dispatch_site_country?.code_pays,
+    dispatch_date: lot.dispatch_date,
+
     // delivery
     delivery_type: lot.delivery_type,
     usage: lot.usage,
@@ -515,6 +546,7 @@ const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
   INCORRECT_DELIVERY_DATE: ["delivery_date"],
   INCORRECT_DELIVERY_SITE_COUNTRY: ["delivery_site_country"],
   INCORRECT_FORMAT_DELIVERY_DATE: ['delivery_date'],
+  INVALID_DISPATCH_SITE: ['dispatch_site'],
   MAC_BC_WRONG: ['biofuel'],
   MISSING_BIOFUEL: ['biofuel'],
   MISSING_CARBURE_CLIENT: ['client'],
