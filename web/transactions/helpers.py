@@ -7,6 +7,7 @@ from django.db.models.query import QuerySet
 
 from core.carburetypes import CarbureStockErrors, CarbureUnit
 from core.models import CarbureLot, CarbureStock, Entity, GenericError
+from transactions.forms.lot_form import DISPATCH_SITE_TYPES
 from transactions.models import YearConfig
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
 
@@ -36,6 +37,7 @@ VOLUME_FORMAT_INCORRECT = "VOLUME_FORMAT_INCORRECT"
 WRONG_FLOAT_FORMAT = "WRONG_FLOAT_FORMAT"
 UNKNOWN_DELIVERY_SITE = "UNKNOWN_DELIVERY_SITE"
 UNKNOWN_DELIVERY_COUNTRY = "UNKNOWN_DELIVERY_COUNTRY"
+INVALID_DISPATCH_SITE = "INVALID_DISPATCH_SITE"
 UNKNOWN_CLIENT = "UNKNOWN_CLIENT"
 
 
@@ -522,6 +524,38 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
     return errors
 
 
+def fill_dispatch_data(lot, data, prefetched_data):
+    dispatch_site_id = data.get("carbure_dispatch_site_id", None)
+    if dispatch_site_id:
+        try:
+            dispatch_site = prefetched_data["sites"].get(int(dispatch_site_id))
+        except (TypeError, ValueError):
+            dispatch_site = None
+
+        if dispatch_site is None or dispatch_site.site_type not in DISPATCH_SITE_TYPES:
+            return [
+                GenericError(
+                    lot=lot,
+                    field="dispatch_site",
+                    error=INVALID_DISPATCH_SITE,
+                    display_to_creator=True,
+                    is_blocking=True,
+                    value=str(dispatch_site_id),
+                )
+            ]
+
+        lot.carbure_dispatch_site = dispatch_site
+        lot.unknown_dispatch_site = None
+        lot.dispatch_site_country = dispatch_site.country
+    else:
+        lot.carbure_dispatch_site = None
+        lot.unknown_dispatch_site = data.get("unknown_dispatch_site", None)
+        dispatch_country_code = data.get("dispatch_site_country_code", None)
+        lot.dispatch_site_country = prefetched_data["countries"].get(dispatch_country_code)
+
+    return []
+
+
 def fill_client_data(lot, data, entity, prefetched_data):
     errors = []
     carbure_client_id = data.get("carbure_client_id", None)
@@ -598,6 +632,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot.copy_production_details(original_lot)
         lot.copy_sustainability_data(original_lot)
         lot.carbure_dispatch_site = parent_stock.depot
+        lot.dispatch_site_country = lot.carbure_dispatch_site.country if lot.carbure_dispatch_site else None
         lot.carbure_supplier = parent_stock.carbure_client
         lot.biofuel = parent_stock.biofuel
     else:
@@ -605,6 +640,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         errors += fill_basic_info(lot, data, prefetched_data)
         errors += fill_production_info(lot, data, entity, prefetched_data)
         errors += fill_ghg_info(lot, data)
+        errors += fill_dispatch_data(lot, data, prefetched_data)
 
     # common data
     fill_delivery_type(lot, data)
