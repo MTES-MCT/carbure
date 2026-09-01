@@ -1,7 +1,7 @@
 .PHONY: \
 	up down restart logs-django_cmd open restart-backend restart-frontend \
 	test-backend test-frontend \
-	makemigrations migrate seed ipython \
+	makemigrations migrate flush seed ipython \
 	lint-fix translate translate-missing \
 	check-diff check-types generate-and-check-types \
 	flush
@@ -52,6 +52,9 @@ makemigrations:
 
 migrate:
 	$(django_cmd) migrate
+
+flush:
+	$(django_cmd) flush
 
 seed:
 	$(django_cmd) create_sample_data $(app)
