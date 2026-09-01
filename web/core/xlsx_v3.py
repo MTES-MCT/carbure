@@ -7,7 +7,8 @@ import xlsxwriter
 
 from core.models import Biocarburant, CarbureStock, Entity, GenericCertificate, MatierePremiere, Pays
 from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
-from transactions.models import Depot, ProductionSite
+from transactions.forms.lot_form import DISPATCH_SITE_TYPES
+from transactions.models import Depot, ProductionSite, Site
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerCSVSerializer
 
 UNKNOWN_PRODUCERS = [
@@ -549,6 +550,29 @@ def make_deliverysites_sheet(workbook):
         row += 1
 
 
+def make_dispatchsites_sheet(workbook):
+    worksheet_sites = workbook.add_worksheet("SitesDExpedition")
+    dispatch_sites = Site.objects.filter(site_type__in=DISPATCH_SITE_TYPES).order_by("country", "id")
+    bold = workbook.add_format({"bold": True})
+    columns = ["id", "name", "city", "country", "site_type"]
+
+    for column, name in enumerate(columns):
+        worksheet_sites.write(0, column, name, bold)
+
+    for row, site in enumerate(dispatch_sites, start=1):
+        worksheet_sites.write_row(
+            row,
+            0,
+            [
+                site.id,
+                site.name,
+                site.city,
+                site.country.code_pays if site.country else "",
+                site.site_type,
+            ],
+        )
+
+
 def template_producers_simple(entity):
     # Create an new Excel file and add a worksheet.
     location = "/tmp/carbure_template_simple.xlsx"
@@ -1060,6 +1084,9 @@ def make_template_carbure_lots_sheet(workbook, entity):
         "supplier",
         "supplier_certificate",
         "vendor_certificate",
+        "dispatch_site",
+        "dispatch_site_country",
+        "dispatch_date",
         "volume",
         "biocarburant_code",
         "matiere_premiere_code",
@@ -1350,6 +1377,7 @@ def make_template_carbure_lots_sheet(workbook, entity):
 
     rowid = 0
     for row in rows:
+        row[10:10] = ["", "", ""]
         colid = 0
         for elem in row:
             worksheet_lots.write(rowid + 1, colid, elem)
@@ -1444,6 +1472,7 @@ def template_v4(entity):
     make_countries_sheet(workbook)
     make_clients_sheet(workbook)
     make_deliverysites_sheet(workbook)
+    make_dispatchsites_sheet(workbook)
     workbook.close()
     return location
 
