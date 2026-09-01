@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "first-deploy": "bash backups/database/restore.sh scalingo carbure-dev"
+    "first-deploy": "python web/manage.py create_sample_data"
   },
   "env": {
     "BASE_URL": {
