@@ -7,7 +7,7 @@ from transactions.helpers import construct_carbure_lot
 
 class ConstructCarbureLotTest(TestCase):
     def setUp(self):
-        self.prefetched_data = {"biofuels": [], "countries": [], "depots": [], "feedstocks": []}
+        self.prefetched_data = {"biofuels": [], "countries": {}, "depots": [], "feedstocks": [], "sites": {}}
 
     def test_includes_udb_transaction_id_to_constructed_lot(self):
         data = {"udb_transaction_id": "12345"}
