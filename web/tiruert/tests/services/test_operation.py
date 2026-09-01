@@ -172,6 +172,7 @@ class OperationServiceEmissionRatesTest(OperationServiceTestCase):
 class OperationServiceCreateOperationsTest(OperationServiceTestCase):
     """Test OperationService.create_operations_from_lots() method."""
 
+    @patch("tiruert.services.operation.OperationService.convert_emag_lots")
     @patch("tiruert.services.operation.OperationService.calculate_volume_ethanol_15")
     @patch("tiruert.services.operation.OperationService.process_ep2_lots")
     @patch("tiruert.services.operation.OperationService.remove_existing_lots")
@@ -184,8 +185,9 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         mock_remove_existing_lots,
         mock_process_ep2_lots,
         mock_calculate_volume_ethanol_15,
+        mock_convert_emag_lots,
     ):
-        """Should call the 3 lot filters and 2 transformation methods in order."""
+        """Should call the 3 lot filters and 3 transformation methods in order."""
         input_lots = Mock(name="input_lots")
         lots_after_valid_filter = Mock(name="lots_after_valid_filter")
         lots_after_fr_filter = Mock(name="lots_after_fr_filter")
@@ -197,6 +199,7 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         mock_remove_existing_lots.return_value = lots_after_existing_filter
         mock_process_ep2_lots.return_value = lots_after_ep2
         mock_calculate_volume_ethanol_15.return_value = None
+        mock_convert_emag_lots.return_value = None
 
         OperationService.create_operations_from_lots(input_lots)
 
@@ -205,6 +208,7 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         mock_remove_existing_lots.assert_called_once_with(lots_after_fr_filter)
         mock_process_ep2_lots.assert_called_once_with(lots_after_existing_filter)
         mock_calculate_volume_ethanol_15.assert_called_once_with(lots_after_ep2)
+        mock_convert_emag_lots.assert_called_once_with(lots_after_ep2)
 
     def test_create_operations_from_lots_creates_correct_number(self):
         """Should create 4 operations from 5 valid lots (grouped by type/feedstock/biofuel/depot)."""
@@ -833,6 +837,33 @@ class OperationServiceCalculateVolumeEthanol15Test(TestCase):
 
         self.assertIsNone(result)
         self.assertEqual(lot_emag.volume, 750.0)
+
+
+class OperationServiceConvertEmagLotsTest(TestCase):
+    """Tests for OperationService.convert_emag_lots()."""
+
+    fixtures = ["json/biofuels.json"]
+
+    def test_convert_emag_lots_converts_supported_biofuel_codes(self):
+        """Should mutate supported biofuels to the EMAG fixture instance."""
+        lots = [Mock(biofuel=Mock(code=code)) for code in ["EMHV", "EMHU", "EMHA", "B100"]]
+
+        result = OperationService.convert_emag_lots(lots)
+
+        emag = Biocarburant.objects.get(code="EMAG")
+        self.assertIsNone(result)
+        for lot in lots:
+            self.assertEqual(lot.biofuel, emag)
+
+    def test_convert_emag_lots_keeps_other_biofuels_unchanged(self):
+        """Should leave non-supported biofuel objects untouched."""
+        original_biofuel = Mock(code="ETH")
+        lot = Mock(biofuel=original_biofuel)
+
+        result = OperationService.convert_emag_lots([lot])
+
+        self.assertIsNone(result)
+        self.assertIs(lot.biofuel, original_biofuel)
 
 
 class OperationServiceCreditedEntityFallbackTest(TestCase):

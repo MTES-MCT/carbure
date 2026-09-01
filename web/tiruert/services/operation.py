@@ -305,9 +305,10 @@ class OperationService:
 
         valid_lots = list(valid_lots)
 
-        # Process EP2 lots and calculate ethanol 15° volumes for valid lots
+        # Process EP2 lots, calculate ethanol 15° volumes for valid lots and convert EMAG lots
         valid_lots = OperationService.process_ep2_lots(valid_lots)
         OperationService.calculate_volume_ethanol_15(valid_lots)
+        OperationService.convert_emag_lots(valid_lots)
 
         # Group validated_lots by delivery_type, feedstock, biofuel and depot
         lots_by_delivery_type = defaultdict(list)
@@ -429,6 +430,16 @@ class OperationService:
             if lot.biofuel.code == "ETH":
                 volume_decimal = Decimal(str(lot.volume))
                 lot.volume = truncate(float(volume_decimal * conversion_factor))
+
+    @staticmethod
+    def convert_emag_lots(lots: list[CarbureLot]) -> dict[str, list[CarbureLot]]:
+        """
+        Lots with biofuel EMHV, EMHU, EMHA or B100 are converted to EMAG biofuel
+        """
+        emag = Biocarburant.objects.get(code="EMAG")
+        for lot in lots:
+            if lot.biofuel.code in ["EMHV", "EMHU", "EMHA", "B100"]:
+                lot.biofuel = emag
 
     @staticmethod
     def define_sector(biofuel: Biocarburant) -> str:
