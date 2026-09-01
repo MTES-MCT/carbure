@@ -23,6 +23,7 @@ from core.models import (
     UserRightsRequests,
 )
 from transactions.models import Airport, Depot, ProductionSite
+from transactions.models.site import Site
 
 
 class FeedStockSerializer(serializers.ModelSerializer):
@@ -189,6 +190,19 @@ class ProductionSiteSerializer(serializers.ModelSerializer):
             "country",
             "date_mise_en_service",
             "dc_reference",
+        ]
+
+
+class SiteSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+
+    class Meta:
+        model = Site
+        fields = [
+            "id",
+            "name",
+            "country",
+            "site_type",
         ]
 
 
@@ -538,7 +552,7 @@ class CarbureLotPublicSerializer(serializers.ModelSerializer):
     production_country = CountrySerializer(read_only=True)
     carbure_supplier = EntitySummarySerializer(read_only=True)
     carbure_client = EntitySummarySerializer(read_only=True)
-    carbure_dispatch_site = DepotSerializer(read_only=True)
+    carbure_dispatch_site = SiteSerializer(read_only=True)
     dispatch_site_country = CountrySerializer(read_only=True)
     carbure_delivery_site = DepotSerializer(read_only=True)
     delivery_site_country = CountrySerializer(read_only=True)
