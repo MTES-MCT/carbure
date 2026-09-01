@@ -20,7 +20,7 @@ def setup_h2_entity() -> Entity:
     )
 
     set_user_access(admin_user, hrs_entity, "ADMIN")
-    set_user_access(regular_user, hrs_entity, "RW")
+    set_user_access(regular_user, hrs_entity, "RO")
 
     return hrs_entity
 
