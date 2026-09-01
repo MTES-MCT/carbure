@@ -9,6 +9,7 @@ class DepotFactory(SiteFactory):
 
     class Meta:
         model = Depot
+        django_get_or_create = ("customs_id",)
 
     site_type = Depot.BIOFUELDEPOT
     customs_id = factory.Faker("lexify", text="????????????")

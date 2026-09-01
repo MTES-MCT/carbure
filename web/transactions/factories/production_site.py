@@ -15,6 +15,7 @@ class ProductionSiteFactory(SiteFactory):
 
     class Meta:
         model = ProductionSite
+        django_get_or_create = ("name",)
 
     site_type = fuzzy.FuzzyChoice(ProductionSite.PRODUCTION_SITE_TYPES, getter=lambda x: x[0])
     date_mise_en_service = factory.Faker("date")
