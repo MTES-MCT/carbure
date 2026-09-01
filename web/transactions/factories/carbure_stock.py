@@ -13,6 +13,7 @@ from transactions.models import Depot, ProductionSite
 class CarbureStockFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = CarbureStock
+        django_get_or_create = ("carbure_id",)
 
     parent_lot = None
     parent_transformation = None
