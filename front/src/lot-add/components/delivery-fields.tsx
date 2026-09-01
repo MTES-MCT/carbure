@@ -11,21 +11,13 @@ import {
 import { UserCheck } from "common/components/icons"
 import * as api from "common/api"
 import * as norm from "common/utils/normalizers"
+import { compact } from "common/utils/collection"
 import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
-import {
-  isExternalDelivery,
-  isLotClient,
-  isLotProducer,
-  isLotSupplier,
-  isLotVendor,
-  LotFormValue,
-} from "./lot-form"
+import { isExternalDelivery, LotFormValue } from "./lot-form"
 import { LotStatus } from "transactions/types"
 import { Country, Depot, EntityPreview } from "common/types"
 import Select, { SelectProps } from "common/components/select"
 import { DeliveryType, FuelUsage } from "transactions/types"
-import { compact, uniqueBy } from "common/utils/collection"
-import CertificateIcon from "transaction-details/components/lots/certificate"
 
 interface DeliveryFieldsProps {
   readOnly?: boolean
@@ -35,9 +27,6 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
   const { t } = useTranslation()
   return (
     <Fieldset label={t("Livraison")}>
-      <SupplierField {...props} />
-      <SupplierCertificateField {...props} />
-      <MyCertificateField {...props} />
       <ClientField {...props} />
       <DeliveryTypeField {...props} />
       <UsageField {...props} />
@@ -46,109 +35,6 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
       <DeliverySiteCountryField {...props} />
       <DeliveryDateField {...props} />
     </Fieldset>
-  )
-}
-
-export const SupplierField = (
-  props: AutocompleteProps<EntityPreview | string>
-) => {
-  const { t } = useTranslation()
-  const entity = useEntity()
-  const { value, bind } = useFormContext<LotFormValue>()
-
-  const { value: supplier, ...bound } = bind("supplier")
-  const isKnown = supplier instanceof Object
-
-  const defaultOptions = uniqueBy(
-    compact([supplier, entity]),
-    (v) => norm.normalizeEntityPreviewOrUnknown(v).label
-  )
-
-  if (entity.isAdmin) {
-    return (
-      <Autocomplete
-        label={t("Fournisseur")}
-        value={supplier}
-        icon={isKnown ? UserCheck : undefined}
-        create={norm.identity}
-        defaultOptions={supplier ? [supplier] : undefined}
-        getOptions={api.findBiofuelEntities}
-        normalize={norm.normalizeEntityPreviewOrUnknown}
-        {...bound}
-        {...props}
-      />
-    )
-  }
-
-  return (
-    <Autocomplete
-      label={t("Fournisseur")}
-      value={supplier}
-      icon={isKnown ? UserCheck : undefined}
-      create={norm.identity}
-      defaultOptions={defaultOptions}
-      getOptions={async () => [entity]}
-      normalize={norm.normalizeEntityPreviewOrUnknown}
-      {...bound}
-      {...props}
-      disabled={
-        props.disabled || bound.disabled || isLotProducer(entity, value)
-      }
-    />
-  )
-}
-
-export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
-  const { t } = useTranslation()
-  const entity = useEntity()
-  const { value, bind } = useFormContext<LotFormValue>()
-
-  const date = value.delivery_date
-  const certificate = value.certificates?.supplier_certificate ?? undefined
-  const bound = bind("supplier_certificate")
-
-  return (
-    <Autocomplete
-      required={isLotClient(entity, value)}
-      label={t("Certificat du fournisseur")}
-      icon={<CertificateIcon certificate={certificate} />}
-      defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={(query) =>
-        isLotSupplier(entity, value)
-          ? api.findMyCertificates(query, { entity_id: entity.id, date })
-          : api.findCertificates(query, { date })
-      }
-      {...bound}
-      {...props}
-    />
-  )
-}
-
-export const MyCertificateField = (props: AutocompleteProps<string>) => {
-  const { t } = useTranslation()
-  const entity = useEntity()
-  const { value, bind } = useFormContext<LotFormValue>()
-  const bound = bind("vendor_certificate")
-
-  // hide this field if this entity is NOT an intermediary
-  if (!isLotVendor(entity, value) || !entity.canTrade) {
-    return null
-  }
-
-  const certificate = value.certificates?.vendor_certificate ?? undefined
-
-  return (
-    <Autocomplete
-      required
-      label={t("Votre certificat de négoce")}
-      icon={<CertificateIcon certificate={certificate} />}
-      defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={(query) =>
-        api.findMyCertificates(query, { entity_id: entity.id })
-      }
-      {...bound}
-      {...props}
-    />
   )
 }
 
