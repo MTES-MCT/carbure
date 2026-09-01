@@ -29,6 +29,10 @@ export type Biofuel = apiTypes["Biofuel"]
 
 export type Country = apiTypes["Country"]
 
+export type Site = apiTypes["ActionSite"] & {
+  country?: Country
+}
+
 export type ProductionSite = apiTypes["ProductionSite"]
 
 export type ProductionSiteDetails = apiTypes["EntityProductionSite"]

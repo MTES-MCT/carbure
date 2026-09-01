@@ -5,6 +5,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
+  Site,
 } from "common/types"
 
 export interface Lot {
@@ -31,8 +32,9 @@ export interface Lot {
   carbure_client: Entity | null
   unknown_client: string | null
   dispatch_date?: string | null
-  carbure_dispatch_site?: Depot | null
+  carbure_dispatch_site?: Site | null
   unknown_dispatch_site?: string | null
+  dispatch_site_country?: Country | null
   delivery_date: string | null
   carbure_delivery_site: Depot | null
   unknown_delivery_site: string | null
