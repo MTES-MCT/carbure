@@ -127,6 +127,7 @@ class ResourcesTest(TestCase):
         assert len(data) == 1
         assert data[0]["name"] == "Hydrogen station"
         assert all(site["site_type"] == Site.H2_REFUELING_STATION for site in data)
+        assert data[0]["country"]["code_pays"] == "FR"
 
         response = self.client.get(reverse("resources-sites"), {"query": "other"})
         assert response.status_code == 200
