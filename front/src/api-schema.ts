@@ -3635,6 +3635,7 @@ export interface components {
             readonly id: number;
             name: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+            readonly country: components["schemas"]["Country"];
         };
         /**
          * @description * `CREATED` - CREATED
@@ -4778,7 +4779,7 @@ export interface components {
             unknown_client?: string | null;
             /** Format: date */
             dispatch_date?: string | null;
-            readonly carbure_dispatch_site: components["schemas"]["Depot"];
+            readonly carbure_dispatch_site: components["schemas"]["ActionSite"];
             unknown_dispatch_site?: string | null;
             readonly dispatch_site_country: components["schemas"]["Country"];
             /** Format: date */
