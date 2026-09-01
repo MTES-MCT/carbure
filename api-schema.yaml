@@ -13662,7 +13662,12 @@ components:
           maxLength: 128
         site_type:
           $ref: "#/components/schemas/SiteTypeEnum"
+        country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
       required:
+        - country
         - id
         - name
     ActionStatusEnum:
@@ -15891,7 +15896,7 @@ components:
           nullable: true
         carbure_dispatch_site:
           allOf:
-            - $ref: "#/components/schemas/Depot"
+            - $ref: "#/components/schemas/ActionSite"
           readOnly: true
         unknown_dispatch_site:
           type: string
