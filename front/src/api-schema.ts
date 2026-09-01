@@ -3547,6 +3547,7 @@ export interface components {
             readonly id: number;
             name: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+            readonly country: components["schemas"]["Country"];
         };
         /**
          * @description * `INIT` - INIT
@@ -4625,7 +4626,7 @@ export interface components {
             unknown_client?: string | null;
             /** Format: date */
             dispatch_date?: string | null;
-            readonly carbure_dispatch_site: components["schemas"]["Depot"];
+            readonly carbure_dispatch_site: components["schemas"]["ActionSite"];
             unknown_dispatch_site?: string | null;
             readonly dispatch_site_country: components["schemas"]["Country"];
             /** Format: date */
@@ -5459,7 +5460,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -5489,7 +5489,6 @@ export interface components {
             sustainability_officer?: string;
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
         };
@@ -5631,7 +5630,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -7287,11 +7285,9 @@ export interface components {
             registered_zipcode?: string;
             registration_id?: string;
             sustainability_officer?: string;
-            /** Format: email */
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
             vat_number?: string;
-            /** Format: uri */
             website?: string;
         };
         UpdateRightsRequestsRequest: {
