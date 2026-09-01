@@ -19,6 +19,7 @@
   "INVALID_DOUBLE_COUNTING_CERTIFICATE": "Certificat double compte invalide pour cette date de livraison",
   "INACTIVE_DOUBLE_COUNTING_CERTIFICATE": "Le certificat double compte n'est plus valide",
   "LOT_NOT_ELIGIBLE_TIRUERT": "Ce lot n'est plus éligible TIRUERT",
+  "INVALID_DISPATCH_SITE": "Le type du site d'expédition n'est pas autorisé",
   "EXPIRED_PRODSITE_CERT": "Certificat du site de production expiré",
   "EXPIRED_SUPPLIER_CERT": "Certificat du fournisseur expiré",
   "EXPIRED_VENDOR_CERT": "Certificat du fournisseur expiré",
