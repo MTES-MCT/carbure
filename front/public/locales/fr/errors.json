@@ -15,6 +15,7 @@
   "ETD_NO_EU_TOO_LOW": "Émissions GES liées au Transport et à la Distribution inférieures à la valeur par défaut",
   "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Certificat double compte expiré",
   "INVALID_DOUBLE_COUNTING_CERTIFICATE": "Certificat double compte invalide pour cette date de livraison",
+  "INVALID_DISPATCH_SITE": "Le type du site d'expédition n'est pas autorisé",
   "EXPIRED_PRODSITE_CERT": "Certificat du site de production expiré",
   "EXPIRED_SUPPLIER_CERT": "Certificat du fournisseur expiré",
   "EXPIRED_VENDOR_CERT": "Certificat du fournisseur expiré",
