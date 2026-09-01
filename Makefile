@@ -53,6 +53,9 @@ makemigrations:
 migrate:
 	$(django_cmd) migrate
 
+flush:
+	$(django_cmd) flush
+
 seed:
 	$(django_cmd) create_sample_data $(app) $(if $(reset),--reset)
 
