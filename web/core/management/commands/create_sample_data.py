@@ -7,6 +7,12 @@ from django.db import connection, transaction
 class Command(BaseCommand):
     help = "Crée les données de démonstration d'une app"
 
+    reference_fixtures = (
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+    )
+
     def add_arguments(self, parser):
         parser.add_argument("app_name", nargs="?", type=str)
         parser.add_argument("--reset", action="store_true", help="Recrée la base configurée avant de générer les données")
@@ -17,6 +23,8 @@ class Command(BaseCommand):
 
         if kwargs["reset"]:
             self._reset_database()
+
+        self._load_reference_fixtures()
 
         if app_name is None:
             for app_config in apps.get_app_configs():
@@ -39,6 +47,10 @@ class Command(BaseCommand):
             cursor.execute(f"DROP DATABASE `{name}`")
             cursor.execute(f"CREATE DATABASE `{name}` CHARACTER SET utf8mb4")
         call_command("migrate")
+
+    def _load_reference_fixtures(self):
+        self.stdout.write("> Chargement des référentiels biofuels, feedstocks et pays...")
+        call_command("loaddata", *self.reference_fixtures, verbosity=0)
 
     def _create_sample_data(self, app_name, report_missing=False):
         try:
