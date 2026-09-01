@@ -20,6 +20,7 @@ import {
   EntityCertificate,
   EntityDepot,
   EntityPreview,
+  Site,
 } from "common/types"
 import { apiTypes } from "common/services/api-fetch.types"
 import { formatMonth, formatPeriod } from "common/utils/formatters"
@@ -122,6 +123,11 @@ export const normalizeAirport: Normalizer<apiTypes["Airport"]> = (airport) => ({
 export const normalizeDepotOrUnknown: Normalizer<Depot | string> = (depot) => ({
   value: depot,
   label: isString(depot) ? depot : depot.name,
+})
+
+export const normalizeSiteOrUnknown: Normalizer<Site | string> = (site) => ({
+  value: site,
+  label: isString(site) ? site : site.name,
 })
 
 // prettier-ignore
