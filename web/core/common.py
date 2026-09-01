@@ -192,6 +192,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         # 'champ_libre',
         # 'producer', 'production_site', 'production_site_reference', 'production_site_country', 'production_site_commissioning_date', 'double_counting_registration',  # noqa: E501
         # 'supplier', 'supplier_certificate', ('vendor_certificate') removed,
+        # 'dispatch_site', 'dispatch_site_country', 'dispatch_date',
         # 'volume', 'biocarburant_code', 'matiere_premiere_code', 'pays_origine_code',
         # 'eec', 'el', 'ep', 'etd', 'eu', 'esca', 'eccs', 'eccr', 'eee',
         # 'dae', 'client', 'delivery_date', 'delivery_site', 'delivery_site_country', 'delivery_type']
@@ -200,6 +201,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         # free_field, carbure_producer, unknown_producer, carbure_production_site, unknown_production_site
         # production_country, production_site, commissioning_date, production_site_certificate, production_site_double_counting_certificate  # noqa: E501
         # carbure_supplier, unknown_supplier, supplier_certificate
+        # carbure_dispatch_site, unknown_dispatch_site, dispatch_site_country, dispatch_date
         # transport_document, carbure_client, unknown_client, delivery_date, carbure_delivery_site, unknown_delivery_site, delivery_site_country  # noqa: E501
         # biofuel, feedstock, country_of_origin
 
@@ -231,6 +233,13 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot["production_site_double_counting_certificate"] = lot_row.get("double_counting_registration", None)
         lot["vendor_certificate"] = lot_row.get("vendor_certificate", "")
         lot["supplier_certificate"] = lot_row.get("supplier_certificate", "")
+        lot["dispatch_date"] = lot_row.get("dispatch_date", "")
+        dispatch_site = str(lot_row.get("dispatch_site", "")).strip()
+        if dispatch_site.upper() in prefetched_data["sitesbyname"]:
+            lot["carbure_dispatch_site_id"] = prefetched_data["sitesbyname"][dispatch_site.upper()].id
+        else:
+            lot["unknown_dispatch_site"] = dispatch_site
+            lot["dispatch_site_country_code"] = str(lot_row.get("dispatch_site_country", "")).strip()
         lot["volume"] = lot_row.get("volume", 0)
         lot["quantity"] = lot_row.get("quantity", 0)
         lot["unit"] = lot_row.get("unit", None)
