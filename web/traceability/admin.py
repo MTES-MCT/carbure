@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from traceability.models import Action, ActionStatus, Material
+from traceability.services.valorize import valorize
 
 
 class ActionStatusInline(admin.TabularInline):
@@ -10,28 +11,51 @@ class ActionStatusInline(admin.TabularInline):
     ordering = ("created_at", "id")
 
 
+class LatestStatusFilter(admin.SimpleListFilter):
+    title = "Statut"
+    parameter_name = "status"
+
+    def lookups(self, request, model_admin):
+        return ActionStatus.STATUSES
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(status=self.value())
+        return queryset
+
+
 @admin.register(Material)
 class MaterialAdmin(admin.ModelAdmin):
     list_display = ("id", "code", "name")
     search_fields = ("code", "name")
 
 
+@admin.action(description="Valider les actions sélectionnées et créer les certificats")
+def valorize_actions_into_certificates(modeladmin, request, queryset):
+    valorize(queryset)
+
+
 @admin.register(Action)
 class ActionAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
         "pos_id",
-        "holder",
         "industry",
         "type",
-        "material",
+        "latest_status",
+        "holder",
+        "material__name",
         "quantity",
         "site",
         "shipping_date",
         "working_date",
-        "latest_status",
     )
-    list_filter = ("industry", "type", "shipping_method", "working_date")
+    list_filter = (
+        "industry",
+        "type",
+        LatestStatusFilter,
+        "material__name",
+        "shipping_method",
+    )
     search_fields = (
         "pos_id",
         "holder__name",
@@ -44,6 +68,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_select_related = ("holder", "material", "site", "certificate")
     date_hierarchy = "working_date"
     inlines = (ActionStatusInline,)
+    actions = [valorize_actions_into_certificates]
 
     @admin.display(description="Statut", ordering="status")
     def latest_status(self, obj):

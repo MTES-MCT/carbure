@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from django.db import models
-from django.db.models import OuterRef, Subquery
+from django.db import models, transaction
+from django.db.models import OuterRef, QuerySet, Subquery
 from django.utils.translation import gettext_lazy as _
 
 from .action_status import ActionStatus
@@ -36,14 +36,15 @@ class Action(models.Model):
     industry = models.CharField(verbose_name="Filière", choices=INDUSTRIES, max_length=16)
 
     INIT = "INIT"
-    TYPES = [(INIT, "INIT")]
+    VALORIZE = "VALORIZE"
+    TYPES = [(INIT, "INIT"), (VALORIZE, "VALORIZE")]
     type = models.CharField(verbose_name="Type d'action", choices=TYPES, max_length=16)
 
     parent = models.ForeignKey(
         "self", verbose_name="Action parente", null=True, blank=True, on_delete=models.PROTECT, related_name="children"
     )
 
-    material = models.ForeignKey("traceability.Material", on_delete=models.PROTECT, verbose_name="Matière")
+    material = models.ForeignKey("traceability.Material", on_delete=models.PROTECT, verbose_name="Matière", null=True)
 
     certificate = models.ForeignKey(
         "core.GenericCertificate",
@@ -57,7 +58,7 @@ class Action(models.Model):
     # Quantity in MJ
     quantity = models.DecimalField(verbose_name="Quantité de matière", max_digits=13, decimal_places=3)
 
-    site = models.ForeignKey("transactions.Site", on_delete=models.PROTECT, verbose_name="Site")
+    site = models.ForeignKey("transactions.Site", on_delete=models.PROTECT, verbose_name="Site", null=True)
 
     shipping_date = models.DateField(verbose_name="Date d'expédition", blank=True, null=True)
     shipping_distance = models.IntegerField(verbose_name="Distance de livraison", blank=True, null=True)
@@ -83,6 +84,17 @@ class Action(models.Model):
     eccs = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
 
     objects = ActionManager()
+
+    @staticmethod
+    @transaction.atomic
+    def bulk_create(actions: list["Action"], default_status=ActionStatus.CREATED) -> QuerySet["Action"]:
+        Action.objects.bulk_create(actions)
+        created_actions = Action.objects.filter(pos_id__in=[a.pos_id for a in actions])
+
+        created_statuses = [ActionStatus(status=default_status, action=a) for a in created_actions]
+        ActionStatus.objects.bulk_create(created_statuses)
+
+        return created_actions
 
     class Meta:
         db_table = "action"

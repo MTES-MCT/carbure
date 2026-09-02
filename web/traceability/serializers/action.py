@@ -72,15 +72,8 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
             )
             for attrs in validated_data
         ]
-        Action.objects.bulk_create(actions)
 
-        created_actions = list(Action.objects.filter(pos_id__in=[action.pos_id for action in actions]))
-        created_at = timezone.now()
-        ActionStatus.objects.bulk_create(
-            ActionStatus(action=action, status=ActionStatus.PENDING, created_at=created_at) for action in created_actions
-        )
-
-        return created_actions
+        return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
 
 
 class ActionExcelImportSerializer(serializers.ModelSerializer):
