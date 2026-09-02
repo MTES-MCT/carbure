@@ -7,6 +7,7 @@ from rest_framework import serializers
 from core.serializers import EntityPreviewSerializer
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
+from traceability.serializers.certificate import ActionCertificateSerializer
 from traceability.serializers.fields import LookupSlugRelatedField
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
@@ -37,6 +38,7 @@ class ActionSerializer(serializers.ModelSerializer):
     parent = ActionParentSerializer(read_only=True, required=False, allow_null=True)
     material = MaterialSerializer(read_only=True)
     site = ActionSiteSerializer(read_only=True)
+    certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
 
     class Meta:
         model = Action
@@ -63,13 +65,16 @@ class ActionExcelUploadSerializer(serializers.Serializer):
     file = serializers.FileField()
 
 
+_ACTION_MODEL_FIELDS = {field.name for field in Action._meta.fields}
+
+
 class ActionExcelImportListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
         holder = self.context["entity"]
         industry = self.context["handler"].industry
         actions = [
             Action(
-                **attrs,
+                **{key: value for key, value in attrs.items() if key in _ACTION_MODEL_FIELDS},
                 holder=holder,
                 industry=industry,
                 type=Action.INIT,
@@ -94,6 +99,13 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         lookup="material",
         error_messages={"does_not_exist": _("Matière inconnue")},
     )
+    certificate = LookupSlugRelatedField(
+        slug_field="certificate_id",
+        lookup="certificate",
+        required=True,
+        allow_null=False,
+        error_messages={"does_not_exist": _("Certificat inconnu")},
+    )
     site = LookupSlugRelatedField(
         slug_field="name",
         lookup="site",
@@ -109,6 +121,7 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         fields = [
             "pos_id",
             "material",
+            "certificate",
             "quantity",
             "site",
             "shipping_date",

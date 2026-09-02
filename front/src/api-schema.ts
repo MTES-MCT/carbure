@@ -3444,6 +3444,7 @@ export interface components {
             readonly parent: components["schemas"]["ActionParent"] | null;
             readonly material: components["schemas"]["Material"];
             readonly site: components["schemas"]["ActionSite"];
+            readonly certificate: components["schemas"]["ActionCertificate"] | null;
             /** N° de POS */
             pos_id: string;
             /** Filière */
@@ -3479,6 +3480,12 @@ export interface components {
             eu?: string;
             /** Format: decimal */
             eccs?: string;
+        };
+        ActionCertificate: {
+            readonly id: number;
+            certificate_id: string;
+            certificate_type: components["schemas"]["CertificateTypeEnum"];
+            certificate_holder: string;
         };
         ActionExcelUploadRequest: {
             /** Format: binary */
@@ -3527,6 +3534,8 @@ export interface components {
             readonly parent: number | null;
             /** Matière */
             material: number;
+            /** Certificat du producteur */
+            certificate?: number | null;
             site: number;
         };
         ActionInputRequest: {
@@ -3565,6 +3574,8 @@ export interface components {
             eccs?: string;
             /** Matière */
             material: number;
+            /** Certificat du producteur */
+            certificate?: number | null;
             site: number;
         };
         /** @description Small representation used for the parent action relation. */
@@ -6328,6 +6339,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Action"][];
+            total_count?: number;
         };
         PaginatedBalanceResponseList: {
             /** @example 123 */
@@ -6617,6 +6629,8 @@ export interface components {
             eccs?: string;
             /** Matière */
             material?: number;
+            /** Certificat du producteur */
+            certificate?: number | null;
             site?: number;
         };
         PatchedBiomethaneAnnualDeclarationRequest: {

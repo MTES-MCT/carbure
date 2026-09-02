@@ -13,6 +13,7 @@ export type Action = apiTypes["Action"]
 export type ActionHolder = NonNullable<Action["holder"]>
 export type ActionMaterial = NonNullable<Action["material"]>
 export type ActionSite = NonNullable<Action["site"]>
+export type ActionCertificate = NonNullable<Action["certificate"]>
 
 export type ActionQueryBuilder = QueryBuilder<ActionStatus[], ActionOrderBy[]>
 

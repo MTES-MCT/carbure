@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from core.excel_importer import ExcelImporter, ExcelValidationError
 from core.import_export_template import DATA_START_ROW, get_data_start_row
-from traceability.serializers.action import ActionExcelImportSerializer, ActionExcelUploadSerializer
+from traceability.serializers.action import ActionExcelUploadSerializer
 from traceability.services.action_excel import parse_action_import_file
 
 
@@ -28,7 +28,9 @@ class ExcelImportActionMixin:
         except Exception:
             return Response({"file": "Invalid Excel file."}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = ActionExcelImportSerializer(data=rows, many=True, context=self.get_serializer_context())
+        serializer = request.handler.excel_import_serializer_class(
+            data=rows, many=True, context=self.get_serializer_context()
+        )
         try:
             serializer = ExcelImporter.validate_retrieved_data(
                 serializer,

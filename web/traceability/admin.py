@@ -32,9 +32,16 @@ class ActionAdmin(admin.ModelAdmin):
         "latest_status",
     )
     list_filter = ("industry", "type", "shipping_method", "working_date")
-    search_fields = ("pos_id", "holder__name", "material__code", "material__name", "site__name")
-    raw_id_fields = ("parent", "holder", "material", "site")
-    list_select_related = ("holder", "material", "site")
+    search_fields = (
+        "pos_id",
+        "holder__name",
+        "material__code",
+        "material__name",
+        "site__name",
+        "certificate__certificate_id",
+    )
+    raw_id_fields = ("parent", "holder", "material", "site", "certificate")
+    list_select_related = ("holder", "material", "site", "certificate")
     date_hierarchy = "working_date"
     inlines = (ActionStatusInline,)
 

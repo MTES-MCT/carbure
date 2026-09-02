@@ -45,6 +45,7 @@ const LotsPage = () => {
             fichier excel à travers le champ au bas de cette fenêtre.
           </Text>
         ),
+        fieldLabels: { lot_id: t("Id du lot") },
       }}
       detailActions={[
         {
@@ -61,12 +62,14 @@ const LotsPage = () => {
       ]}
       columns={[
         { ...columns.material, header: t("Nature d'H2") },
+        columns.certificate,
         columns.quantity,
         { ...columns.site, header: t("Station") },
         columns.holder,
       ]}
       fields={[
         fields.pos_id,
+        fields.certificate,
         fields.holder,
         { ...fields.material, label: t("Nature d'hydrogène") },
         fields.quantity,

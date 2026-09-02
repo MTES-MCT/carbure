@@ -27,6 +27,14 @@ export function useActionColumns() {
       cell: (action) => <Cell text={action.material.name} />,
     },
 
+    certificate: {
+      key: "certificate",
+      header: t("N° de certificat"),
+      cell: (action) => (
+        <Cell text={action.certificate?.certificate_id ?? ""} />
+      ),
+    },
+
     quantity: {
       key: "quantity",
       header: t("Quantité"),

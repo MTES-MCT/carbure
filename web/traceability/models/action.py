@@ -15,7 +15,7 @@ class ActionManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .select_related("holder", "material", "site", "parent")
+            .select_related("holder", "material", "site", "parent", "certificate")
             .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
             .annotate(created_at=Subquery(first_status_subquery.values("created_at")[:1]))
             .annotate(updated_at=Subquery(latest_status_subquery.values("created_at")[:1]))
@@ -44,6 +44,15 @@ class Action(models.Model):
     )
 
     material = models.ForeignKey("traceability.Material", on_delete=models.PROTECT, verbose_name="Matière")
+
+    certificate = models.ForeignKey(
+        "core.GenericCertificate",
+        on_delete=models.PROTECT,
+        verbose_name="Certificat du producteur",
+        null=True,
+        blank=True,
+        related_name="actions",
+    )
 
     # Quantity in MJ
     quantity = models.DecimalField(verbose_name="Quantité de matière", max_digits=13, decimal_places=3)

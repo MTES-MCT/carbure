@@ -3,7 +3,12 @@ import { useTranslation } from "react-i18next"
 import { findEnabledEntities, findMaterials, findSites } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { FormManager } from "common/components/form2"
-import { DateInput, NumberInput, TextInput } from "common/components/inputs2"
+import {
+  DateInput,
+  DecimalInput,
+  NumberInput,
+  TextInput,
+} from "common/components/inputs2"
 import { Select } from "common/components/selects2"
 import { EntityManager } from "common/hooks/entity"
 import { EntityPreview } from "common/types"
@@ -82,7 +87,7 @@ export function useActionFields() {
       key: "quantity",
       label: t("Quantité"),
       field: ({ form, props }) => (
-        <TextInput {...props} {...form.bind("quantity")} />
+        <DecimalInput {...props} {...form.bind("quantity")} />
       ),
     },
 
@@ -110,6 +115,17 @@ export function useActionFields() {
       label: t("N° de POS"),
       field: ({ form, props }) => (
         <TextInput {...props} {...form.bind("pos_id")} />
+      ),
+    },
+
+    certificate: {
+      key: "certificate",
+      label: t("N° de certificat"),
+      field: ({ form, props }) => (
+        <TextInput
+          {...props}
+          value={form.value.certificate?.certificate_id ?? ""}
+        />
       ),
     },
 
@@ -162,34 +178,40 @@ export function useActionFields() {
     ei: {
       key: "ei",
       label: t("EI"),
-      field: ({ form, props }) => <TextInput {...props} {...form.bind("ei")} />,
+      field: ({ form, props }) => (
+        <DecimalInput {...props} {...form.bind("ei")} />
+      ),
     },
 
     ep: {
       key: "ep",
       label: t("EP"),
-      field: ({ form, props }) => <TextInput {...props} {...form.bind("ep")} />,
+      field: ({ form, props }) => (
+        <DecimalInput {...props} {...form.bind("ep")} />
+      ),
     },
 
     etd: {
       key: "etd",
       label: t("ETD"),
       field: ({ form, props }) => (
-        <TextInput {...props} {...form.bind("etd")} />
+        <DecimalInput {...props} {...form.bind("etd")} />
       ),
     },
 
     eu: {
       key: "eu",
       label: t("EU"),
-      field: ({ form, props }) => <TextInput {...props} {...form.bind("eu")} />,
+      field: ({ form, props }) => (
+        <DecimalInput {...props} {...form.bind("eu")} />
+      ),
     },
 
     eccs: {
       key: "eccs",
       label: t("ECCS"),
       field: ({ form, props }) => (
-        <TextInput {...props} {...form.bind("eccs")} />
+        <DecimalInput {...props} {...form.bind("eccs")} />
       ),
     },
   } satisfies Record<string, ActionField>

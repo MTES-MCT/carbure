@@ -49,6 +49,7 @@ export type DetailAction = {
 export type ExcelImportConfig = {
   buttonLabel: string
   description: ReactNode
+  fieldLabels?: Record<string, string>
 }
 
 export type ActionsPageProps = {
@@ -96,9 +97,12 @@ export const ActionsPage = ({
     visibleFilters.map((filter) => [filter.key, filter.label])
   ) as Partial<Record<ActionFilter, string>>
 
-  const fieldLabels = Object.fromEntries(
-    (fields ?? []).map((field) => [field.key, field.label])
-  )
+  const fieldLabels = {
+    ...Object.fromEntries(
+      (fields ?? []).map((field) => [field.key, field.label])
+    ),
+    ...excelImport?.fieldLabels,
+  }
 
   const filterNormalizers = Object.fromEntries(
     visibleFilters
