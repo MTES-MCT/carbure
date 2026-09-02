@@ -49,6 +49,8 @@ export type DetailAction = {
 export type ExcelImportConfig = {
   buttonLabel: string
   description: ReactNode
+
+  // Temporary attribute to add labels to the fields of the excel import that are not stored on the Action model (ex: lot_id, batch_id, etc..)
   fieldLabels?: Record<string, string>
 }
 
