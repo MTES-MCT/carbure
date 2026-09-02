@@ -6,6 +6,7 @@ import { FormManager } from "common/components/form2"
 import {
   DateInput,
   DecimalInput,
+  DecimalInputProps,
   NumberInput,
   TextInput,
 } from "common/components/inputs2"
@@ -25,6 +26,13 @@ import {
   normalizeActionSite,
 } from "traceability/normalizers"
 import { SiteTypeEnum } from "api-schema"
+import { getStepFromFractionDigits } from "common/utils/formatters"
+
+const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
+
+const ActionDecimalInput = (props: DecimalInputProps) => (
+  <DecimalInput step={ACTION_DECIMAL_STEP} {...props} />
+)
 
 export type ActionFieldConfig = {
   form: FormManager<Partial<Action>>
@@ -87,7 +95,7 @@ export function useActionFields() {
       key: "quantity",
       label: t("Quantité"),
       field: ({ form, props }) => (
-        <DecimalInput {...props} {...form.bind("quantity")} />
+        <ActionDecimalInput {...props} {...form.bind("quantity")} />
       ),
     },
 
@@ -179,7 +187,7 @@ export function useActionFields() {
       key: "ei",
       label: t("EI"),
       field: ({ form, props }) => (
-        <DecimalInput {...props} {...form.bind("ei")} />
+        <ActionDecimalInput {...props} {...form.bind("ei")} />
       ),
     },
 
@@ -187,7 +195,7 @@ export function useActionFields() {
       key: "ep",
       label: t("EP"),
       field: ({ form, props }) => (
-        <DecimalInput {...props} {...form.bind("ep")} />
+        <ActionDecimalInput {...props} {...form.bind("ep")} />
       ),
     },
 
@@ -195,7 +203,7 @@ export function useActionFields() {
       key: "etd",
       label: t("ETD"),
       field: ({ form, props }) => (
-        <DecimalInput {...props} {...form.bind("etd")} />
+        <ActionDecimalInput {...props} {...form.bind("etd")} />
       ),
     },
 
@@ -203,7 +211,7 @@ export function useActionFields() {
       key: "eu",
       label: t("EU"),
       field: ({ form, props }) => (
-        <DecimalInput {...props} {...form.bind("eu")} />
+        <ActionDecimalInput {...props} {...form.bind("eu")} />
       ),
     },
 
@@ -211,7 +219,7 @@ export function useActionFields() {
       key: "eccs",
       label: t("ECCS"),
       field: ({ form, props }) => (
-        <DecimalInput {...props} {...form.bind("eccs")} />
+        <ActionDecimalInput {...props} {...form.bind("eccs")} />
       ),
     },
   } satisfies Record<string, ActionField>
