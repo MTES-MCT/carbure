@@ -10,6 +10,11 @@ from traceability.serializers.action import ActionExcelUploadSerializer
 from traceability.services.action_excel import parse_action_import_file
 
 
+class ExcelImportActionMixinErrors:
+    INVALID_FILE = "INVALID_FILE"
+    EMPTY_FILE = "EMPTY_FILE"
+
+
 class ExcelImportActionMixin:
     @extend_schema(
         operation_id="import_actions_from_excel",
@@ -26,7 +31,16 @@ class ExcelImportActionMixin:
         try:
             rows = parse_action_import_file(file_serializer.validated_data["file"], request.handler)
         except Exception:
-            return Response({"file": "Invalid Excel file."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": ExcelImportActionMixinErrors.INVALID_FILE},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not rows:
+            return Response(
+                {"error": ExcelImportActionMixinErrors.EMPTY_FILE},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         serializer = request.handler.excel_import_serializer_class(
             data=rows, many=True, context=self.get_serializer_context()

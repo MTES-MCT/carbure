@@ -78,7 +78,8 @@ class ActionExcelImportListSerializer(serializers.ListSerializer):
                 holder=holder,
                 industry=industry,
                 type=Action.INIT,
-                working_date=attrs["shipping_date"],
+                # Temporary code, working_date should be set by the user or inferred from another field
+                working_date=timezone.now().date(),
             )
             for attrs in validated_data
         ]
@@ -112,7 +113,9 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         error_messages={"does_not_exist": _("Site inconnu")},
     )
     shipping_date = ExcelDateField(
-        input_formats=["%d/%m/%Y"], error_messages={"invalid": _("La date doit être au format jour/mois/année.")}
+        input_formats=["%d/%m/%Y"],
+        error_messages={"invalid": _("La date doit être au format jour/mois/année.")},
+        allow_null=True,
     )
 
     class Meta:

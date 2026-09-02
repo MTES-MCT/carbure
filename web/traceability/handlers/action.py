@@ -13,8 +13,8 @@ class ActionIndustryHandler:
     excel_import_serializer_class = ActionExcelImportSerializer
     write_actions = ("create", "update", "partial_update", "destroy", "import_actions")
 
-    @staticmethod
-    def get_permissions(action: str):
-        if action in ActionIndustryHandler.write_actions:
+    @classmethod
+    def get_permissions(cls, action: str):
+        if action in cls.write_actions:
             return [HasEntityWriteRights()]
         return [HasEntityReadRights()]

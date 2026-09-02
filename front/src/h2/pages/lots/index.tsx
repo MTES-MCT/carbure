@@ -7,12 +7,18 @@ import {
   ActionSiteFieldOptions,
   useActionFields,
 } from "traceability/hooks/use-action-fields"
-import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
+import {
+  ActionIndustry,
+  ActionQuery,
+  ActionStatus,
+  ActionType,
+} from "traceability/types"
 import { SiteTypeEnum } from "api-schema"
 import { Text } from "common/components/text"
 
 const H2_LOT_QUERY: Partial<ActionQuery> = {
   type: [ActionType.INIT],
+  status: [ActionStatus.PENDING],
 }
 
 const H2_SITE_FIELD_OPTIONS: ActionSiteFieldOptions = {
@@ -32,11 +38,6 @@ const LotsPage = () => {
       detailTitle={t("Lot d'hydrogène n˚")}
       subpath="lots"
       fixedQuery={H2_LOT_QUERY}
-      mainAction={{
-        icon: "fr-icon-add-line",
-        label: t("Importer des lots d'hydrogène"),
-        onAction: () => {},
-      }}
       excelImport={{
         buttonLabel: t("Importer des lots"),
         description: (
@@ -45,7 +46,11 @@ const LotsPage = () => {
             fichier excel à travers le champ au bas de cette fenêtre.
           </Text>
         ),
-        fieldLabels: { lot_id: t("Id du lot") },
+        fieldLabels: {
+          lot_id: t("Id du lot"),
+          producer: t("Producteur"),
+          batch_id: t("N° de batch (batch ID)"),
+        },
       }}
       detailActions={[
         {
@@ -61,11 +66,10 @@ const LotsPage = () => {
         filters.shipping_method,
       ]}
       columns={[
-        { ...columns.material, header: t("Nature d'H2") },
-        columns.certificate,
-        columns.quantity,
+        columns.pos_id,
         { ...columns.site, header: t("Station") },
-        columns.holder,
+        { ...columns.material, header: t("Nature d'H2") },
+        columns.quantity,
       ]}
       fields={[
         fields.pos_id,

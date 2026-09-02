@@ -48,5 +48,11 @@ export function useActionColumns() {
       header: t("Site"),
       cell: (action) => <Cell text={action.site.name} />,
     },
+
+    pos_id: {
+      key: "pos_id",
+      header: t("N° de POS"),
+      cell: (action) => <Cell text={action.pos_id} />,
+    },
   } satisfies Record<string, ActionColumn>
 }

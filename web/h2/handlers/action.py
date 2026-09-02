@@ -17,10 +17,16 @@ class H2ActionHandler(ActionIndustryHandler):
             "comment": "Identifiant dans votre système",
             "color": EXCEL_PRODUCTION_COLOR,
         },
+        {
+            "key": "producer",
+            "header": "Producteur",
+            "comment": "Raison sociale du producteur",
+            "color": EXCEL_PRODUCTION_COLOR,
+        },
         excel_column("certificate"),
-        {"header": "N° de batch (batch ID)", "color": EXCEL_PRODUCTION_COLOR},
         excel_column("material", header="Nature d'hydrogène"),
         excel_column("pos_id"),
+        {"key": "batch_id", "header": "N° de batch (batch ID)", "color": EXCEL_PRODUCTION_COLOR},
         excel_column("ei"),
         excel_column("ep"),
         {"header": "Consommation sur le site de production", "color": EXCEL_TRANSPORT_COLOR, "comment": "Oui/Non"},
@@ -36,8 +42,8 @@ class H2ActionHandler(ActionIndustryHandler):
         excel_column("eccs"),
     ]
 
-    @staticmethod
-    def get_permissions(action: str):
-        if action in ActionIndustryHandler.write_actions:
+    @classmethod
+    def get_permissions(cls, action: str):
+        if action in cls.write_actions:
             return [HasHRSWriteRights()]
         return [HasHRSRights()]

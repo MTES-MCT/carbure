@@ -48,7 +48,7 @@ class Action(models.Model):
     certificate = models.ForeignKey(
         "core.GenericCertificate",
         on_delete=models.PROTECT,
-        verbose_name="Certificat du producteur",
+        verbose_name="Certificat",
         null=True,
         blank=True,
         related_name="actions",
@@ -59,15 +59,15 @@ class Action(models.Model):
 
     site = models.ForeignKey("transactions.Site", on_delete=models.PROTECT, verbose_name="Site")
 
-    shipping_date = models.DateField(verbose_name="Date d'expédition")
-    shipping_distance = models.IntegerField(verbose_name="Distance de livraison")
+    shipping_date = models.DateField(verbose_name="Date d'expédition", blank=True, null=True)
+    shipping_distance = models.IntegerField(verbose_name="Distance de livraison", blank=True, null=True)
 
     ROAD = "ROAD"
     PIPELINE = "PIPELINE"
     RAILROAD = "RAILROAD"
     SEA = "SEA"
     SHIPPING_METHODS = [(ROAD, "Transport routier"), (PIPELINE, "Pipeline"), (RAILROAD, "Rail"), (SEA, "Transport maritime")]
-    shipping_method = models.CharField(verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16)
+    shipping_method = models.CharField(verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16, blank=True)
 
     working_date = models.DateField(verbose_name="Date de référence")
 

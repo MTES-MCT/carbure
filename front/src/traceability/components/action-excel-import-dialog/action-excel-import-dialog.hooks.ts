@@ -28,6 +28,33 @@ function isImportErrorResponse(data: unknown): data is ImportErrorResponse {
   )
 }
 
+function getErrorCode(data: unknown): string | undefined {
+  if (typeof data !== "object" || data === null || !("error" in data)) {
+    return undefined
+  }
+  const error = (data as { error: unknown }).error
+
+  return typeof error === "string" ? error : undefined
+}
+
+function getFileErrorMessage(
+  code: string | undefined,
+  t: (key: string) => string
+): string {
+  switch (code) {
+    case "EMPTY_FILE":
+      return t("Le fichier ne contient aucune ligne à importer.")
+    case "INVALID_FILE":
+      return t(
+        "Le fichier Excel est invalide. Veuillez vérifier le format et réessayer."
+      )
+    default:
+      return t(
+        "Erreur lors de l'import du fichier. Veuillez vérifier le format et réessayer."
+      )
+  }
+}
+
 export const useActionExcelImportDialog = ({
   industry,
   onClose,
@@ -57,13 +84,8 @@ export const useActionExcelImportDialog = ({
         return
       }
 
-      notifyError(
-        new Error(
-          t(
-            "Erreur lors de l'import du fichier. Veuillez vérifier le format et réessayer."
-          )
-        )
-      )
+      const errorMessage = getFileErrorMessage(getErrorCode(data), t)
+      notifyError(error, errorMessage)
     },
   })
 

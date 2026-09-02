@@ -23,6 +23,8 @@ def filled_h2_template(
     site_name,
     certificate_id="",
     lot_id="LOT-001",
+    producer="Air Liquide",
+    batch_id="BATCH-001",
     shipping_date=date(2026, 1, 15),
     extra_headers=None,
 ):
@@ -32,6 +34,8 @@ def filled_h2_template(
     sheet = workbook["Import actions H2"]
     values_by_key = {
         "lot_id": lot_id,
+        "producer": producer,
+        "batch_id": batch_id,
         "pos_id": pos_id,
         "material": material_name,
         "certificate": certificate_id,
@@ -117,7 +121,7 @@ class ParseActionImportFileTest(TestCase):
             pos_id="H2-001",
             material_name="Hydrogène gazeux",
             site_name="Station Paris",
-            extra_headers=[("Producteur", "Air Liquide")],
+            extra_headers=[("Colonne inconnue", "valeur ignorée")],
         )
 
         rows = parse_action_import_file(buffer, H2ActionHandler())
@@ -125,6 +129,7 @@ class ParseActionImportFileTest(TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["pos_id"], "H2-001")
         self.assertEqual(rows[0]["lot_id"], "LOT-001")
+        self.assertEqual(rows[0]["producer"], "Air Liquide")
+        self.assertEqual(rows[0]["batch_id"], "BATCH-001")
         self.assertEqual(rows[0]["material"], "Hydrogène gazeux")
-        self.assertNotIn("Producteur", rows[0])
-        self.assertNotIn("producer", rows[0])
+        self.assertNotIn("Colonne inconnue", rows[0])

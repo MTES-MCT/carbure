@@ -1,17 +1,22 @@
 from datetime import date
+from io import BytesIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from core.models import Entity
 from core.models.certificate import GenericCertificate
 from core.tests_utils import assert_object_contains_data, setup_current_user
 from h2.factories.h2_station import H2StationFactory
+from h2.handlers import H2ActionHandler
 from traceability.factories import MaterialFactory
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
+from traceability.services.action_excel import build_action_import_template
 from traceability.tests.services.test_action_excel import filled_h2_template
+from traceability.views.mixins.excel_import import ExcelImportActionMixinErrors
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models.site import Site
 
@@ -54,6 +59,17 @@ class ActionExcelImportViewTest(APITestCase):
             format="multipart",
         )
 
+    def test_import_rejects_empty_file(self):
+        file_handle = build_action_import_template(H2ActionHandler())
+        buffer = BytesIO(file_handle.read())
+        file_handle.close()
+
+        response = self._post(buffer)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertEqual(response.data, {"error": ExcelImportActionMixinErrors.EMPTY_FILE})
+
     def test_import_creates_an_init_action_for_the_entity(self):
         response = self._post(
             filled_h2_template(
@@ -79,7 +95,8 @@ class ActionExcelImportViewTest(APITestCase):
                 "certificate": self.certificate,
                 "site_id": self.station.id,
                 "shipping_method": Action.ROAD,
-                "working_date": date(2026, 1, 15),
+                "shipping_date": date(2026, 1, 15),
+                "working_date": timezone.now().date(),
                 "status": ActionStatus.CREATED,
             },
         )
@@ -156,20 +173,22 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertEqual(Action.objects.count(), 0)
         self.assertTrue(response.data["validation_errors"])
 
-    def test_import_rejects_missing_lot_id(self):
-        response = self._post(
-            filled_h2_template(
-                pos_id="H2-001",
-                material_name=self.material.name,
-                site_name=self.station.name,
-                certificate_id=self.certificate.certificate_id,
-                lot_id="",
-            )
-        )
+    def test_import_rejects_missing_h2_extra_fields(self):
+        for field in ("lot_id", "producer", "batch_id"):
+            with self.subTest(field=field):
+                response = self._post(
+                    filled_h2_template(
+                        pos_id="H2-001",
+                        material_name=self.material.name,
+                        site_name=self.station.name,
+                        certificate_id=self.certificate.certificate_id,
+                        **{field: ""},
+                    )
+                )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(Action.objects.count(), 0)
-        self.assertTrue(any("lot_id" in row["errors"] for row in response.data["validation_errors"]))
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(Action.objects.count(), 0)
+                self.assertTrue(any(field in row["errors"] for row in response.data["validation_errors"]))
 
     def test_import_rejects_certificate_from_another_scheme(self):
         response = self._post(
