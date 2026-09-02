@@ -1,11 +1,10 @@
 import datetime
-import subprocess
 from os import environ as env
 
 from django.core.management import call_command
 from django.db.models.query import QuerySet
 from huey import crontab
-from huey.contrib.djhuey import db_periodic_task, db_task, periodic_task
+from huey.contrib.djhuey import db_periodic_task, db_task
 
 from carbure.scripts.create_declaration_reminder import create_declaration_reminder
 from carbure.scripts.send_notification_emails import send_notification_emails
@@ -97,12 +96,6 @@ if env.get("IMAGE_TAG") == "prod":
     def periodic_send_meter_readings_application_deadline_reminder() -> None:
         create_meter_readings_application_deadline_reminder()
 
-    # Read replica
-    @periodic_task(crontab(hour=1, minute=45))
-    def populate_read_replica() -> None:
-        replica_url = env.get("READ_REPLICA_DATABASE_URL")
-        subprocess.run(["bash", "/app/backups/database/restore.sh", "scalingo", "carbure-prod", replica_url])
-
     # Anonymization
     @db_periodic_task(crontab(day=1, hour=1, minute=0))
     def anonymize_inactive_users() -> None:
@@ -138,10 +131,3 @@ if env.get("IMAGE_TAG") == "prod":
     @db_periodic_task(crontab(hour=2, minute=0))
     def periodic_backfill_site_gps_coordinates() -> None:
         call_command("backfill_site_gps_coordinates", dry_run="false")
-
-
-if env.get("IMAGE_TAG") == "staging":
-
-    @periodic_task(crontab(hour=0, minute=45))
-    def restore_prod_db() -> None:
-        subprocess.run(["bash", "/app/backups/database/restore.sh", "scalingo", "carbure-prod"])
