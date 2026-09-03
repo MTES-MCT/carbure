@@ -6285,6 +6285,7 @@ export interface components {
          *     * `TRANSFERT` - TRANSFERT
          *     * `EXPIRATION` - EXPIRATION
          *     * `REPORT` - REPORT
+         *     * `YEARLY_BALANCE` - YEARLY_BALANCE
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -14406,6 +14407,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `YEARLY_BALANCE` - YEARLY_BALANCE
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -14783,6 +14785,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `YEARLY_BALANCE` - YEARLY_BALANCE
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -14902,6 +14905,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `YEARLY_BALANCE` - YEARLY_BALANCE
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15040,6 +15044,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `YEARLY_BALANCE` - YEARLY_BALANCE
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -16070,7 +16075,8 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     MAC_BIO = "MAC_BIO",
     REPORT = "REPORT",
     TENEUR = "TENEUR",
-    TRANSFERT = "TRANSFERT"
+    TRANSFERT = "TRANSFERT",
+    YEARLY_BALANCE = "YEARLY_BALANCE"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
     ValueMinusavailable_balance = "-available_balance",
@@ -16423,7 +16429,8 @@ export enum OperationTypeEnum {
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     TRANSFERT = "TRANSFERT",
     EXPIRATION = "EXPIRATION",
-    REPORT = "REPORT"
+    REPORT = "REPORT",
+    YEARLY_BALANCE = "YEARLY_BALANCE"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",

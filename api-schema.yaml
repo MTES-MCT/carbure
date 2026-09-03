@@ -10978,6 +10978,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -10991,6 +10992,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11563,6 +11565,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11576,6 +11579,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11857,6 +11861,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11870,6 +11875,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12183,6 +12189,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -12196,6 +12203,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -19820,6 +19828,7 @@ components:
         - TRANSFERT
         - EXPIRATION
         - REPORT
+        - YEARLY_BALANCE
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -19834,6 +19843,7 @@ components:
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT
+        * `YEARLY_BALANCE` - YEARLY_BALANCE
     OperationUpdate:
       type: object
       properties:
