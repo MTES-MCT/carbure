@@ -546,6 +546,7 @@ const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
   INCORRECT_DELIVERY_DATE: ["delivery_date"],
   INCORRECT_DELIVERY_SITE_COUNTRY: ["delivery_site_country"],
   INCORRECT_FORMAT_DELIVERY_DATE: ['delivery_date'],
+  INCORRECT_FORMAT_DISPATCH_DATE: ['dispatch_date'],
   INVALID_DISPATCH_SITE: ['dispatch_site'],
   MAC_BC_WRONG: ['biofuel'],
   MISSING_BIOFUEL: ['biofuel'],
