@@ -24,6 +24,7 @@ def check_locked_year(current_year: int):
 
 INCORRECT_DELIVERY_DATE = "INCORRECT_DELIVERY_DATE"
 INCORRECT_FORMAT_DELIVERY_DATE = "INCORRECT_FORMAT_DELIVERY_DATE"
+INCORRECT_FORMAT_DISPATCH_DATE = "INCORRECT_FORMAT_DISPATCH_DATE"
 COULD_NOT_FIND_PRODUCTION_SITE = "COULD_NOT_FIND_PRODUCTION_SITE"
 MISSING_BIOFUEL = "MISSING_BIOFUEL"
 MISSING_FEEDSTOCK = "MISSING_FEEDSTOCK"
@@ -94,6 +95,24 @@ def fill_delivery_date(lot, data):
         lot.delivery_date = today
     lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
     lot.year = lot.delivery_date.year
+    return errors
+
+
+def fill_dispatch_date(lot, data):
+    errors = []
+    try:
+        lot.dispatch_date = try_get_date(data.get("dispatch_date", ""))
+    except Exception:
+        errors.append(
+            GenericError(
+                lot=lot,
+                field="dispatch_date",
+                error=INCORRECT_FORMAT_DISPATCH_DATE,
+                value=data.get("dispatch_date", ""),
+                display_to_creator=True,
+                is_blocking=True,
+            )
+        )
     return errors
 
 
@@ -608,12 +627,12 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot = existing_lot
     else:
         lot = CarbureLot()
-    lot.dispatch_date = try_get_date(data.get("dispatch_date", None))
     lot.free_field = data.get("free_field", None)
     lot.udb_transaction_id = data.get("udb_transaction_id", "")
     lot.added_by = entity
     carbure_stock_id = data.get("carbure_stock_id", False)
 
+    errors += fill_dispatch_date(lot, data)
     errors += fill_delivery_date(lot, data)
 
     if carbure_stock_id or lot.parent_stock_id:
