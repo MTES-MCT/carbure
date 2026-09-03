@@ -292,6 +292,9 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
     production_country = serializers.SerializerMethodField()
     supplier = serializers.SerializerMethodField()
     client = serializers.SerializerMethodField()
+    dispatch_date = serializers.SerializerMethodField()
+    dispatch_site = serializers.SerializerMethodField()
+    dispatch_site_country = serializers.SerializerMethodField()
     delivery_date = serializers.SerializerMethodField()
     delivery_site = serializers.SerializerMethodField()
     delivery_site_country = serializers.SerializerMethodField()
@@ -318,6 +321,9 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
             "supplier_certificate",
             "transport_document_reference",
             "client",
+            "dispatch_date",
+            "dispatch_site",
+            "dispatch_site_country",
             "delivery_date",
             "delivery_site",
             "delivery_site_country",
@@ -367,6 +373,15 @@ class CarbureLotCSVSerializer(serializers.ModelSerializer):
 
     def get_client(self, obj):
         return obj.carbure_client.name if obj.carbure_client else obj.unknown_client
+
+    def get_dispatch_date(self, obj):
+        return obj.dispatch_date.strftime("%d/%m/%Y") if obj.dispatch_date else ""
+
+    def get_dispatch_site(self, obj):
+        return obj.carbure_dispatch_site.name if obj.carbure_dispatch_site else obj.unknown_dispatch_site
+
+    def get_dispatch_site_country(self, obj):
+        return obj.dispatch_site_country.code_pays if obj.dispatch_site_country else ""
 
     def get_delivery_date(self, obj):
         return obj.delivery_date.strftime("%d/%m/%Y") if obj.delivery_date else ""
