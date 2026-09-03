@@ -600,6 +600,7 @@ const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
   YEAR_LOCKED: ["delivery_date"],
   DECLARATION_ALREADY_VALIDATED: ["delivery_date"],
   DELIVERY_DATE_VALIDITY: ["delivery_date"],
+  DELIVERY_DATE_BEFORE_DISPATCH_DATE: ["delivery_date"],
   MISSING_PRODUCTION_INFO: ["production_site"],
   INVALID_CERTIFICATE: ["supplier_certificate"],
   MISSING_DELIVERY_TYPE: ["delivery_type"],
