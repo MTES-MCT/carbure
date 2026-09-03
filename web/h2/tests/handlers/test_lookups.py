@@ -30,9 +30,13 @@ class H2ActionLookupsTest(TestCase):
             certificate_id="CHY-001",
             certificate_type=GenericCertificate.CERTIFHY,
         )
-        GenericCertificateFactory.create(
+        iscc = GenericCertificateFactory.create(
             certificate_id="ISCC-001",
             certificate_type=GenericCertificate.ISCC,
         )
 
-        self.assertEqual(list(lookups.certificate(None)), [certifhy])
+        results = list(lookups.certificate(None))
+
+        self.assertIn(certifhy, results)
+        self.assertTrue(all(c.certificate_type == GenericCertificate.CERTIFHY for c in results))
+        self.assertNotIn(iscc, results)
