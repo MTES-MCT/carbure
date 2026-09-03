@@ -57,6 +57,24 @@ class GeneralSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
 
+    def test_delivery_date_before_dispatch_date(self):
+        error = CarbureSanityCheckErrors.DELIVERY_DATE_BEFORE_DISPATCH_DATE
+        dispatch_date = datetime.date(2025, 1, 2)
+
+        lot = self.create_lot(delivery_date=datetime.date(2025, 1, 1), dispatch_date=dispatch_date)
+
+        error_list = self.run_checks(lot)
+        assert has_error(error, error_list)
+        assert has_blocking_errors(error_list)
+
+        lot.delivery_date = dispatch_date
+        error_list = self.run_checks(lot)
+        assert not has_error(error, error_list)
+
+        lot.delivery_date = datetime.date(2025, 1, 3)
+        error_list = self.run_checks(lot)
+        assert not has_error(error, error_list)
+
     def test_mac_not_efpe(self):
         error = CarbureSanityCheckErrors.MAC_NOT_EFPE
 
