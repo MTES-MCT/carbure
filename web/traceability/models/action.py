@@ -8,13 +8,16 @@ from .action_status import ActionStatus
 
 
 class ActionManager(models.Manager):
+    def unannotated(self):
+        """Action rows without status/created_at annotations (use as CTE base)."""
+        return super().get_queryset()
+
     def get_queryset(self):
         first_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("created_at", "id")
         latest_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("-created_at", "-id")
 
         return (
-            super()
-            .get_queryset()
+            self.unannotated()
             .select_related("holder", "material", "site", "parent", "certificate")
             .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
             .annotate(created_at=Subquery(first_status_subquery.values("created_at")[:1]))
