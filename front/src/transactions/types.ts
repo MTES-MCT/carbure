@@ -348,6 +348,7 @@ export interface StockPayload {
   supplier_certificate: string | undefined
   transport_document_type: string | undefined
   transport_document_reference: string | undefined
+  dispatch_date: string | undefined
   delivery_date: string | undefined
   carbure_delivery_site_id: number | undefined
   unknown_delivery_site: string | undefined

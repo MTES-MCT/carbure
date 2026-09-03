@@ -96,7 +96,7 @@ def stock_split(request, *args, **kwargs):
         lot.carbure_supplier_id = entity_id
         lot.supplier_certificate = entry.get("supplier_certificate", entity.default_certificate)
         lot.added_by_id = entity_id
-        lot.dispatch_date = entry.get("dispatch_date", None)
+        lot.dispatch_date = try_get_date(entry.get("dispatch_date", None))
         lot.unknown_client = entry.get("unknown_client", None)
         lot.unknown_delivery_site = entry.get("unknown_delivery_site", None)
         country_code = entry.get("delivery_site_country_id", None)
