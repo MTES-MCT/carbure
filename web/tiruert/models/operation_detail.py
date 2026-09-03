@@ -1,9 +1,16 @@
 from django.db import models
 
+from tiruert.models.operation import Operation
 from tiruert.services.energy import avoided_emissions_tco2, energy_mj
 
 
-class OperationDetailsManager(models.Manager):
+class OperationDetailQuerySet(models.QuerySet):
+    def exclude_informative(self):
+        """Drop details of operations that only carry information and must not impact any computation."""
+        return self.exclude(operation__type__in=Operation.BALANCE_EXCLUDED_TYPES)
+
+
+class OperationDetailsManager(models.Manager.from_queryset(OperationDetailQuerySet)):
     def get_queryset(self):
         return (
             super()
@@ -24,13 +31,19 @@ class OperationDetailsManager(models.Manager):
 
 class OperationDetail(models.Model):
     operation = models.ForeignKey("tiruert.Operation", on_delete=models.deletion.CASCADE, related_name="details")
-    lot = models.ForeignKey("core.CarbureLot", on_delete=models.deletion.CASCADE, related_name="tiruert_operation")
+    # Null for informative operations carrying an aggregated value instead of a per-lot breakdown
+    lot = models.ForeignKey(
+        "core.CarbureLot", null=True, blank=True, on_delete=models.deletion.CASCADE, related_name="tiruert_operation"
+    )
     volume = models.FloatField(default=0.0)
     emission_rate_per_mj = models.FloatField(default=0.0)  # gC02/MJ réellement utilisés pour la création du lot
 
     @property
     def energy(self):
         """Returns the energy used for lot creation in MJ, no rounded."""
+        if self.lot_id is None:
+            return 0
+
         renewable_energy_share = getattr(self.operation, "renewable_energy_share", 1)
         return energy_mj(
             self.volume,
@@ -42,6 +55,9 @@ class OperationDetail(models.Model):
     def avoided_emissions(self):
         """Return the saved emissions in tCO2, no rounded."""
         from tiruert.services.teneur import GHG_REFERENCE_RED_II
+
+        if self.lot_id is None:
+            return 0
 
         return avoided_emissions_tco2(
             self.energy,
