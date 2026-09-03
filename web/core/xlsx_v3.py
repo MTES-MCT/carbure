@@ -1042,6 +1042,7 @@ def export_carbure_lots(entity, transactions):
     make_biofuels_sheet(workbook)
     make_clients_sheet(workbook)
     make_deliverysites_sheet(workbook)
+    make_dispatchsites_sheet(workbook)
     workbook.close()
     return location
 

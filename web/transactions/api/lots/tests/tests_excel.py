@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from unittest.mock import patch
 
 import openpyxl
@@ -8,6 +9,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from core.models import CarbureLot, Entity, Pays
+from core.serializers import CarbureLotCSVSerializer
 from core.tests_utils import setup_current_user
 from core.xlsx_v3 import template_v4
 from transactions.helpers import INVALID_DISPATCH_SITE, fill_dispatch_data
@@ -185,6 +187,19 @@ class LotsExcelImportTest(TestCase):
         assert self.owner_production_site.id in dispatch_ids
         assert self.owner_depot.id in dispatch_ids
         assert invalid_dispatch_site.id not in dispatch_ids
+
+    def test_lot_export_contains_dispatch_fields(self):
+        lot = CarbureLot(
+            dispatch_date=date(2025, 2, 15),
+            carbure_dispatch_site=self.owner_production_site,
+            dispatch_site_country=self.FR,
+        )
+
+        data = CarbureLotCSVSerializer(lot).data
+
+        assert data["dispatch_date"] == "15/02/2025"
+        assert data["dispatch_site"] == self.owner_production_site.name
+        assert data["dispatch_site_country"] == "FR"
 
     def test_dispatch_fields_are_parsed_from_fixture(self):
         self.owner.entity_type = Entity.PRODUCER
