@@ -5459,7 +5459,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -5489,7 +5488,6 @@ export interface components {
             sustainability_officer?: string;
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
         };
@@ -5631,7 +5629,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -6261,6 +6258,7 @@ export interface components {
          *     * `TRANSFERT` - TRANSFERT
          *     * `EXPIRATION` - EXPIRATION
          *     * `REPORT` - REPORT
+         *     * `YEARLY_BALANCE` - YEARLY_BALANCE
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -7287,11 +7285,9 @@ export interface components {
             registered_zipcode?: string;
             registration_id?: string;
             sustainability_officer?: string;
-            /** Format: email */
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
             vat_number?: string;
-            /** Format: uri */
             website?: string;
         };
         UpdateRightsRequestsRequest: {
@@ -14400,6 +14396,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `YEARLY_BALANCE` - YEARLY_BALANCE
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -14777,6 +14774,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `YEARLY_BALANCE` - YEARLY_BALANCE
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -14896,6 +14894,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `YEARLY_BALANCE` - YEARLY_BALANCE
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15034,6 +15033,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `YEARLY_BALANCE` - YEARLY_BALANCE
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -16087,7 +16087,8 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     MAC_BIO = "MAC_BIO",
     REPORT = "REPORT",
     TENEUR = "TENEUR",
-    TRANSFERT = "TRANSFERT"
+    TRANSFERT = "TRANSFERT",
+    YEARLY_BALANCE = "YEARLY_BALANCE"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryOrder_by {
     ValueMinusavailable_balance = "-available_balance",
@@ -16438,7 +16439,8 @@ export enum OperationTypeEnum {
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     TRANSFERT = "TRANSFERT",
     EXPIRATION = "EXPIRATION",
-    REPORT = "REPORT"
+    REPORT = "REPORT",
+    YEARLY_BALANCE = "YEARLY_BALANCE"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",

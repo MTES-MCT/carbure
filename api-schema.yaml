@@ -10962,6 +10962,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -10975,6 +10976,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11547,6 +11549,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11560,6 +11563,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11841,6 +11845,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11854,6 +11859,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12167,6 +12173,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -12180,6 +12187,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -17862,9 +17870,12 @@ components:
         activity_description:
           type: string
         website:
-          type: string
-          format: uri
-          maxLength: 200
+          oneOf:
+            - type: string
+              format: uri
+              maxLength: 200
+            - type: string
+              maxLength: 0
         vat_number:
           type: string
           maxLength: 32
@@ -17942,9 +17953,12 @@ components:
           type: string
           maxLength: 32
         website:
-          type: string
-          format: uri
-          maxLength: 200
+          oneOf:
+            - type: string
+              format: uri
+              maxLength: 200
+            - type: string
+              maxLength: 0
         vat_number:
           type: string
           maxLength: 32
@@ -18316,9 +18330,12 @@ components:
         activity_description:
           type: string
         website:
-          type: string
-          format: uri
-          maxLength: 200
+          oneOf:
+            - type: string
+              format: uri
+              maxLength: 200
+            - type: string
+              maxLength: 0
         vat_number:
           type: string
           maxLength: 32
@@ -19821,6 +19838,7 @@ components:
         - TRANSFERT
         - EXPIRATION
         - REPORT
+        - YEARLY_BALANCE
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -19835,6 +19853,7 @@ components:
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT
+        * `YEARLY_BALANCE` - YEARLY_BALANCE
     OperationUpdate:
       type: object
       properties:
@@ -22064,8 +22083,11 @@ components:
           type: string
           maxLength: 256
         sustainability_officer_email:
-          type: string
-          format: email
+          oneOf:
+            - type: string
+              format: email
+            - type: string
+              maxLength: 0
         sustainability_officer_phone_number:
           type: string
           maxLength: 32
@@ -22073,8 +22095,11 @@ components:
           type: string
           maxLength: 32
         website:
-          type: string
-          format: uri
+          oneOf:
+            - type: string
+              format: uri
+            - type: string
+              maxLength: 0
     UpdateRightsRequestsRequest:
       type: object
       properties:
