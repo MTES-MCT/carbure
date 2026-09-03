@@ -13,6 +13,7 @@
   "INCORRECT_DELIVERY_DATE": "Delivery date is incorrect",
   "INCORRECT_DELIVERY_SITE_COUNTRY": "Delivery site is incorrect",
   "INCORRECT_FORMAT_DELIVERY_DATE": "Delivery date format is incorrect",
+  "INCORRECT_FORMAT_DISPATCH_DATE": "Dispatch date format is incorrect",
   "MAC_BC_WRONG": "Biofuel incompatible with release for consumption (only ED95 or B100 are allowed)",
   "MISSING_BIOFUEL": "Biofuel is missing",
   "MISSING_CARBURE_CLIENT": "Client is missing",
