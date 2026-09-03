@@ -25,7 +25,7 @@ export function useActionColumns() {
     material: {
       key: "material",
       header: t("Matière"),
-      cell: (action) => <Cell text={action.material.name} />,
+      cell: (action) => <Cell text={action.material?.name} />,
     },
 
     certificate: {
@@ -47,7 +47,7 @@ export function useActionColumns() {
     site: {
       key: "site",
       header: t("Site"),
-      cell: (action) => <Cell text={action.site.name} />,
+      cell: (action) => <Cell text={action.site?.name} />,
     },
 
     pos_id: {
