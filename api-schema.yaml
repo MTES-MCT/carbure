@@ -14426,9 +14426,8 @@ components:
         country:
           allOf:
             - $ref: "#/components/schemas/Country"
-          readOnly: true
+          nullable: true
       required:
-        - country
         - id
         - name
     ActionStatusEnum:

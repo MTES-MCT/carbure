@@ -3635,7 +3635,7 @@ export interface components {
             readonly id: number;
             name: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
-            readonly country: components["schemas"]["Country"];
+            country?: components["schemas"]["Country"] | null;
         };
         /**
          * @description * `CREATED` - CREATED
