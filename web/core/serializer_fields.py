@@ -15,6 +15,12 @@ class LabelChoiceField(serializers.ChoiceField):
             data = self.label_to_value[data.lower()]
         return super().to_internal_value(data)
 
+    def validate_empty_values(self, data):
+        # Excel empty cells are parsed as None; blank CharFields store "".
+        if data is None and self.allow_blank:
+            data = ""
+        return super().validate_empty_values(data)
+
 
 class CachedPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     """PrimaryKeyRelatedField resolving instances from a pre-fetched cache instead of one query per value.

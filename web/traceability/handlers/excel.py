@@ -44,7 +44,7 @@ ACTION_EXCEL_COLUMNS = {
         "color": EXCEL_TRANSPORT_COLOR,
     },
     "shipping_distance": {
-        "header": "Distance de livraison",
+        "header": "Distance de livraison (km)",
         "comment": "Chiffre supérieur ou égal à 0",
         "color": EXCEL_TRANSPORT_COLOR,
     },

@@ -50,3 +50,12 @@ class LabelChoiceFieldTests(TestCase):
 
         result = numeric_field.to_internal_value("One")
         self.assertEqual(result, 1)
+
+    def test_allow_blank_treats_none_as_empty_string(self):
+        field = LabelChoiceField(choices=self.choices, required=False, allow_blank=True)
+        self.assertEqual(field.run_validation(None), "")
+        self.assertEqual(field.run_validation(""), "")
+
+    def test_allow_null_keeps_none(self):
+        field = LabelChoiceField(choices=self.choices, required=False, allow_null=True)
+        self.assertIsNone(field.run_validation(None))

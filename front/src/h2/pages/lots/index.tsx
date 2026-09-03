@@ -51,6 +51,8 @@ const LotsPage = () => {
           lot_quantity: t("Quantite (kg)"),
           producer: t("Producteur"),
           certificate: t("N° du certificat du producteur"),
+          etd1: t("Etd1"),
+          etd2: t("Etd2"),
         },
       }}
       detailActions={[

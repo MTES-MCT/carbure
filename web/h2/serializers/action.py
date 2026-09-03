@@ -11,6 +11,13 @@ class H2ActionExcelImportSerializer(ActionExcelImportSerializer):
     lot_id = serializers.CharField(write_only=True)
     lot_quantity = serializers.DecimalField(max_digits=13, decimal_places=3, min_value=Decimal("0"), write_only=True)
     producer = serializers.CharField(write_only=True)
+    etd1 = serializers.DecimalField(max_digits=7, decimal_places=3, min_value=Decimal("0"), write_only=True)
+    etd2 = serializers.DecimalField(max_digits=7, decimal_places=3, min_value=Decimal("0"), write_only=True)
 
     class Meta(ActionExcelImportSerializer.Meta):
-        fields = [*ActionExcelImportSerializer.Meta.fields, "lot_id", "lot_quantity", "producer"]
+        fields = [*ActionExcelImportSerializer.Meta.fields, "lot_id", "lot_quantity", "producer", "etd1", "etd2"]
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        attrs["etd"] = attrs.pop("etd1") + attrs.pop("etd2")
+        return attrs
