@@ -13,8 +13,15 @@ class H2ActionHandler(ActionIndustryHandler):
     excel_columns = [
         {
             "key": "lot_id",
-            "header": "Id du lot",
-            "comment": "Identifiant dans votre système",
+            "header": "ID_LOT/Batch ID",
+            "comment": "Peut être répété sur plusieurs lignes si le lot est fractionné entre plusieurs stations / mois",
+            "color": EXCEL_PRODUCTION_COLOR,
+        },
+        excel_column("pos_id", header="N° de PoS"),
+        {
+            "key": "lot_quantity",
+            "header": "Quantite (kg)",
+            "comment": "Quantité TOTALE du lot, constante quelle que soit la ligne (ne pas re-décompter)",
             "color": EXCEL_PRODUCTION_COLOR,
         },
         {
@@ -23,13 +30,15 @@ class H2ActionHandler(ActionIndustryHandler):
             "comment": "Raison sociale du producteur",
             "color": EXCEL_PRODUCTION_COLOR,
         },
-        excel_column("certificate"),
-        excel_column("material", header="Nature d'hydrogène"),
-        excel_column("pos_id"),
-        {"key": "batch_id", "header": "N° de batch (batch ID)", "color": EXCEL_PRODUCTION_COLOR},
+        excel_column("certificate", header="N° du certificat du producteur"),
+        excel_column("material", header="Nature d'H2"),
         excel_column("ei"),
         excel_column("ep"),
-        {"header": "Consommation sur le site de production", "color": EXCEL_TRANSPORT_COLOR, "comment": "Oui/Non"},
+        {
+            "header": "L'H2 est-il consommé sur le site de production",
+            "comment": "Si oui, passer directement à la section consommation — Oui/Non",
+            "color": EXCEL_TRANSPORT_COLOR,
+        },
         excel_column("shipping_method"),
         excel_column("shipping_distance"),
         {"header": "Masse transportée (kg)", "color": EXCEL_TRANSPORT_COLOR},

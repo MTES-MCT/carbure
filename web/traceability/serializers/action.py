@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from core.serializer_fields import LabelChoiceField
 from core.serializers import EntityPreviewSerializer
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
@@ -129,6 +130,7 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         input_formats=["%m/%Y"],
         error_messages={"invalid": _("La période doit être au format mois/année.")},
     )
+    shipping_method = LabelChoiceField(choices=Action.SHIPPING_METHODS, required=False, allow_blank=True)
 
     class Meta:
         model = Action

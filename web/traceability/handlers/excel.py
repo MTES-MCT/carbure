@@ -1,3 +1,5 @@
+from django.utils.encoding import force_str
+
 from traceability.models import Action
 
 # Shared section colors so each industry reuses the same palette.
@@ -49,7 +51,7 @@ ACTION_EXCEL_COLUMNS = {
     "shipping_method": {
         "header": "Mode de transport",
         "comment": "Liste de choix",
-        "options": [value for value, _ in Action.SHIPPING_METHODS],
+        "options": [force_str(label) for _, label in Action.SHIPPING_METHODS],
         "color": EXCEL_TRANSPORT_COLOR,
     },
     "ei": {

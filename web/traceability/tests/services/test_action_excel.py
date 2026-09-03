@@ -10,7 +10,6 @@ from core.models import Entity
 from core.models.certificate import GenericCertificate
 from h2.handlers import H2ActionHandler
 from traceability.factories import MaterialFactory
-from traceability.models import Action
 from traceability.services.action_excel import build_action_import_template, parse_action_import_file
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models import Site
@@ -23,8 +22,8 @@ def filled_h2_template(
     site_name,
     certificate_id="",
     lot_id="LOT-001",
+    lot_quantity=Decimal("314"),
     producer="Air Liquide",
-    batch_id="BATCH-001",
     shipping_date=date(2026, 1, 15),
     working_date=date(2026, 2, 1),
     extra_headers=None,
@@ -35,8 +34,8 @@ def filled_h2_template(
     sheet = workbook["Import actions H2"]
     values_by_key = {
         "lot_id": lot_id,
+        "lot_quantity": lot_quantity,
         "producer": producer,
-        "batch_id": batch_id,
         "pos_id": pos_id,
         "material": material_name,
         "certificate": certificate_id,
@@ -44,7 +43,7 @@ def filled_h2_template(
         "site": site_name,
         "shipping_date": shipping_date,
         "shipping_distance": 25,
-        "shipping_method": Action.ROAD,
+        "shipping_method": "Transport routier",
         "working_date": working_date,
         "ei": 0,
         "ep": 0,
@@ -132,6 +131,5 @@ class ParseActionImportFileTest(TestCase):
         self.assertEqual(rows[0]["pos_id"], "H2-001")
         self.assertEqual(rows[0]["lot_id"], "LOT-001")
         self.assertEqual(rows[0]["producer"], "Air Liquide")
-        self.assertEqual(rows[0]["batch_id"], "BATCH-001")
         self.assertEqual(rows[0]["material"], "Hydrogène gazeux")
         self.assertNotIn("Colonne inconnue", rows[0])

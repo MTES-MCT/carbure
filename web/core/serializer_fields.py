@@ -1,4 +1,19 @@
+from django.utils.encoding import force_str
 from rest_framework import serializers
+
+
+class LabelChoiceField(serializers.ChoiceField):
+    """ChoiceField that also accepts the (translated) display label of a Django choice."""
+
+    def __init__(self, choices=(), **kwargs):
+        super().__init__(choices=choices, **kwargs)
+        self.label_to_value = {force_str(label).lower(): value for value, label in choices}
+        self.label_to_value.update({value: value for value, label in choices})
+
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.lower() in self.label_to_value:
+            data = self.label_to_value[data.lower()]
+        return super().to_internal_value(data)
 
 
 class CachedPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):

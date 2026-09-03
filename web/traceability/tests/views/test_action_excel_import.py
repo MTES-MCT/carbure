@@ -187,7 +187,7 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertTrue(response.data["validation_errors"])
 
     def test_import_rejects_missing_h2_extra_fields(self):
-        for field in ("lot_id", "producer", "batch_id"):
+        for field in ("lot_id", "lot_quantity", "producer"):
             with self.subTest(field=field):
                 response = self._post(
                     filled_h2_template(

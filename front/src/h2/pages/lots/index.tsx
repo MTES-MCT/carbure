@@ -47,9 +47,10 @@ const LotsPage = () => {
           </Text>
         ),
         fieldLabels: {
-          lot_id: t("Id du lot"),
+          lot_id: t("ID_LOT/Batch ID"),
+          lot_quantity: t("Quantite (kg)"),
           producer: t("Producteur"),
-          batch_id: t("N° de batch (batch ID)"),
+          certificate: t("N° du certificat du producteur"),
         },
       }}
       detailActions={[

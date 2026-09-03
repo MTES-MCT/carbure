@@ -66,7 +66,12 @@ class Action(models.Model):
     PIPELINE = "PIPELINE"
     RAILROAD = "RAILROAD"
     SEA = "SEA"
-    SHIPPING_METHODS = [(ROAD, "Transport routier"), (PIPELINE, "Pipeline"), (RAILROAD, "Rail"), (SEA, "Transport maritime")]
+    SHIPPING_METHODS = [
+        (ROAD, _("Transport routier")),
+        (PIPELINE, _("Pipeline")),
+        (RAILROAD, _("Rail")),
+        (SEA, _("Transport maritime")),
+    ]
     shipping_method = models.CharField(verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16, blank=True)
 
     working_date = models.DateField(verbose_name="Date de référence")
