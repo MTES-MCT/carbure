@@ -656,7 +656,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
 def bulk_insert_lots(
     entity: Entity,
     lots: List[CarbureLot],
-    errors: List[GenericError],
+    errors: List[List[GenericError]],
     prefetched_data: dict,
 ) -> QuerySet:
     CarbureLot.objects.bulk_create(lots, batch_size=100)
@@ -697,7 +697,7 @@ def bulk_insert_lots(
         .filter(added_by=entity)
         .order_by("-id")[0 : len(lots)]
     )
-    errors = reversed(errors)  # lots are fetched by DESC ID
+    errors = list(reversed(errors))  # lots are fetched by DESC ID
     for lot, lot_errors in zip(inserted_lots, errors):
         for e in lot_errors:
             e.lot_id = lot.id
