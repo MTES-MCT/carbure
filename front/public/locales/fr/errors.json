@@ -31,6 +31,7 @@
   "INCORRECT_DELIVERY_DATE": "Date de livraison incorrecte",
   "INCORRECT_DELIVERY_SITE_COUNTRY": "Site de livraison incorrect",
   "INCORRECT_FORMAT_DELIVERY_DATE": "Format de la date de livraison incorrect",
+  "INCORRECT_FORMAT_DISPATCH_DATE": "Format de la date d'expédition incorrect",
   "MAC_BC_WRONG": "Biocarburant incompatible avec un mise à consommation (seuls ED95 ou B100 sont autorisés)",
   "MISSING_BIOFUEL": "Le biocarburant est manquant",
   "MISSING_CARBURE_CLIENT": "Le client est manquant",
