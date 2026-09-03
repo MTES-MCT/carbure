@@ -60,6 +60,19 @@ def check_delivery_in_the_future(lot: CarbureLot):
         )
 
 
+def check_delivery_date_before_dispatch_date(lot: CarbureLot):
+    if not lot.delivery_date or not lot.dispatch_date:
+        return
+
+    if lot.delivery_date < lot.dispatch_date:
+        return generic_error(
+            error=CarbureSanityCheckErrors.DELIVERY_DATE_BEFORE_DISPATCH_DATE,
+            lot=lot,
+            field="delivery_date",
+            is_blocking=True,
+        )
+
+
 def check_mac_bc_wrong(lot: CarbureLot):
     mac_biofuels = (
         "ED95",
