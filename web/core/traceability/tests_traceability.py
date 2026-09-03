@@ -143,6 +143,37 @@ class TraceabilityTest(TestCase):
         assert lot_node.data.unknown_delivery_site == original_child_lot_unknown_delivery_site
         assert lot_node.data.esca == 2.0
 
+    def test_traceability_stock_depot_to_lot_dispatch_site(self):
+        parent_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED",
+            added_by=self.entity,
+            carbure_client=self.entity,
+            carbure_delivery_site=self.depot2,
+        )
+        parent_stock = CarbureStockFactory.create(
+            parent_lot=parent_lot,
+            carbure_client=self.entity,
+            depot=self.depot,
+        )
+        CarbureLotFactory.create(
+            lot_status="ACCEPTED",
+            parent_stock=parent_stock,
+            added_by=self.entity,
+            carbure_dispatch_site=None,
+        )
+
+        root_node = LotNode(parent_lot)
+        stock_node = root_node.get_first(Node.STOCK)
+        lot_node = stock_node.get_first(Node.LOT)
+
+        assert lot_node.data.carbure_dispatch_site is None
+
+        stock_node.propagate()
+
+        assert lot_node.data.carbure_dispatch_site == self.depot
+        _, disabled_fields = lot_node.get_disabled_fields(self.entity.id)
+        assert "carbure_dispatch_site" in disabled_fields
+
     def test_traceability_lot_to_stock_transform_lot(self):
         root_lot = CarbureLotFactory.create(
             lot_status="ACCEPTED",
