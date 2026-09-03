@@ -3436,12 +3436,13 @@ export interface components {
         AccessTypeEnum: PathsApiH2StationsGetParametersQueryAccess_type;
         Action: {
             readonly id: number;
-            readonly status: string;
+            readonly status: components["schemas"]["ActionStatusEnum"] | null;
             readonly holder: components["schemas"]["EntityPreview"];
             readonly parent: components["schemas"]["ActionParent"] | null;
             readonly material: components["schemas"]["Material"];
             readonly site: components["schemas"]["ActionSite"];
             readonly certificate: components["schemas"]["ActionCertificate"] | null;
+            readonly total_emissions: components["schemas"]["ActionTotalEmissions"] | null;
             /** N° de POS */
             pos_id: string;
             /** Filière */
@@ -3508,7 +3509,33 @@ export interface components {
             site_type?: components["schemas"]["SiteTypeEnum"];
         };
         /**
+         * @description * `CREATED` - CREATED
+         *     * `PENDING` - PENDING
+         *     * `ACCEPTED` - ACCEPTED
+         *     * `REJECTED` - REJECTED
+         *     * `BLOCKED` - BLOCKED
+         *     * `DELETED` - DELETED
+         * @enum {string}
+         */
+        ActionStatusEnum: PathsApiTraceabilityActionsGetParametersQueryStatus;
+        /** @description Cumulative GES along the parent chain (gCO₂eq/MJ). */
+        ActionTotalEmissions: {
+            /** Format: decimal */
+            readonly ei: string;
+            /** Format: decimal */
+            readonly ep: string;
+            /** Format: decimal */
+            readonly etd: string;
+            /** Format: decimal */
+            readonly eu: string;
+            /** Format: decimal */
+            readonly eccs: string;
+            /** Format: decimal */
+            readonly total: string;
+        };
+        /**
          * @description * `INIT` - INIT
+         *     * `VALORIZE` - VALORIZE
          * @enum {string}
          */
         ActionTypeEnum: PathsApiTraceabilityActionsGetParametersQueryType;
@@ -15282,7 +15309,10 @@ export interface operations {
                  *     * `DELETED` - DELETED
                  */
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
-                /** @description * `INIT` - INIT */
+                /**
+                 * @description * `INIT` - INIT
+                 *     * `VALORIZE` - VALORIZE
+                 */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -15411,7 +15441,10 @@ export interface operations {
                  *     * `DELETED` - DELETED
                  */
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
-                /** @description * `INIT` - INIT */
+                /**
+                 * @description * `INIT` - INIT
+                 *     * `VALORIZE` - VALORIZE
+                 */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -15548,7 +15581,10 @@ export interface operations {
                  *     * `DELETED` - DELETED
                  */
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
-                /** @description * `INIT` - INIT */
+                /**
+                 * @description * `INIT` - INIT
+                 *     * `VALORIZE` - VALORIZE
+                 */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16081,7 +16117,8 @@ export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
     REJECTED = "REJECTED"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
-    INIT = "INIT"
+    INIT = "INIT",
+    VALORIZE = "VALORIZE"
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     holder = "holder",

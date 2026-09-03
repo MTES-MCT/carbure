@@ -17,7 +17,7 @@ from traceability.models.action import Action
 
 def _plain_actions():
     # Recursive CTE: no Meta.ordering, no status subqueries (MySQL rejects both).
-    return Action.objects.unannotated().order_by()
+    return Action.unannotated.all().order_by()
 
 
 def _parent_path_cte(queryset: QuerySet[Action]) -> CTE:

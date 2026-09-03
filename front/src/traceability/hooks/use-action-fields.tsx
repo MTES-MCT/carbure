@@ -27,6 +27,7 @@ import {
 } from "traceability/normalizers"
 import { SiteTypeEnum } from "api-schema"
 import { getStepFromFractionDigits } from "common/utils/formatters"
+import { ACTION_EMISSIONS_UNIT } from "traceability/utils"
 
 const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
 
@@ -220,6 +221,19 @@ export function useActionFields() {
       label: t("ECCS"),
       field: ({ form, props }) => (
         <ActionDecimalInput {...props} {...form.bind("eccs")} />
+      ),
+    },
+
+    total_emissions: {
+      key: "total_emissions",
+      label: t("Emissions"),
+      field: ({ form, props }) => (
+        <ActionDecimalInput
+          {...props}
+          hintText={ACTION_EMISSIONS_UNIT}
+          readOnly
+          value={form.value.total_emissions?.total ?? ""}
+        />
       ),
     },
   } satisfies Record<string, ActionField>

@@ -71,11 +71,13 @@ const LotsPage = () => {
         filters.shipping_method,
       ]}
       columns={[
+        columns.status,
         columns.working_date,
         columns.pos_id,
         { ...columns.site, header: t("Station") },
         { ...columns.material, header: t("Nature d'H2") },
         columns.quantity,
+        columns.total_emissions,
       ]}
       fields={[
         fields.pos_id,
@@ -92,6 +94,7 @@ const LotsPage = () => {
         fields.etd,
         fields.eu,
         fields.eccs,
+        fields.total_emissions,
       ]}
       industry={ActionIndustry.H2}
     />

@@ -1,4 +1,3 @@
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -11,6 +10,7 @@ from traceability.serializers.certificate import ActionCertificateSerializer
 from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField, LookupSlugRelatedField
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
+from traceability.serializers.total_emissions import ActionTotalEmissionsSerializer
 
 
 class ActionParentSerializer(serializers.ModelSerializer):
@@ -22,14 +22,14 @@ class ActionParentSerializer(serializers.ModelSerializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(read_only=True)
+    status = serializers.ChoiceField(choices=ActionStatus.STATUSES, read_only=True, allow_null=True)
     holder = EntityPreviewSerializer(read_only=True)
     parent = ActionParentSerializer(read_only=True, required=False, allow_null=True)
     material = MaterialSerializer(read_only=True)
     site = ActionSiteSerializer(read_only=True)
     certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
 
-    total_emissions = serializers.JSONField(read_only=True)
+    total_emissions = ActionTotalEmissionsSerializer(read_only=True, allow_null=True)
 
     class Meta:
         model = Action

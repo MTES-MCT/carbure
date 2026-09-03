@@ -78,7 +78,7 @@ La CTE a **toutes** les étapes. On ne veut que celle arrivée à la racine (`ne
 
 | Dans le code | Pourquoi |
 |--------------|----------|
-| `Action.objects.unannotated().order_by()` | Interdit `ORDER BY` / `DISTINCT` / sous-requêtes de statut **dans** une CTE récursive. `Meta.ordering` et le manager annoté cassent la requête. |
+| `Action.unannotated.all().order_by()` | Interdit `ORDER BY` / `DISTINCT` / sous-requêtes de statut **dans** une CTE récursive. `Meta.ordering` et le manager annoté cassent la requête. |
 | `ei_sum` et pas `ei` | Collision avec la colonne `action.ei` au `JOIN`. |
 | `next_parent_id` | Pareil avec `action.parent_id`. |
 | `_next_parent_id` + `filter(…isnull=True)` | On ne peut pas filtrer directement `cte.next_parent_id` une fois joint à `Action` (le champ modèle gagne). |

@@ -3,8 +3,13 @@ import { useTranslation } from "react-i18next"
 import { Cell, Column } from "common/components/table2"
 import { EntityManager } from "common/hooks/entity"
 import { formatDate } from "common/utils/formatters"
+import { ActionStatusBadge } from "traceability/components/action-status-badge"
 import { Action } from "traceability/types"
-import { formatActionDecimal } from "traceability/utils"
+import {
+  ACTION_EMISSIONS_UNIT,
+  formatActionDecimal,
+  formatActionTotalEmissions,
+} from "traceability/utils"
 
 export type ActionColumn = Column<Action> & {
   condition?: (entity: EntityManager) => boolean
@@ -14,6 +19,11 @@ export function useActionColumns() {
   const { t } = useTranslation()
 
   return {
+    status: {
+      key: "status",
+      header: t("Statut"),
+      cell: (action) => <ActionStatusBadge status={action.status} />,
+    },
     holder: {
       key: "holder",
       header: t("Détenteur"),
@@ -61,6 +71,17 @@ export function useActionColumns() {
       header: t("Consommé le"),
       cell: (action) => (
         <Cell text={formatDate(action.working_date, "MM/yyyy")} />
+      ),
+    },
+
+    total_emissions: {
+      key: "total_emissions",
+      header: t("Emissions"),
+      cell: (action) => (
+        <Cell
+          text={formatActionTotalEmissions(action.total_emissions)}
+          sub={ACTION_EMISSIONS_UNIT}
+        />
       ),
     },
   } satisfies Record<string, ActionColumn>

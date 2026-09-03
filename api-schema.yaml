@@ -12735,7 +12735,10 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-          description: "* `INIT` - INIT"
+                - VALORIZE
+          description: |-
+            * `INIT` - INIT
+            * `VALORIZE` - VALORIZE
           explode: true
           style: form
         - in: query
@@ -12997,7 +13000,10 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-          description: "* `INIT` - INIT"
+                - VALORIZE
+          description: |-
+            * `INIT` - INIT
+            * `VALORIZE` - VALORIZE
           explode: true
           style: form
         - in: query
@@ -13267,7 +13273,10 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-          description: "* `INIT` - INIT"
+                - VALORIZE
+          description: |-
+            * `INIT` - INIT
+            * `VALORIZE` - VALORIZE
           explode: true
           style: form
         - in: query
@@ -13399,8 +13408,10 @@ components:
           type: integer
           readOnly: true
         status:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/ActionStatusEnum"
           readOnly: true
+          nullable: true
         holder:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -13421,6 +13432,11 @@ components:
         certificate:
           allOf:
             - $ref: "#/components/schemas/ActionCertificate"
+          readOnly: true
+          nullable: true
+        total_emissions:
+          allOf:
+            - $ref: "#/components/schemas/ActionTotalEmissions"
           readOnly: true
           nullable: true
         pos_id:
@@ -13490,6 +13506,7 @@ components:
         - quantity
         - site
         - status
+        - total_emissions
         - type
         - working_date
     ActionCertificate:
@@ -13559,11 +13576,71 @@ components:
       required:
         - id
         - name
+    ActionStatusEnum:
+      enum:
+        - CREATED
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - BLOCKED
+        - DELETED
+      type: string
+      description: |-
+        * `CREATED` - CREATED
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `BLOCKED` - BLOCKED
+        * `DELETED` - DELETED
+    ActionTotalEmissions:
+      type: object
+      description: Cumulative GES along the parent chain (gCO₂eq/MJ).
+      properties:
+        ei:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        ep:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        etd:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        eu:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+      required:
+        - eccs
+        - ei
+        - ep
+        - etd
+        - eu
+        - total
     ActionTypeEnum:
       enum:
         - INIT
+        - VALORIZE
       type: string
-      description: "* `INIT` - INIT"
+      description: |-
+        * `INIT` - INIT
+        * `VALORIZE` - VALORIZE
     ActivateAccountRequest:
       type: object
       properties:
