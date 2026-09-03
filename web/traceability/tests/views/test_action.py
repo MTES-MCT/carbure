@@ -57,3 +57,8 @@ class ActionViewsetQuerysetTest(TestCase):
         ids = [item["id"] for item in response.data["results"]]
         self.assertIn(self.own_action.id, ids)
         self.assertNotIn(self.other_industry_action.id, ids)
+
+    def test_list_does_not_fail_when_browsable_api_clones_the_request(self):
+        response = self.client.get(self.list_url, self.base_params, HTTP_ACCEPT="text/html")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
