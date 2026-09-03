@@ -6,6 +6,7 @@ from transactions.models import Depot, ProductionSite
 from transactions.models.site import Site
 
 DISPATCH_SITE_TYPES = [
+    Site.OTHER,
     Site.EFS,
     Site.EFPE,
     Site.OILDEPOT,
