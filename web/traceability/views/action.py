@@ -11,6 +11,7 @@ from traceability.handlers.action import ActionIndustryHandler
 from traceability.middlewares import ActionHandlerMiddleware
 from traceability.models import Action
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
+from traceability.services.total_emissions import annotate_total_emissions
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
 
@@ -55,10 +56,21 @@ class ActionViewset(
         return handler.get_permissions(self.action)
 
     def get_queryset(self):
-        return self.queryset.filter(
+        queryset = self.queryset.filter(
             Q(holder=self.request.entity) | Q(parent__holder=self.request.entity),
             industry=self.request.handler.industry,
         )
+        if self.action == "retrieve":
+            queryset = annotate_total_emissions(queryset)
+        return queryset
+
+    def paginate_queryset(self, queryset):
+        page = super().paginate_queryset(queryset)
+        if page is None:
+            return None
+        ids = [action.pk for action in page]
+        annotated = {action.pk: action for action in annotate_total_emissions(Action.objects.filter(pk__in=ids))}
+        return [annotated[action_id] for action_id in ids]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

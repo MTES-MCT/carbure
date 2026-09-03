@@ -62,3 +62,22 @@ class ActionViewsetQuerysetTest(TestCase):
         response = self.client.get(self.list_url, self.base_params, HTTP_ACCEPT="text/html")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_list_includes_total_emissions(self):
+        response = self.client.get(self.list_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        by_id = {item["id"]: item for item in response.data["results"]}
+        self.assertIn("total_emissions", by_id[self.own_action.id])
+        self.assertIn("total", by_id[self.own_action.id]["total_emissions"])
+        self.assertEqual(by_id[self.own_action.id]["status"], "CREATED")
+
+    def test_retrieve_includes_total_emissions(self):
+        response = self.client.get(
+            reverse("traceability-action-detail", args=[self.own_action.id]),
+            self.base_params,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("total_emissions", response.data)
+        self.assertIn("total", response.data["total_emissions"])

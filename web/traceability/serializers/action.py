@@ -29,6 +29,8 @@ class ActionSerializer(serializers.ModelSerializer):
     site = ActionSiteSerializer(read_only=True)
     certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
 
+    total_emissions = serializers.JSONField(read_only=True)
+
     class Meta:
         model = Action
         fields = "__all__"
