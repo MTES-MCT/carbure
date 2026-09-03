@@ -3442,6 +3442,9 @@ export interface components {
             readonly material: components["schemas"]["Material"];
             readonly site: components["schemas"]["ActionSite"];
             readonly certificate: components["schemas"]["ActionCertificate"] | null;
+            /** Format: decimal */
+            readonly display_quantity: string;
+            readonly display_unit: string;
             /** N° de POS */
             pos_id: string;
             /** Filière */
@@ -15250,6 +15253,7 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
+                quantity_unit?: string;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -15297,6 +15301,7 @@ export interface operations {
                 entity_id: number;
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                quantity_unit?: string;
                 /** @description Filter actions by working date year. */
                 year?: number;
             };
@@ -15326,6 +15331,7 @@ export interface operations {
                 entity_id: number;
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                quantity_unit?: string;
                 /** @description Filter actions by working date year. */
                 year?: number;
             };
@@ -15379,6 +15385,7 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                quantity_unit?: string;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -15426,6 +15433,7 @@ export interface operations {
                 entity_id: number;
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                quantity_unit?: string;
                 /** @description Filter actions by working date year. */
                 year?: number;
             };
@@ -15466,6 +15474,7 @@ export interface operations {
                 entity_id: number;
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                quantity_unit?: string;
                 /** @description Filter actions by working date year. */
                 year?: number;
             };
@@ -15516,6 +15525,7 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                quantity_unit?: string;
                 /** @description A search term. */
                 search?: string;
                 /**

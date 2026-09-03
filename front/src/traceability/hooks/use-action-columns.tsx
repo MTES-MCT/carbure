@@ -40,7 +40,10 @@ export function useActionColumns() {
       key: "quantity",
       header: t("Quantité"),
       cell: (action) => (
-        <Cell text={formatActionDecimal(action.quantity)} sub="MJ" />
+        <Cell
+          text={formatActionDecimal(action.display_quantity)}
+          sub={action.display_unit}
+        />
       ),
     },
 

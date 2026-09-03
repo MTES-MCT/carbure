@@ -1,3 +1,4 @@
+from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -5,9 +6,11 @@ from django.forms.models import model_to_dict
 from django.test import SimpleTestCase, TestCase
 
 from core.models import Entity
+from h2.handlers import H2ActionHandler
 from traceability.factories import ActionFactory
 from traceability.models import Action
 from traceability.serializers import ActionInputSerializer
+from traceability.serializers.action import ActionSerializer
 from traceability.serializers.fields import LookupSlugRelatedField
 
 
@@ -59,6 +62,29 @@ class ActionInputSerializerTest(TestCase):
         self.assertEqual(action.industry, Action.H2)
         self.assertEqual(action.holder, self.entity)
         self.assertIsNone(action.parent_id)
+
+
+class ActionSerializerTest(TestCase):
+    fixtures = ["json/countries.json"]
+
+    def test_quantity_stays_in_mj_and_display_fields_follow_the_requested_unit(self):
+        action = ActionFactory.create(quantity=Decimal("14400000.000"))
+        serializer = ActionSerializer(
+            action,
+            context={"handler": H2ActionHandler(), "quantity_unit": "kg"},
+        )
+
+        self.assertEqual(serializer.data["quantity"], "14400000.000")
+        self.assertEqual(serializer.data["display_quantity"], "120000.000")
+        self.assertEqual(serializer.data["display_unit"], "kg")
+
+    def test_display_fields_stay_in_mj_by_default(self):
+        action = ActionFactory.create(quantity=Decimal("14400000.000"))
+        serializer = ActionSerializer(action, context={"handler": H2ActionHandler(), "quantity_unit": "MJ"})
+
+        self.assertEqual(serializer.data["quantity"], "14400000.000")
+        self.assertEqual(serializer.data["display_quantity"], "14400000.000")
+        self.assertEqual(serializer.data["display_unit"], "MJ")
 
 
 class LookupSlugRelatedFieldTest(SimpleTestCase):

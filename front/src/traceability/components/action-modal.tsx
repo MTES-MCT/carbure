@@ -18,6 +18,7 @@ export type ActionModalProps = {
   title: string
   fields: ActionField[]
   industry: ActionIndustry
+  quantityUnit?: string
   detailActions?: DetailAction[]
 }
 
@@ -25,6 +26,7 @@ export const ActionModal = ({
   title,
   fields,
   industry,
+  quantityUnit = "MJ",
   detailActions,
 }: ActionModalProps) => {
   const navigate = useNavigate()
@@ -34,7 +36,12 @@ export const ActionModal = ({
 
   const actionResponse = useQuery(getActionDetail, {
     key: "traceability-action-detail",
-    params: [entity.id, parseInt(match?.params.id ?? "", 10), industry],
+    params: [
+      entity.id,
+      parseInt(match?.params.id ?? "", 10),
+      industry,
+      quantityUnit,
+    ],
   })
 
   const action = actionResponse.result?.data

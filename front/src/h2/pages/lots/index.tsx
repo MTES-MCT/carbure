@@ -94,6 +94,7 @@ const LotsPage = () => {
         fields.eccs,
       ]}
       industry={ActionIndustry.H2}
+      quantityUnit="kg"
     />
   )
 }

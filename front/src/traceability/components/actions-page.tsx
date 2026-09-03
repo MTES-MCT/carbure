@@ -1,4 +1,4 @@
-import { ReactNode, useCallback } from "react"
+import { ReactNode, useCallback, useMemo } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import HashRoute from "common/components/hash-route"
@@ -66,6 +66,7 @@ export type ActionsPageProps = {
   columns: ActionColumn[]
   fields?: ActionField[]
   industry: ActionIndustry
+  quantityUnit?: string
 }
 
 export const ActionsPage = ({
@@ -80,6 +81,7 @@ export const ActionsPage = ({
   columns,
   fields,
   industry,
+  quantityUnit = "MJ",
 }: ActionsPageProps) => {
   usePrivateNavigation(listTitle)
 
@@ -121,15 +123,19 @@ export const ActionsPage = ({
   >({ year: years.selected })
 
   const combinedQuery = useCombinedQuery(fixedQuery, query)
+  const actionsQuery = useMemo(
+    () => ({ ...combinedQuery, quantity_unit: quantityUnit }),
+    [combinedQuery, quantityUnit]
+  )
 
   const { result, loading } = useQuery(getActions, {
     key: QUERY_KEY,
-    params: [industry, combinedQuery],
+    params: [industry, actionsQuery],
   })
 
   const getFilterOptions = useCallback(
-    (filter: ActionFilter) => getActionFilters(filter, industry, combinedQuery),
-    [industry, combinedQuery]
+    (filter: ActionFilter) => getActionFilters(filter, industry, actionsQuery),
+    [industry, actionsQuery]
   )
 
   return (
@@ -214,6 +220,7 @@ export const ActionsPage = ({
               fields={fields}
               detailActions={detailActions}
               industry={industry}
+              quantityUnit={quantityUnit}
             />
           }
         />

@@ -23,6 +23,7 @@ export type ActionQuery = ActionQueryBuilder["query"] & {
   [ActionFilter.material]?: string[]
   [ActionFilter.shipping_method]?: ActionShippingMethod[]
   [ActionFilter.site]?: string[]
+  quantity_unit?: string
 }
 
 export {

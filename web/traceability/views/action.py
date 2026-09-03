@@ -1,5 +1,7 @@
 from django.db.models import Q
+from django.utils.translation import gettext as _
 from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
 
@@ -50,7 +52,17 @@ class ActionViewset(
     def initial(self, request, *args, **kwargs):
         query = ActionQuerySerializer(data=request.query_params)
         query.is_valid(raise_exception=True)
-        request.handler = get_action_handler(query.validated_data["industry"])
+        handler = get_action_handler(query.validated_data["industry"])
+        quantity_unit = query.validated_data["quantity_unit"]
+        if quantity_unit not in handler.units:
+            raise ValidationError(
+                {
+                    "quantity_unit": _("Unité inconnue. Unités possibles : %(units)s")
+                    % {"units": ", ".join(sorted(handler.units))}
+                }
+            )
+        request.handler = handler
+        request.quantity_unit = quantity_unit
         super().initial(request, *args, **kwargs)
 
     def get_permissions(self):
@@ -67,5 +79,6 @@ class ActionViewset(
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
-        context["handler"] = self.request.handler
+        context["handler"] = getattr(self.request, "handler", None)
+        context["quantity_unit"] = getattr(self.request, "quantity_unit", "MJ")
         return context

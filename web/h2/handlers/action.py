@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import h2.handlers.lookups as lookups
 from h2.permissions import HasHRSRights, HasHRSWriteRights
 from h2.serializers.action import H2ActionExcelImportSerializer
@@ -10,6 +12,9 @@ class H2ActionHandler(ActionIndustryHandler):
     industry = Action.H2
     lookups = lookups
     excel_import_serializer_class = H2ActionExcelImportSerializer
+    MJ_PER_KG = Decimal("120")
+    units = ["MJ", "kg"]
+    excel_quantity_unit = "kg"
     excel_columns = [
         {
             "key": "lot_id",
@@ -66,6 +71,16 @@ class H2ActionHandler(ActionIndustryHandler):
         excel_column("eu"),
         excel_column("eccs"),
     ]
+
+    def to_mj(self, quantity: Decimal, unit: str, action: Action | None = None) -> Decimal:
+        if unit == "kg":
+            return quantity * self.MJ_PER_KG
+        return super().to_mj(quantity, unit, action)
+
+    def from_mj(self, quantity_mj: Decimal, unit: str, action: Action | None = None) -> Decimal:
+        if unit == "kg":
+            return quantity_mj / self.MJ_PER_KG
+        return super().from_mj(quantity_mj, unit, action)
 
     @classmethod
     def get_permissions(cls, action: str):

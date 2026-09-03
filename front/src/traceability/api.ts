@@ -41,12 +41,13 @@ export function getActions(industry: ActionIndustry, query: ActionQuery) {
 export function getActionDetail(
   entity_id: number,
   id: number,
-  industry: ActionIndustry
+  industry: ActionIndustry,
+  quantity_unit?: string
 ) {
   return api.GET("/traceability/actions/{id}/", {
     params: {
       path: { id },
-      query: { entity_id, industry },
+      query: { entity_id, industry, quantity_unit },
     },
   })
 }

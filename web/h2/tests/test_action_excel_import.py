@@ -8,6 +8,7 @@ from core.models import Entity
 from core.models.certificate import GenericCertificate
 from core.tests_utils import setup_current_user
 from h2.factories.h2_station import H2StationFactory
+from h2.handlers import H2ActionHandler
 from h2.tests.excel import filled_h2_template
 from traceability.factories import MaterialFactory
 from traceability.models import Action
@@ -63,6 +64,10 @@ class H2ActionExcelImportViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Action.objects.get(pos_id="H2-001").etd, Decimal("2.000"))
+        self.assertEqual(
+            Action.objects.get(pos_id="H2-001").quantity,
+            Decimal("120000.000") * H2ActionHandler.MJ_PER_KG,
+        )
 
     def test_import_rejects_missing_h2_extra_fields(self):
         for field in ("lot_id", "lot_quantity", "producer", "etd1", "etd2"):

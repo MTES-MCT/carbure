@@ -95,7 +95,7 @@ export function useActionFields() {
       key: "quantity",
       label: t("Quantité"),
       field: ({ form, props }) => (
-        <ActionDecimalInput {...props} {...form.bind("quantity")} />
+        <ActionDecimalInput {...props} {...form.bind("display_quantity")} />
       ),
     },
 

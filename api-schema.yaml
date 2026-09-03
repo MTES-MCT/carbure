@@ -12671,6 +12671,12 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
+        - in: query
+          name: quantity_unit
+          schema:
+            type: string
+            minLength: 1
+            default: MJ
         - name: search
           required: false
           in: query
@@ -12782,6 +12788,12 @@ paths:
           description: "* `H2` - Hydrogène"
           required: true
         - in: query
+          name: quantity_unit
+          schema:
+            type: string
+            minLength: 1
+            default: MJ
+        - in: query
           name: year
           schema:
             type: integer
@@ -12823,6 +12835,12 @@ paths:
             minLength: 1
           description: "* `H2` - Hydrogène"
           required: true
+        - in: query
+          name: quantity_unit
+          schema:
+            type: string
+            minLength: 1
+            default: MJ
         - in: query
           name: year
           schema:
@@ -12933,6 +12951,12 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: quantity_unit
+          schema:
+            type: string
+            minLength: 1
+            default: MJ
         - name: search
           required: false
           in: query
@@ -13049,6 +13073,12 @@ paths:
           description: "* `H2` - Hydrogène"
           required: true
         - in: query
+          name: quantity_unit
+          schema:
+            type: string
+            minLength: 1
+            default: MJ
+        - in: query
           name: year
           schema:
             type: integer
@@ -13103,6 +13133,12 @@ paths:
             minLength: 1
           description: "* `H2` - Hydrogène"
           required: true
+        - in: query
+          name: quantity_unit
+          schema:
+            type: string
+            minLength: 1
+            default: MJ
         - in: query
           name: year
           schema:
@@ -13203,6 +13239,12 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: quantity_unit
+          schema:
+            type: string
+            minLength: 1
+            default: MJ
         - name: search
           required: false
           in: query
@@ -13423,6 +13465,14 @@ components:
             - $ref: "#/components/schemas/ActionCertificate"
           readOnly: true
           nullable: true
+        display_quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        display_unit:
+          type: string
+          readOnly: true
         pos_id:
           type: string
           title: N° de POS
@@ -13481,6 +13531,8 @@ components:
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
       required:
         - certificate
+        - display_quantity
+        - display_unit
         - holder
         - id
         - industry

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.serializer_fields import LabelChoiceField
@@ -50,10 +51,25 @@ class ActionSerializer(serializers.ModelSerializer):
     material = MaterialSerializer(read_only=True)
     site = ActionSiteSerializer(read_only=True)
     certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
+    display_quantity = serializers.SerializerMethodField()
+    display_unit = serializers.SerializerMethodField()
 
     class Meta:
         model = Action
         fields = "__all__"
+
+    @extend_schema_field(serializers.DecimalField(max_digits=13, decimal_places=3))
+    def get_display_quantity(self, instance):
+        quantity = instance.quantity
+        handler = self.context.get("handler")
+        unit = self.context.get("quantity_unit", "MJ")
+        if handler is not None:
+            quantity = handler.from_mj(quantity, unit, instance)
+        return self.fields["quantity"].to_representation(quantity)
+
+    @extend_schema_field(serializers.CharField())
+    def get_display_unit(self, instance):
+        return self.context.get("quantity_unit", "MJ")
 
 
 class ActionInputSerializer(serializers.ModelSerializer):
@@ -70,6 +86,7 @@ class ActionInputSerializer(serializers.ModelSerializer):
 
 class ActionQuerySerializer(serializers.Serializer):
     industry = serializers.ChoiceField(choices=Action.INDUSTRIES)
+    quantity_unit = serializers.CharField(required=False, default="MJ")
 
 
 class ActionExcelUploadSerializer(serializers.Serializer):
@@ -131,6 +148,13 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         error_messages={"invalid": _("La période doit être au format mois/année.")},
     )
     shipping_method = LabelChoiceField(choices=Action.SHIPPING_METHODS, required=False, allow_blank=True)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        handler = self.context.get("handler")
+        if handler is not None and "quantity" in attrs:
+            attrs["quantity"] = handler.to_mj(attrs["quantity"], handler.excel_quantity_unit)
+        return attrs
 
     class Meta:
         model = Action
