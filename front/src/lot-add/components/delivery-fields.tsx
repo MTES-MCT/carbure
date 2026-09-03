@@ -13,7 +13,7 @@ import * as api from "common/api"
 import * as norm from "common/utils/normalizers"
 import { compact } from "common/utils/collection"
 import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
-import { isExternalDelivery, LotFormValue } from "./lot-form"
+import { isFrenchDelivery, LotFormValue } from "./lot-form"
 import { LotStatus } from "transactions/types"
 import { Country, Depot, EntityPreview } from "common/types"
 import Select, { SelectProps } from "common/components/select"
@@ -50,7 +50,7 @@ export const ClientField = (
 
   return (
     <Autocomplete
-      required={!isExternalDelivery(value)}
+      required={isFrenchDelivery(value)}
       label={t("Client")}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
@@ -165,7 +165,7 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
 
   return (
     <Autocomplete
-      required={!isExternalDelivery(value)}
+      required={isFrenchDelivery(value)}
       label={t("Site de livraison")}
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
