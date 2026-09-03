@@ -3,7 +3,6 @@ from io import BytesIO
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
-from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from core.models import Entity
@@ -96,7 +95,7 @@ class ActionExcelImportViewTest(APITestCase):
                 "site_id": self.station.id,
                 "shipping_method": Action.ROAD,
                 "shipping_date": date(2026, 1, 15),
-                "working_date": timezone.now().date(),
+                "working_date": date(2026, 2, 1),
                 "status": ActionStatus.CREATED,
             },
         )
@@ -114,6 +113,20 @@ class ActionExcelImportViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Action.objects.get(pos_id="H2-001").shipping_date, date(2026, 1, 15))
+
+    def test_import_accepts_working_date_as_month_year(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.station.name,
+                certificate_id=self.certificate.certificate_id,
+                working_date="02/2026",
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="H2-001").working_date, date(2026, 2, 1))
 
     def test_import_rejects_unknown_material(self):
         response = self._post(

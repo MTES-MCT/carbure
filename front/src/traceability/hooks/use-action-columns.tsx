@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 
 import { Cell, Column } from "common/components/table2"
 import { EntityManager } from "common/hooks/entity"
+import { formatDate } from "common/utils/formatters"
 import { Action } from "traceability/types"
 import { formatActionDecimal } from "traceability/utils"
 
@@ -53,6 +54,14 @@ export function useActionColumns() {
       key: "pos_id",
       header: t("N° de POS"),
       cell: (action) => <Cell text={action.pos_id} />,
+    },
+
+    working_date: {
+      key: "working_date",
+      header: t("Consommé le"),
+      cell: (action) => (
+        <Cell text={formatDate(action.working_date, "MM/yyyy")} />
+      ),
     },
   } satisfies Record<string, ActionColumn>
 }

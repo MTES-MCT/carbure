@@ -24,6 +24,16 @@ class ExcelDateField(serializers.DateField):
         return super().to_internal_value(value)
 
 
+class ExcelMonthYearField(ExcelDateField):
+    """Parse MM/YYYY (or an Excel datetime) and store the first day of that month."""
+
+    def to_internal_value(self, value):
+        value = super().to_internal_value(value)
+        if value:
+            return value.replace(day=1)
+        return value
+
+
 class ActionParentSerializer(serializers.ModelSerializer):
     """Small representation used for the parent action relation."""
 
@@ -78,8 +88,6 @@ class ActionExcelImportListSerializer(serializers.ListSerializer):
                 holder=holder,
                 industry=industry,
                 type=Action.INIT,
-                # Temporary code, working_date should be set by the user or inferred from another field
-                working_date=timezone.now().date(),
             )
             for attrs in validated_data
         ]
@@ -117,6 +125,10 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         error_messages={"invalid": _("La date doit être au format jour/mois/année.")},
         allow_null=True,
     )
+    working_date = ExcelMonthYearField(
+        input_formats=["%m/%Y"],
+        error_messages={"invalid": _("La période doit être au format mois/année.")},
+    )
 
     class Meta:
         model = Action
@@ -135,4 +147,5 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
             "etd",
             "eu",
             "eccs",
+            "working_date",
         ]

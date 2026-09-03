@@ -26,6 +26,7 @@ def filled_h2_template(
     producer="Air Liquide",
     batch_id="BATCH-001",
     shipping_date=date(2026, 1, 15),
+    working_date=date(2026, 2, 1),
     extra_headers=None,
 ):
     file_handle = build_action_import_template(H2ActionHandler())
@@ -44,6 +45,7 @@ def filled_h2_template(
         "shipping_date": shipping_date,
         "shipping_distance": 25,
         "shipping_method": Action.ROAD,
+        "working_date": working_date,
         "ei": 0,
         "ep": 0,
         "etd": 0,

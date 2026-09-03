@@ -40,6 +40,7 @@ class H2ActionHandler(ActionIndustryHandler):
         excel_column("quantity", header="Quantité consommée (MJ)"),
         excel_column("eu"),
         excel_column("eccs"),
+        excel_column("working_date"),
     ]
 
     @classmethod

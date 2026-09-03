@@ -66,6 +66,7 @@ const LotsPage = () => {
         filters.shipping_method,
       ]}
       columns={[
+        columns.working_date,
         columns.pos_id,
         { ...columns.site, header: t("Station") },
         { ...columns.material, header: t("Nature d'H2") },

@@ -77,6 +77,11 @@ ACTION_EXCEL_COLUMNS = {
         "comment": "Réductions d'émissions dues au captage et au stockage géologique du carbone (gCO₂éq/MJ de carburant) - Chiffre supérieur ou égal à 0",  # noqa: E501
         "color": EXCEL_CONSUMPTION_COLOR,
     },
+    "working_date": {
+        "header": "Date de consommation",
+        "comment": "Format : MM/AAAA",
+        "color": EXCEL_CONSUMPTION_COLOR,
+    },
 }
 
 
