@@ -22,6 +22,7 @@ interface DispatchFieldsProps {
 }
 
 const DISPATCH_SITE_TYPES: SiteType[] = [
+  SiteType.OTHER,
   SiteType.EFS,
   SiteType.EFPE,
   SiteType.OIL_DEPOT,
