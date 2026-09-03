@@ -178,6 +178,7 @@ class BalanceService:
         - A dictionary containing the calculated balances based on the specified grouping
         """
         operations = BalanceService._filter_operations_for_current_year(operations)
+        operations = operations.exclude_informative()
 
         if group_by in [None, BalanceService.GROUP_BY_SECTOR, BalanceService.GROUP_BY_CATEGORY]:
             return calculate_balance_with_annotations(
