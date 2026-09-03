@@ -10,6 +10,8 @@ from transactions.models import Site
 
 
 class H2ActionLookupsTest(TestCase):
+    fixtures = ["json/countries.json"]
+
     def test_materials_are_limited_to_hydrogen(self):
         hydrogen = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux")
         MaterialFactory(code="BIO-WOOD", name="Bois")

@@ -7,6 +7,7 @@ from core.import_export_template import (
     DATA_START_ROW,
     DATA_START_ROW_WITH_COMMENTS,
     HEADER_ROW,
+    LAST_DATA_ROW,
     create_import_template,
     to_snake_case,
 )
@@ -58,8 +59,8 @@ class ImportExportTemplateTests(SimpleTestCase):
         self.assertEqual(
             validation_data,
             {
-                ("=References!$B$2:$B$3", f"B{DATA_START_ROW}:B1000"),
-                ("=References!$C$2:$C$4", f"C{DATA_START_ROW}:C1000"),
+                ("=References!$B$2:$B$3", f"B{DATA_START_ROW}:B{LAST_DATA_ROW}"),
+                ("=References!$C$2:$C$4", f"C{DATA_START_ROW}:C{LAST_DATA_ROW}"),
             },
         )
 
@@ -78,7 +79,7 @@ class ImportExportTemplateTests(SimpleTestCase):
 
         validations = main_sheet.data_validations.dataValidation
         self.assertEqual(len(validations), 1)
-        self.assertEqual(str(validations[0].sqref), f"B{DATA_START_ROW_WITH_COMMENTS}:B1000")
+        self.assertEqual(str(validations[0].sqref), f"B{DATA_START_ROW_WITH_COMMENTS}:B{LAST_DATA_ROW}")
 
     def test_create_import_template_skips_validation_when_no_options(self):
         columns = [{"header": "Name"}]

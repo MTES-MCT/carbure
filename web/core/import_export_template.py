@@ -12,6 +12,7 @@ from core.excel import ExcelResponse
 HEADER_ROW = 1
 DATA_START_ROW = 2
 DATA_START_ROW_WITH_COMMENTS = 3
+LAST_DATA_ROW = 1000
 
 
 class TemplateColumns(TypedDict):
@@ -109,11 +110,12 @@ def get_data_start_row(columns: list[TemplateColumns]) -> int:
 
 
 def _cell_format(workbook, color=None, **props):
-    # Excel hides gridlines on filled cells; a thin border keeps the rows visible.
+    # Excel hides gridlines on filled cells; Numbers also drops column styles on
+    # dropdown cells. A thin border on the format keeps the grid visible.
+    props.setdefault("border", 1)
+    props.setdefault("border_color", "#B4B4B4")
     if color:
         props["bg_color"] = color
-        props.setdefault("border", 1)
-        props.setdefault("border_color", "#B4B4B4")
     return workbook.add_format(props)
 
 
@@ -122,7 +124,7 @@ def _formats_for_column(workbook, color=None):
     return {
         "header": _cell_format(workbook, color, bold=True, text_wrap=True, valign="vcenter"),
         "comment": _cell_format(workbook, color, italic=True, font_color="#000000", text_wrap=True),
-        "column": _cell_format(workbook, color) if color else None,
+        "column": _cell_format(workbook, color),
     }
 
 
@@ -133,7 +135,7 @@ def _write_column(sheet, col, spec, formats, has_comments):
         sheet.write(DATA_START_ROW - 1, col, spec.get("comment", ""), formats["comment"])
 
 
-def _add_dropdown(main_sheet, reference_sheet, col, spec, first_data_row):
+def _add_dropdown(main_sheet, reference_sheet, col, spec, first_data_row, data_format):
     """List options live on the hidden References sheet and feed the column dropdown."""
     options = spec.get("options") or []
     reference_sheet.write(0, col, spec["header"])
@@ -145,12 +147,16 @@ def _add_dropdown(main_sheet, reference_sheet, col, spec, first_data_row):
 
     column_letter = chr(ord("A") + col)
     main_sheet.data_validation(
-        f"{column_letter}{first_data_row}:{column_letter}1000",
+        f"{column_letter}{first_data_row}:{column_letter}{LAST_DATA_ROW}",
         {
             "validate": "list",
             "source": f"=References!${column_letter}$2:${column_letter}${len(options) + 1}",
         },
     )
+    # Numbers ignores column styles on validated cells; stamp fill/border on the cells.
+    if data_format:
+        for row in range(first_data_row - 1, LAST_DATA_ROW):
+            main_sheet.write_blank(row, col, None, data_format)
 
 
 def create_import_template(title: str, columns: list[TemplateColumns]):
@@ -170,7 +176,7 @@ def create_import_template(title: str, columns: list[TemplateColumns]):
     for col, spec in enumerate(columns):
         formats = _formats_for_column(workbook, spec.get("color"))
         _write_column(main_sheet, col, spec, formats, has_comments)
-        _add_dropdown(main_sheet, reference_sheet, col, spec, first_data_row)
+        _add_dropdown(main_sheet, reference_sheet, col, spec, first_data_row, formats["column"])
 
     workbook.close()
     return open(path, "rb")
