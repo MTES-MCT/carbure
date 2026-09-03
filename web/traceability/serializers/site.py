@@ -5,7 +5,7 @@ from transactions.models import Site
 
 
 class ActionSiteSerializer(serializers.ModelSerializer):
-    country = CountrySerializer(read_only=True)
+    country = CountrySerializer(allow_null=True, required=False)
 
     class Meta:
         model = Site
