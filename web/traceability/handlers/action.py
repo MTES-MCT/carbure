@@ -11,7 +11,7 @@ class ActionIndustryHandler:
     lookups = default_lookups
     excel_columns: list[dict] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
     excel_import_serializer_class = ActionExcelImportSerializer
-    write_actions = ("create", "update", "partial_update", "destroy", "import_actions")
+    write_actions = ("destroy", "import_actions")
 
     @classmethod
     def get_permissions(cls, action: str):

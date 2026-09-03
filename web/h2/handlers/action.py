@@ -57,10 +57,14 @@ class H2ActionHandler(ActionIndustryHandler):
             "color": EXCEL_CONSUMPTION_COLOR,
         },
         excel_column("site", header="Station", comment="Liste de choix - Nom de la station dans carbure"),
-        excel_column("quantity", header="Quantité consommée (MJ)"),
+        excel_column("working_date", header="Mois d'utilisation / consommation"),
+        excel_column(
+            "quantity",
+            header="Quantité consommée (kg)",
+            comment="Peut être différent de la quantité du lot/batch — Chiffre strictement supérieur à 0",
+        ),
         excel_column("eu"),
         excel_column("eccs"),
-        excel_column("working_date"),
     ]
 
     @classmethod

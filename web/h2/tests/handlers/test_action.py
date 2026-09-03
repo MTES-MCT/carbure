@@ -9,10 +9,10 @@ class H2ActionHandlerPermissionTest(TestCase, PermissionTestMixin):
     def test_permissions(self):
         handler = H2ActionHandler()
 
-        for action in ["list", "retrieve", "filters", "get_years"]:
+        for action in ["list", "retrieve", "filters", "get_years", "download_import_template"]:
             with self.subTest(action=action):
                 self.assertPermissionsEqual(handler.get_permissions(action), [HasHRSRights()])
 
-        for action in ["create", "update", "partial_update", "destroy", "import_actions"]:
+        for action in ["destroy", "import_actions"]:
             with self.subTest(action=action):
                 self.assertPermissionsEqual(handler.get_permissions(action), [HasHRSWriteRights()])

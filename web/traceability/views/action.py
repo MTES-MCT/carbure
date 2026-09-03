@@ -1,6 +1,7 @@
 from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema
-from rest_framework import viewsets
+from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
+from rest_framework.viewsets import GenericViewSet
 
 from core.filters import FiltersActionFactory
 from core.pagination import TotalCountPagination
@@ -8,7 +9,7 @@ from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.registry import get_action_handler
 from traceability.models import Action
-from traceability.serializers.action import ActionInputSerializer, ActionQuerySerializer, ActionSerializer
+from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
 
@@ -31,7 +32,14 @@ from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActio
     ]
 )
 class ActionViewset(
-    YearsActionMixin, ExcelTemplateActionMixin, ExcelImportActionMixin, FiltersActionFactory(), viewsets.ModelViewSet
+    YearsActionMixin,
+    ExcelTemplateActionMixin,
+    ExcelImportActionMixin,
+    FiltersActionFactory(),
+    ListModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    GenericViewSet,
 ):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
@@ -61,8 +69,3 @@ class ActionViewset(
         context["entity"] = getattr(self.request, "entity", None)
         context["handler"] = self.request.handler
         return context
-
-    def get_serializer_class(self):
-        if self.action in ["create", "update", "partial_update"]:
-            return ActionInputSerializer
-        return ActionSerializer

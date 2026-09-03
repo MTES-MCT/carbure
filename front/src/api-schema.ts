@@ -3280,8 +3280,7 @@ export interface paths {
         /** @description Add a years action based on an action's working date. */
         get: operations["traceability_actions_list"];
         put?: never;
-        /** @description Add a years action based on an action's working date. */
-        post: operations["traceability_actions_create"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3297,15 +3296,13 @@ export interface paths {
         };
         /** @description Add a years action based on an action's working date. */
         get: operations["traceability_actions_retrieve"];
-        /** @description Add a years action based on an action's working date. */
-        put: operations["traceability_actions_update"];
+        put?: never;
         post?: never;
         /** @description Add a years action based on an action's working date. */
         delete: operations["traceability_actions_destroy"];
         options?: never;
         head?: never;
-        /** @description Add a years action based on an action's working date. */
-        patch: operations["traceability_actions_partial_update"];
+        patch?: never;
         trace?: never;
     };
     "/api/traceability/actions/filters/": {
@@ -3460,11 +3457,11 @@ export interface components {
              * Date d'expédition
              * Format: date
              */
-            shipping_date: string;
+            shipping_date?: string | null;
             /** Distance de livraison */
-            shipping_distance: number;
+            shipping_distance?: number | null;
             /** Mode de transport */
-            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
+            shipping_method?: components["schemas"]["ActionShippingMethodEnum"];
             /**
              * Date de référence
              * Format: date
@@ -3490,93 +3487,6 @@ export interface components {
         ActionExcelUploadRequest: {
             /** Format: binary */
             file: File;
-        };
-        ActionInput: {
-            readonly id: number;
-            /** N° de POS */
-            pos_id: string;
-            /** Filière */
-            readonly industry: components["schemas"]["IndustryEnum"];
-            /** Type d'action */
-            type: components["schemas"]["ActionTypeEnum"];
-            /**
-             * Quantité de matière
-             * Format: decimal
-             */
-            quantity: string;
-            /**
-             * Date d'expédition
-             * Format: date
-             */
-            shipping_date: string;
-            /** Distance de livraison */
-            shipping_distance: number;
-            /** Mode de transport */
-            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
-            /**
-             * Date de référence
-             * Format: date
-             */
-            working_date: string;
-            /** Format: decimal */
-            ei?: string;
-            /** Format: decimal */
-            ep?: string;
-            /** Format: decimal */
-            etd?: string;
-            /** Format: decimal */
-            eu?: string;
-            /** Format: decimal */
-            eccs?: string;
-            /** Entité détentrice de la quantité de l'action */
-            readonly holder: number;
-            /** Action parente */
-            readonly parent: number | null;
-            /** Matière */
-            material: number;
-            /** Certificat du producteur */
-            certificate?: number | null;
-            site: number;
-        };
-        ActionInputRequest: {
-            /** N° de POS */
-            pos_id: string;
-            /** Type d'action */
-            type: components["schemas"]["ActionTypeEnum"];
-            /**
-             * Quantité de matière
-             * Format: decimal
-             */
-            quantity: string;
-            /**
-             * Date d'expédition
-             * Format: date
-             */
-            shipping_date: string;
-            /** Distance de livraison */
-            shipping_distance: number;
-            /** Mode de transport */
-            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
-            /**
-             * Date de référence
-             * Format: date
-             */
-            working_date: string;
-            /** Format: decimal */
-            ei?: string;
-            /** Format: decimal */
-            ep?: string;
-            /** Format: decimal */
-            etd?: string;
-            /** Format: decimal */
-            eu?: string;
-            /** Format: decimal */
-            eccs?: string;
-            /** Matière */
-            material: number;
-            /** Certificat du producteur */
-            certificate?: number | null;
-            site: number;
         };
         /** @description Small representation used for the parent action relation. */
         ActionParent: {
@@ -6592,46 +6502,6 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
-        };
-        PatchedActionInputRequest: {
-            /** N° de POS */
-            pos_id?: string;
-            /** Type d'action */
-            type?: components["schemas"]["ActionTypeEnum"];
-            /**
-             * Quantité de matière
-             * Format: decimal
-             */
-            quantity?: string;
-            /**
-             * Date d'expédition
-             * Format: date
-             */
-            shipping_date?: string;
-            /** Distance de livraison */
-            shipping_distance?: number;
-            /** Mode de transport */
-            shipping_method?: components["schemas"]["ActionShippingMethodEnum"];
-            /**
-             * Date de référence
-             * Format: date
-             */
-            working_date?: string;
-            /** Format: decimal */
-            ei?: string;
-            /** Format: decimal */
-            ep?: string;
-            /** Format: decimal */
-            etd?: string;
-            /** Format: decimal */
-            eu?: string;
-            /** Format: decimal */
-            eccs?: string;
-            /** Matière */
-            material?: number;
-            /** Certificat du producteur */
-            certificate?: number | null;
-            site?: number;
         };
         PatchedBiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
@@ -15420,38 +15290,6 @@ export interface operations {
             };
         };
     };
-    traceability_actions_create: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-                /** @description * `H2` - Hydrogène */
-                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
-                /** @description Filter actions by working date year. */
-                year?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActionInputRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["ActionInputRequest"];
-                "multipart/form-data": components["schemas"]["ActionInputRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ActionInput"];
-                };
-            };
-        };
-    };
     traceability_actions_retrieve: {
         parameters: {
             query: {
@@ -15481,41 +15319,6 @@ export interface operations {
             };
         };
     };
-    traceability_actions_update: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-                /** @description * `H2` - Hydrogène */
-                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
-                /** @description Filter actions by working date year. */
-                year?: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this Action. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ActionInputRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["ActionInputRequest"];
-                "multipart/form-data": components["schemas"]["ActionInputRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ActionInput"];
-                };
-            };
-        };
-    };
     traceability_actions_destroy: {
         parameters: {
             query: {
@@ -15541,41 +15344,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    traceability_actions_partial_update: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-                /** @description * `H2` - Hydrogène */
-                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
-                /** @description Filter actions by working date year. */
-                year?: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this Action. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedActionInputRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedActionInputRequest"];
-                "multipart/form-data": components["schemas"]["PatchedActionInputRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ActionInput"];
-                };
             };
         };
     };

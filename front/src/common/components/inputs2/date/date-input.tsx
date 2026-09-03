@@ -1,7 +1,7 @@
 import { Input, InputProps } from "../input"
 
 export type DateInputProps = InputProps & {
-  value?: string
+  value?: string | null
   onChange?: (value: string | undefined) => void
   min?: string
   max?: string
