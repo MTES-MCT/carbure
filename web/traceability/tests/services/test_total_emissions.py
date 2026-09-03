@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from traceability.factories import ActionFactory
 from traceability.models import Action
-from traceability.services.total_emissions import annotate_total_emissions, parent_chain
+from traceability.services.total_emissions import annotate_total_emissions
 
 
 class TotalEmissionsTest(TestCase):
@@ -42,20 +42,11 @@ class TotalEmissionsTest(TestCase):
             eccs=Decimal("500.000"),
         )
 
-    def test_parent_chain_walks_up_to_the_root(self):
-        chain = list(parent_chain(Action.objects.filter(pk=self.leaf.pk)))
-
-        self.assertEqual(len(chain), 3)
-        self.assertCountEqual(
-            [row["ancestor_id"] for row in chain],
-            [self.leaf.pk, self.middle.pk, self.root.pk],
-        )
-
-    def test_lowest_action_total_emissions_sums_the_parent_chain(self):
-        annotated_actions = list(annotate_total_emissions(Action.objects.all()))
+    def test_each_action_sums_ges_from_itself_up_to_the_root(self):
+        by_id = {action.pk: action.total_emissions for action in annotate_total_emissions(Action.objects.all())}
 
         self.assertEqual(
-            annotated_actions[0].total_emissions,
+            by_id[self.root.pk],
             {
                 "ei": Decimal("1.000"),
                 "ep": Decimal("2.000"),
@@ -65,9 +56,8 @@ class TotalEmissionsTest(TestCase):
                 "total": Decimal("5.000"),
             },
         )
-
         self.assertEqual(
-            annotated_actions[1].total_emissions,
+            by_id[self.middle.pk],
             {
                 "ei": Decimal("11.000"),
                 "ep": Decimal("22.000"),
@@ -77,9 +67,8 @@ class TotalEmissionsTest(TestCase):
                 "total": Decimal("55.000"),
             },
         )
-
         self.assertEqual(
-            annotated_actions[2].total_emissions,
+            by_id[self.leaf.pk],
             {
                 "ei": Decimal("111.000"),
                 "ep": Decimal("222.000"),

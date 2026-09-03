@@ -1,7 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 
 from traceability.models import Action, ActionStatus, Material
-from traceability.services.valorize import valorize
+from traceability.services.valorize import NoEligibleActionError, valorize
 
 
 class ActionStatusInline(admin.TabularInline):
@@ -32,7 +32,12 @@ class MaterialAdmin(admin.ModelAdmin):
 
 @admin.action(description="Valider les actions sélectionnées et créer les certificats")
 def valorize_actions_into_certificates(modeladmin, request, queryset):
-    valorize(queryset)
+    try:
+        created = valorize(queryset)
+    except NoEligibleActionError:
+        modeladmin.message_user(request, "Aucune action éligible à valoriser", messages.WARNING)
+        return
+    modeladmin.message_user(request, f"{len(created)} certificat(s) créé(s).")
 
 
 @admin.register(Action)

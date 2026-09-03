@@ -6,18 +6,22 @@ from django.db.models import QuerySet
 from traceability.models import Action, ActionStatus
 
 
-def valorize(actions: QuerySet[Action]):
-    # Only actions of type INIT and with status PENDING can be valorized (only for H2-v0)
-    valorizable_actions = actions.filter(type__in=[Action.INIT], status__in=[ActionStatus.PENDING])
+class NoEligibleActionError(Exception):
+    pass
 
-    if not valorizable_actions.exists():
-        raise Exception("Aucune action éligible à valoriser")
 
-    new_actions = []
-    updated_action_statuses = []
+@transaction.atomic
+def valorize(actions: QuerySet[Action]) -> list[Action]:
+    """Create a VALORIZE child for each INIT action currently PENDING, then accept the INIT.
 
-    for action in valorizable_actions:
-        new_actions.append(
+    Ineligible rows in `actions` are skipped. Raises NoEligibleActionError if none remain.
+    """
+    pending_inits = list(actions.filter(type=Action.INIT, status=ActionStatus.PENDING))
+    if not pending_inits:
+        raise NoEligibleActionError()
+
+    children = Action.bulk_create(
+        [
             Action(
                 pos_id=str(uuid.uuid4()),
                 type=Action.VALORIZE,
@@ -27,10 +31,8 @@ def valorize(actions: QuerySet[Action]):
                 quantity=action.quantity,
                 parent=action,
             )
-        )
-
-        updated_action_statuses.append(ActionStatus(status=ActionStatus.ACCEPTED, action=action))
-
-    with transaction.atomic():
-        Action.bulk_create(new_actions)
-        ActionStatus.objects.bulk_create(updated_action_statuses)
+            for action in pending_inits
+        ]
+    )
+    ActionStatus.objects.bulk_create(ActionStatus(status=ActionStatus.ACCEPTED, action=action) for action in pending_inits)
+    return list(children)
