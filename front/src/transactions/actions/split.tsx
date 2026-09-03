@@ -190,6 +190,10 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               />
             )}
             <DateInput
+              label={t("Date d'expédition")}
+              {...bind("dispatch_date")}
+            />
+            <DateInput
               required
               label={t("Date de livraison")}
               {...bind("delivery_date")}
@@ -229,6 +233,7 @@ function formToStockPayload(form: SplitForm): StockPayload {
     supplier_certificate: form.supplier_certificate,
     transport_document_reference: form.transport_document_reference,
     transport_document_type: undefined,
+    dispatch_date: form.dispatch_date,
     delivery_type: form.delivery_type,
     delivery_date: form.delivery_date,
     carbure_delivery_site_id:
@@ -251,6 +256,7 @@ const defaultSplit = {
   usage_precision: undefined as string | undefined,
   volume: 0 as number | undefined,
   transport_document_reference: undefined as string | undefined,
+  dispatch_date: undefined as string | undefined,
   supplier_certificate: undefined as string | undefined,
   client: undefined as EntityPreview | string | undefined,
   delivery_date: undefined as string | undefined,
