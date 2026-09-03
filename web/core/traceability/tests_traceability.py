@@ -64,6 +64,8 @@ class TraceabilityTest(TestCase):
             delivery_type=CarbureLot.TRADING,
             supplier_certificate="PARENT_CERT",
             parent_lot=None,
+            carbure_dispatch_site=self.depot,
+            dispatch_site_country=self.depot.country,
         )
 
         CarbureLotFactory.create(
@@ -103,6 +105,8 @@ class TraceabilityTest(TestCase):
         assert child_node.data.transport_document_reference == "ABCD"
         assert child_node.data.supplier_certificate == original_child_supplier_cert
         assert child_node.data.esca == 2.0
+        assert child_node.data.carbure_dispatch_site == self.depot
+        assert child_node.data.dispatch_site_country == self.depot.country
 
     def test_traceability_lot_to_stock_lot(self):
         parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity)
