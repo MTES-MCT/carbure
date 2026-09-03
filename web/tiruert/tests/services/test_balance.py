@@ -3,7 +3,7 @@ from unittest.mock import Mock
 from django.test import TestCase
 
 from core.models import MatierePremiere
-from tiruert.models import Operation
+from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
 
 
@@ -301,6 +301,37 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
                             self.assertEqual(
                                 entry["quantity"]["credit"], 0, f"Status {status_code} should not contribute to credit"
                             )
+
+    def test_calculate_balance_excludes_informative_operations(self):
+        """YEARLY_BALANCE operations must not contribute to balance calculations."""
+        from core.models import Biocarburant
+
+        biofuel = Biocarburant.objects.filter(compatible_essence=True).first()
+
+        if not biofuel:
+            self.skipTest("Missing compatible_essence biofuel in fixtures")
+
+        credit_operation = self.OperationFactory.create_incorporation(
+            entity=self.entity,
+            biofuel=biofuel,
+        )
+        self.OperationDetailFactory.create_for_operation(credit_operation, volume=1000.0)
+
+        yearly_balance = self.OperationFactory(
+            type=Operation.YEARLY_BALANCE,
+            status=Operation.ACCEPTED,
+            customs_category=MatierePremiere.CONV,
+            biofuel=biofuel,
+            credited_entity=self.entity,
+        )
+        OperationDetail.objects.create(operation=yearly_balance, lot=None, volume=500.0)
+
+        operations = Operation.objects.filter(id__in=[credit_operation.id, yearly_balance.id])
+
+        result = BalanceService.calculate_balance(operations, self.entity.id, None, "l")
+        total = sum(entry["available_balance"] for entry in result.values())
+
+        self.assertEqual(total, 1000.0)  # 500 from YEARLY_BALANCE should be excluded
 
     def test_calculate_balance_applies_credit_and_debit_logic(self):
         """Test calculate_balance correctly applies credit/debit based on entity relationship."""

@@ -165,6 +165,9 @@ class BalanceService:
         Returns:
         - A dictionary containing the calculated balances based on the specified grouping
         """
+        # Informative operations (e.g. YEARLY_BALANCE snapshots) must never impact the balance
+        operations = operations.exclude_informative()
+
         if group_by in [None, BalanceService.GROUP_BY_SECTOR, BalanceService.GROUP_BY_CATEGORY]:
             return calculate_balance_with_annotations(
                 operations,
