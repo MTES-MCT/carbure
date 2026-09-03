@@ -478,12 +478,16 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
   }
 }
 
-export function isExternalDelivery(value: LotFormValue) {
+export function isFrenchDelivery(value: LotFormValue) {
   return (
-    value.delivery_type &&
-    [DeliveryType.Exportation, DeliveryType.RFC, DeliveryType.Direct].includes(
-      value.delivery_type
-    )
+    [
+      DeliveryType.Blending,
+      DeliveryType.Trading,
+      DeliveryType.Stock,
+      DeliveryType.Direct,
+      DeliveryType.Unknown,
+    ].includes(value.delivery_type ?? DeliveryType.Unknown) &&
+    value.delivery_site_country?.code_pays === "FR"
   )
 }
 
