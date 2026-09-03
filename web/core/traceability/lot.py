@@ -74,6 +74,7 @@ class LotNode(Node):
     # data to copy only from a direct parent stock
     FROM_PARENT_STOCK = {
         "carbure_client": "carbure_supplier",
+        "depot": "carbure_dispatch_site",
         **FROM_STOCK,
     }
 
@@ -126,6 +127,16 @@ class LotNode(Node):
         "carbure_delivery_site_id",
         "unknown_delivery_site",
         "delivery_site_country",
+    ]
+
+    # Dispatch sites are entered on root lots. On lots extracted from a stock,
+    # this information is inherited from the stock depot and cannot be edited.
+    DISPATCH_FIELDS = [
+        "dispatch_site",
+        "carbure_dispatch_site",
+        "carbure_dispatch_site_id",
+        "unknown_dispatch_site",
+        "dispatch_site_country",
     ]
 
     # fields only available to the root owner (the one who input the data first on carbure)
@@ -203,7 +214,11 @@ class LotNode(Node):
         # if the lot has no parent, allow all fields
         if self.parent is None:
             return (
-                LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS
+                LotNode.TRANSACTION_FIELDS
+                + LotNode.TRADING_FIELDS
+                + LotNode.DELIVERY_FIELDS
+                + LotNode.DISPATCH_FIELDS
+                + LotNode.SUSTAINABILITY_FIELDS
             )
 
         # find the first lot of the current traceability chain
@@ -233,7 +248,11 @@ class LotNode(Node):
 
     def get_disabled_fields(self, entity_id) -> tuple[bool, list[str]]:
         all_fields = (
-            LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS
+            LotNode.TRANSACTION_FIELDS
+            + LotNode.TRADING_FIELDS
+            + LotNode.DELIVERY_FIELDS
+            + LotNode.DISPATCH_FIELDS
+            + LotNode.SUSTAINABILITY_FIELDS
         )
 
         allowed_fields = self.get_allowed_fields(entity_id)
@@ -303,6 +322,8 @@ class LotNode(Node):
                 derived_fields["production_site_commissioning_date"] = value.date_mise_en_service
             if field == "carbure_delivery_site" and value:
                 derived_fields["delivery_site_country"] = value.country
+            if field == "carbure_dispatch_site" and value:
+                derived_fields["dispatch_site_country"] = value.country
         return derived_fields
 
 
