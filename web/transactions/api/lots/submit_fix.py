@@ -7,6 +7,7 @@ from core.decorators import check_user_rights
 from core.models import CarbureLot, CarbureLotEvent, GenericError, UserRights
 from core.notifications import notify_correction_done
 from core.traceability import Node, bulk_update_traceability_nodes, diff_to_metadata, get_traceability_nodes
+from tiruert.services.correction import CorrectionService
 
 
 class SubmitFixError:
@@ -56,9 +57,15 @@ def submit_fix(request, context):
     # prepare a list of update events so we know how lots were updated after propagation
     updated_lots = []
     update_events = []
+    correction_lot_ids = set(fix_lots.values_list("id", flat=True))
+
     for node in updated_nodes:
         if node.type == Node.LOT:
             updated_lots.append(node)
+
+            ghg_total_diff = node.diff.get("ghg_total")
+            if ghg_total_diff is not None and ghg_total_diff[0] != ghg_total_diff[1]:
+                correction_lot_ids.add(node.data.id)
 
             if len(node.diff) > 0:
                 update_events.append(
@@ -80,6 +87,10 @@ def submit_fix(request, context):
 
         CarbureLotEvent.objects.bulk_create(submit_fix_events)
         CarbureLotEvent.objects.bulk_create(update_events)
+
+        if correction_lot_ids:
+            CorrectionService.create_correction_operations_for_lot_ghg_update(sorted(correction_lot_ids))
+
         notify_correction_done(lots.exclude(carbure_client_id=entity_id))
 
     return SuccessResponse()

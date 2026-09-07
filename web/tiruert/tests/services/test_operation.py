@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from tiruert.models import Operation, OperationDetail
+from tiruert.services.correction import CorrectionService
 from tiruert.services.operation import OperationService, OperationServiceErrors
 from transactions.factories import CarbureLotFactory
 from transactions.factories.depot import DepotFactory
@@ -270,6 +271,264 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         self.assertEqual(operation.to_depot, self.depot)
         self.assertIsNotNone(operation.biofuel)
         self.assertIsNotNone(operation.customs_category)
+
+
+class OperationServiceCreateCorrectionOperationsTest(OperationServiceTestCase):
+    BASELINE_EMISSION_RATE_PER_MJ = 50.0
+    BASELINE_VOLUME = 1000.0
+
+    def _create_existing_operation_detail(
+        self,
+        lot,
+        emission_rate_per_mj=BASELINE_EMISSION_RATE_PER_MJ,
+        volume=BASELINE_VOLUME,
+    ):
+        """Create one non-CORRECTION baseline detail used to compute future correction deltas."""
+        operation = Operation.objects.create(
+            type=Operation.CESSION,
+            status=Operation.VALIDATED,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            credited_entity=self.entity,
+            debited_entity=None,
+            renewable_energy_share=1,
+        )
+        OperationDetail.objects.create(
+            operation=operation,
+            lot=lot,
+            volume=volume,
+            emission_rate_per_mj=emission_rate_per_mj,
+        )
+
+    def _create_existing_correction(self, lot, direction, magnitude):
+        """Create one existing CORRECTION operation for the target entity with a non-signed magnitude."""
+        correction = Operation.objects.create(
+            type=Operation.CORRECTION,
+            status=Operation.VALIDATED,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            credited_entity=self.entity if direction == "credit" else None,
+            debited_entity=self.entity if direction == "debit" else None,
+            renewable_energy_share=lot.biofuel.renewable_energy_share,
+            durability_period=lot.period,
+        )
+        OperationDetail.objects.create(
+            operation=correction,
+            lot=lot,
+            volume=0,
+            emission_rate_per_mj=lot.ghg_total,
+            avoided_emissions_tco2=magnitude,
+        )
+
+    def _run_and_get_latest_correction_for_entity(self, lot, new_ghg_total):
+        """Apply a new ghg_total to lot, run correction service, and return latest CORRECTION for the entity."""
+        lot.ghg_total = new_ghg_total
+        lot.save(update_fields=["ghg_total"])
+
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        latest_credit = (
+            Operation.objects.filter(type=Operation.CORRECTION, credited_entity=self.entity).order_by("-id").first()
+        )
+        latest_debit = (
+            Operation.objects.filter(type=Operation.CORRECTION, debited_entity=self.entity).order_by("-id").first()
+        )
+        candidates = [operation for operation in [latest_credit, latest_debit] if operation is not None]
+        self.assertTrue(candidates)
+
+        return max(candidates, key=lambda operation: operation.id)
+
+    def _assert_single_unsigned_detail(self, correction):
+        """Assert the CORRECTION contract: exactly one detail, volume=0, non-signed avoided emissions."""
+        self.assertEqual(correction.status, Operation.VALIDATED)
+        self.assertEqual(correction.details.count(), 1)
+
+        detail = correction.details.get()
+        self.assertEqual(detail.volume, 0)
+        self.assertGreater(detail.avoided_emissions_tco2, 0)
+        return detail
+
+    @patch("tiruert.services.correction.avoided_emissions_tco2")
+    @patch("tiruert.services.correction.energy_mj")
+    def test_create_debit_correction_without_existing_correction(self, mock_energy_mj, mock_avoided_emissions_tco2):
+        """Create a debit correction with a simple mocked computation.
+
+        Scenario:
+        - one historical non-CORRECTION detail
+        - no existing correction
+        - mocked base delta from non-CORRECTION detail = -6
+
+        Expected net delta: -6, so a DEBIT correction with magnitude 6.
+        """
+        lot = self.lot_blending_accepted
+        self._create_existing_operation_detail(lot)
+
+        # Base delta = 10 - 16 = -6, so DEBIT magnitude is 6.
+        mock_energy_mj.return_value = 1000.0
+        mock_avoided_emissions_tco2.side_effect = [16.0, 10.0]
+
+        correction = self._run_and_get_latest_correction_for_entity(lot, new_ghg_total=60.0)
+
+        self.assertEqual(mock_avoided_emissions_tco2.call_count, 2)
+        self.assertIsNone(correction.credited_entity)
+        self.assertEqual(correction.debited_entity, self.entity)
+        detail = self._assert_single_unsigned_detail(correction)
+        self.assertEqual(detail.avoided_emissions_tco2, 6.0)
+
+    @patch("tiruert.services.correction.avoided_emissions_tco2")
+    @patch("tiruert.services.correction.energy_mj")
+    def test_create_debit_correction_with_existing_debit_correction(self, mock_energy_mj, mock_avoided_emissions_tco2):
+        """Create a debit correction with one prior debit correction.
+
+        Scenario:
+        - one historical non-CORRECTION detail
+        - one existing DEBIT correction with magnitude 2
+        - mocked base delta from non-CORRECTION detail = -6
+
+        Expected net delta: -6 + 2 = -4, so a DEBIT correction with magnitude 4.
+        """
+        lot = self.lot_blending_accepted
+        self._create_existing_operation_detail(lot)
+        self._create_existing_correction(lot, direction="debit", magnitude=2.0)
+
+        # Base delta = 10 - 16 = -6. Existing debit (+2) => net delta = -4.
+        # Expect DEBIT magnitude 4.
+        mock_energy_mj.return_value = 1000.0
+        mock_avoided_emissions_tco2.side_effect = [16.0, 10.0]
+
+        correction = self._run_and_get_latest_correction_for_entity(lot, new_ghg_total=60.0)
+
+        self.assertEqual(mock_avoided_emissions_tco2.call_count, 2)
+        self.assertIsNone(correction.credited_entity)
+        self.assertEqual(correction.debited_entity, self.entity)
+        detail = self._assert_single_unsigned_detail(correction)
+        self.assertEqual(detail.avoided_emissions_tco2, 4.0)
+
+    @patch("tiruert.services.correction.avoided_emissions_tco2")
+    @patch("tiruert.services.correction.energy_mj")
+    def test_create_debit_correction_with_existing_credit_correction(self, mock_energy_mj, mock_avoided_emissions_tco2):
+        """Create a debit correction with one prior credit correction.
+
+        Scenario:
+        - one historical non-CORRECTION detail
+        - one existing CREDIT correction with magnitude 2
+        - mocked base delta from non-CORRECTION detail = -6
+
+        Expected net delta: -6 - 2 = -8, so a DEBIT correction with magnitude 8.
+        """
+        lot = self.lot_blending_accepted
+        self._create_existing_operation_detail(lot)
+        self._create_existing_correction(lot, direction="credit", magnitude=2.0)
+
+        # Base delta = 10 - 16 = -6. Existing credit (-2) => net delta = -8.
+        # Expect DEBIT magnitude 8.
+        mock_energy_mj.return_value = 1000.0
+        mock_avoided_emissions_tco2.side_effect = [16.0, 10.0]
+
+        correction = self._run_and_get_latest_correction_for_entity(lot, new_ghg_total=60.0)
+
+        self.assertEqual(mock_avoided_emissions_tco2.call_count, 2)
+        self.assertIsNone(correction.credited_entity)
+        self.assertEqual(correction.debited_entity, self.entity)
+        detail = self._assert_single_unsigned_detail(correction)
+        self.assertEqual(detail.avoided_emissions_tco2, 8.0)
+
+    @patch("tiruert.services.correction.avoided_emissions_tco2")
+    @patch("tiruert.services.correction.energy_mj")
+    def test_create_credit_correction_without_existing_correction(self, mock_energy_mj, mock_avoided_emissions_tco2):
+        """Create a credit correction with a simple mocked computation.
+
+        Scenario:
+        - one historical non-CORRECTION detail
+        - no existing correction
+        - mocked base delta from non-CORRECTION detail = +6
+
+        Expected net delta: +6, so a CREDIT correction with magnitude 6.
+        """
+        lot = self.lot_blending_accepted
+        self._create_existing_operation_detail(lot)
+
+        # Base delta = 16 - 10 = +6, so CREDIT magnitude is 6.
+        mock_energy_mj.return_value = 1000.0
+        mock_avoided_emissions_tco2.side_effect = [10.0, 16.0]
+
+        correction = self._run_and_get_latest_correction_for_entity(lot, new_ghg_total=40.0)
+
+        self.assertEqual(mock_avoided_emissions_tco2.call_count, 2)
+        self.assertEqual(correction.credited_entity, self.entity)
+        self.assertIsNone(correction.debited_entity)
+        detail = self._assert_single_unsigned_detail(correction)
+        self.assertEqual(detail.avoided_emissions_tco2, 6.0)
+
+    @patch("tiruert.services.correction.avoided_emissions_tco2")
+    @patch("tiruert.services.correction.energy_mj")
+    def test_create_credit_correction_with_existing_debit_correction(self, mock_energy_mj, mock_avoided_emissions_tco2):
+        """Create a credit correction with one prior debit correction.
+
+        Scenario:
+        - one historical non-CORRECTION detail
+        - one existing DEBIT correction with magnitude 2
+        - mocked base delta from non-CORRECTION detail = +6
+
+        Expected net delta: +6 + 2 = +8, so a CREDIT correction with magnitude 8.
+        """
+        lot = self.lot_blending_accepted
+        self._create_existing_operation_detail(lot)
+        self._create_existing_correction(lot, direction="debit", magnitude=2.0)
+
+        # Base delta = 16 - 10 = +6. Existing debit (+2) => net delta = +8.
+        # Expect CREDIT magnitude 8.
+        mock_energy_mj.return_value = 1000.0
+        mock_avoided_emissions_tco2.side_effect = [10.0, 16.0]
+
+        correction = self._run_and_get_latest_correction_for_entity(lot, new_ghg_total=40.0)
+
+        self.assertEqual(mock_avoided_emissions_tco2.call_count, 2)
+        self.assertEqual(correction.credited_entity, self.entity)
+        self.assertIsNone(correction.debited_entity)
+        detail = self._assert_single_unsigned_detail(correction)
+        self.assertEqual(detail.avoided_emissions_tco2, 8.0)
+
+    @patch("tiruert.services.correction.avoided_emissions_tco2")
+    @patch("tiruert.services.correction.energy_mj")
+    def test_create_credit_correction_with_existing_credit_correction(
+        self,
+        mock_energy_mj,
+        mock_avoided_emissions_tco2,
+    ):
+        """Create a credit correction with a simple mocked computation.
+
+        Scenario:
+        - one historical non-CORRECTION detail
+        - one existing CREDIT correction with magnitude 2
+        - mocked base delta from non-CORRECTION detail = +6
+
+        Expected net delta: 6 - 2 = 4, so a CREDIT correction with magnitude 4.
+        """
+        lot = self.lot_blending_accepted
+        self._create_existing_operation_detail(lot)
+        self._create_existing_correction(lot, direction="credit", magnitude=2.0)
+
+        # Keep the energy path deterministic.
+        mock_energy_mj.return_value = 1000.0
+        # Called twice for the non-CORRECTION detail only: old then new.
+        # Base delta = 16 - 10 = 6.
+        mock_avoided_emissions_tco2.side_effect = [10.0, 16.0]
+
+        correction = self._run_and_get_latest_correction_for_entity(lot, new_ghg_total=40.0)
+
+        self.assertEqual(mock_avoided_emissions_tco2.call_count, 2)
+        self.assertEqual(correction.credited_entity, self.entity)
+        self.assertIsNone(correction.debited_entity)
+
+        detail = self._assert_single_unsigned_detail(correction)
+        self.assertEqual(detail.avoided_emissions_tco2, 4.0)
+
+    def test_create_correction_operations_for_lot_ghg_update_ignores_unchanged_lot_ids(self):
+        """Do not create any correction when no lot ids are provided."""
+        CorrectionService.create_correction_operations_for_lot_ghg_update([])
+
+        self.assertFalse(Operation.objects.filter(type=Operation.CORRECTION).exists())
 
 
 class OperationServiceFilterLotsTest(OperationServiceTestCase):
