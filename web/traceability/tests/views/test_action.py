@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -6,6 +8,7 @@ from core.models import Entity
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory
 from traceability.models import Action
+from traceability.services.total_emissions import annotate_total_emissions
 
 
 class ActionViewsetQuerysetTest(TestCase):
@@ -76,3 +79,19 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("total_emissions", response.data)
         self.assertIn("total", response.data["total_emissions"])
+
+    def test_retrieve_annotates_only_the_requested_action(self):
+        seen_pks = []
+
+        def capture(queryset):
+            seen_pks.extend(queryset.values_list("pk", flat=True))
+            return annotate_total_emissions(queryset)
+
+        with patch("traceability.views.action.annotate_total_emissions", side_effect=capture):
+            response = self.client.get(
+                reverse("traceability-action-detail", args=[self.own_action.id]),
+                self.base_params,
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(seen_pks, [self.own_action.id])

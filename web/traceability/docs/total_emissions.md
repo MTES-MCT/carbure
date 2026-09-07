@@ -87,6 +87,6 @@ La CTE a **toutes** les étapes. On ne veut que celle arrivée à la racine (`ne
 
 ## Où c’est branché
 
-`ActionViewset` : **retrieve** annote le queryset ; **list** pagine d’abord, puis annote **uniquement les ids de la page**. Le `COUNT` de pagination ne paie pas la CTE.
+`ActionViewset` : **retrieve** annote après le filtre `pk` ; **list** pagine d’abord, puis annote les ids de la page (MySQL interdit `LIMIT` dans la sous-requête de la CTE). Le `COUNT` de pagination s’exécute donc sur le queryset **sans** CTE.
 
 Ne pas remettre `annotate_total_emissions` sur `Action.objects` (manager) : ça recalculerait le cumul pour toute la table, y compris `/years/` et `/filters/`.

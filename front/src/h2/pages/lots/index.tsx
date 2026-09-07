@@ -7,18 +7,12 @@ import {
   ActionSiteFieldOptions,
   useActionFields,
 } from "traceability/hooks/use-action-fields"
-import {
-  ActionIndustry,
-  ActionQuery,
-  ActionStatus,
-  ActionType,
-} from "traceability/types"
+import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 import { SiteTypeEnum } from "api-schema"
 import { Text } from "common/components/text"
 
 const H2_LOT_QUERY: Partial<ActionQuery> = {
   type: [ActionType.INIT],
-  status: [ActionStatus.PENDING],
 }
 
 const H2_SITE_FIELD_OPTIONS: ActionSiteFieldOptions = {

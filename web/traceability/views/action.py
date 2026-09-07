@@ -61,16 +61,18 @@ class ActionViewset(
             industry=self.request.handler.industry,
         )
         if self.action == "retrieve":
-            queryset = annotate_total_emissions(queryset)
+            queryset = annotate_total_emissions(queryset.filter(pk=self.kwargs["pk"]))
         return queryset
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
         if page is None:
             return None
+        # Annotate the current page only: the CTE cannot run on a sliced queryset
+        # (MySQL rejects LIMIT in the pk__in subquery). Re-index to keep page order.
         ids = [action.pk for action in page]
-        annotated = {action.pk: action for action in annotate_total_emissions(Action.objects.filter(pk__in=ids))}
-        return [annotated[action_id] for action_id in ids]
+        by_id = {action.pk: action for action in annotate_total_emissions(queryset.filter(pk__in=ids))}
+        return [by_id[action_id] for action_id in ids]
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
