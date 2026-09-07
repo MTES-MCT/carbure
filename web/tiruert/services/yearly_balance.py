@@ -3,8 +3,8 @@ from django.db.models import Q
 
 from core.utils import truncate
 from tiruert.models.operation import Operation
-from tiruert.models.operation_detail import OperationDetail
 from tiruert.services.balance import BalanceService
+from tiruert.services.operation import OperationService
 
 
 class YearlyBalanceService:
@@ -62,16 +62,24 @@ class YearlyBalanceService:
             if volume < 0 or entry["biofuel"] is None:
                 continue
 
-            operation = Operation.objects.create(
-                type=Operation.YEARLY_BALANCE,
-                status=Operation.ACCEPTED,
-                customs_category=entry["customs_category"],
-                biofuel=entry["biofuel"],
-                credited_entity_id=entity_id,
-                debited_entity=None,
-                declaration_year=year,
-            )
-            OperationDetail.objects.create(operation=operation, lot=None, volume=volume)
+            operation_data = {
+                "type": Operation.YEARLY_BALANCE,
+                "status": Operation.ACCEPTED,
+                "customs_category": entry["customs_category"],
+                "biofuel": entry["biofuel"],
+                "credited_entity_id": entity_id,
+                "debited_entity": None,
+                "declaration_year": year,
+            }
+            details_data = [
+                {
+                    "lot_id": None,
+                    "volume": volume,
+                    "emission_rate_per_mj": 0,
+                    "avoided_emissions_tco2": entry["saved_emissions"],
+                }
+            ]
+            OperationService.create_operation_with_details(operation_data, details_data)
             operations_created += 1
 
         return operations_created
