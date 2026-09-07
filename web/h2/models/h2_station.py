@@ -36,6 +36,11 @@ class H2Station(Site):
         verbose_name="Connecteurs compatibles avec les véhicules particuliers", default=False
     )
 
+    has_compliant_measuring_instruments = models.BooleanField(
+        verbose_name="Instruments de mesure de la masse d'H2 conformes au décret 2001-387",
+        default=False,
+    )
+
     storage_capacity = models.IntegerField(verbose_name="Capacité de stockage sur site", validators=[MinValueValidator(1)])
 
     distribution_capacity = models.IntegerField(verbose_name="Capacité de distribution", validators=[MinValueValidator(1)])

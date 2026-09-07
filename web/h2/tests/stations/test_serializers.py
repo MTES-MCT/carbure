@@ -20,6 +20,7 @@ class H2StationInputSerializerTests(TestCase):
             "access_type": H2Station.PUBLIC,
             "distributed_pressure": [H2Station.DP_350_BAR],
             "has_personal_vehicle_connector": True,
+            "has_compliant_measuring_instruments": True,
             "storage_capacity": 1000,
             "distribution_capacity": 500,
         }
@@ -43,3 +44,13 @@ class H2StationInputSerializerTests(TestCase):
         serializer = H2StationInputSerializer(data=self._payload(distributed_pressure=[]))
         self.assertTrue(serializer.is_valid(), serializer.errors)
         self.assertEqual(serializer.validated_data["distributed_pressure"], [])
+
+    def test_compliant_measuring_instruments_defaults_to_false(self):
+        payload = self._payload()
+        del payload["has_compliant_measuring_instruments"]
+
+        serializer = H2StationInputSerializer(data=payload, context={"entity": self.entity})
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+        station = serializer.save()
+        self.assertFalse(station.has_compliant_measuring_instruments)

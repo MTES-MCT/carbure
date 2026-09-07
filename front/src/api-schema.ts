@@ -5459,7 +5459,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -5489,7 +5488,6 @@ export interface components {
             sustainability_officer?: string;
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
         };
@@ -5631,7 +5629,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -5819,6 +5816,8 @@ export interface components {
             access_type: components["schemas"]["AccessTypeEnum"];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
             /** Capacité de stockage sur site */
             storage_capacity: number;
             /** Capacité de distribution */
@@ -5850,6 +5849,8 @@ export interface components {
             access_type: components["schemas"]["AccessTypeEnum"];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
             /** Capacité de stockage sur site */
             storage_capacity: number;
             /** Capacité de distribution */
@@ -5879,6 +5880,8 @@ export interface components {
             access_type: components["schemas"]["AccessTypeEnum"];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
             /** Capacité de stockage sur site */
             storage_capacity: number;
             /** Capacité de distribution */
@@ -6685,6 +6688,8 @@ export interface components {
             access_type?: components["schemas"]["AccessTypeEnum"];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
             /** Capacité de stockage sur site */
             storage_capacity?: number;
             /** Capacité de distribution */
@@ -7287,11 +7292,9 @@ export interface components {
             registered_zipcode?: string;
             registration_id?: string;
             sustainability_officer?: string;
-            /** Format: email */
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
             vat_number?: string;
-            /** Format: uri */
             website?: string;
         };
         UpdateRightsRequestsRequest: {

@@ -1,5 +1,6 @@
 import { Form } from "common/components/form2"
 import {
+  Checkbox,
   CheckboxGroup,
   DateInput,
   NumberInput,
@@ -7,7 +8,7 @@ import {
   TextInput,
 } from "common/components/inputs2"
 import { Grid } from "common/components/scaffold"
-import { useTranslation } from "react-i18next"
+import { Trans, useTranslation } from "react-i18next"
 import { H2StationFormData, useStationForm } from "./station-form.hooks"
 import { AccessType, DistributedPressure, H2Station } from "h2/types"
 import { ToggleSwitch } from "common/components/inputs2/toggle-switch/toggle-switch"
@@ -19,14 +20,12 @@ type StationFormProps = {
   readOnly?: boolean
   station?: H2Station
   onSubmit: (value?: H2StationFormData) => void
-  children?: React.ReactNode
 }
 
 export const StationForm = ({
   readOnly,
   station,
   onSubmit,
-  children,
 }: StationFormProps) => {
   const { t } = useTranslation()
 
@@ -146,7 +145,25 @@ export const StationForm = ({
         {...form.bind("commissioning_date")}
       />
 
-      {children}
+      <Checkbox
+        readOnly={readOnly}
+        {...form.bind("has_compliant_measuring_instruments")}
+        label={
+          <span>
+            <Trans>
+              En cochant cette case, je déclare sur l’honneur que les
+              instruments de mesure de la masse d'H2 sont conformes au{" "}
+              <a
+                href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000000579193"
+                target="_blank"
+              >
+                Décret no 2001-387
+              </a>{" "}
+              du 3 mai 2001 relatif au contrôle des instruments de mesure
+            </Trans>
+          </span>
+        }
+      />
     </Form>
   )
 }
