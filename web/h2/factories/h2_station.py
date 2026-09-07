@@ -19,5 +19,6 @@ class H2StationFactory(SiteFactory):
     access_type = fuzzy.FuzzyChoice(H2Station.ACCESS_TYPES, getter=lambda x: x[0])
     distributed_pressure = factory.LazyFunction(lambda: [H2Station.DP_350_BAR])
     has_personal_vehicle_connector = False
+    has_compliant_measuring_instruments = False
     storage_capacity = factory.Faker("random_int", min=100, max=10000)
     distribution_capacity = factory.Faker("random_int", min=50, max=5000)

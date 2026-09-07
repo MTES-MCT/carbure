@@ -17862,9 +17862,12 @@ components:
         activity_description:
           type: string
         website:
-          type: string
-          format: uri
-          maxLength: 200
+          oneOf:
+            - type: string
+              format: uri
+              maxLength: 200
+            - type: string
+              maxLength: 0
         vat_number:
           type: string
           maxLength: 32
@@ -17942,9 +17945,12 @@ components:
           type: string
           maxLength: 32
         website:
-          type: string
-          format: uri
-          maxLength: 200
+          oneOf:
+            - type: string
+              format: uri
+              maxLength: 200
+            - type: string
+              maxLength: 0
         vat_number:
           type: string
           maxLength: 32
@@ -18316,9 +18322,12 @@ components:
         activity_description:
           type: string
         website:
-          type: string
-          format: uri
-          maxLength: 200
+          oneOf:
+            - type: string
+              format: uri
+              maxLength: 200
+            - type: string
+              maxLength: 0
         vat_number:
           type: string
           maxLength: 32
@@ -18790,6 +18799,9 @@ components:
         has_personal_vehicle_connector:
           type: boolean
           title: Connecteurs compatibles avec les véhicules particuliers
+        has_compliant_measuring_instruments:
+          type: boolean
+          title: Instruments de mesure de la masse d'H2 conformes au décret 2001-387
         storage_capacity:
           type: integer
           maximum: 2147483647
@@ -18860,6 +18872,9 @@ components:
         has_personal_vehicle_connector:
           type: boolean
           title: Connecteurs compatibles avec les véhicules particuliers
+        has_compliant_measuring_instruments:
+          type: boolean
+          title: Instruments de mesure de la masse d'H2 conformes au décret 2001-387
         storage_capacity:
           type: integer
           maximum: 2147483647
@@ -18925,6 +18940,9 @@ components:
         has_personal_vehicle_connector:
           type: boolean
           title: Connecteurs compatibles avec les véhicules particuliers
+        has_compliant_measuring_instruments:
+          type: boolean
+          title: Instruments de mesure de la masse d'H2 conformes au décret 2001-387
         storage_capacity:
           type: integer
           maximum: 2147483647
@@ -20561,6 +20579,9 @@ components:
         has_personal_vehicle_connector:
           type: boolean
           title: Connecteurs compatibles avec les véhicules particuliers
+        has_compliant_measuring_instruments:
+          type: boolean
+          title: Instruments de mesure de la masse d'H2 conformes au décret 2001-387
         storage_capacity:
           type: integer
           maximum: 2147483647
@@ -22064,8 +22085,11 @@ components:
           type: string
           maxLength: 256
         sustainability_officer_email:
-          type: string
-          format: email
+          oneOf:
+            - type: string
+              format: email
+            - type: string
+              maxLength: 0
         sustainability_officer_phone_number:
           type: string
           maxLength: 32
@@ -22073,8 +22097,11 @@ components:
           type: string
           maxLength: 32
         website:
-          type: string
-          format: uri
+          oneOf:
+            - type: string
+              format: uri
+            - type: string
+              maxLength: 0
     UpdateRightsRequestsRequest:
       type: object
       properties:
