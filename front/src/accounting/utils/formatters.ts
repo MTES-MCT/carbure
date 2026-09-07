@@ -77,6 +77,8 @@ export const formatOperationType = (type: string) => {
       return i18next.t("Report 2026")
     case OperationType.YEARLY_BALANCE:
       return i18next.t("Bilan annuel")
+    case OperationType.CORRECTION:
+      return i18next.t("Correction")
     default:
       return i18next.t("Inconnu")
   }

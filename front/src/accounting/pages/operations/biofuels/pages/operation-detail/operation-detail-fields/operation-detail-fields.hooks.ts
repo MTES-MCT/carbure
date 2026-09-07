@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { formatQuantityDisplay } from "./operation-detail-fields.utils"
 import { formatDate, formatPeriod } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
-import { formatValue } from "../../../operations.utils"
+import { formatValue, isCreditOperation } from "../../../operations.utils"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const { t } = useTranslation()
@@ -15,9 +15,8 @@ export const useOperationDetailFields = (operation?: Operation) => {
   return useMemo(() => {
     if (!operation) return []
 
-    // Determine operation direction: positive quantity = receiving, negative = sending
-    const isReceiver = (operation?.volume ?? 0) > 0
-    const isSender = (operation?.volume ?? 0) < 0
+    const isReceiver = isCreditOperation(operation.transaction)
+    const isSender = !isReceiver
 
     // Define all possible conditional fields
     const fields = compact([
@@ -28,10 +27,11 @@ export const useOperationDetailFields = (operation?: Operation) => {
       },
       { label: t("Catégorie"), value: operation.customs_category },
       { label: t("Biocarburant"), value: operation.biofuel?.code },
-      {
-        label: t("Quantité"),
-        value: formatQuantityDisplay(operation, false),
-      },
+      operation.type !== OperationType.CORRECTION &&
+        operation.volume !== 0 && {
+          label: t("Quantité"),
+          value: formatQuantityDisplay(operation, false),
+        },
       operation.type === OperationType.INCORPORATION &&
         operation.renewable_energy_share !== 1 && {
           label: t("Quantité renouvelable"),

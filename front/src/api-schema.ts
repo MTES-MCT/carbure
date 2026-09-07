@@ -6127,6 +6127,7 @@ export interface components {
             readonly avoided_emissions: number;
             readonly year: number;
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
+            readonly transaction: string;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -6222,6 +6223,7 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
+            readonly transaction: string;
         };
         OperationLot: {
             id: number;
@@ -6255,6 +6257,7 @@ export interface components {
          *     * `EXPEDITION` - EXPEDITION
          *     * `DEVALUATION` - DEVALUATION
          *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+         *     * `CORRECTION` - CORRECTION
          *     * `TRANSFERT` - TRANSFERT
          *     * `EXPIRATION` - EXPIRATION
          *     * `REPORT` - REPORT
@@ -14393,6 +14396,7 @@ export interface operations {
                  *     * `EXPEDITION` - EXPEDITION
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                 *     * `CORRECTION` - CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
@@ -14771,6 +14775,7 @@ export interface operations {
                  *     * `EXPEDITION` - EXPEDITION
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                 *     * `CORRECTION` - CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
@@ -14891,6 +14896,7 @@ export interface operations {
                  *     * `EXPEDITION` - EXPEDITION
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                 *     * `CORRECTION` - CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
@@ -15030,6 +15036,7 @@ export interface operations {
                  *     * `EXPEDITION` - EXPEDITION
                  *     * `DEVALUATION` - DEVALUATION
                  *     * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+                 *     * `CORRECTION` - CORRECTION
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
@@ -16077,6 +16084,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     ACQUISITION = "ACQUISITION",
     CESSION = "CESSION",
+    CORRECTION = "CORRECTION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     DEVALUATION = "DEVALUATION",
     EXPEDITION = "EXPEDITION",
@@ -16437,6 +16445,7 @@ export enum OperationTypeEnum {
     EXPEDITION = "EXPEDITION",
     DEVALUATION = "DEVALUATION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+    CORRECTION = "CORRECTION",
     TRANSFERT = "TRANSFERT",
     EXPIRATION = "EXPIRATION",
     REPORT = "REPORT",
