@@ -123,14 +123,17 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             details_queryset.values("operation_id")
             .annotate(
                 total=Sum(
-                    avoided_emissions_tco2_expression(
-                        energy_mj_expression(
-                            F("volume"),
-                            F("operation__renewable_energy_share"),
-                            F("lot__biofuel__pci_litre"),
+                    Coalesce(
+                        F("avoided_emissions_tco2"),
+                        avoided_emissions_tco2_expression(
+                            energy_mj_expression(
+                                F("volume"),
+                                F("operation__renewable_energy_share"),
+                                F("lot__biofuel__pci_litre"),
+                            ),
+                            F("emission_rate_per_mj"),
+                            GHG_REFERENCE_RED_II,
                         ),
-                        F("emission_rate_per_mj"),
-                        GHG_REFERENCE_RED_II,
                     )
                 )
             )

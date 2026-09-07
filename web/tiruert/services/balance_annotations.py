@@ -15,6 +15,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django.db.models.functions import Coalesce
 
 from core.models import Biocarburant
 from saf.models.constants import SAF_BIOFUEL_TYPES
@@ -70,10 +71,13 @@ def _get_avoided_emissions_expression():
         F("operation__renewable_energy_share"),
         F("lot__biofuel__pci_litre"),
     )
-    return avoided_emissions_tco2_expression(
-        energy_expr,
-        F("emission_rate_per_mj"),
-        GHG_REFERENCE_RED_II,
+    return Coalesce(
+        F("avoided_emissions_tco2"),
+        avoided_emissions_tco2_expression(
+            energy_expr,
+            F("emission_rate_per_mj"),
+            GHG_REFERENCE_RED_II,
+        ),
     )
 
 
