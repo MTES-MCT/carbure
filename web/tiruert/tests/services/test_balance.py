@@ -5,6 +5,7 @@ from django.test import TestCase
 from core.models import MatierePremiere
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
+from tiruert.services.objective import ObjectiveService
 
 
 class BalanceServiceInitBalanceEntryTest(TestCase):
@@ -82,6 +83,7 @@ class OperationDetailAvoidedEmissionsTest(TestCase):
         from tiruert.models.operation_detail import OperationDetail
 
         mock_detail = Mock(spec=OperationDetail)
+        mock_detail.avoided_emissions_tco2 = None
         mock_detail.volume = 100.0
         mock_detail.operation.renewable_energy_share = 0.4
         mock_detail.lot.biofuel.pci_litre = 10.0
@@ -94,12 +96,23 @@ class OperationDetailAvoidedEmissionsTest(TestCase):
         from tiruert.models.operation_detail import OperationDetail
 
         mock_detail = Mock(spec=OperationDetail)
+        mock_detail.avoided_emissions_tco2 = None
         mock_detail.emission_rate_per_mj = 20.0
         mock_detail.energy = 10.0 * 100.0 * 0.4
 
         result = OperationDetail.avoided_emissions.fget(mock_detail)
 
         self.assertEqual(result, (94 - 20.0) * mock_detail.energy / 1000000)
+
+    def test_avoided_emissions_uses_override_when_present(self):
+        from tiruert.models.operation_detail import OperationDetail
+
+        mock_detail = Mock(spec=OperationDetail)
+        mock_detail.avoided_emissions_tco2 = 1.25
+
+        result = OperationDetail.avoided_emissions.fget(mock_detail)
+
+        self.assertEqual(result, 1.25)
 
 
 class BalanceServiceUpdateAvailableBalanceTest(TestCase):
@@ -620,6 +633,66 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         old_global_pending_teneur = int((1.0 + 1.0) * 27 * 0.5)
         self.assertEqual(old_global_pending_teneur, 27)
         self.assertNotEqual(result[Operation.ESSENCE]["pending_teneur"], old_global_pending_teneur)
+
+    def test_correction_saved_emissions_are_included_in_global_objective_tco2(self):
+        """A CORRECTION avoided_emissions override must contribute to global objective progress in tCO2.
+
+        Scenario:
+        - one VALIDATED CORRECTION credited to the entity
+        - one detail with volume=0 and avoided_emissions_tco2 override = 1.75
+
+        Expected:
+        - sector balance saved_emissions includes +1.75
+        - global objective available_balance (unit tCO2) includes the same +1.75
+        """
+        from core.models import Biocarburant
+
+        biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
+
+        if not biofuel_essence:
+            self.skipTest("Missing compatible_essence biofuel in fixtures")
+
+        operation = self.OperationFactory(
+            type=Operation.CORRECTION,
+            status=Operation.VALIDATED,
+            customs_category=MatierePremiere.CONV,
+            biofuel=biofuel_essence,
+            credited_entity=self.entity,
+            debited_entity=None,
+            renewable_energy_share=biofuel_essence.renewable_energy_share,
+        )
+        lot = self.CarbureLotFactory.create(
+            added_by=self.entity,
+            carbure_supplier=self.entity,
+            carbure_client=self.entity,
+            carbure_producer=self.entity,
+        )
+        self.OperationDetailFactory.create_for_operation(
+            operation,
+            lot=lot,
+            volume=0,
+            emission_rate_per_mj=lot.ghg_total,
+            avoided_emissions_tco2=1.75,
+        )
+
+        operations = Operation.objects.filter(id=operation.id)
+        sector_balance = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "mj")
+
+        self.assertIn(Operation.ESSENCE, sector_balance)
+        self.assertAlmostEqual(sector_balance[Operation.ESSENCE]["saved_emissions"], 1.75)
+
+        objective_queryset = Mock()
+        objective_queryset.filter.return_value.values.return_value.first.return_value = None
+
+        global_objective = ObjectiveService.calculate_global_objective(
+            list(sector_balance.values()),
+            {"available_balance": 0, "pending_teneur": 0, "declared_teneur": 0},
+            objective_queryset,
+            energy_basis=0,
+        )
+
+        self.assertEqual(global_objective["unit"], "tCO2")
+        self.assertAlmostEqual(global_objective["available_balance"], 1.75)
 
 
 class BalanceServiceObjectiveSectorTest(TestCase):
