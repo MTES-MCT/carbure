@@ -259,6 +259,7 @@ class OperationService:
                     lot_id=detail["lot_id"],
                     volume=truncate(detail["volume"]),
                     emission_rate_per_mj=detail["emission_rate_per_mj"],
+                    avoided_emissions_tco2=detail.get("avoided_emissions_tco2"),
                 )
                 for detail in details_data
             ]

@@ -20,6 +20,7 @@ class OperationDetailsManager(models.Manager.from_queryset(OperationDetailQueryS
                 "id",
                 "volume",
                 "emission_rate_per_mj",
+                "avoided_emissions_tco2",
                 "lot__volume",
                 "operation__id",
                 "lot__biofuel__pci_litre",
@@ -37,6 +38,7 @@ class OperationDetail(models.Model):
     )
     volume = models.FloatField(default=0.0)
     emission_rate_per_mj = models.FloatField(default=0.0)  # gC02/MJ réellement utilisés pour la création du lot
+    avoided_emissions_tco2 = models.FloatField(null=True)  # override; formula used when null
 
     @property
     def energy(self):
@@ -55,6 +57,9 @@ class OperationDetail(models.Model):
     def avoided_emissions(self):
         """Return the saved emissions in tCO2, no rounded."""
         from tiruert.services.teneur import GHG_REFERENCE_RED_II
+
+        if self.avoided_emissions_tco2 is not None:
+            return self.avoided_emissions_tco2
 
         if self.lot_id is None:
             return 0
