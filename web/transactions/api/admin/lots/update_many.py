@@ -13,6 +13,7 @@ from core.traceability import (
     get_traceability_nodes,
     serialize_integrity_errors,
 )
+from tiruert.services.correction import CorrectionService
 from transactions.forms import LotForm
 from transactions.helpers import compute_lot_quantity
 from transactions.sanity_checks import bulk_sanity_checks, get_prefetched_data
@@ -85,6 +86,7 @@ def update_many(request):
 
     # prepare lot events and comments
     updated_lots = []
+    updated_lot_ids_with_ghg_change = []
     update_events = []
     update_comments = []
 
@@ -99,6 +101,9 @@ def update_many(request):
         diff_ghg = update_data_diff_with_ghg(node)
         # update node.diff to add new ghg values
         node.diff.update(diff_ghg)
+
+        if diff_ghg["ghg_total"][0] != diff_ghg["ghg_total"][1]:
+            updated_lot_ids_with_ghg_change.append(node.data.id)
 
         # save a lot event with the current modification
         update_events.append(
@@ -161,6 +166,11 @@ def update_many(request):
             GenericError.objects.filter(lot__in=updated_lots).delete()
             GenericError.objects.bulk_create(sanity_check_errors)
 
+            if updated_lot_ids_with_ghg_change:
+                CorrectionService.create_correction_operations_for_lot_ghg_update(
+                    sorted(set(updated_lot_ids_with_ghg_change))
+                )
+
     # prepare the response data
     updates = [serialize_node(node) for node in updated_nodes]
     errors_by_lot = group_errors_by_lot(sanity_check_errors)
@@ -212,11 +222,15 @@ def group_lots_by_entity(lots):
 
 
 def update_data_diff_with_ghg(node):
-    ghg_values_before_update = node.data
+    # keep the previous values before they get overwritten by update_ghg()
+    previous_ghg_reduction = node.data.ghg_reduction
+    previous_ghg_reduction_red_ii = node.data.ghg_reduction_red_ii
+    previous_ghg_total = node.data.ghg_total
+
     node.data.update_ghg()
 
     return {
-        "ghg_reduction": (node.data.ghg_reduction, ghg_values_before_update.ghg_reduction),
-        "ghg_reduction_red_ii": (node.data.ghg_reduction_red_ii, ghg_values_before_update.ghg_reduction_red_ii),
-        "ghg_total": (node.data.ghg_total, ghg_values_before_update.ghg_total),
+        "ghg_reduction": (node.data.ghg_reduction, previous_ghg_reduction),
+        "ghg_reduction_red_ii": (node.data.ghg_reduction_red_ii, previous_ghg_reduction_red_ii),
+        "ghg_total": (node.data.ghg_total, previous_ghg_total),
     }
