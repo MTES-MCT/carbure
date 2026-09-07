@@ -10967,6 +10967,7 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
@@ -10989,6 +10990,7 @@ paths:
             * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `CORRECTION` - CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
@@ -11558,6 +11560,7 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
@@ -11580,6 +11583,7 @@ paths:
             * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `CORRECTION` - CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
@@ -11858,6 +11862,7 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
@@ -11880,6 +11885,7 @@ paths:
             * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `CORRECTION` - CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
@@ -12190,6 +12196,7 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
@@ -12212,6 +12219,7 @@ paths:
             * `EXPEDITION` - EXPEDITION
             * `DEVALUATION` - DEVALUATION
             * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+            * `CORRECTION` - CORRECTION
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
@@ -19500,6 +19508,9 @@ components:
           allOf:
             - $ref: "#/components/schemas/DevaluationTypeEnum"
           nullable: true
+        transaction:
+          type: string
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -19514,6 +19525,7 @@ components:
         - id
         - sector
         - to_depot
+        - transaction
         - type
         - volume
         - year
@@ -19774,6 +19786,9 @@ components:
         year:
           type: integer
           readOnly: true
+        transaction:
+          type: string
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -19787,6 +19802,7 @@ components:
         - id
         - sector
         - to_depot
+        - transaction
         - type
         - volume
         - year
@@ -19845,6 +19861,7 @@ components:
         - EXPEDITION
         - DEVALUATION
         - CUSTOMS_CORRECTION
+        - CORRECTION
         - TRANSFERT
         - EXPIRATION
         - REPORT
@@ -19860,6 +19877,7 @@ components:
         * `EXPEDITION` - EXPEDITION
         * `DEVALUATION` - DEVALUATION
         * `CUSTOMS_CORRECTION` - CUSTOMS_CORRECTION
+        * `CORRECTION` - CORRECTION
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT

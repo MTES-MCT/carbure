@@ -16,8 +16,8 @@ export const formatOperationCreditOrDebit = (type: string) => {
   }
 }
 
-export const isSendingOperation = (quantity: number) => quantity < 0
-export const isReceivingOperation = (quantity: number) => quantity > 0
+export const isCreditOperation = (type: string) =>
+  type === OperationDebitOrCredit.CREDIT
 
 export const getOperationQuantity = (formattedQuantity: string) => {
   if (formattedQuantity.trim().startsWith("-")) {

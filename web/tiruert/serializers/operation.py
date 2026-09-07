@@ -42,6 +42,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
     year = serializers.IntegerField(source="declaration_year", read_only=True)
+    transaction = serializers.CharField(read_only=True, source="_transaction")
 
     def get_volume(self, instance) -> float:
         return instance.volume
@@ -88,6 +89,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "details",
             "avoided_emissions",
             "year",
+            "transaction",
         ]
 
 
@@ -120,6 +122,7 @@ class OperationSerializer(BaseOperationSerializer):
             "details",
             "year",
             "devaluation_type",
+            "transaction",
         ]
 
     export_country = CountrySerializer(read_only=True)

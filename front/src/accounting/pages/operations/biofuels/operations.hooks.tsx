@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { OperationBadge } from "accounting/components/operation-badge"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
-import { formatValue, isSendingOperation } from "./operations.utils"
+import { formatValue, isCreditOperation } from "./operations.utils"
 import * as api from "accounting/api/biofuels/operations"
 import {
   OperationDebitOrCredit,
@@ -36,13 +36,13 @@ type UseOperationsColumnsProps = {
 
 const displayValueDebitOrCredit = (
   value: number | string,
-  isOperationDebit: boolean,
+  isOperationCredit: boolean,
   isOperationRejected: boolean,
   isOperationYearlyBalance: boolean
 ) => {
-  const operator = isOperationDebit ? "-" : "+"
+  const operator = isOperationCredit ? "+" : "-"
 
-  return isOperationDebit ? (
+  return isOperationCredit ? (
     <Text
       size="sm"
       fontWeight="semibold"
@@ -146,12 +146,15 @@ export const useOperationsBiofuelsColumns = ({
         const formattedQuantity = formatNumber(calculatedQuantity, {
           fractionDigits: FRACTION_DIGITS_LITERS,
         })
-        return displayValueDebitOrCredit(
-          formattedQuantity,
-          isSendingOperation(item.volume),
-          item.status === OperationsStatus.REJECTED,
-          item.type === OperationType.YEARLY_BALANCE
-        )
+        return calculatedQuantity === 0 &&
+          item.type === OperationType.CORRECTION
+          ? "-"
+          : displayValueDebitOrCredit(
+              formattedQuantity,
+              isCreditOperation(item.transaction),
+              item.status === OperationsStatus.REJECTED,
+              item.type === OperationType.YEARLY_BALANCE
+            )
       },
     },
     {
@@ -165,7 +168,7 @@ export const useOperationsBiofuelsColumns = ({
         )
         return displayValueDebitOrCredit(
           formattedAvoidedEmissions,
-          isSendingOperation(item.volume),
+          isCreditOperation(item.transaction),
           item.status === OperationsStatus.REJECTED,
           item.type === OperationType.YEARLY_BALANCE
         )
