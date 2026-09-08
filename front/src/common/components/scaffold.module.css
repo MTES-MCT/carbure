@@ -4,6 +4,7 @@
   padding: 0 var(--main-spacing-x);
   box-shadow: var(--shadow);
   min-height: 64px;
+  flex-shrink: 0;
 }
 
 .header [data-field] input,

@@ -21,9 +21,6 @@ class StatsResponseSerializer(serializers.Serializer):
     metabase_iframe_url = serializers.CharField()
 
 
-METABASE_SITE_URL = "https://metabase.carbure.beta.gouv.fr"
-
-
 class StatsEntityError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
     STATS_ENTITY_FAILED = "STATS_ENTITY_FAILED"
@@ -64,7 +61,9 @@ class EntityStatsActionMixin:
         examples=[
             OpenApiExample(
                 "Success example",
-                value={"metabase_iframe_url": f"{METABASE_SITE_URL}/embed/dashboard/...#bordered=false&titled=false"},
+                value={
+                    "metabase_iframe_url": f"{settings.METABASE_SITE_URL}/embed/dashboard/...#bordered=false&titled=false"
+                },
                 response_only=True,
                 status_codes=["200"],
             ),
@@ -105,7 +104,7 @@ class EntityStatsActionMixin:
                 "exp": round(time.time()) + (60 * 10),
             }
             token = jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256")
-            iframe_url = f"{METABASE_SITE_URL}/embed/dashboard/{token}#bordered=false&titled=false"
+            iframe_url = f"{settings.METABASE_SITE_URL}/embed/dashboard/{token}#bordered=false&titled=false"
             serializer = StatsResponseSerializer(data={"metabase_iframe_url": iframe_url})
             serializer.is_valid(raise_exception=True)
             return Response(serializer.validated_data)
