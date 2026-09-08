@@ -17,6 +17,9 @@ django_cmd ?= uv run python web/manage.py
 npm_cmd ?= npm --prefix front
 
 # Docker
+build:
+	$(docker_cmd) build
+
 up:
 	$(docker_cmd) up -d
 
