@@ -8,3 +8,6 @@ class UDBElement:
 
     def __init__(self, xml_root_element):
         self.xml_root_element = xml_root_element
+
+    def to_xml(self):
+        return ET.tostring(self.xml_root_element, encoding="utf-8").decode("utf-8")

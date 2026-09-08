@@ -15,6 +15,7 @@ export type H2StationFormData = {
   access_type: AccessType
   distributed_pressure: DistributedPressure[] | undefined
   has_personal_vehicle_connector: boolean
+  has_compliant_measuring_instruments: boolean
   storage_capacity: number | undefined
   distribution_capacity: number | undefined
   commissioning_date: string | undefined
@@ -31,6 +32,8 @@ export function useStationForm(station?: H2Station) {
     distributed_pressure: station?.distributed_pressure ?? [],
     has_personal_vehicle_connector:
       station?.has_personal_vehicle_connector ?? false,
+    has_compliant_measuring_instruments:
+      station?.has_compliant_measuring_instruments ?? false,
     storage_capacity: station?.storage_capacity ?? undefined,
     distribution_capacity: station?.distribution_capacity ?? undefined,
     commissioning_date: station?.commissioning_date ?? undefined,

@@ -4940,6 +4940,13 @@ export interface components {
             certificates: components["schemas"]["ProductionSiteCertificateSertificate"][];
         };
         /**
+         * @description * `LOSS` - Perte
+         *     * `DOWNGRADING` - Déclassement
+         *     * `OTHER` - Autre
+         * @enum {string}
+         */
+        DevaluationTypeEnum: DevaluationTypeEnum;
+        /**
          * @description * `SPREADING_PLAN_ICPE` - Plan d'épandage (ICPE)
          *     * `AMM` - Autorisation de mise sur le marché (AMM)
          *     * `MANDATORY_STANDARD` - Norme rendue d'application obligatoire
@@ -5411,7 +5418,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -5441,7 +5447,6 @@ export interface components {
             sustainability_officer?: string;
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
         };
@@ -5583,7 +5588,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -5771,6 +5775,8 @@ export interface components {
             access_type: components["schemas"]["AccessTypeEnum"];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
             /** Capacité de stockage sur site */
             storage_capacity: number;
             /** Capacité de distribution */
@@ -5802,6 +5808,8 @@ export interface components {
             access_type: components["schemas"]["AccessTypeEnum"];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
             /** Capacité de stockage sur site */
             storage_capacity: number;
             /** Capacité de distribution */
@@ -5831,6 +5839,8 @@ export interface components {
             access_type: components["schemas"]["AccessTypeEnum"];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
             /** Capacité de stockage sur site */
             storage_capacity: number;
             /** Capacité de distribution */
@@ -6081,6 +6091,7 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -6131,6 +6142,7 @@ export interface components {
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLot"][];
             status?: components["schemas"]["OperationStatusEnum"];
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationInputRequest: {
             type: components["schemas"]["OperationTypeEnum"];
@@ -6145,6 +6157,7 @@ export interface components {
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationList: {
             readonly id: number;
@@ -6597,6 +6610,8 @@ export interface components {
             access_type?: components["schemas"]["AccessTypeEnum"];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
             /** Capacité de stockage sur site */
             storage_capacity?: number;
             /** Capacité de distribution */
@@ -7199,11 +7214,9 @@ export interface components {
             registered_zipcode?: string;
             registration_id?: string;
             sustainability_officer?: string;
-            /** Format: email */
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
             vat_number?: string;
-            /** Format: uri */
             website?: string;
         };
         UpdateRightsRequestsRequest: {
@@ -16152,6 +16165,11 @@ export enum DeliveryTypeEnum {
     DIRECT = "DIRECT",
     FLUSHED = "FLUSHED",
     CONSUMPTION = "CONSUMPTION"
+}
+export enum DevaluationTypeEnum {
+    LOSS = "LOSS",
+    DOWNGRADING = "DOWNGRADING",
+    OTHER = "OTHER"
 }
 export enum DigestateSaleTypesEnum {
     SPREADING_PLAN_ICPE = "SPREADING_PLAN_ICPE",

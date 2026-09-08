@@ -42,6 +42,7 @@ class H2StationViewsTests(TestCase):
             "access_type": H2Station.PUBLIC,
             "distributed_pressure": [H2Station.DP_350_BAR, H2Station.DP_700_BAR],
             "has_personal_vehicle_connector": True,
+            "has_compliant_measuring_instruments": True,
             "storage_capacity": 1000,
             "distribution_capacity": 500,
             "site_siret": "12345678900012",
@@ -76,6 +77,7 @@ class H2StationViewsTests(TestCase):
         self.assertEqual(station.created_by, self.hrs_entity)
         self.assertEqual(station.distributed_pressure, [H2Station.DP_350_BAR, H2Station.DP_700_BAR])
         self.assertTrue(station.has_personal_vehicle_connector)
+        self.assertTrue(station.has_compliant_measuring_instruments)
 
     def test_retrieve_station(self):
         station = H2StationFactory.create(created_by=self.hrs_entity, country=self.country)
@@ -97,6 +99,7 @@ class H2StationViewsTests(TestCase):
                 name="Station Updated",
                 distributed_pressure=[H2Station.DP_700_BAR],
                 storage_capacity=2000,
+                has_compliant_measuring_instruments=False,
             ),
             content_type="application/json",
             query_params=self.base_params,
@@ -108,6 +111,7 @@ class H2StationViewsTests(TestCase):
         self.assertEqual(station.name, "Station Updated")
         self.assertEqual(station.distributed_pressure, [H2Station.DP_700_BAR])
         self.assertEqual(station.storage_capacity, 2000)
+        self.assertFalse(station.has_compliant_measuring_instruments)
 
     def test_cannot_retrieve_other_entity_station(self):
         station = H2StationFactory.create(created_by=self.other_hrs, country=self.country)

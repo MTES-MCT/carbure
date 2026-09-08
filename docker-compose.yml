@@ -23,6 +23,19 @@ services:
     volumes:
       - carbureredis:/data
 
+  carbure-s3mock:
+    image: adobe/s3mock:latest
+    container_name: carbure_s3mock
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /containers3root
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: ${AWS_STORAGE_BUCKET_NAME:-carbure}
+      COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: "true"
+    networks: [carbure]
+    volumes:
+      - ./files:/containers3root
+    ports:
+      - 9090:9090
+
   carbure-frontend:
     image: carbure_frontend:local
     container_name: carbure_frontend
@@ -40,8 +53,7 @@ services:
     image: carbure_test:local
     container_name: carbure_test
     profiles: [test]
-    extends:
-      carbure-django
+    extends: carbure-django
     environment:
       TEST: 1
     command: "uv run python web/manage.py test --keepdb"

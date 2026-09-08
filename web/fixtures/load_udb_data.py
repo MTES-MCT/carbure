@@ -7,6 +7,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import Entity, EntityCertificate, GenericCertificate, Pays  # noqa: E402
+from transactions.models.entity_site import EntitySite  # noqa: E402
+from transactions.models.site import Site  # noqa: E402
 
 data = {
     "operators": [
@@ -17,6 +19,7 @@ data = {
         {
             "registration_id": "123456789",
             "name": "CARBURE",
+            "sites": [],
             "certificate": {
                 "id": "EU-ISCC-Cert-Test-FR004",
                 "type": GenericCertificate.ISCC,
@@ -28,6 +31,7 @@ data = {
         {
             "registration_id": "000000011",
             "name": "CARBURE_FR_FAME_PRODUCER",
+            "sites": [],
             "certificate": {
                 "id": "EU-ISCC-Cert-FR999-00000011",
                 "type": GenericCertificate.ISCC,
@@ -39,6 +43,14 @@ data = {
         {
             "registration_id": "000004807",
             "name": "CARBURE_EO_THROUGH_API",
+            "sites": [
+                {
+                    "name": "Some Site",
+                    "address": "1 rue du Chat-Perché",
+                    "postal_code": "75010",
+                    "city": "Paris",
+                },
+            ],
             "certificate": {
                 "id": "SN_UN_2026_0179",
                 "type": GenericCertificate.SYSTEME_NATIONAL,
@@ -80,6 +92,11 @@ if settings.WITH_UDB_ACCEPTANCE_DATA:
                 "last_status_update": certificate_data["valid_from"],
             },
         )
+
+        sites_data = producer_data["sites"]
+        for s in sites_data:
+            site, _ = Site.objects.update_or_create(**s, defaults={"country": france})
+            EntitySite.objects.update_or_create(entity=entity, site=site)
 
         EntityCertificate.objects.update_or_create(
             certificate=certificate,
