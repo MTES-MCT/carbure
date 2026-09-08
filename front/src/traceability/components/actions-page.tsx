@@ -25,7 +25,7 @@ import { ActionColumn } from "traceability/hooks/use-action-columns"
 import { useCombinedQuery } from "traceability/hooks/use-combined-query"
 import { ActionModal } from "traceability/components/action-modal"
 import { ActionExcelImportDialog } from "traceability/components/action-excel-import-dialog"
-import { ActionField } from "traceability/hooks/use-action-fields"
+import { ActionFieldset } from "traceability/hooks/use-action-fields"
 import { Button, ButtonProps } from "common/components/button2"
 import { FrIconClassName } from "@codegouvfr/react-dsfr"
 import { SearchInput } from "common/components/inputs2"
@@ -64,7 +64,7 @@ export type ActionsPageProps = {
   excelImport?: ExcelImportConfig
   filters: ActionFilterDisplay[]
   columns: ActionColumn[]
-  fields?: ActionField[]
+  fieldsets?: ActionFieldset[]
   industry: ActionIndustry
 }
 
@@ -78,7 +78,7 @@ export const ActionsPage = ({
   excelImport,
   filters,
   columns,
-  fields,
+  fieldsets,
   industry,
 }: ActionsPageProps) => {
   usePrivateNavigation(listTitle)
@@ -101,7 +101,9 @@ export const ActionsPage = ({
 
   const fieldLabels = {
     ...Object.fromEntries(
-      (fields ?? []).map((field) => [field.key, field.label])
+      (fieldsets ?? []).flatMap((fieldset) =>
+        fieldset.fields.map((field) => [field.key, field.label])
+      )
     ),
     ...excelImport?.fieldLabels,
   }
@@ -160,6 +162,7 @@ export const ActionsPage = ({
           <ActionBar.Grow>
             <SearchInput value={state.search} onChange={actions.setSearch} />
           </ActionBar.Grow>
+
           {excelImport && (
             <Button
               iconId="fr-icon-add-line"
@@ -171,6 +174,7 @@ export const ActionsPage = ({
             </Button>
           )}
         </ActionBar>
+
         <FilterMultiSelect2
           filterLabels={filterLabels}
           selected={state.filters}
@@ -205,13 +209,14 @@ export const ActionsPage = ({
           }
         />
       )}
-      {fields && (
+
+      {fieldsets && (
         <HashRoute
           path="action/:id"
           element={
             <ActionModal
               title={detailTitle}
-              fields={fields}
+              fieldsets={fieldsets}
               detailActions={detailActions}
               industry={industry}
             />
