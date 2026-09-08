@@ -1,7 +1,8 @@
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import OuterRef, QuerySet, Subquery
+from django.db.models import CharField, OuterRef, QuerySet, Subquery, Value
+from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
 from .action_status import ActionStatus
@@ -19,6 +20,14 @@ class ActionManager(models.Manager):
             .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
             .annotate(created_at=Subquery(first_status_subquery.values("created_at")[:1]))
             .annotate(updated_at=Subquery(latest_status_subquery.values("created_at")[:1]))
+            .annotate(
+                period=Concat(
+                    ExtractYear("working_date"),
+                    Value("-"),
+                    LPad(ExtractMonth("working_date"), 2, Value("0")),
+                    output_field=CharField(),
+                )
+            )
         )
 
 
