@@ -1,8 +1,8 @@
-import { useCallback } from "react"
-import { useLocation } from "react-router-dom"
+import { ReactNode, useCallback } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 
 import HashRoute from "common/components/hash-route"
-import { Content, Main } from "common/components/scaffold"
+import { ActionBar, Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
@@ -24,9 +24,11 @@ import { ActionFilterDisplay } from "traceability/hooks/use-action-filters"
 import { ActionColumn } from "traceability/hooks/use-action-columns"
 import { useCombinedQuery } from "traceability/hooks/use-combined-query"
 import { ActionModal } from "traceability/components/action-modal"
+import { ActionExcelImportDialog } from "traceability/components/action-excel-import-dialog"
 import { ActionField } from "traceability/hooks/use-action-fields"
 import { Button, ButtonProps } from "common/components/button2"
 import { FrIconClassName } from "@codegouvfr/react-dsfr"
+import { SearchInput } from "common/components/inputs2"
 
 export const QUERY_KEY = "traceability-actions"
 
@@ -44,6 +46,14 @@ export type DetailAction = {
   onAction: (action: Action) => void
 }
 
+export type ExcelImportConfig = {
+  buttonLabel: string
+  description: ReactNode
+
+  // Temporary attribute to add labels to the fields of the excel import that are not stored on the Action model (ex: lot_id, batch_id, etc..)
+  fieldLabels?: Record<string, string>
+}
+
 export type ActionsPageProps = {
   listTitle: string
   detailTitle: string
@@ -51,6 +61,7 @@ export type ActionsPageProps = {
   fixedQuery: Partial<ActionQuery>
   mainAction?: MainAction
   detailActions?: DetailAction[]
+  excelImport?: ExcelImportConfig
   filters: ActionFilterDisplay[]
   columns: ActionColumn[]
   fields?: ActionField[]
@@ -64,6 +75,7 @@ export const ActionsPage = ({
   fixedQuery,
   mainAction,
   detailActions,
+  excelImport,
   filters,
   columns,
   fields,
@@ -73,6 +85,7 @@ export const ActionsPage = ({
 
   const entity = useEntity()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const visibleColumns = columns.filter(
     (column) => column.condition?.(entity) ?? true
@@ -85,6 +98,13 @@ export const ActionsPage = ({
   const filterLabels = Object.fromEntries(
     visibleFilters.map((filter) => [filter.key, filter.label])
   ) as Partial<Record<ActionFilter, string>>
+
+  const fieldLabels = {
+    ...Object.fromEntries(
+      (fields ?? []).map((field) => [field.key, field.label])
+    ),
+    ...excelImport?.fieldLabels,
+  }
 
   const filterNormalizers = Object.fromEntries(
     visibleFilters
@@ -136,6 +156,21 @@ export const ActionsPage = ({
       </header>
 
       <Content marginTop>
+        <ActionBar>
+          <ActionBar.Grow>
+            <SearchInput value={state.search} onChange={actions.setSearch} />
+          </ActionBar.Grow>
+          {excelImport && (
+            <Button
+              iconId="fr-icon-add-line"
+              onClick={() =>
+                navigate({ search: location.search, hash: "import" })
+              }
+            >
+              {excelImport.buttonLabel}
+            </Button>
+          )}
+        </ActionBar>
         <FilterMultiSelect2
           filterLabels={filterLabels}
           selected={state.filters}
@@ -158,6 +193,18 @@ export const ActionsPage = ({
         />
       </Content>
 
+      {excelImport && (
+        <HashRoute
+          path="import"
+          element={
+            <ActionExcelImportDialog
+              description={excelImport.description}
+              industry={industry}
+              fieldLabels={fieldLabels}
+            />
+          }
+        />
+      )}
       {fields && (
         <HashRoute
           path="action/:id"

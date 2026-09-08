@@ -9,6 +9,7 @@ import {
 } from "traceability/hooks/use-action-fields"
 import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 import { SiteTypeEnum } from "api-schema"
+import { Text } from "common/components/text"
 
 const H2_LOT_QUERY: Partial<ActionQuery> = {
   type: [ActionType.INIT],
@@ -31,10 +32,24 @@ const LotsPage = () => {
       detailTitle={t("Lot d'hydrogène n˚")}
       subpath="lots"
       fixedQuery={H2_LOT_QUERY}
-      mainAction={{
-        icon: "fr-icon-add-line",
-        label: t("Importer des lots d'hydrogène"),
-        onAction: () => {},
+      excelImport={{
+        buttonLabel: t("Importer des lots"),
+        description: (
+          <Text>
+            Vous pouvez importer plusieurs lots à la fois en important un
+            fichier excel à travers le champ au bas de cette fenêtre.
+          </Text>
+        ),
+        fieldLabels: {
+          lot_id: t("ID_LOT/Batch ID"),
+          lot_quantity: t("Quantite (kg)"),
+          producer: t("Producteur"),
+          certificate: t("N° du certificat du producteur"),
+          etd1: t("Etd1"),
+          etd2: t("Etd2"),
+          quantity: t("Quantité consommée (kg)"),
+          working_date: t("Mois d'utilisation / consommation"),
+        },
       }}
       detailActions={[
         {
@@ -50,13 +65,17 @@ const LotsPage = () => {
         filters.shipping_method,
       ]}
       columns={[
+        columns.status,
+        columns.working_date,
+        columns.pos_id,
+        { ...columns.site, header: t("Station") },
         { ...columns.material, header: t("Nature d'H2") },
         columns.quantity,
-        { ...columns.site, header: t("Station") },
-        columns.holder,
+        columns.total_emissions,
       ]}
       fields={[
         fields.pos_id,
+        fields.certificate,
         fields.holder,
         { ...fields.material, label: t("Nature d'hydrogène") },
         fields.quantity,
@@ -69,6 +88,7 @@ const LotsPage = () => {
         fields.etd,
         fields.eu,
         fields.eccs,
+        fields.total_emissions,
       ]}
       industry={ActionIndustry.H2}
     />

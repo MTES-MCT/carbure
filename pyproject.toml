@@ -49,6 +49,7 @@ dependencies = [
     "djangorestframework-api-key==3.*",
     "djangorestframework-simplejwt==5.*",
     "django-import-export",
+    "django-cte>=4.0.0",
 ]
 
 [tool.ruff]

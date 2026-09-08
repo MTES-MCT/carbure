@@ -3,7 +3,13 @@ import { useTranslation } from "react-i18next"
 import { findEnabledEntities, findMaterials, findSites } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { FormManager } from "common/components/form2"
-import { DateInput, NumberInput, TextInput } from "common/components/inputs2"
+import {
+  DateInput,
+  DecimalInput,
+  DecimalInputProps,
+  NumberInput,
+  TextInput,
+} from "common/components/inputs2"
 import { Select } from "common/components/selects2"
 import { EntityManager } from "common/hooks/entity"
 import { EntityPreview } from "common/types"
@@ -20,6 +26,14 @@ import {
   normalizeActionSite,
 } from "traceability/normalizers"
 import { SiteTypeEnum } from "api-schema"
+import { getStepFromFractionDigits } from "common/utils/formatters"
+import { ACTION_EMISSIONS_UNIT } from "traceability/utils"
+
+const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
+
+const ActionDecimalInput = (props: DecimalInputProps) => (
+  <DecimalInput step={ACTION_DECIMAL_STEP} {...props} />
+)
 
 export type ActionFieldConfig = {
   form: FormManager<Partial<Action>>
@@ -82,7 +96,7 @@ export function useActionFields() {
       key: "quantity",
       label: t("Quantité"),
       field: ({ form, props }) => (
-        <TextInput {...props} {...form.bind("quantity")} />
+        <ActionDecimalInput {...props} {...form.bind("quantity")} />
       ),
     },
 
@@ -110,6 +124,17 @@ export function useActionFields() {
       label: t("N° de POS"),
       field: ({ form, props }) => (
         <TextInput {...props} {...form.bind("pos_id")} />
+      ),
+    },
+
+    certificate: {
+      key: "certificate",
+      label: t("N° de certificat"),
+      field: ({ form, props }) => (
+        <TextInput
+          {...props}
+          value={form.value.certificate?.certificate_id ?? ""}
+        />
       ),
     },
 
@@ -162,34 +187,53 @@ export function useActionFields() {
     ei: {
       key: "ei",
       label: t("EI"),
-      field: ({ form, props }) => <TextInput {...props} {...form.bind("ei")} />,
+      field: ({ form, props }) => (
+        <ActionDecimalInput {...props} {...form.bind("ei")} />
+      ),
     },
 
     ep: {
       key: "ep",
       label: t("EP"),
-      field: ({ form, props }) => <TextInput {...props} {...form.bind("ep")} />,
+      field: ({ form, props }) => (
+        <ActionDecimalInput {...props} {...form.bind("ep")} />
+      ),
     },
 
     etd: {
       key: "etd",
       label: t("ETD"),
       field: ({ form, props }) => (
-        <TextInput {...props} {...form.bind("etd")} />
+        <ActionDecimalInput {...props} {...form.bind("etd")} />
       ),
     },
 
     eu: {
       key: "eu",
       label: t("EU"),
-      field: ({ form, props }) => <TextInput {...props} {...form.bind("eu")} />,
+      field: ({ form, props }) => (
+        <ActionDecimalInput {...props} {...form.bind("eu")} />
+      ),
     },
 
     eccs: {
       key: "eccs",
       label: t("ECCS"),
       field: ({ form, props }) => (
-        <TextInput {...props} {...form.bind("eccs")} />
+        <ActionDecimalInput {...props} {...form.bind("eccs")} />
+      ),
+    },
+
+    total_emissions: {
+      key: "total_emissions",
+      label: t("Emissions"),
+      field: ({ form, props }) => (
+        <ActionDecimalInput
+          {...props}
+          hintText={ACTION_EMISSIONS_UNIT}
+          readOnly
+          value={form.value.total_emissions?.total ?? ""}
+        />
       ),
     },
   } satisfies Record<string, ActionField>
