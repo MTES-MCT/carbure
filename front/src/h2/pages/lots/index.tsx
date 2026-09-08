@@ -62,6 +62,7 @@ const LotsPage = () => {
       ]}
       filters={[
         { ...filters.material, label: t("Nature d'H2") },
+        filters.period,
         filters.site,
         filters.shipping_method,
       ]}

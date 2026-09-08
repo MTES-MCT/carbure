@@ -25,7 +25,7 @@ const CertificatesPage = () => {
       subpath="certificates"
       fixedQuery={H2_CERTIFICATE_QUERY}
       filters={[
-        filters.year, //
+        filters.period, //
       ]}
       columns={[
         { ...columns.pos_id, header: t("N˚ de certificat") },
