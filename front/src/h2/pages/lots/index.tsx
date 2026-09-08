@@ -28,6 +28,7 @@ const LotsPage = () => {
 
   return (
     <ActionsPage
+      industry={ActionIndustry.H2}
       listTitle={t("Lots d'hydrogène")}
       detailTitle={t("Lot d'hydrogène n˚")}
       subpath="lots"
@@ -90,7 +91,6 @@ const LotsPage = () => {
         fields.eccs,
         fields.total_emissions,
       ]}
-      industry={ActionIndustry.H2}
     />
   )
 }
