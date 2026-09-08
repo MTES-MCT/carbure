@@ -1,6 +1,7 @@
 from django.urls import path, include
 
 from .home_stats import get_home_stats
+from .metabase_status import get_metabase_status
 from .nav_stats import get_nav_stats
 
 urlpatterns = [
@@ -13,6 +14,7 @@ urlpatterns = [
     path("user/", include("user.urls")),
     path("elec/", include("elec.urls")),
     path("home-stats", get_home_stats, name="carbure-home-stats"),
+    path("metabase-status", get_metabase_status, name="carbure-metabase-status"),
     path("tiruert/", include("tiruert.urls")),
     path("biomethane/", include("biomethane.urls")),
     path("h2/", include("h2.urls")),

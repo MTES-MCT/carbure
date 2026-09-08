@@ -7653,6 +7653,22 @@ paths:
                     - order_by
                   summary: Example of filters response.
           description: ""
+  /api/metabase-status:
+    get:
+      operationId: metabase_status_retrieve
+      tags:
+        - metabase-status
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetabaseStatus"
+          description: ""
   /api/nav-stats:
     get:
       operationId: nav_stats_retrieve
@@ -19235,6 +19251,13 @@ components:
       required:
         - company_name
         - entities
+    MetabaseStatus:
+      type: object
+      properties:
+        available:
+          type: boolean
+      required:
+        - available
     MethanizationProcessEnum:
       enum:
         - CONTINUOUS_INFINITELY_MIXED
