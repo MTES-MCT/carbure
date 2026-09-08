@@ -2190,6 +2190,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/metabase-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["metabase_status_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/nav-stats": {
         parameters: {
             query?: never;
@@ -4316,6 +4332,8 @@ export interface components {
             unknown_delivery_site?: string | null;
             readonly delivery_site_country: components["schemas"]["Country"];
             delivery_type?: components["schemas"]["DeliveryTypeEnum"];
+            usage?: components["schemas"]["UsageEnum"];
+            usage_precision?: string;
             lot_status?: components["schemas"]["LotStatusEnum"];
             correction_status?: components["schemas"]["CorrectionStatusEnum"];
             /** Format: double */
@@ -5438,7 +5456,7 @@ export interface components {
             /** Format: date */
             valid_until: string;
             download_link?: string | null;
-            scope?: unknown;
+            scope?: string | null;
             input?: unknown;
             output?: unknown;
         };
@@ -5568,6 +5586,9 @@ export interface components {
         Meta: {
             entities: components["schemas"]["EntityPreview"][];
             company_name: string;
+        };
+        MetabaseStatus: {
+            available: boolean;
         };
         /**
          * @description * `CONTINUOUS_INFINITELY_MIXED` - Continu (infiniment mélangé)
@@ -6762,6 +6783,19 @@ export interface components {
         UpdatedQuotasRequest: {
             approved_quotas: number[][];
         };
+        /**
+         * @description * `ROAD` - ROAD
+         *     * `HEATING` - HEATING
+         *     * `AGRICULTURE` - AGRICULTURE
+         *     * `CONSTRUCTION` - CONSTRUCTION
+         *     * `MARITIME` - MARITIME
+         *     * `INLAND_WATERWAY` - INLAND_WATERWAY
+         *     * `RAIL` - RAIL
+         *     * `FISHING` - FISHING
+         *     * `OTHER` - OTHER
+         * @enum {string}
+         */
+        UsageEnum: UsageEnum;
         /**
          * @description Serializer for creating new users. Includes required fields
          *     and repeated password validation.
@@ -11788,6 +11822,25 @@ export interface operations {
             };
         };
     };
+    metabase_status_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetabaseStatus"];
+                };
+            };
+        };
+    };
     nav_stats_retrieve: {
         parameters: {
             query: {
@@ -15211,6 +15264,17 @@ export enum UnitTypeEnum {
     HOUSEHOLD_WASTE_BIOWASTE = "HOUSEHOLD_WASTE_BIOWASTE",
     STEP = "STEP",
     ISDND = "ISDND"
+}
+export enum UsageEnum {
+    ROAD = "ROAD",
+    HEATING = "HEATING",
+    AGRICULTURE = "AGRICULTURE",
+    CONSTRUCTION = "CONSTRUCTION",
+    MARITIME = "MARITIME",
+    INLAND_WATERWAY = "INLAND_WATERWAY",
+    RAIL = "RAIL",
+    FISHING = "FISHING",
+    OTHER = "OTHER"
 }
 export enum UserRightsRequestsStatusEnum {
     Pending = "PENDING",

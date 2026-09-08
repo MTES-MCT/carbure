@@ -41,6 +41,7 @@ env = environ.Env(
     EMAIL_HOST_PASSWORD=(str, ""),
     EMAIL_USE_TLS=(str, ""),
     METABASE_SECRET_KEY=(str, ""),
+    METABASE_SITE_URL=(str, "https://metabase.carbure.beta.gouv.fr"),
     FAKE_PROD=(bool, False),
     WITH_EMAIL_DECORATED_AS_TEST=(bool, False),
     WITH_SENTRY=(bool, False),
@@ -391,8 +392,9 @@ CSP_STYLE_SRC = ("'self'",)
 
 CSP_EXCLUDE_URL_PREFIXES = "/admin"
 
-# Metabase API key
+# Metabase
 METABASE_SECRET_KEY = env("METABASE_SECRET_KEY")
+METABASE_SITE_URL = env("METABASE_SITE_URL")
 
 # Max upload size
 DATA_UPLOAD_MAX_MEMORY_SIZE = env("DATA_UPLOAD_MAX_MEMORY_SIZE_MB") * 1024 * 1024

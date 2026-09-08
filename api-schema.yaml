@@ -7259,6 +7259,22 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
+  /api/metabase-status:
+    get:
+      operationId: metabase_status_retrieve
+      tags:
+        - metabase-status
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+        - {}
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetabaseStatus"
+          description: ""
   /api/nav-stats:
     get:
       operationId: nav_stats_retrieve
@@ -14362,6 +14378,11 @@ components:
           readOnly: true
         delivery_type:
           $ref: "#/components/schemas/DeliveryTypeEnum"
+        usage:
+          $ref: "#/components/schemas/UsageEnum"
+        usage_precision:
+          type: string
+          maxLength: 255
         lot_status:
           $ref: "#/components/schemas/LotStatusEnum"
         correction_status:
@@ -17131,6 +17152,7 @@ components:
           nullable: true
           maxLength: 512
         scope:
+          type: string
           nullable: true
         input:
           nullable: true
@@ -17417,6 +17439,13 @@ components:
       required:
         - company_name
         - entities
+    MetabaseStatus:
+      type: object
+      properties:
+        available:
+          type: boolean
+      required:
+        - available
     MethanizationProcessEnum:
       enum:
         - CONTINUOUS_INFINITELY_MIXED
@@ -20130,6 +20159,28 @@ components:
             minItems: 2
       required:
         - approved_quotas
+    UsageEnum:
+      enum:
+        - ROAD
+        - HEATING
+        - AGRICULTURE
+        - CONSTRUCTION
+        - MARITIME
+        - INLAND_WATERWAY
+        - RAIL
+        - FISHING
+        - OTHER
+      type: string
+      description: |-
+        * `ROAD` - ROAD
+        * `HEATING` - HEATING
+        * `AGRICULTURE` - AGRICULTURE
+        * `CONSTRUCTION` - CONSTRUCTION
+        * `MARITIME` - MARITIME
+        * `INLAND_WATERWAY` - INLAND_WATERWAY
+        * `RAIL` - RAIL
+        * `FISHING` - FISHING
+        * `OTHER` - OTHER
     UserCreation:
       type: object
       description: |-
