@@ -27,6 +27,12 @@
   flex: 1;
 }
 
+.modal {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-1w);
+}
+
 .fieldset {
   display: flex;
   flex-direction: column;
