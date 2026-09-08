@@ -190,3 +190,7 @@ def UserRightsFactory(
             super().__init__(role, entity_type, check)
 
     return _HasUserRights
+
+
+HasEntityReadRights = UserRightsFactory()
+HasEntityWriteRights = UserRightsFactory(role=[UserRights.RW, UserRights.ADMIN])

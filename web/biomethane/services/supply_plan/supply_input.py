@@ -60,6 +60,7 @@ FEEDSTOCK_FIELD_RULES = (
         "field": "collection_type",
         "condition": lambda feedstock, data: getattr(feedstock, "code", None) in COLLECTION_TYPE_REQUIRED_FEEDSTOCK_CODES,
         "error_message": "Le champ type de collecte est requis pour cette matière première.",
+        "value": "",
     },
     {
         "field": "volume",
@@ -101,7 +102,7 @@ def apply_feedstock_field_rules(validated_data):
 
     if not feedstock:
         for rule in FEEDSTOCK_FIELD_RULES:
-            validated_data[rule["field"]] = None
+            validated_data[rule["field"]] = rule.get("value", None)
         return errors
 
     for rule in FEEDSTOCK_FIELD_RULES:
@@ -110,6 +111,6 @@ def apply_feedstock_field_rules(validated_data):
             if not validated_data.get(field):
                 errors[field] = rule["error_message"]
         else:
-            validated_data[field] = None
+            validated_data[field] = rule.get("value", None)
 
     return errors

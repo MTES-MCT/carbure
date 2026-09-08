@@ -1,7 +1,8 @@
 from django.db import models
 
-from biomethane.models import BiomethaneSupplyPlan
 from core.models import Pays
+
+from .biomethane_supply_plan import BiomethaneSupplyPlan
 
 
 class BiomethaneSupplyInput(models.Model):
@@ -44,7 +45,7 @@ class BiomethaneSupplyInput(models.Model):
         (IAA, "Issus de résidus d'IAA"),
     ]
     collection_type = models.CharField(
-        verbose_name="Type de collecte", max_length=10, choices=COLLECTION_TYPE_CHOICES, null=True, blank=True
+        verbose_name="Type de collecte", max_length=10, choices=COLLECTION_TYPE_CHOICES, blank=True, default=""
     )
 
     # Unité matière

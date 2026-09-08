@@ -1079,6 +1079,8 @@ def make_template_carbure_lots_sheet(workbook, entity):
         "delivery_site",
         "delivery_site_country",
         "delivery_type",
+        "usage",
+        "usage_precision",
     ]
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -1119,6 +1121,8 @@ def make_template_carbure_lots_sheet(workbook, entity):
                     random.choice(delivery_sites).name,
                     "",
                     "",
+                    "",
+                    "",
                 ]
             )
 
@@ -1153,6 +1157,8 @@ def make_template_carbure_lots_sheet(workbook, entity):
                     today,
                     "UNKNOWN DEPOT",
                     "DE",
+                    "",
+                    "",
                     "",
                 ]
             )
@@ -1189,6 +1195,8 @@ def make_template_carbure_lots_sheet(workbook, entity):
                     random.choice(delivery_sites).name,
                     "",
                     "",
+                    "",
+                    "",
                 ]
             )
             # CASE 4
@@ -1223,6 +1231,8 @@ def make_template_carbure_lots_sheet(workbook, entity):
                     "",
                     "FR",
                     "RFC",
+                    "OTHER",
+                    "Consommation spécifique",
                 ]
             )
 
@@ -1259,6 +1269,8 @@ def make_template_carbure_lots_sheet(workbook, entity):
                 "EPHS Melun",
                 "",
                 "",
+                "",
+                "",
             ]
         )
         # CASE 6
@@ -1293,6 +1305,8 @@ def make_template_carbure_lots_sheet(workbook, entity):
                 random.choice(delivery_sites).name,
                 "",
                 "STOCK",
+                "",
+                "",
             ]
         )
 
@@ -1329,6 +1343,8 @@ def make_template_carbure_lots_sheet(workbook, entity):
                 random.choice(delivery_sites).name,
                 "",
                 "BLENDING",
+                "",
+                "",
             ]
         )
 

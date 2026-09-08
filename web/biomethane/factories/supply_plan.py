@@ -14,6 +14,7 @@ faker = Faker()
 class BiomethaneSupplyPlanFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneSupplyPlan
+        django_get_or_create = ("producer", "year")
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
     year = factory.Faker("random_int", min=2020, max=datetime.today().year)
@@ -44,8 +45,21 @@ class BiomethaneSupplyInputFactory(factory.django.DjangoModelFactory):
 
 
 def create_supply_plan(entity):
-    supply_plan = BiomethaneSupplyPlanFactory.create(producer=entity)
-    BiomethaneSupplyInputFactory.create_batch(10, supply_plan=supply_plan)
+    current_year = datetime.today().year
+    create_supply_plan_for_year(entity, current_year - 1)
+    create_supply_plan_for_year(entity, current_year)
 
-    supply_plan2 = BiomethaneSupplyPlanFactory.create(producer=entity, year=datetime.today().year)
-    BiomethaneSupplyInputFactory.create_batch(10, supply_plan=supply_plan2)
+
+def create_supply_plan_for_year(entity, year):
+    supply_plan = BiomethaneSupplyPlanFactory.create(producer=entity, year=year)
+
+    for origin_department in range(10, 20):
+        origin_department = str(origin_department)
+        if not BiomethaneSupplyInput.objects.filter(
+            supply_plan=supply_plan,
+            origin_department=origin_department,
+        ).exists():
+            BiomethaneSupplyInputFactory.create(
+                supply_plan=supply_plan,
+                origin_department=origin_department,
+            )

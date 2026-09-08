@@ -41,6 +41,10 @@ export const useCreateOperation = ({
           "L'exportation d'une quantité de {{quantity}} a été réalisée avec succès",
           { quantity: quantityFormatted }
         ),
+        [CreateOperationType.DEVALUATION]: t(
+          "La dévalorisation d'une quantité de {{quantity}} a été réalisée avec succès",
+          { quantity: quantityFormatted }
+        ),
       }
 
       if (!messages[operationType]) {

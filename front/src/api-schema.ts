@@ -2190,6 +2190,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/h2/stations/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["h2_stations_list"];
+        put?: never;
+        post: operations["h2_stations_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/h2/stations/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["h2_stations_retrieve"];
+        put: operations["h2_stations_update"];
+        post?: never;
+        delete: operations["h2_stations_destroy"];
+        options?: never;
+        head?: never;
+        patch: operations["h2_stations_partial_update"];
+        trace?: never;
+    };
+    "/api/h2/stations/filters/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["h2_stations_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/metabase-status": {
         parameters: {
             query?: never;
@@ -2350,6 +2398,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/resources/materials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["resources_materials_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/resources/production-sites": {
         parameters: {
             query?: never;
@@ -2358,6 +2422,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["resources_production_sites_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/resources/sites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["resources_sites_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3206,6 +3286,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/traceability/actions/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Add a years action based on an action's working date. */
+        get: operations["traceability_actions_list"];
+        put?: never;
+        /** @description Add a years action based on an action's working date. */
+        post: operations["traceability_actions_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/traceability/actions/{id}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Add a years action based on an action's working date. */
+        get: operations["traceability_actions_retrieve"];
+        /** @description Add a years action based on an action's working date. */
+        put: operations["traceability_actions_update"];
+        post?: never;
+        /** @description Add a years action based on an action's working date. */
+        delete: operations["traceability_actions_destroy"];
+        options?: never;
+        head?: never;
+        /** @description Add a years action based on an action's working date. */
+        patch: operations["traceability_actions_partial_update"];
+        trace?: never;
+    };
+    "/api/traceability/actions/filters/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Add a years action based on an action's working date. */
+        get: operations["traceability_actions_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/traceability/actions/years/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Add a years action based on an action's working date. */
+        get: operations["traceability_actions_years_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/user/": {
         parameters: {
             query?: never;
@@ -3261,6 +3413,162 @@ export interface components {
         AcceptRequest: {
             ets_status: components["schemas"]["EtsStatusEnum"];
         };
+        /**
+         * @description * `PUBLIC` - Public
+         *     * `PRIVATE` - Privé
+         * @enum {string}
+         */
+        AccessTypeEnum: PathsApiH2StationsGetParametersQueryAccess_type;
+        Action: {
+            readonly id: number;
+            readonly status: string;
+            readonly holder: components["schemas"]["EntityPreview"];
+            readonly parent: components["schemas"]["ActionParent"] | null;
+            readonly material: components["schemas"]["Material"];
+            readonly site: components["schemas"]["ActionSite"];
+            /** N° de POS */
+            pos_id: string;
+            /** Filière */
+            industry: components["schemas"]["IndustryEnum"];
+            /** Type d'action */
+            type: components["schemas"]["ActionTypeEnum"];
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date: string;
+            /** Distance de livraison */
+            shipping_distance: number;
+            /** Mode de transport */
+            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+        };
+        ActionInput: {
+            readonly id: number;
+            /** N° de POS */
+            pos_id: string;
+            /** Filière */
+            readonly industry: components["schemas"]["IndustryEnum"];
+            /** Type d'action */
+            type: components["schemas"]["ActionTypeEnum"];
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date: string;
+            /** Distance de livraison */
+            shipping_distance: number;
+            /** Mode de transport */
+            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Entité détentrice de la quantité de l'action */
+            readonly holder: number;
+            /** Action parente */
+            readonly parent: number | null;
+            /** Matière */
+            material: number;
+            site: number;
+        };
+        ActionInputRequest: {
+            /** N° de POS */
+            pos_id: string;
+            /** Type d'action */
+            type: components["schemas"]["ActionTypeEnum"];
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date: string;
+            /** Distance de livraison */
+            shipping_distance: number;
+            /** Mode de transport */
+            shipping_method: components["schemas"]["ActionShippingMethodEnum"];
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Matière */
+            material: number;
+            site: number;
+        };
+        /** @description Small representation used for the parent action relation. */
+        ActionParent: {
+            readonly id: number;
+            /** N° de POS */
+            pos_id: string;
+        };
+        /**
+         * @description * `ROAD` - Transport routier
+         *     * `PIPELINE` - Pipeline
+         *     * `RAILROAD` - Rail
+         *     * `SEA` - Transport maritime
+         * @enum {string}
+         */
+        ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
+        ActionSite: {
+            readonly id: number;
+            name: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+        };
+        /**
+         * @description * `INIT` - INIT
+         * @enum {string}
+         */
+        ActionTypeEnum: PathsApiTraceabilityActionsGetParametersQueryType;
         ActivateAccountRequest: {
             uidb64: string;
             token: string;
@@ -4059,6 +4367,11 @@ export interface components {
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
             /** Code INSEE */
             insee_code?: string | null;
             /** Type d'installation */
@@ -4121,6 +4434,11 @@ export interface components {
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
             /** Code INSEE */
             insee_code?: string | null;
             /** Type d'installation */
@@ -4179,7 +4497,7 @@ export interface components {
             /** Précisez la culture */
             culture_details?: string | null;
             /** Type de collecte */
-            collection_type?: components["schemas"]["CollectionTypeEnum"] | null;
+            collection_type?: components["schemas"]["CollectionTypeEnum"];
             /** Unité matière */
             material_unit?: components["schemas"]["MaterialUnitEnum"] | null;
             /**
@@ -4558,6 +4876,11 @@ export interface components {
             gps_coordinates?: string | null;
             private?: boolean;
             is_enabled?: boolean;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
             customs_id?: string;
             accise?: string;
             /**
@@ -4674,6 +4997,13 @@ export interface components {
             certificates: components["schemas"]["ProductionSiteCertificateSertificate"][];
         };
         /**
+         * @description * `LOSS` - Perte
+         *     * `DOWNGRADING` - Déclassement
+         *     * `OTHER` - Autre
+         * @enum {string}
+         */
+        DevaluationTypeEnum: DevaluationTypeEnum;
+        /**
          * @description * `SPREADING_PLAN_ICPE` - Plan d'épandage (ICPE)
          *     * `AMM` - Autorisation de mise sur le marché (AMM)
          *     * `MANDATORY_STANDARD` - Norme rendue d'application obligatoire
@@ -4693,6 +5023,12 @@ export interface components {
             /** @default false */
             has_direct_deliveries: boolean;
         };
+        /**
+         * @description * `350` - 350 bars
+         *     * `700` - 700 bars
+         * @enum {integer}
+         */
+        DistributedPressureEnum: DistributedPressureEnum;
         DoubleCountingAdminAddRequest: {
             certificate_id?: string;
             entity_id: number;
@@ -5139,7 +5475,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -5169,7 +5504,6 @@ export interface components {
             sustainability_officer?: string;
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
         };
@@ -5311,7 +5645,6 @@ export interface components {
             registered_city?: string;
             registered_country?: number | null;
             activity_description?: string;
-            /** Format: uri */
             website?: string;
             vat_number?: string;
             is_enabled?: boolean;
@@ -5473,6 +5806,105 @@ export interface components {
         GroupAssignmentResponse: {
             assigned_tickets_count: number;
         };
+        H2Station: {
+            readonly id: number;
+            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
+            name: string;
+            /** SIRET */
+            site_siret?: string;
+            site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Adresse */
+            address?: string;
+            /** Code postal */
+            postal_code?: string;
+            /** Commune */
+            city?: string;
+            /** Coordonnées GPS */
+            gps_coordinates?: string | null;
+            private?: boolean;
+            is_enabled?: boolean;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Nature d'accès au site */
+            access_type: components["schemas"]["AccessTypeEnum"];
+            /** Connecteurs compatibles avec les véhicules particuliers */
+            has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
+            /** Capacité de stockage sur site */
+            storage_capacity: number;
+            /** Capacité de distribution */
+            distribution_capacity: number;
+            /** Pays */
+            country?: number | null;
+            created_by?: number | null;
+        };
+        H2StationInput: {
+            readonly id: number;
+            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
+            name: string;
+            /** SIRET */
+            site_siret?: string;
+            /** Adresse */
+            address?: string;
+            /** Code postal */
+            postal_code?: string;
+            /** Commune */
+            city?: string;
+            /** Coordonnées GPS */
+            gps_coordinates?: string | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Nature d'accès au site */
+            access_type: components["schemas"]["AccessTypeEnum"];
+            /** Connecteurs compatibles avec les véhicules particuliers */
+            has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
+            /** Capacité de stockage sur site */
+            storage_capacity: number;
+            /** Capacité de distribution */
+            distribution_capacity: number;
+            /** Pays */
+            country?: number | null;
+        };
+        H2StationInputRequest: {
+            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
+            name: string;
+            /** SIRET */
+            site_siret?: string;
+            /** Adresse */
+            address?: string;
+            /** Code postal */
+            postal_code?: string;
+            /** Commune */
+            city?: string;
+            /** Coordonnées GPS */
+            gps_coordinates?: string | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Nature d'accès au site */
+            access_type: components["schemas"]["AccessTypeEnum"];
+            /** Connecteurs compatibles avec les véhicules particuliers */
+            has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
+            /** Capacité de stockage sur site */
+            storage_capacity: number;
+            /** Capacité de distribution */
+            distribution_capacity: number;
+            /** Pays */
+            country?: number | null;
+        };
         /**
          * @description * `TOTAL` - Totale
          *     * `PARTIAL` - Partielle
@@ -5486,6 +5918,11 @@ export interface components {
          * @enum {string}
          */
         IcpeRegimeEnum: IcpeRegimeEnum;
+        /**
+         * @description * `H2` - Hydrogène
+         * @enum {string}
+         */
+        IndustryEnum: PathsApiTraceabilityActionsGetParametersQueryIndustry;
         /**
          * @description * `INSTALLATION_CATEGORY_1` - Méthanisation en digesteur de produits ou déchets non dangereux, hors matières résultant du traitement des eaux usées urbaines ou industrielles
          *     * `INSTALLATION_CATEGORY_2` - Méthanisation en digesteur de produits ou déchets non dangereux, y compris des matières résultant du traitement des eaux usées urbaines ou industrielles
@@ -5577,6 +6014,11 @@ export interface components {
          * @enum {string}
          */
         MalfunctionTypesEnum: MalfunctionTypesEnum;
+        Material: {
+            readonly id: number;
+            code: string;
+            name: string;
+        };
         /**
          * @description * `DRY` - Sèche
          *     * `WET` - Brute
@@ -5709,6 +6151,7 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -5759,6 +6202,7 @@ export interface components {
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLot"][];
             status?: components["schemas"]["OperationStatusEnum"];
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationInputRequest: {
             type: components["schemas"]["OperationTypeEnum"];
@@ -5773,6 +6217,7 @@ export interface components {
             objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
+            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
         };
         OperationList: {
             readonly id: number;
@@ -5863,6 +6308,21 @@ export interface components {
          * @enum {string}
          */
         OwnershipTypeEnum: OwnershipTypeEnum;
+        PaginatedActionList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Action"][];
+        };
         PaginatedBalanceResponseList: {
             /** @example 123 */
             count: number;
@@ -6036,6 +6496,22 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["EntityProductionSite"][];
         };
+        PaginatedH2StationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["H2Station"][];
+            total_count?: number;
+        };
         PaginatedMacFossilFuelList: {
             /** @example 123 */
             count: number;
@@ -6098,6 +6574,44 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
+        };
+        PatchedActionInputRequest: {
+            /** N° de POS */
+            pos_id?: string;
+            /** Type d'action */
+            type?: components["schemas"]["ActionTypeEnum"];
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity?: string;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date?: string;
+            /** Distance de livraison */
+            shipping_distance?: number;
+            /** Mode de transport */
+            shipping_method?: components["schemas"]["ActionShippingMethodEnum"];
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date?: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Matière */
+            material?: number;
+            site?: number;
         };
         PatchedBiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
@@ -6170,6 +6684,37 @@ export interface components {
             postal_code?: string;
             /** SIRET */
             site_siret?: string;
+        };
+        PatchedH2StationInputRequest: {
+            distributed_pressure?: components["schemas"]["DistributedPressureEnum"][];
+            name?: string;
+            /** SIRET */
+            site_siret?: string;
+            /** Adresse */
+            address?: string;
+            /** Code postal */
+            postal_code?: string;
+            /** Commune */
+            city?: string;
+            /** Coordonnées GPS */
+            gps_coordinates?: string | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Nature d'accès au site */
+            access_type?: components["schemas"]["AccessTypeEnum"];
+            /** Connecteurs compatibles avec les véhicules particuliers */
+            has_personal_vehicle_connector?: boolean;
+            /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
+            has_compliant_measuring_instruments?: boolean;
+            /** Capacité de stockage sur site */
+            storage_capacity?: number;
+            /** Capacité de distribution */
+            distribution_capacity?: number;
+            /** Pays */
+            country?: number | null;
         };
         PatchedOperationUpdateRequest: {
             to_depot?: number | null;
@@ -6342,6 +6887,20 @@ export interface components {
             /** Format: double */
             assigned_volume: number;
         };
+        /**
+         * @description * `TRUCK` - Routier
+         *     * `BARGE` - Barge
+         *     * `TRAIN` - Train
+         *     * `SHIP` - Bateau
+         *     * `PIPELINE` - Oléoduc
+         *     * `PIPELINE_DMM` - Oléoduc DMM
+         *     * `PIPELINE_LHP` - Oléoduc LHP
+         *     * `PIPELINE_ODC` - Oléoduc ODC
+         *     * `PIPELINE_SPMR` - Oléoduc SPMR
+         *     * `PIPELINE_SPSE` - Oléoduc SPSE
+         * @enum {string}
+         */
+        SafShippingMethodEnum: PathsApiResourcesAirportsGetParametersQueryShipping_method;
         SafTicket: {
             readonly id: number;
             carbure_id?: string | null;
@@ -6396,7 +6955,7 @@ export interface components {
             ghg_total?: number;
             client_comment?: string | null;
             readonly parent_ticket_source: components["schemas"]["SafRelatedTicketSource"];
-            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
+            shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             readonly child_ticket_sources: components["schemas"]["SafRelatedTicketSource"][];
             origin_lot?: components["schemas"]["SafParentLot"];
             origin_lot_site?: components["schemas"]["Site"];
@@ -6483,7 +7042,7 @@ export interface components {
             assignment_period: number;
             reception_airport?: number | null;
             consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
-            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
+            shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -6498,7 +7057,7 @@ export interface components {
             assignment_period: number;
             reception_airport?: number | null;
             consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
-            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
+            shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -6513,7 +7072,7 @@ export interface components {
             assignment_period: number;
             reception_airport?: number | null;
             consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
-            shipping_method?: components["schemas"]["ShippingMethodEnum"] | null;
+            shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
             pos_number?: string;
@@ -6548,20 +7107,6 @@ export interface components {
         SetDefaultCertificateRequest: {
             certificate_id: string;
         };
-        /**
-         * @description * `TRUCK` - Routier
-         *     * `BARGE` - Barge
-         *     * `TRAIN` - Train
-         *     * `SHIP` - Bateau
-         *     * `PIPELINE` - Oléoduc
-         *     * `PIPELINE_DMM` - Oléoduc DMM
-         *     * `PIPELINE_LHP` - Oléoduc LHP
-         *     * `PIPELINE_ODC` - Oléoduc ODC
-         *     * `PIPELINE_SPMR` - Oléoduc SPMR
-         *     * `PIPELINE_SPSE` - Oléoduc SPSE
-         * @enum {string}
-         */
-        ShippingMethodEnum: PathsApiResourcesAirportsGetParametersQueryShipping_method;
         SimulationInputRequest: {
             customs_category: components["schemas"]["MPCategoriesEnum"];
             biofuel: number | null;
@@ -6631,6 +7176,7 @@ export interface components {
          *     * `PRODUCTION BIOGAZ` - PRODUCTION BIOGAZ
          *     * `EFCA` - EFCA
          *     * `AIRPORT` - AIRPORT
+         *     * `H2 REFUELING STATION` - H2 REFUELING STATION
          * @enum {string}
          */
         SiteTypeEnum: SiteTypeEnum;
@@ -6765,11 +7311,9 @@ export interface components {
             registered_zipcode?: string;
             registration_id?: string;
             sustainability_officer?: string;
-            /** Format: email */
             sustainability_officer_email?: string;
             sustainability_officer_phone_number?: string;
             vat_number?: string;
-            /** Format: uri */
             website?: string;
         };
         UpdateRightsRequestsRequest: {
@@ -11822,6 +12366,251 @@ export interface operations {
             };
         };
     };
+    h2_stations_list: {
+        parameters: {
+            query: {
+                /**
+                 * @description * `PUBLIC` - Public
+                 *     * `PRIVATE` - Privé
+                 */
+                access_type?: PathsApiH2StationsGetParametersQueryAccess_type[];
+                commissioning_year?: number[];
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /**
+                 * @description * `true` - True
+                 *     * `false` - False
+                 */
+                has_personal_vehicle_connector?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `name` - Name
+                 *     * `-name` - Name (décroissant)
+                 *     * `site_siret` - Site siret
+                 *     * `-site_siret` - Site siret (décroissant)
+                 *     * `distribution_capacity` - Distribution capacity
+                 *     * `-distribution_capacity` - Distribution capacity (décroissant)
+                 *     * `commissioning_date` - Commissioning date
+                 *     * `-commissioning_date` - Commissioning date (décroissant)
+                 */
+                order_by?: PathsApiH2StationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedH2StationList"];
+                };
+            };
+        };
+    };
+    h2_stations_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["H2StationInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["H2StationInputRequest"];
+                "multipart/form-data": components["schemas"]["H2StationInputRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["H2StationInput"];
+                };
+            };
+        };
+    };
+    h2_stations_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this h2 station. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["H2Station"];
+                };
+            };
+        };
+    };
+    h2_stations_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this h2 station. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["H2StationInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["H2StationInputRequest"];
+                "multipart/form-data": components["schemas"]["H2StationInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["H2StationInput"];
+                };
+            };
+        };
+    };
+    h2_stations_destroy: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this h2 station. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    h2_stations_partial_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this h2 station. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedH2StationInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedH2StationInputRequest"];
+                "multipart/form-data": components["schemas"]["PatchedH2StationInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["H2StationInput"];
+                };
+            };
+        };
+    };
+    h2_stations_filters_retrieve: {
+        parameters: {
+            query: {
+                /**
+                 * @description * `PUBLIC` - Public
+                 *     * `PRIVATE` - Privé
+                 */
+                access_type?: PathsApiH2StationsGetParametersQueryAccess_type[];
+                commissioning_year?: number[];
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Filter string to apply */
+                filter: PathsApiH2StationsFiltersGetParametersQueryFilter;
+                /**
+                 * @description * `true` - True
+                 *     * `false` - False
+                 */
+                has_personal_vehicle_connector?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `name` - Name
+                 *     * `-name` - Name (décroissant)
+                 *     * `site_siret` - Site siret
+                 *     * `-site_siret` - Site siret (décroissant)
+                 *     * `distribution_capacity` - Distribution capacity
+                 *     * `-distribution_capacity` - Distribution capacity (décroissant)
+                 *     * `commissioning_date` - Commissioning date
+                 *     * `-commissioning_date` - Commissioning date (décroissant)
+                 */
+                order_by?: PathsApiH2StationsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
     metabase_status_retrieve: {
         parameters: {
             query?: never;
@@ -12066,6 +12855,28 @@ export interface operations {
             };
         };
     };
+    resources_materials_list: {
+        parameters: {
+            query?: {
+                /** @description Search within the fields `name` and `code` */
+                query?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Material"][];
+                };
+            };
+        };
+    };
     resources_production_sites_list: {
         parameters: {
             query?: {
@@ -12086,6 +12897,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProductionSite"][];
+                };
+            };
+        };
+    };
+    resources_sites_list: {
+        parameters: {
+            query?: {
+                /** @description Search within the fields `name`, `site_siret` and `city` */
+                query?: string;
+                /** @description Only keep specific site types */
+                site_type?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionSite"][];
                 };
             };
         };
@@ -14510,6 +15345,381 @@ export interface operations {
             };
         };
     };
+    traceability_actions_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                holder?: string[];
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                material?: string[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `pos_id` - Pos id
+                 *     * `-pos_id` - Pos id (décroissant)
+                 *     * `holder` - Holder
+                 *     * `-holder` - Holder (décroissant)
+                 *     * `material` - Material
+                 *     * `-material` - Material (décroissant)
+                 *     * `quantity` - Quantity
+                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `site` - Site
+                 *     * `-site` - Site (décroissant)
+                 *     * `shipping_distance` - Shipping distance
+                 *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `working_date` - Working date
+                 *     * `-working_date` - Working date (décroissant)
+                 */
+                order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ROAD` - Transport routier
+                 *     * `PIPELINE` - Pipeline
+                 *     * `RAILROAD` - Rail
+                 *     * `SEA` - Transport maritime
+                 */
+                shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
+                site?: string[];
+                /**
+                 * @description * `CREATED` - CREATED
+                 *     * `PENDING` - PENDING
+                 *     * `ACCEPTED` - ACCEPTED
+                 *     * `REJECTED` - REJECTED
+                 *     * `BLOCKED` - BLOCKED
+                 *     * `DELETED` - DELETED
+                 */
+                status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
+                /** @description * `INIT` - INIT */
+                type?: PathsApiTraceabilityActionsGetParametersQueryType[];
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedActionList"];
+                };
+            };
+        };
+    };
+    traceability_actions_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionInputRequest"];
+                "multipart/form-data": components["schemas"]["ActionInputRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionInput"];
+                };
+            };
+        };
+    };
+    traceability_actions_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"];
+                };
+            };
+        };
+    };
+    traceability_actions_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionInputRequest"];
+                "multipart/form-data": components["schemas"]["ActionInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionInput"];
+                };
+            };
+        };
+    };
+    traceability_actions_destroy: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    traceability_actions_partial_update: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedActionInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedActionInputRequest"];
+                "multipart/form-data": components["schemas"]["PatchedActionInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionInput"];
+                };
+            };
+        };
+    };
+    traceability_actions_filters_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Filter string to apply */
+                filter: PathsApiTraceabilityActionsFiltersGetParametersQueryFilter;
+                holder?: string[];
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                material?: string[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `pos_id` - Pos id
+                 *     * `-pos_id` - Pos id (décroissant)
+                 *     * `holder` - Holder
+                 *     * `-holder` - Holder (décroissant)
+                 *     * `material` - Material
+                 *     * `-material` - Material (décroissant)
+                 *     * `quantity` - Quantity
+                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `site` - Site
+                 *     * `-site` - Site (décroissant)
+                 *     * `shipping_distance` - Shipping distance
+                 *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `working_date` - Working date
+                 *     * `-working_date` - Working date (décroissant)
+                 */
+                order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ROAD` - Transport routier
+                 *     * `PIPELINE` - Pipeline
+                 *     * `RAILROAD` - Rail
+                 *     * `SEA` - Transport maritime
+                 */
+                shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
+                site?: string[];
+                /**
+                 * @description * `CREATED` - CREATED
+                 *     * `PENDING` - PENDING
+                 *     * `ACCEPTED` - ACCEPTED
+                 *     * `REJECTED` - REJECTED
+                 *     * `BLOCKED` - BLOCKED
+                 *     * `DELETED` - DELETED
+                 */
+                status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
+                /** @description * `INIT` - INIT */
+                type?: PathsApiTraceabilityActionsGetParametersQueryType[];
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
+    traceability_actions_years_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                holder?: string[];
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                material?: string[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `pos_id` - Pos id
+                 *     * `-pos_id` - Pos id (décroissant)
+                 *     * `holder` - Holder
+                 *     * `-holder` - Holder (décroissant)
+                 *     * `material` - Material
+                 *     * `-material` - Material (décroissant)
+                 *     * `quantity` - Quantity
+                 *     * `-quantity` - Quantity (décroissant)
+                 *     * `site` - Site
+                 *     * `-site` - Site (décroissant)
+                 *     * `shipping_distance` - Shipping distance
+                 *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `working_date` - Working date
+                 *     * `-working_date` - Working date (décroissant)
+                 */
+                order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A search term. */
+                search?: string;
+                /**
+                 * @description * `ROAD` - Transport routier
+                 *     * `PIPELINE` - Pipeline
+                 *     * `RAILROAD` - Rail
+                 *     * `SEA` - Transport maritime
+                 */
+                shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
+                site?: string[];
+                /**
+                 * @description * `CREATED` - CREATED
+                 *     * `PENDING` - PENDING
+                 *     * `ACCEPTED` - ACCEPTED
+                 *     * `REJECTED` - REJECTED
+                 *     * `BLOCKED` - BLOCKED
+                 *     * `DELETED` - DELETED
+                 */
+                status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
+                /** @description * `INIT` - INIT */
+                type?: PathsApiTraceabilityActionsGetParametersQueryType[];
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": number[];
+                };
+            };
+        };
+    };
     user_retrieve: {
         parameters: {
             query?: never;
@@ -14730,6 +15940,26 @@ export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
     status = "status",
     used_in_tiruert = "used_in_tiruert",
     year = "year"
+}
+export enum PathsApiH2StationsGetParametersQueryAccess_type {
+    PRIVATE = "PRIVATE",
+    PUBLIC = "PUBLIC"
+}
+export enum PathsApiH2StationsGetParametersQueryOrder_by {
+    ValueMinuscommissioning_date = "-commissioning_date",
+    ValueMinusdistribution_capacity = "-distribution_capacity",
+    ValueMinusname = "-name",
+    ValueMinussite_siret = "-site_siret",
+    commissioning_date = "commissioning_date",
+    distribution_capacity = "distribution_capacity",
+    name = "name",
+    site_siret = "site_siret"
+}
+export enum PathsApiH2StationsFiltersGetParametersQueryFilter {
+    access_type = "access_type",
+    commissioning_year = "commissioning_year",
+    has_personal_vehicle_connector = "has_personal_vehicle_connector",
+    order_by = "order_by"
 }
 export enum PathsApiResourcesAirportsGetParametersQueryShipping_method {
     TRUCK = "TRUCK",
@@ -14968,6 +16198,52 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     type = "type",
     years = "years"
 }
+export enum PathsApiTraceabilityActionsGetParametersQueryIndustry {
+    H2 = "H2"
+}
+export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
+    ValueMinusholder = "-holder",
+    ValueMinusmaterial = "-material",
+    ValueMinuspos_id = "-pos_id",
+    ValueMinusquantity = "-quantity",
+    ValueMinusshipping_distance = "-shipping_distance",
+    ValueMinussite = "-site",
+    ValueMinusworking_date = "-working_date",
+    holder = "holder",
+    material = "material",
+    pos_id = "pos_id",
+    quantity = "quantity",
+    shipping_distance = "shipping_distance",
+    site = "site",
+    working_date = "working_date"
+}
+export enum PathsApiTraceabilityActionsGetParametersQueryShipping_method {
+    PIPELINE = "PIPELINE",
+    RAILROAD = "RAILROAD",
+    ROAD = "ROAD",
+    SEA = "SEA"
+}
+export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
+    ACCEPTED = "ACCEPTED",
+    BLOCKED = "BLOCKED",
+    CREATED = "CREATED",
+    DELETED = "DELETED",
+    PENDING = "PENDING",
+    REJECTED = "REJECTED"
+}
+export enum PathsApiTraceabilityActionsGetParametersQueryType {
+    INIT = "INIT"
+}
+export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
+    holder = "holder",
+    material = "material",
+    order_by = "order_by",
+    shipping_method = "shipping_method",
+    site = "site",
+    status = "status",
+    type = "type",
+    year = "year"
+}
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",
     EFFECTIVE_DATE = "EFFECTIVE_DATE",
@@ -15041,6 +16317,11 @@ export enum DeliveryTypeEnum {
     FLUSHED = "FLUSHED",
     CONSUMPTION = "CONSUMPTION"
 }
+export enum DevaluationTypeEnum {
+    LOSS = "LOSS",
+    DOWNGRADING = "DOWNGRADING",
+    OTHER = "OTHER"
+}
 export enum DigestateSaleTypesEnum {
     SPREADING_PLAN_ICPE = "SPREADING_PLAN_ICPE",
     AMM = "AMM",
@@ -15052,6 +16333,10 @@ export enum DigestateValorizationMethodsEnum {
     SPREADING = "SPREADING",
     COMPOSTING = "COMPOSTING",
     INCINERATION_LANDFILLING = "INCINERATION_LANDFILLING"
+}
+export enum DistributedPressureEnum {
+    Value350 = 350,
+    Value700 = 700
 }
 export enum DoubleCountingAgreementStatus {
     ACTIVE = "ACTIVE",
@@ -15228,7 +16513,8 @@ export enum SiteTypeEnum {
     PRODUCTION_BIOLIQUID = "PRODUCTION BIOLIQUID",
     PRODUCTION_BIOGAZ = "PRODUCTION BIOGAZ",
     EFCA = "EFCA",
-    AIRPORT = "AIRPORT"
+    AIRPORT = "AIRPORT",
+    H2_REFUELING_STATION = "H2 REFUELING STATION"
 }
 export enum SpreadingManagementMethodsEnum {
     DIRECT_SPREADING = "DIRECT_SPREADING",
