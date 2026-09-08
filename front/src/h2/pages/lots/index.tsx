@@ -74,22 +74,46 @@ const LotsPage = () => {
         columns.quantity,
         columns.total_emissions,
       ]}
-      fields={[
-        fields.pos_id,
-        fields.certificate,
-        fields.holder,
-        { ...fields.material, label: t("Nature d'hydrogène") },
-        fields.quantity,
-        { ...fields.site, label: t("Station"), options: H2_SITE_FIELD_OPTIONS },
-        fields.shipping_date,
-        fields.shipping_distance,
-        fields.shipping_method,
-        fields.ei,
-        fields.ep,
-        fields.etd,
-        fields.eu,
-        fields.eccs,
-        fields.total_emissions,
+      fieldsets={[
+        {
+          legend: t("Production"),
+          fields: [
+            fields.certificate,
+            { ...fields.material, label: t("Nature d'hydrogène") },
+            fields.pos_id,
+          ],
+        },
+        {
+          legend: t("Transport"),
+          fields: [
+            fields.shipping_method,
+            fields.shipping_distance,
+            fields.shipping_date,
+          ],
+        },
+        {
+          legend: t("Consommation"),
+          fields: [
+            {
+              ...fields.site,
+              label: t("Station"),
+              options: H2_SITE_FIELD_OPTIONS,
+            },
+            { ...fields.quantity, label: t("Quantité consommée") },
+            { ...fields.working_date, label: t("Date de consommation") },
+          ],
+        },
+        {
+          legend: t("Émissions/réductions"),
+          fields: [
+            fields.ei,
+            fields.ep,
+            fields.etd,
+            fields.eu,
+            fields.eccs,
+            fields.total_emissions,
+          ],
+        },
       ]}
     />
   )

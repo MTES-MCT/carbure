@@ -33,16 +33,26 @@ const CertificatesPage = () => {
         columns.quantity,
         columns.total_emissions,
       ]}
-      fields={[
-        fields.pos_id,
-        fields.holder,
-        fields.quantity,
-        fields.ei,
-        fields.ep,
-        fields.etd,
-        fields.eu,
-        fields.eccs,
-        fields.total_emissions,
+      fieldsets={[
+        {
+          legend: t("Certificat"),
+          fields: [
+            fields.pos_id,
+            { ...fields.quantity, label: t("Quantité certifiée") },
+            { ...fields.working_date, label: t("Date de création") },
+          ],
+        },
+        {
+          legend: t("Émissions/réductions"),
+          fields: [
+            fields.ei,
+            fields.ep,
+            fields.etd,
+            fields.eu,
+            fields.eccs,
+            fields.total_emissions,
+          ],
+        },
       ]}
     />
   )
