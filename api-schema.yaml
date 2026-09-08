@@ -12687,6 +12687,14 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -12699,6 +12707,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -12874,6 +12883,7 @@ paths:
               - holder
               - material
               - order_by
+              - period
               - shipping_method
               - site
               - status
@@ -12952,6 +12962,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -12964,6 +12982,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -13046,8 +13065,8 @@ paths:
                     - holder
                     - material
                     - order_by
+                    - period
                     - shipping_method
-                    - site
                   summary: Example of filters response.
           description: ""
   /api/traceability/actions/import/:
@@ -13225,6 +13244,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -13237,6 +13264,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -13486,6 +13514,7 @@ components:
         shipping_method:
           allOf:
             - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          nullable: true
           title: Mode de transport
         working_date:
           type: string

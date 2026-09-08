@@ -3478,7 +3478,7 @@ export interface components {
             /** Distance de livraison */
             shipping_distance?: number | null;
             /** Mode de transport */
-            shipping_method?: components["schemas"]["ActionShippingMethodEnum"];
+            shipping_method?: components["schemas"]["ActionShippingMethodEnum"] | null;
             /**
              * Date de référence
              * Format: date
@@ -15328,6 +15328,7 @@ export interface operations {
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
+                period?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -15460,6 +15461,7 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                period?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -15600,6 +15602,7 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                period?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16162,6 +16165,7 @@ export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     holder = "holder",
     material = "material",
     order_by = "order_by",
+    period = "period",
     shipping_method = "shipping_method",
     site = "site",
     status = "status",
