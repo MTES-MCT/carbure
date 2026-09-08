@@ -73,7 +73,9 @@ class Action(models.Model):
         (RAILROAD, _("Rail")),
         (SEA, _("Transport maritime")),
     ]
-    shipping_method = models.CharField(verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16, blank=True)
+    shipping_method = models.CharField(
+        verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16, null=True, blank=True
+    )
 
     working_date = models.DateField(verbose_name="Date de référence")
 
