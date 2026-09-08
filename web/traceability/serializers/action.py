@@ -1,38 +1,16 @@
-from datetime import datetime
-
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.serializer_fields import LabelChoiceField
+from core.serializer_validators import UniqueInListSerializer
 from core.serializers import EntityPreviewSerializer
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
 from traceability.serializers.certificate import ActionCertificateSerializer
-from traceability.serializers.fields import LookupSlugRelatedField
+from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField, LookupSlugRelatedField
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
-
-
-class ExcelDateField(serializers.DateField):
-    """
-    Excel reader converts dates to datetime objects so we need to convert them back to date objects.
-    """
-
-    def to_internal_value(self, value):
-        if isinstance(value, datetime):
-            value = value.date()
-        return super().to_internal_value(value)
-
-
-class ExcelMonthYearField(ExcelDateField):
-    """Parse MM/YYYY (or an Excel datetime) and store the first day of that month."""
-
-    def to_internal_value(self, value):
-        value = super().to_internal_value(value)
-        if value:
-            return value.replace(day=1)
-        return value
 
 
 class ActionParentSerializer(serializers.ModelSerializer):
@@ -79,7 +57,9 @@ class ActionExcelUploadSerializer(serializers.Serializer):
 _ACTION_MODEL_FIELDS = {field.name for field in Action._meta.fields}
 
 
-class ActionExcelImportListSerializer(serializers.ListSerializer):
+class ActionExcelImportListSerializer(UniqueInListSerializer):
+    unique_fields = ["pos_id"]
+
     def create(self, validated_data):
         holder = self.context["entity"]
         industry = self.context["handler"].industry

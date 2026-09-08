@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 
 
@@ -25,3 +27,24 @@ class LookupSlugRelatedField(serializers.SlugRelatedField):
             return serializer_cache[self.lookup][data]
         except KeyError:
             self.fail("does_not_exist", slug_name=self.slug_field, value=data)
+
+
+class ExcelDateField(serializers.DateField):
+    """
+    Excel reader converts dates to datetime objects so we need to convert them back to date objects.
+    """
+
+    def to_internal_value(self, value):
+        if isinstance(value, datetime):
+            value = value.date()
+        return super().to_internal_value(value)
+
+
+class ExcelMonthYearField(ExcelDateField):
+    """Parse MM/YYYY (or an Excel datetime) and store the first day of that month."""
+
+    def to_internal_value(self, value):
+        value = super().to_internal_value(value)
+        if value:
+            return value.replace(day=1)
+        return value

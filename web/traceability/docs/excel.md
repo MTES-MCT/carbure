@@ -26,7 +26,7 @@ Couleurs de section, à réutiliser plutôt que de les redéfinir :
 
 Le mixin d’import instancie `request.handler.excel_import_serializer_class`.
 
-Erreurs **fichier** (pas une ligne) : `{ "error": "<CODE>" }` — `EMPTY_FILE`, `INVALID_FILE`. Le front traduit le code. Les erreurs de cellules restent dans `validation_errors`.
+Erreurs **fichier** (pas une ligne) : `{ "error": "<CODE>" }` — `EMPTY_FILE`, `INVALID_FILE`. Le front traduit le code. Les erreurs de cellules restent dans `validation_errors`. Une colonne peut être déclarée unique dans le fichier : chaque doublon est une erreur de cellule.
 
 **Sans `key`**, la colonne apparaît dans le fichier et **disparaît au parse** : aucune validation, aucune persistence. Toujours poser un `key` dès que la colonne doit être lue.
 
