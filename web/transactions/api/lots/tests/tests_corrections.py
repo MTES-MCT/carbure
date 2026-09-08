@@ -168,7 +168,7 @@ class LotCorrectionTest(TestCase):
         )
 
         assert response.status_code == 200
-        correction_mock.assert_called_once_with([lot.id], [])
+        correction_mock.assert_called_once_with([lot.id], [lot.id])
 
     def test_simple_correction_on_locked_year(self):
         lot = self.prepare_lot(self.producer, self.trader)
