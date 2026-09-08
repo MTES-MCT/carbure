@@ -58,6 +58,7 @@ def submit_fix(request, context):
     updated_lots = []
     update_events = []
     correction_lot_ids = set(fix_lots.values_list("id", flat=True))
+    volume_correction_lot_ids = set()
 
     for node in updated_nodes:
         if node.type == Node.LOT:
@@ -66,6 +67,9 @@ def submit_fix(request, context):
             ghg_total_diff = node.diff.get("ghg_total")
             if ghg_total_diff is not None and ghg_total_diff[0] != ghg_total_diff[1]:
                 correction_lot_ids.add(node.data.id)
+            volume_diff = node.diff.get("volume")
+            if volume_diff is not None and volume_diff[0] != volume_diff[1]:
+                volume_correction_lot_ids.add(node.data.id)
 
             if len(node.diff) > 0:
                 update_events.append(
@@ -88,8 +92,10 @@ def submit_fix(request, context):
         CarbureLotEvent.objects.bulk_create(submit_fix_events)
         CarbureLotEvent.objects.bulk_create(update_events)
 
-        if correction_lot_ids:
-            CorrectionService.create_correction_operations_for_lot_ghg_update(sorted(correction_lot_ids))
+        CorrectionService.create_correction_operations_for_lot_update(
+            sorted(correction_lot_ids),
+            sorted(volume_correction_lot_ids),
+        )
 
         notify_correction_done(lots.exclude(carbure_client_id=entity_id))
 

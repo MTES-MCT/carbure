@@ -58,18 +58,18 @@ class AdminUpdateManyCorrectionTest(TestCase):
             },
         )
 
-    @patch("transactions.api.admin.lots.update_many.CorrectionService.create_correction_operations_for_lot_ghg_update")
+    @patch("transactions.api.admin.lots.update_many.CorrectionService.create_correction_operations_for_lot_update")
     def test_update_many_triggers_sync_correction_service_on_ghg_change(self, correction_mock):
         """Admin bulk update must synchronously trigger correction creation for lots whose ghg_total changed."""
         response = self.post_update_many(eec=self.lot.eec + 12)
 
         assert response.status_code == 200, response.json()
-        correction_mock.assert_called_once_with([self.lot.id])
+        correction_mock.assert_called_once_with([self.lot.id], [])
 
         self.lot.refresh_from_db()
         assert self.lot.eec == 22
 
-    @patch("transactions.api.admin.lots.update_many.CorrectionService.create_correction_operations_for_lot_ghg_update")
+    @patch("transactions.api.admin.lots.update_many.CorrectionService.create_correction_operations_for_lot_update")
     def test_update_many_skips_correction_when_ghg_is_unchanged(self, correction_mock):
         """No correction must be created when the admin update does not change ghg_total."""
         response = self.post_update_many(free_field="some admin note")
@@ -77,7 +77,7 @@ class AdminUpdateManyCorrectionTest(TestCase):
         assert response.status_code == 200, response.json()
         correction_mock.assert_not_called()
 
-    @patch("transactions.api.admin.lots.update_many.CorrectionService.create_correction_operations_for_lot_ghg_update")
+    @patch("transactions.api.admin.lots.update_many.CorrectionService.create_correction_operations_for_lot_update")
     def test_update_many_skips_correction_on_dry_run(self, correction_mock):
         """Dry runs must not persist anything, including correction operations."""
         response = self.post_update_many(eec=self.lot.eec + 12, dry_run=True)

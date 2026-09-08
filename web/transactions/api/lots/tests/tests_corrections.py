@@ -156,7 +156,7 @@ class LotCorrectionTest(TestCase):
         assert lot.correction_status == CarbureLot.NO_PROBLEMO
         assert lot.lot_status == CarbureLot.ACCEPTED
 
-    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_ghg_update")
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_update")
     def test_submit_fix_triggers_sync_correction_service(self, correction_mock):
         """Submitting a fix must synchronously trigger correction operation creation for impacted lot ids."""
         lot = self.prepare_lot(self.producer, self.trader)
@@ -168,7 +168,7 @@ class LotCorrectionTest(TestCase):
         )
 
         assert response.status_code == 200
-        correction_mock.assert_called_once_with([lot.id])
+        correction_mock.assert_called_once_with([lot.id], [])
 
     def test_simple_correction_on_locked_year(self):
         lot = self.prepare_lot(self.producer, self.trader)

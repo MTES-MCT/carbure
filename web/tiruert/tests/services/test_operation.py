@@ -1,5 +1,6 @@
 from datetime import date
 from unittest.mock import Mock, patch
+from unittest.mock import call as mock_call
 
 from django.http import QueryDict
 from django.test import TestCase
@@ -529,6 +530,76 @@ class OperationServiceCreateCorrectionOperationsTest(OperationServiceTestCase):
         CorrectionService.create_correction_operations_for_lot_ghg_update([])
 
         self.assertFalse(Operation.objects.filter(type=Operation.CORRECTION).exists())
+
+    def test_create_correction_operations_for_lot_volume_update_creates_credit(self):
+        """Create only the positive volume delta for the initial credit entity."""
+        lot = self.lot_blending_accepted
+        source_operation = Operation.objects.create(
+            type=Operation.INCORPORATION,
+            status=Operation.VALIDATED,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            credited_entity=self.entity,
+            renewable_energy_share=lot.biofuel.renewable_energy_share,
+        )
+        OperationDetail.objects.create(operation=source_operation, lot=lot, volume=lot.volume)
+        lot.volume += 25
+        lot.save(update_fields=["volume"])
+
+        CorrectionService.create_correction_operations_for_lot_volume_update([lot.id])
+
+        correction = Operation.objects.get(type=Operation.CORRECTION)
+        self.assertEqual(correction.credited_entity, self.entity)
+        self.assertIsNone(correction.debited_entity)
+        detail = correction.details.get()
+        self.assertEqual(detail.volume, 25)
+        self.assertEqual(detail.emission_rate_per_mj, lot.ghg_total)
+        self.assertIsNone(detail.avoided_emissions_tco2)
+
+    def test_create_correction_operations_for_lot_volume_update_creates_only_residual_delta(self):
+        """Ignore downstream details and previously created volume corrections."""
+        lot = self.lot_blending_accepted
+        source_operation = Operation.objects.create(
+            type=Operation.INCORPORATION,
+            status=Operation.VALIDATED,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            credited_entity=self.entity,
+            renewable_energy_share=lot.biofuel.renewable_energy_share,
+        )
+        OperationDetail.objects.create(operation=source_operation, lot=lot, volume=lot.volume)
+        lot.volume += 25
+        lot.save(update_fields=["volume"])
+        CorrectionService.create_correction_operations_for_lot_volume_update([lot.id])
+
+        lot.volume += 10
+        lot.save(update_fields=["volume"])
+        CorrectionService.create_correction_operations_for_lot_volume_update([lot.id])
+
+        corrections = Operation.objects.filter(type=Operation.CORRECTION).order_by("id")
+        self.assertEqual(corrections.count(), 2)
+        self.assertEqual(corrections.first().details.get().volume, 25)
+        self.assertEqual(corrections.last().details.get().volume, 10)
+
+    def test_create_correction_operations_for_lot_update_orders_corrections(self):
+        """Create GHG corrections before volume corrections and deduplicate ids."""
+        calls = Mock()
+        with (
+            patch.object(CorrectionService, "create_correction_operations_for_lot_ghg_update") as ghg_correction,
+            patch.object(CorrectionService, "create_correction_operations_for_lot_volume_update") as volume_correction,
+        ):
+            calls.attach_mock(ghg_correction, "ghg")
+            calls.attach_mock(volume_correction, "volume")
+
+            CorrectionService.create_correction_operations_for_lot_update([3, 1, 3], [2, 1])
+
+        self.assertEqual(
+            calls.mock_calls,
+            [
+                mock_call.ghg([1, 3]),
+                mock_call.volume([1, 2]),
+            ],
+        )
 
 
 class OperationServiceFilterLotsTest(OperationServiceTestCase):

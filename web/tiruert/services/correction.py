@@ -11,6 +11,18 @@ from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
 class CorrectionService:
     @staticmethod
+    @transaction.atomic
+    def create_correction_operations_for_lot_update(ghg_changed_ids: list[int], volume_changed_ids: list[int]):
+        """Create GHG corrections before volume corrections for updated lots."""
+        ghg_changed_ids = sorted(set(ghg_changed_ids))
+        volume_changed_ids = sorted(set(volume_changed_ids))
+
+        if ghg_changed_ids:
+            CorrectionService.create_correction_operations_for_lot_ghg_update(ghg_changed_ids)
+        if volume_changed_ids:
+            CorrectionService.create_correction_operations_for_lot_volume_update(volume_changed_ids)
+
+    @staticmethod
     def _get_active_details_by_lot(lot_ids: list[int]) -> dict[int, list[OperationDetail]]:
         """Return active non-informative details grouped by lot id."""
         details = (
@@ -106,6 +118,31 @@ class CorrectionService:
         return operation_data, details_data
 
     @staticmethod
+    def _build_volume_correction_payload(lot, lot_id: int, entity_id: int, volume_delta: float) -> tuple[dict, list[dict]]:
+        """Build a credit correction payload for a lot volume delta."""
+        operation_data = {
+            "type": Operation.CORRECTION,
+            "status": Operation.VALIDATED,
+            "customs_category": lot.feedstock.category,
+            "biofuel": lot.biofuel,
+            "credited_entity_id": entity_id,
+            "debited_entity_id": None,
+            "from_depot": None,
+            "to_depot": None,
+            "renewable_energy_share": lot.biofuel.renewable_energy_share,
+            "durability_period": lot.period,
+        }
+        details_data = [
+            {
+                "lot_id": lot_id,
+                "volume": volume_delta,
+                "emission_rate_per_mj": lot.ghg_total,
+                "avoided_emissions_tco2": None,
+            }
+        ]
+        return operation_data, details_data
+
+    @staticmethod
     @transaction.atomic
     def create_correction_operations_for_lot_ghg_update(lot_ids: list[int]):
         """
@@ -144,3 +181,48 @@ class CorrectionService:
                 from tiruert.services.operation import OperationService
 
                 OperationService.create_operation_with_details(operation_data, details_data)
+
+    @staticmethod
+    @transaction.atomic
+    def create_correction_operations_for_lot_volume_update(lot_ids: list[int]):
+        """Create credit corrections for increases to a lot's volume."""
+        if not lot_ids:
+            return
+
+        details_by_lot = CorrectionService._get_active_details_by_lot(lot_ids)
+
+        for lot_id, lot_details in details_by_lot.items():
+            lot = lot_details[0].lot
+            source_details = [detail for detail in lot_details if detail.operation.type in Operation.CREDIT_TYPES]
+            if not source_details:
+                continue
+
+            entity_id = source_details[0].operation.credited_entity_id
+            if entity_id is None:
+                continue
+
+            current_volume = sum(detail.volume for detail in source_details)
+
+            # Includes volumes from potential previous correction operations
+            current_volume += sum(
+                detail.volume
+                for detail in lot_details
+                if detail.operation.type == Operation.CORRECTION
+                and detail.operation.credited_entity_id == entity_id
+                and detail.avoided_emissions_tco2 is None
+            )
+
+            volume_delta = truncate(lot.volume - current_volume)
+            if volume_delta <= 0:
+                continue
+
+            operation_data, details_data = CorrectionService._build_volume_correction_payload(
+                lot,
+                lot_id,
+                entity_id,
+                volume_delta,
+            )
+
+            from tiruert.services.operation import OperationService
+
+            OperationService.create_operation_with_details(operation_data, details_data)
