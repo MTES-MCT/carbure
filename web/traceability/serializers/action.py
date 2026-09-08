@@ -1,4 +1,3 @@
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -11,6 +10,7 @@ from traceability.serializers.certificate import ActionCertificateSerializer
 from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField, LookupSlugRelatedField
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
+from traceability.serializers.total_emissions import ActionTotalEmissionsSerializer
 
 
 class ActionParentSerializer(serializers.ModelSerializer):
@@ -22,12 +22,14 @@ class ActionParentSerializer(serializers.ModelSerializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(read_only=True)
+    status = serializers.ChoiceField(choices=ActionStatus.STATUSES, read_only=True, allow_null=True)
     holder = EntityPreviewSerializer(read_only=True)
     parent = ActionParentSerializer(read_only=True, required=False, allow_null=True)
     material = MaterialSerializer(read_only=True)
     site = ActionSiteSerializer(read_only=True)
     certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
+
+    total_emissions = ActionTotalEmissionsSerializer(read_only=True, allow_null=True)
 
     class Meta:
         model = Action
@@ -72,15 +74,8 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
             )
             for attrs in validated_data
         ]
-        Action.objects.bulk_create(actions)
 
-        created_actions = list(Action.objects.filter(pos_id__in=[action.pos_id for action in actions]))
-        created_at = timezone.now()
-        ActionStatus.objects.bulk_create(
-            ActionStatus(action=action, status=ActionStatus.PENDING, created_at=created_at) for action in created_actions
-        )
-
-        return created_actions
+        return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
 
 
 class ActionExcelImportSerializer(serializers.ModelSerializer):

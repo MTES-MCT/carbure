@@ -7,18 +7,12 @@ import {
   ActionSiteFieldOptions,
   useActionFields,
 } from "traceability/hooks/use-action-fields"
-import {
-  ActionIndustry,
-  ActionQuery,
-  ActionStatus,
-  ActionType,
-} from "traceability/types"
+import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 import { SiteTypeEnum } from "api-schema"
 import { Text } from "common/components/text"
 
 const H2_LOT_QUERY: Partial<ActionQuery> = {
   type: [ActionType.INIT],
-  status: [ActionStatus.PENDING],
 }
 
 const H2_SITE_FIELD_OPTIONS: ActionSiteFieldOptions = {
@@ -71,11 +65,13 @@ const LotsPage = () => {
         filters.shipping_method,
       ]}
       columns={[
+        columns.status,
         columns.working_date,
         columns.pos_id,
         { ...columns.site, header: t("Station") },
         { ...columns.material, header: t("Nature d'H2") },
         columns.quantity,
+        columns.total_emissions,
       ]}
       fields={[
         fields.pos_id,
@@ -92,6 +88,7 @@ const LotsPage = () => {
         fields.etd,
         fields.eu,
         fields.eccs,
+        fields.total_emissions,
       ]}
       industry={ActionIndustry.H2}
     />

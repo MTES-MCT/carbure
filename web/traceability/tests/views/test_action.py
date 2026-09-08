@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -6,6 +8,7 @@ from core.models import Entity
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory
 from traceability.models import Action
+from traceability.services.total_emissions import annotate_total_emissions
 
 
 class ActionViewsetQuerysetTest(TestCase):
@@ -57,3 +60,38 @@ class ActionViewsetQuerysetTest(TestCase):
         ids = [item["id"] for item in response.data["results"]]
         self.assertIn(self.own_action.id, ids)
         self.assertNotIn(self.other_industry_action.id, ids)
+
+    def test_list_includes_total_emissions(self):
+        response = self.client.get(self.list_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        by_id = {item["id"]: item for item in response.data["results"]}
+        self.assertIn("total_emissions", by_id[self.own_action.id])
+        self.assertIn("total", by_id[self.own_action.id]["total_emissions"])
+        self.assertEqual(by_id[self.own_action.id]["status"], "CREATED")
+
+    def test_retrieve_includes_total_emissions(self):
+        response = self.client.get(
+            reverse("traceability-action-detail", args=[self.own_action.id]),
+            self.base_params,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("total_emissions", response.data)
+        self.assertIn("total", response.data["total_emissions"])
+
+    def test_retrieve_annotates_only_the_requested_action(self):
+        seen_pks = []
+
+        def capture(queryset):
+            seen_pks.extend(queryset.values_list("pk", flat=True))
+            return annotate_total_emissions(queryset)
+
+        with patch("traceability.views.action.annotate_total_emissions", side_effect=capture):
+            response = self.client.get(
+                reverse("traceability-action-detail", args=[self.own_action.id]),
+                self.base_params,
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(seen_pks, [self.own_action.id])
