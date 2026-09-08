@@ -39,7 +39,13 @@ class TariffCoefficientProportionsTests(TestCase):
         Coeff.objects.create(feedstock=self.feedstock_p1, regime=Coeff.AT_2011, coefficient=Coeff.P1)
         Coeff.objects.create(feedstock=self.feedstock_p2, regime=Coeff.AT_2011, coefficient=Coeff.P2)
         Coeff.objects.create(feedstock=self.feedstock_p2, regime=Coeff.AT_2020_PLUS, coefficient=Coeff.P)
-        Coeff.objects.create(feedstock=self.feedstock_huiles, regime=Coeff.AT_2011, coefficient=Coeff.P1)
+        # Conditional rule: only LOCAL collection gets P1 (PRIVATE / IAA without a row → no prime).
+        Coeff.objects.create(
+            feedstock=self.feedstock_huiles,
+            regime=Coeff.AT_2011,
+            collection_type=BiomethaneSupplyInput.LOCAL,
+            coefficient=Coeff.P1,
+        )
 
     def _inputs(self):
         return self.supply_plan.supply_inputs.all()
@@ -185,11 +191,26 @@ class TariffCoefficientProportionsTests(TestCase):
 
         self.assertEqual(result["p"], 100.0)
 
-    def test_private_collection_type_excludes_coefficient(self):
+    def test_empty_collection_type_matches_unconditional_referential_row(self):
+        """Supply-input "" maps to referential "" (unconditional rule)."""
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock_p1,
+            collection_type="",
+            volume=100,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+
+        result = compute_tariff_coefficient_proportions(self._inputs())
+
+        self.assertEqual(result["p1"], 100.0)
+
+    def test_iaa_collection_type_without_referential_row_is_unclassified(self):
+        """IAA with no matching referential row weighs the denominator only."""
         BiomethaneSupplyInputFactory.create(
             supply_plan=self.supply_plan,
             feedstock=self.feedstock_huiles,
-            collection_type=BiomethaneSupplyInput.PRIVATE,
+            collection_type=BiomethaneSupplyInput.IAA,
             volume=100,
             material_unit=BiomethaneSupplyInput.WET,
         )
@@ -204,6 +225,59 @@ class TariffCoefficientProportionsTests(TestCase):
         result = compute_tariff_coefficient_proportions(self._inputs())
 
         self.assertEqual(result["p1"], 50.0)
+
+    def test_conditional_only_referential_does_not_fallback_when_collection_type_missing(self):
+        """Conditional rules only: declaration without collection_type must not get a prime."""
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=self.feedstock_huiles,
+            collection_type="",
+            volume=100,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+
+        result = compute_tariff_coefficient_proportions(self._inputs())
+
+        self.assertEqual(result["p1"], 0.0)
+
+    def test_collection_type_selects_among_conditional_coefficients(self):
+        """Same feedstock: LOCAL → P1, IAA → P2; volumes are wet-matter weighted."""
+        feedstock = MatierePremiere.objects.create(
+            name="Plats cuisinés",
+            name_en="Cooked meals",
+            code="PLATS-CUISINES-SANS-PRODUITS-ANIMAUX",
+            is_methanogenic=True,
+        )
+        Coeff.objects.create(
+            feedstock=feedstock,
+            regime=Coeff.AT_2011,
+            collection_type=BiomethaneSupplyInput.LOCAL,
+            coefficient=Coeff.P1,
+        )
+        Coeff.objects.create(
+            feedstock=feedstock,
+            regime=Coeff.AT_2011,
+            collection_type=BiomethaneSupplyInput.IAA,
+            coefficient=Coeff.P2,
+        )
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=feedstock,
+            collection_type=BiomethaneSupplyInput.LOCAL,
+            volume=300,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=self.supply_plan,
+            feedstock=feedstock,
+            collection_type=BiomethaneSupplyInput.IAA,
+            volume=700,
+            material_unit=BiomethaneSupplyInput.WET,
+        )
+
+        result = compute_tariff_coefficient_proportions(self._inputs())
+
+        self.assertEqual(result, {"p1": 30.0, "p2": 70.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
 
     def test_empty_plan_returns_zeros(self):
         self.assertEqual(

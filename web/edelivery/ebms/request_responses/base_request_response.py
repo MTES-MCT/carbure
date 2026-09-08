@@ -7,4 +7,4 @@ class BaseRequestResponse:
         self.parsed_XML = ET.fromstring(payload)
 
     def post_retrieval_action_result(self):
-        pass
+        return {"responseStatus": "success"}

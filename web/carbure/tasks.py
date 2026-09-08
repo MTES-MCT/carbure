@@ -1,11 +1,10 @@
 import datetime
-import subprocess
 from os import environ as env
 
 from django.core.management import call_command
 from django.db.models.query import QuerySet
 from huey import crontab
-from huey.contrib.djhuey import db_periodic_task, db_task, periodic_task
+from huey.contrib.djhuey import db_periodic_task, db_task
 
 from carbure.scripts.create_declaration_reminder import create_declaration_reminder
 from carbure.scripts.send_notification_emails import send_notification_emails
@@ -43,10 +42,6 @@ def background_create_tiruert_operations_from_lots(lots: QuerySet) -> None:
 
 
 if env.get("IMAGE_TAG") == "prod":
-
-    @periodic_task(crontab(hour=23, minute=45))
-    def periodic_backup_prod_db() -> None:
-        subprocess.run(["bash", "/app/scripts/database/backup_prod_db.sh"])
 
     @db_periodic_task(crontab(day_of_week=7, hour=3, minute=0))
     def periodic_update_2bs_certificates() -> None:
@@ -101,11 +96,6 @@ if env.get("IMAGE_TAG") == "prod":
     def periodic_send_meter_readings_application_deadline_reminder() -> None:
         create_meter_readings_application_deadline_reminder()
 
-    # Read replica
-    @periodic_task(crontab(hour=1, minute=45))
-    def populate_read_replica() -> None:
-        subprocess.run(["bash", "/app/scripts/database/restore_db.sh", "carbure-prod", env.get("READ_REPLICA_DATABASE_URL")])
-
     # Anonymization
     @db_periodic_task(crontab(day=1, hour=1, minute=0))
     def anonymize_inactive_users() -> None:
@@ -141,10 +131,3 @@ if env.get("IMAGE_TAG") == "prod":
     @db_periodic_task(crontab(hour=2, minute=0))
     def periodic_backfill_site_gps_coordinates() -> None:
         call_command("backfill_site_gps_coordinates", dry_run="false")
-
-
-if env.get("IMAGE_TAG") == "staging":
-
-    @periodic_task(crontab(hour=0, minute=45))
-    def restore_prod_db() -> None:
-        subprocess.run(["bash", "/app/scripts/database/restore_db.sh"])

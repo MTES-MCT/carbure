@@ -41,6 +41,7 @@ export const Checkbox = ({
       label,
       nativeInputProps: {
         checked: value,
+        required: props.required,
         onChange: (e: ChangeEvent<HTMLInputElement>) =>
           onChange?.(e.target.checked),
         onClick: captive ? (e) => e.stopPropagation() : undefined,
