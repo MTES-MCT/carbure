@@ -61,6 +61,7 @@ class Operation(models.Model):
     CORRECTED = "CORRECTED"  # By customs
     VALIDATED = "VALIDATED"  # By customs
     DRAFT = "DRAFT"  # For transfert operations
+    AUTO = "AUTO"
 
     OPERATION_STATUSES = (
         (PENDING, PENDING),
@@ -71,6 +72,7 @@ class Operation(models.Model):
         (CORRECTED, CORRECTED),
         (VALIDATED, VALIDATED),
         (DRAFT, DRAFT),
+        (AUTO, AUTO),
     )
 
     INCORPORATION = "INCORPORATION"

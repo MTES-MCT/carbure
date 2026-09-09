@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from django.core.management.base import BaseCommand
 
 from tiruert.models.declaration_period import TiruertDeclarationPeriod
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.yearly_balance import YearlyBalanceService
 
 
@@ -29,7 +30,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("No declaration period closed yesterday. No snapshot created."))
             return
 
-        year = period_closed_yesterday.year
+        year = DeclarationPeriodService.get_current_declaration_year()
         declaration_end_date = period_closed_yesterday.end_date
 
         if YearlyBalanceService.snapshot_exists(year):

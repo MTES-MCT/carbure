@@ -34,7 +34,14 @@ class CreateYearlyBalanceOperationsTest(TestCase):
         )
 
     def _call_command(self, fixed_today=FIXED_TODAY):
-        with patch("tiruert.management.commands.create_yearly_balance_operations.date") as mock_date:
+        current_declaration_year = fixed_today.year
+        with (
+            patch("tiruert.management.commands.create_yearly_balance_operations.date") as mock_date,
+            patch(
+                "tiruert.management.commands.create_yearly_balance_operations.DeclarationPeriodService.get_current_declaration_year",
+                return_value=current_declaration_year,
+            ),
+        ):
             mock_date.today.return_value = fixed_today
             out = StringIO()
             call_command("create_yearly_balance_operations", stdout=out)
@@ -88,8 +95,8 @@ class CreateYearlyBalanceOperationsTest(TestCase):
         self._call_command()
 
         snapshot = Operation.objects.get(type=Operation.YEARLY_BALANCE)
-        self.assertEqual(snapshot.declaration_year, 2025)
-        self.assertEqual(snapshot.status, Operation.ACCEPTED)
+        self.assertEqual(snapshot.declaration_year, 2026)
+        self.assertEqual(snapshot.status, Operation.AUTO)
         self.assertEqual(snapshot.credited_entity, self.entity)
         self.assertEqual(snapshot.biofuel, self.biofuel)
         self.assertEqual(snapshot.customs_category, MatierePremiere.CONV)
@@ -99,13 +106,13 @@ class CreateYearlyBalanceOperationsTest(TestCase):
         self.assertEqual(details.count(), 1)
         self.assertIsNone(details.first().lot_id)
 
-    def test_snapshot_uses_year_of_closed_period(self):
+    def test_snapshot_uses_current_declaration_year(self):
         self._create_incorporation(volume=500.0)
 
         self._call_command()
 
         snapshot = Operation.objects.get(type=Operation.YEARLY_BALANCE)
-        self.assertEqual(snapshot.declaration_year, self.period.year)
+        self.assertEqual(snapshot.declaration_year, self.period.year + 1)
 
     def test_no_snapshot_when_balance_is_empty(self):
         _, detail = self._create_incorporation(volume=1000.0)
@@ -144,11 +151,11 @@ class CreateYearlyBalanceOperationsTest(TestCase):
         self._call_command(fixed_today=date(2025, 4, 1))
         self._call_command(fixed_today=FIXED_TODAY)
 
-        snapshot_2024 = Operation.objects.get(type=Operation.YEARLY_BALANCE, declaration_year=2024)
-        self.assertEqual(snapshot_2024.volume, 1000.0)
-
         snapshot_2025 = Operation.objects.get(type=Operation.YEARLY_BALANCE, declaration_year=2025)
         self.assertEqual(snapshot_2025.volume, 1000.0)
+
+        snapshot_2026 = Operation.objects.get(type=Operation.YEARLY_BALANCE, declaration_year=2026)
+        self.assertEqual(snapshot_2026.volume, 1000.0)
 
     def test_snapshot_excludes_operations_after_period_end_date(self):
         self._create_incorporation(volume=1000.0)
@@ -157,7 +164,7 @@ class CreateYearlyBalanceOperationsTest(TestCase):
 
         self._call_command()
 
-        snapshot = Operation.objects.get(type=Operation.YEARLY_BALANCE, declaration_year=2025)
+        snapshot = Operation.objects.get(type=Operation.YEARLY_BALANCE, declaration_year=2026)
         self.assertEqual(snapshot.volume, 1000.0)
 
     def test_snapshot_is_excluded_from_balance(self):

@@ -6269,6 +6269,7 @@ export interface components {
          *     * `CORRECTED` - CORRECTED
          *     * `VALIDATED` - VALIDATED
          *     * `DRAFT` - DRAFT
+         *     * `AUTO` - AUTO
          * @enum {string}
          */
         OperationStatusEnum: PathsApiTiruertOperationsGetParametersQueryStatus;
@@ -14468,6 +14469,7 @@ export interface operations {
                  *     * `CORRECTED` - CORRECTED
                  *     * `VALIDATED` - VALIDATED
                  *     * `DRAFT` - DRAFT
+                 *     * `AUTO` - AUTO
                  */
                 status?: PathsApiTiruertOperationsGetParametersQueryStatus[];
                 /**
@@ -14846,6 +14848,7 @@ export interface operations {
                  *     * `CORRECTED` - CORRECTED
                  *     * `VALIDATED` - VALIDATED
                  *     * `DRAFT` - DRAFT
+                 *     * `AUTO` - AUTO
                  */
                 status?: PathsApiTiruertOperationsGetParametersQueryStatus[];
                 /**
@@ -14962,6 +14965,7 @@ export interface operations {
                  *     * `CORRECTED` - CORRECTED
                  *     * `VALIDATED` - VALIDATED
                  *     * `DRAFT` - DRAFT
+                 *     * `AUTO` - AUTO
                  */
                 status?: PathsApiTiruertOperationsGetParametersQueryStatus[];
                 /**
@@ -15101,6 +15105,7 @@ export interface operations {
                  *     * `CORRECTED` - CORRECTED
                  *     * `VALIDATED` - VALIDATED
                  *     * `DRAFT` - DRAFT
+                 *     * `AUTO` - AUTO
                  */
                 status?: PathsApiTiruertOperationsGetParametersQueryStatus[];
                 /**
@@ -16113,6 +16118,7 @@ export enum PathsApiTiruertOperationsGetParametersQuerySector {
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {
     ACCEPTED = "ACCEPTED",
+    AUTO = "AUTO",
     CANCELED = "CANCELED",
     CORRECTED = "CORRECTED",
     DECLARED = "DECLARED",

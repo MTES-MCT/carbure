@@ -11127,6 +11127,7 @@ paths:
               type: string
               enum:
                 - ACCEPTED
+                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -11143,6 +11144,7 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -11714,6 +11716,7 @@ paths:
               type: string
               enum:
                 - ACCEPTED
+                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -11730,6 +11733,7 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -11998,6 +12002,7 @@ paths:
               type: string
               enum:
                 - ACCEPTED
+                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -12014,6 +12019,7 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -12326,6 +12332,7 @@ paths:
               type: string
               enum:
                 - ACCEPTED
+                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -12342,6 +12349,7 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -19804,6 +19812,7 @@ components:
         - CORRECTED
         - VALIDATED
         - DRAFT
+        - AUTO
       type: string
       description: |-
         * `PENDING` - PENDING
@@ -19814,6 +19823,7 @@ components:
         * `CORRECTED` - CORRECTED
         * `VALIDATED` - VALIDATED
         * `DRAFT` - DRAFT
+        * `AUTO` - AUTO
     OperationTypeEnum:
       enum:
         - INCORPORATION

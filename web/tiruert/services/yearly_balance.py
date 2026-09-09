@@ -64,7 +64,7 @@ class YearlyBalanceService:
 
             operation = Operation.objects.create(
                 type=Operation.YEARLY_BALANCE,
-                status=Operation.ACCEPTED,
+                status=Operation.AUTO,
                 customs_category=entry["customs_category"],
                 biofuel=entry["biofuel"],
                 credited_entity_id=entity_id,
