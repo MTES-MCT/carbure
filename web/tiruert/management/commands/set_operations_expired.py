@@ -97,7 +97,6 @@ class Command(BaseCommand):
                 operation__credited_entity__isnull=False,
                 operation__status__in=Operation.CONFIRMED_STATUSES,
             )
-            .exclude_informative()
             .values_list("operation__credited_entity_id", flat=True)
             .distinct()
         )
@@ -147,7 +146,6 @@ class Command(BaseCommand):
                 operation__credited_entity_id=entity_id,
                 operation__status__in=Operation.CONFIRMED_STATUSES,
             )
-            .exclude_informative()
             .values("lot_id")
             .annotate(total=Sum(F("volume") * F("operation__renewable_energy_share")))
         )
@@ -161,7 +159,6 @@ class Command(BaseCommand):
                 operation__debited_entity_id=entity_id,
                 operation__status__in=Operation.ACTIVE_STATUSES,
             )
-            .exclude_informative()
             .values("lot_id")
             .annotate(total=Sum(F("volume") * F("operation__renewable_energy_share")))
         )
@@ -188,7 +185,7 @@ class Command(BaseCommand):
             lot_id__in=list(lots_to_expire.keys()),
             operation__credited_entity_id=entity_id,
             operation__status__in=Operation.CONFIRMED_STATUSES,
-        ).exclude_informative()
+        )
 
         lot_source_info = {}
         for detail in source_details:

@@ -30,7 +30,6 @@ class YearlyBalanceService:
                 status__in=Operation.CONFIRMED_STATUSES,
                 created_at__date__lte=declaration_end_date,
             )
-            .exclude_informative()
             .values_list("credited_entity_id", flat=True)
             .distinct()
         )
