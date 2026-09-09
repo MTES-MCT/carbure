@@ -13,7 +13,7 @@ export const DevaluationTypeForm = () => {
   return (
     <Select
       variant="form"
-      label={t("Type de perte")}
+      label={t("Type de dévalorisation")}
       options={[
         {
           label: formatDevaluationType(DevaluationType.LOSS),
@@ -48,7 +48,7 @@ export const DevaluationTypeSummary = ({
 
   return (
     <OperationText
-      title={t("Type de perte")}
+      title={t("Type de dévalorisation")}
       description={formatDevaluationType(values.devaluation_type)}
     />
   )

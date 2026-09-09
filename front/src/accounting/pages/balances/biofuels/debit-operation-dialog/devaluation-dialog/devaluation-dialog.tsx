@@ -105,7 +105,7 @@ export const DevaluationDialog = (props: DevaluationDialogProps) => {
 
   const steps = [
     fromDepotFiltersStep(form.value, {
-      title: t("Type de perte, dépôt et filtres"),
+      title: t("Type de dévalorisation, dépôt et filtres"),
     }),
     devaluationQuantityFormStep,
     { key: "recap", title: t("Récapitulatif") },
