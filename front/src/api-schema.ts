@@ -3485,6 +3485,10 @@ export interface components {
              */
             working_date: string;
             /** Format: decimal */
+            eec?: string;
+            /** Format: decimal */
+            el?: string;
+            /** Format: decimal */
             ei?: string;
             /** Format: decimal */
             ep?: string;
@@ -3494,6 +3498,10 @@ export interface components {
             eu?: string;
             /** Format: decimal */
             eccs?: string;
+            /** Format: decimal */
+            esca?: string;
+            /** Format: decimal */
+            eccr?: string;
         };
         ActionCertificate: {
             readonly id: number;
@@ -3537,6 +3545,10 @@ export interface components {
         /** @description Cumulative GES along the parent chain (gCO₂eq/MJ). */
         ActionTotalEmissions: {
             /** Format: decimal */
+            readonly eec: string;
+            /** Format: decimal */
+            readonly el: string;
+            /** Format: decimal */
             readonly ei: string;
             /** Format: decimal */
             readonly ep: string;
@@ -3546,6 +3558,10 @@ export interface components {
             readonly eu: string;
             /** Format: decimal */
             readonly eccs: string;
+            /** Format: decimal */
+            readonly esca: string;
+            /** Format: decimal */
+            readonly eccr: string;
             /** Format: decimal */
             readonly total: string;
         };
