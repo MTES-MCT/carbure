@@ -24,11 +24,15 @@ GENERIC_ROW = {
     "shipping_distance": 25,
     "shipping_method": "Transport routier",
     "working_date": date(2026, 2, 1),
+    "eec": 0,
+    "el": 0,
     "ei": 0,
     "ep": 0,
     "etd": 0,
     "eu": 0,
     "eccs": 0,
+    "esca": 0,
+    "eccr": 0,
 }
 
 

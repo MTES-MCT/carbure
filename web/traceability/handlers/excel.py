@@ -54,6 +54,16 @@ ACTION_EXCEL_COLUMNS = {
         "options": [force_str(label) for _, label in Action.SHIPPING_METHODS],
         "color": EXCEL_TRANSPORT_COLOR,
     },
+    "eec": {
+        "header": "EEC",
+        "comment": "Émissions résultant de l'extraction ou de la culture des matières premières - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "color": EXCEL_PRODUCTION_COLOR,
+    },
+    "el": {
+        "header": "EL",
+        "comment": "Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "color": EXCEL_PRODUCTION_COLOR,
+    },
     "ei": {
         "header": "EI",
         "comment": "Emissions liées aux intrants (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",
@@ -77,6 +87,16 @@ ACTION_EXCEL_COLUMNS = {
     "eccs": {
         "header": "ECCS",
         "comment": "Réductions d'émissions dues au captage et au stockage géologique du carbone (gCO₂éq/MJ de carburant) - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "color": EXCEL_CONSUMPTION_COLOR,
+    },
+    "esca": {
+        "header": "ESCA",
+        "comment": "Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "color": EXCEL_PRODUCTION_COLOR,
+    },
+    "eccr": {
+        "header": "ECCR",
+        "comment": "Réductions d'émissions dues au piégeage et à la substitution du CO2 - Chiffre supérieur ou égal à 0",
         "color": EXCEL_CONSUMPTION_COLOR,
     },
     "working_date": {
