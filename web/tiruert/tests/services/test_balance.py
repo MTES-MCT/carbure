@@ -1,5 +1,6 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+from django.db.models import Q
 from django.test import TestCase
 
 from core.models import MatierePremiere
@@ -73,6 +74,25 @@ class BalanceServiceLotVolumeRuleTest(TestCase):
         mock_detail.volume = 100.0
 
         self.assertEqual(mock_detail.volume, 100.0)
+
+
+class BalanceServiceFilterOperationsTest(TestCase):
+    """Unit tests for filtering operations by the current declaration year."""
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_filter_operations_for_current_year_excludes_next_year(self, mock_current_year):
+        operations = Mock()
+        filtered_operations = Mock()
+        operations.filter.return_value = filtered_operations
+
+        result = BalanceService._filter_operations_for_current_year(operations)
+
+        self.assertIs(result, filtered_operations)
+        operations.filter.assert_called_once_with(
+            (Q(durability_period__isnull=True) | Q(durability_period__lt="2026"))
+            & (Q(declaration_year__isnull=True) | Q(declaration_year__lte=2025))
+        )
+        mock_current_year.assert_called_once_with()
 
 
 class OperationDetailAvoidedEmissionsTest(TestCase):
@@ -347,6 +367,31 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         # Pending credit operations should not update available_balance
         for entry in result.values():
             self.assertEqual(entry["available_balance"], 0)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_calculate_balance_excludes_operations_from_next_year(self, mock_current_year):
+        """Balance only includes operations up to the current durability year."""
+        current_year_operation = self._create_operation_with_details(
+            credited_entity=self.entity,
+            type=Operation.INCORPORATION,
+            status=Operation.ACCEPTED,
+            durability_period="202512",
+        )
+        next_year_operation = self._create_operation_with_details(
+            credited_entity=self.entity,
+            type=Operation.INCORPORATION,
+            status=Operation.ACCEPTED,
+            durability_period="202601",
+        )
+
+        operations = Operation.objects.filter(id__in=[current_year_operation.id, next_year_operation.id])
+
+        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "l")
+
+        total_credit = sum(entry["quantity"]["credit"] for entry in result.values())
+        current_year_volume = sum(detail.volume for detail in current_year_operation.details.all())
+        self.assertEqual(total_credit, current_year_volume)
+        mock_current_year.assert_called_once_with()
 
     def test_calculate_balance_applies_ges_filtering(self):
         """Test calculate_balance filters lots by GHG reduction bounds."""
