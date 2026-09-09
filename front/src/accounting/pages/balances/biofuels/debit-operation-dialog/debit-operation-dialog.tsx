@@ -91,10 +91,12 @@ export const DebitOperationDialog = ({
                 label: formatOperationType(OperationType.EXPORTATION),
                 value: OperationType.EXPORTATION,
               },
-              {
-                label: formatOperationType(OperationType.DEVALUATION),
-                value: OperationType.DEVALUATION,
-              },
+              // {
+              //   label:
+              //     formatOperationType(OperationType.DEVALUATION) +
+              //     " (pertes, déclassement, autres cas éventuels)",
+              //   value: OperationType.DEVALUATION,
+              // },
             ]}
             onChange={setCurrentOperation}
             value={currentOperation}
