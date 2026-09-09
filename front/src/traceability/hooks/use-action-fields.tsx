@@ -49,6 +49,11 @@ export type ActionField = {
   options?: Record<string, unknown>
 }
 
+export type ActionFieldset = {
+  legend: string
+  fields: ActionField[]
+}
+
 export type ActionSiteFieldOptions = {
   siteTypes?: SiteTypeEnum[]
 }

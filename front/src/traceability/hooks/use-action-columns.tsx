@@ -66,12 +66,18 @@ export function useActionColumns() {
       cell: (action) => <Cell text={action.pos_id} />,
     },
 
-    working_date: {
+    period: {
       key: "working_date",
-      header: t("Consommé le"),
+      header: t("Période"),
       cell: (action) => (
         <Cell text={formatDate(action.working_date, "MM/yyyy")} />
       ),
+    },
+
+    working_date: {
+      key: "working_date",
+      header: t("Date de création"),
+      cell: (action) => <Cell text={formatDate(action.working_date)} />,
     },
 
     total_emissions: {

@@ -36,6 +36,7 @@ class ActionFactory(factory.django.DjangoModelFactory):
     eccs = Decimal("0")
 
     @factory.post_generation
-    def action_statuses(self, create, extracted, **kwargs):
+    def status(self, create, extracted, **kwargs):
         if create:
-            ActionStatus.objects.create(action=self, status=ActionStatus.CREATED)
+            status = extracted or ActionStatus.PENDING
+            ActionStatus.objects.get_or_create(action=self, status=status)

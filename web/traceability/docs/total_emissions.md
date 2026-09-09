@@ -5,10 +5,10 @@ Code : `services/total_emissions.py`. Tests : `tests/services/test_total_emissio
 On annote chaque action listée avec les GES **de sa chaîne de parents** (elle-même → parent → … → racine).
 
 ```
-total = (ei + ep + etd + eu) - eccs
+total = eec + el + ei + ep + etd + eu - eccs - esca - eccr
 ```
 
-Les postes `ei`, `ep`, `etd`, `eu`, `eccs` du JSON sont les **sommes** sur ce chemin, `total` est la formule ci-dessus.
+Les postes `eec`, `el`, `ei`, `ep`, `etd`, `eu`, `eccs`, `esca` et `eccr` du JSON sont les **sommes** sur ce chemin, `total` est la formule ci-dessus.
 
 ---
 

@@ -12687,6 +12687,14 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -12699,6 +12707,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -12874,6 +12883,7 @@ paths:
               - holder
               - material
               - order_by
+              - period
               - shipping_method
               - site
               - status
@@ -12952,6 +12962,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -12964,6 +12982,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -13046,8 +13065,8 @@ paths:
                     - holder
                     - material
                     - order_by
+                    - period
                     - shipping_method
-                    - site
                   summary: Example of filters response.
           description: ""
   /api/traceability/actions/import/:
@@ -13225,6 +13244,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -13237,6 +13264,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -13486,11 +13514,20 @@ components:
         shipping_method:
           allOf:
             - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          nullable: true
           title: Mode de transport
         working_date:
           type: string
           format: date
           title: Date de référence
+        eec:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        el:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
         ei:
           type: string
           format: decimal
@@ -13508,6 +13545,14 @@ components:
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
         eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        esca:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eccr:
           type: string
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
@@ -13612,6 +13657,16 @@ components:
       type: object
       description: Cumulative GES along the parent chain (gCO₂eq/MJ).
       properties:
+        eec:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        el:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
         ei:
           type: string
           format: decimal
@@ -13637,15 +13692,29 @@ components:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
+        esca:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        eccr:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
         total:
           type: string
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
       required:
+        - eccr
         - eccs
+        - eec
         - ei
+        - el
         - ep
+        - esca
         - etd
         - eu
         - total

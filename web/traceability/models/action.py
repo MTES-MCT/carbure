@@ -1,7 +1,8 @@
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import OuterRef, QuerySet, Subquery
+from django.db.models import CharField, OuterRef, QuerySet, Subquery, Value
+from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
 from .action_status import ActionStatus
@@ -19,6 +20,14 @@ class ActionManager(models.Manager):
             .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
             .annotate(created_at=Subquery(first_status_subquery.values("created_at")[:1]))
             .annotate(updated_at=Subquery(latest_status_subquery.values("created_at")[:1]))
+            .annotate(
+                period=Concat(
+                    ExtractYear("working_date"),
+                    Value("-"),
+                    LPad(ExtractMonth("working_date"), 2, Value("0")),
+                    output_field=CharField(),
+                )
+            )
         )
 
 
@@ -73,15 +82,21 @@ class Action(models.Model):
         (RAILROAD, _("Rail")),
         (SEA, _("Transport maritime")),
     ]
-    shipping_method = models.CharField(verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16, blank=True)
+    shipping_method = models.CharField(
+        verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16, null=True, blank=True
+    )
 
     working_date = models.DateField(verbose_name="Date de référence")
 
+    eec = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
+    el = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     ei = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     ep = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     etd = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     eu = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     eccs = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
+    esca = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
+    eccr = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
 
     objects = ActionManager()
     unannotated = models.Manager()
