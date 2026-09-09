@@ -5,7 +5,7 @@ from django.utils import timezone
 class Biocarburant(models.Model):
     name = models.CharField(max_length=64)
     name_en = models.CharField(max_length=64)
-    description = models.CharField(max_length=128)
+    description = models.CharField(max_length=320)
     date_added = models.DateField(default=timezone.now)
     code = models.CharField(max_length=16, unique=True)
     pci_kg = models.FloatField(default=0)
