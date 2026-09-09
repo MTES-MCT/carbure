@@ -68,7 +68,7 @@ class ActionViewsetQuerysetTest(TestCase):
         by_id = {item["id"]: item for item in response.data["results"]}
         self.assertIn("total_emissions", by_id[self.own_action.id])
         self.assertIn("total", by_id[self.own_action.id]["total_emissions"])
-        self.assertEqual(by_id[self.own_action.id]["status"], "CREATED")
+        self.assertEqual(by_id[self.own_action.id]["status"], "PENDING")
 
     def test_retrieve_includes_total_emissions(self):
         response = self.client.get(

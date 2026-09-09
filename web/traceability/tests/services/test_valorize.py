@@ -25,7 +25,7 @@ class ValorizeTest(TestCase):
     def test_skips_ineligible_actions(self):
         pending = ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None)
         ActionStatus.objects.create(action=pending, status=ActionStatus.PENDING)
-        ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None)  # CREATED only
+        ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, status=ActionStatus.CREATED)
 
         created = valorize(Action.objects.filter(type=Action.INIT))
 
@@ -33,7 +33,7 @@ class ValorizeTest(TestCase):
         self.assertEqual(created[0].parent_id, pending.pk)
 
     def test_raises_when_nothing_is_eligible(self):
-        ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None)
+        ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, status=ActionStatus.CREATED)
 
         with self.assertRaises(NoEligibleActionError):
             valorize(Action.objects.all())
