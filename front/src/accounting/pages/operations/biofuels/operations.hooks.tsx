@@ -42,7 +42,7 @@ const displayValueDebitOrCredit = (
 ) => {
   const operator = isOperationCredit ? "+" : "-"
 
-  return isOperationCredit ? (
+  return !isOperationCredit ? (
     <Text
       size="sm"
       fontWeight="semibold"

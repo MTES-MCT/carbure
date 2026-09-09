@@ -17,6 +17,7 @@ export const useOperationDetailFields = (operation?: Operation) => {
 
     const isReceiver = isCreditOperation(operation.transaction)
     const isSender = !isReceiver
+    const avoidedEmissionsSign = isReceiver ? "+" : "-"
 
     // Define all possible conditional fields
     const fields = compact([
@@ -39,9 +40,9 @@ export const useOperationDetailFields = (operation?: Operation) => {
         },
       {
         label: t("Tonnes CO2 eq évitées"),
-        value: formatTCO2Number(
-          formatValue(operation, operation.avoided_emissions)
-        ),
+        value:
+          avoidedEmissionsSign +
+          formatTCO2Number(formatValue(operation, operation.avoided_emissions)),
       },
       operation.type === OperationType.TRANSFERT &&
         isReceiver && {
