@@ -88,11 +88,15 @@ class Action(models.Model):
 
     working_date = models.DateField(verbose_name="Date de référence")
 
+    eec = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
+    el = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     ei = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     ep = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     etd = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     eu = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
     eccs = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
+    esca = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
+    eccr = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
 
     objects = ActionManager()
     unannotated = models.Manager()
