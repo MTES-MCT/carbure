@@ -1,12 +1,13 @@
 from collections import defaultdict
 from functools import partial
 
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 
 from tiruert.models import Operation
 from tiruert.models.operation_detail import OperationDetail
 from tiruert.services.balance_annotations import calculate_balance_with_annotations
 from tiruert.services.balance_filters import apply_operation_detail_filters
+from tiruert.services.declaration_period import DeclarationPeriodService
 
 
 class BalanceService:
@@ -116,6 +117,17 @@ class BalanceService:
         return operations.prefetch_related(Prefetch("details", queryset=details_qs, to_attr="prefetched_details"))
 
     @staticmethod
+    def _filter_operations_for_current_year(operations):
+        current_year = DeclarationPeriodService.get_current_declaration_year()
+        if current_year is None:
+            return operations
+
+        return operations.filter(
+            (Q(durability_period__isnull=True) | Q(durability_period__lt=str(current_year + 1)))
+            & (Q(declaration_year__isnull=True) | Q(declaration_year__lte=current_year))
+        )
+
+    @staticmethod
     def _calculate_balance_for_lot(operations, entity_id, group_by, date_from=None, detail_filters=None):
         # Use a defaultdict with a factory function that creates an appropriate balance entry
         balance = defaultdict(partial(BalanceService._init_lot_balance_entry))
@@ -165,6 +177,8 @@ class BalanceService:
         Returns:
         - A dictionary containing the calculated balances based on the specified grouping
         """
+        operations = BalanceService._filter_operations_for_current_year(operations)
+
         if group_by in [None, BalanceService.GROUP_BY_SECTOR, BalanceService.GROUP_BY_CATEGORY]:
             return calculate_balance_with_annotations(
                 operations,
