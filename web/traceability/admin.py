@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 
+from core.models import StoredFile
 from traceability.models import Action, ActionStatus, Material
 from traceability.services.valorize import NoEligibleActionError, valorize
 
@@ -9,6 +10,25 @@ class ActionStatusInline(admin.TabularInline):
     extra = 0
     readonly_fields = ("created_at",)
     ordering = ("created_at", "id")
+
+
+class StoredFileActionInline(admin.TabularInline):
+    model = Action
+    fk_name = "file"
+    extra = 0
+    show_change_link = True
+    fields = ("pos_id", "industry", "type", "holder", "quantity", "working_date")
+    readonly_fields = fields
+    ordering = ("pos_id",)
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class LatestStatusFilter(admin.SimpleListFilter):
@@ -69,7 +89,7 @@ class ActionAdmin(admin.ModelAdmin):
         "site__name",
         "certificate__certificate_id",
     )
-    raw_id_fields = ("parent", "holder", "material", "site", "certificate")
+    raw_id_fields = ("parent", "holder", "material", "site", "certificate", "file")
     list_select_related = ("holder", "material", "site", "certificate")
     date_hierarchy = "working_date"
     inlines = (ActionStatusInline,)
@@ -78,3 +98,15 @@ class ActionAdmin(admin.ModelAdmin):
     @admin.display(description="Statut", ordering="status")
     def latest_status(self, obj):
         return obj.status
+
+
+@admin.register(StoredFile)
+class StoredFileAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "entity", "user", "created_at")
+    fields = ("entity", "user", "name", "url", "created_at")
+    search_fields = ("name", "entity__name", "user__email", "actions__pos_id")
+    raw_id_fields = ("user", "entity")
+    readonly_fields = ("created_at",)
+    list_select_related = ("entity", "user")
+    date_hierarchy = "created_at"
+    inlines = (StoredFileActionInline,)
