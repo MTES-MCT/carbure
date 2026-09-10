@@ -36,6 +36,7 @@ class OperationManager(models.Manager):
                 "biofuel__pci_litre",
                 "biofuel__compatible_essence",
                 "biofuel__compatible_diesel",
+                "biofuel__compatible_gpl",
                 "biofuel__masse_volumique",
                 "biofuel__renewable_energy_share",
                 "credited_entity__name",
