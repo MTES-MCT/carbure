@@ -3,6 +3,7 @@ from unittest import TestCase
 from core.models.geography import Pays
 from edelivery.ebms.certificate_site import CertificateSite
 from edelivery.tests.ebms.fixtures.certificate_site_xml_data import certificate_site_xml_data
+from entity.factories.entity import EntityFactory
 from transactions.models.site import Site
 
 
@@ -50,3 +51,16 @@ class CertificateSiteTest(TestCase):
         site = CertificateSite.from_carbure_site(carbure_site)
         country_code = site.country_code()
         self.assertEqual("BE", country_code)
+
+    def test_is_not_main_site_when_created_from_carbure_site(self):
+        country = Pays(code_pays="BE")
+        carbure_site = Site(country=country)
+        site = CertificateSite.from_carbure_site(carbure_site)
+        is_main_site = site.xml_root_element.find("./MAIN_SITE")
+        self.assertEqual("false", is_main_site.text)
+
+    def test_is_main_site_when_created_from_carbure_entity(self):
+        carbure_entity = EntityFactory.build()
+        site = CertificateSite.from_carbure_entity(carbure_entity)
+        is_main_site = site.xml_root_element.find("./MAIN_SITE")
+        self.assertEqual("true", is_main_site.text)

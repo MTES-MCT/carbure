@@ -3,16 +3,41 @@ from edelivery.ebms.udb_element import UDBElement
 
 class CertificateSite(UDBElement):
     @staticmethod
+    def from_carbure_entity(carbure_entity):
+        country_code = carbure_entity.registered_country and carbure_entity.registered_country.code_pays
+
+        return CertificateSite.from_raw_data(
+            name=carbure_entity.name,
+            address=carbure_entity.registered_address,
+            zipcode=carbure_entity.registered_zipcode,
+            city=carbure_entity.registered_city,
+            country_code=country_code,
+            is_main_site=True,
+        )
+
+    @staticmethod
     def from_carbure_site(carbure_site):
         country_code = carbure_site.country and carbure_site.country.code_pays
 
+        return CertificateSite.from_raw_data(
+            name=carbure_site.name,
+            address=carbure_site.address,
+            zipcode=carbure_site.postal_code,
+            city=carbure_site.city,
+            country_code=country_code,
+            is_main_site=False,
+        )
+
+    @staticmethod
+    def from_raw_data(name, address, zipcode, city, country_code, is_main_site):
         return CertificateSite.from_xml(f"""\
 <EO_CERTIFICATE_SITE>
-    <SITE_NAME>{carbure_site.name}</SITE_NAME>
-    <STREET_LINE>{carbure_site.address}</STREET_LINE>
-    <POST_CODE>{carbure_site.postal_code}</POST_CODE>
-    <CITY>{carbure_site.city}</CITY>
+    <SITE_NAME>{name}</SITE_NAME>
+    <STREET_LINE>{address}</STREET_LINE>
+    <POST_CODE>{zipcode}</POST_CODE>
+    <CITY>{city}</CITY>
     <COUNTRY_CODE>{country_code}</COUNTRY_CODE>
+    <MAIN_SITE>{str(is_main_site).lower()}</MAIN_SITE>
 </EO_CERTIFICATE_SITE>
         """)
 
