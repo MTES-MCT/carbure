@@ -38,6 +38,7 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
 
         self.patched_CertificateSite = patch(f"{module_to_patch}.CertificateSite").start()
         self.patched_CertificateSite.from_carbure_site.side_effect = lambda _: CertificateSite.from_xml("<SOME_TAG />")
+        self.patched_CertificateSite.from_carbure_entity.side_effect = lambda _: CertificateSite.from_xml("<SOME_TAG />")
 
     def tearDown(self):
         patch.stopall()
@@ -132,19 +133,19 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         organisation_scopes = root_xml_element.findall("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/EO_SCOPE/ORGANISATION_SCOPE")
         self.assertEqual(["PB", "FSP"], [s.text for s in organisation_scopes])
 
-    def test_injects_site_infos(self):
-        patched_from_carbure_site = self.patched_CertificateSite.from_carbure_site
-        patched_from_carbure_site.side_effect = [CertificateSite.from_xml("<SOME_TAG>Some value</SOME_TAG>")]
+    def test_injects_main_site_infos(self):
+        patched_from_carbure_entity = self.patched_CertificateSite.from_carbure_entity
+        patched_from_carbure_entity.side_effect = [CertificateSite.from_xml("<SOME_TAG>Main site</SOME_TAG>")]
 
-        carbure_site = MagicMock()
-        self.entity.get_sites.return_value = [carbure_site]
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
-        patched_from_carbure_site.assert_called_with(carbure_site)
+        patched_from_carbure_entity.assert_called_with(self.entity)
 
         site_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/SOME_TAG")
-        self.assertEqual("Some value", site_element.text)
+        self.assertEqual("Main site", site_element.text)
 
     def test_handles_multiple_sites(self):
+        patched_from_carbure_entity = self.patched_CertificateSite.from_carbure_entity
+        patched_from_carbure_entity.side_effect = [CertificateSite.from_xml("<SOME_TAG>Main site</SOME_TAG>")]
         patched_from_carbure_site = self.patched_CertificateSite.from_carbure_site
         patched_from_carbure_site.side_effect = [
             CertificateSite.from_xml("<SOME_TAG>Site 1</SOME_TAG>"),
@@ -156,11 +157,4 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         self.assertEqual(2, patched_from_carbure_site.call_count)
 
         sites = root_xml_element.findall("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/SOME_TAG")
-        self.assertEqual(["Site 1", "Site 2"], [s.text for s in sites])
-
-    def test_inserts_main_site_tag(self):
-        self.entity.get_sites.return_value = [MagicMock(), MagicMock()]
-        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
-
-        main_sites = root_xml_element.findall("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/SOME_TAG/MAIN_SITE")
-        self.assertEqual(["true", "false"], [ms.text for ms in main_sites])
+        self.assertEqual(["Main site", "Site 1", "Site 2"], [s.text for s in sites])
