@@ -4,7 +4,7 @@ from openpyxl import Workbook
 
 from core.models import GenericCertificate
 from doublecount.parser.excel_to_carbure_convertor import get_feedstock_from_dc_feedstock
-from doublecount.parser.helpers import extract_country_code, extract_year, intOrZero
+from doublecount.parser.helpers import extract_country_code, extract_year, intOrZero, is_subtotal_row
 from doublecount.parser.types import SourcingHistoryRow
 
 
@@ -26,6 +26,10 @@ def parse_sourcing_history(excel_file: Workbook, start_year: int) -> List[Sourci
         if current_year > start_year:
             continue
 
+        # Subtotal rows merge the sourcing columns (C:H).
+        if is_subtotal_row(row, start=2, end=8):
+            continue
+
         feedstock_name = row[2].value
         origin_country_cell = row[3].value
         supply_country_cell = row[4].value
@@ -33,12 +37,10 @@ def parse_sourcing_history(excel_file: Workbook, start_year: int) -> List[Sourci
         raw_material_supplier = row[6].value
         supplier_certificate_id = row[7].value
 
-        if not feedstock_name or feedstock_name == origin_country_cell:
+        if not feedstock_name and not origin_country_cell:
             continue
 
         feedstock = get_feedstock_from_dc_feedstock(feedstock_name)
-        if not feedstock:
-            continue
 
         origin_country = extract_country_code(origin_country_cell)
         supply_country = extract_country_code(supply_country_cell)

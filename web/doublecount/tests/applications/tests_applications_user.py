@@ -169,7 +169,9 @@ class DoubleCountApplicationsTest(TestCase):
 
         # sourcing history
         sourcing_errors = errors["sourcing_history"]
-        assert len(sourcing_errors) == 0
+        assert len(sourcing_errors) == 2
+        assert sourcing_errors[0]["error"] == DoubleCountingError.MISSING_FEEDSTOCK
+        assert sourcing_errors[1]["error"] == DoubleCountingError.MISSING_FEEDSTOCK
 
     def test_production_integrity(self):
         response = self.check_file("dc_agreement_application_errors_prod_integrity.xlsx")

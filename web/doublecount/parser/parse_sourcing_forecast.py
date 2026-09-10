@@ -3,7 +3,7 @@ from typing import List
 from openpyxl import Workbook
 
 from doublecount.parser.excel_to_carbure_convertor import get_feedstock_from_dc_feedstock
-from doublecount.parser.helpers import extract_country_code, extract_year, intOrZero
+from doublecount.parser.helpers import extract_country_code, extract_year, intOrZero, is_subtotal_row
 from doublecount.parser.types import SourcingRow
 
 
@@ -16,6 +16,10 @@ def parse_sourcing_forecast(excel_file: Workbook, start_year: int) -> List[Sourc
     for line, row in enumerate(sourcing_sheet.iter_rows()):
         current_year = extract_year(row[1].value, current_year)
         if current_year < start_year:
+            continue
+
+        # Subtotal rows merge the sourcing columns (C:F).
+        if is_subtotal_row(row, start=2, end=6):
             continue
 
         feedstock_name = row[2].value
