@@ -79,6 +79,7 @@ class BiocarburantAdmin(admin.ModelAdmin):
         "is_displayed",
         "compatible_essence",
         "compatible_diesel",
+        "compatible_gpl",
     )
     search_fields = ("name",)
     list_filter = ("is_alcool", "is_graisse", "is_displayed")

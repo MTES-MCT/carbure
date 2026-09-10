@@ -25,6 +25,7 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
         renewable_energy_share = row["renewable_energy_share"]
         compatible_essence = row["compatible_essence"]
         compatible_diesel = row["compatible_diesel"]
+        compatible_gpl = row["compatible_gpl"]
         description = row["description"]
 
         obj, created = Biocarburant.objects.update_or_create(
@@ -41,6 +42,7 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
                 "renewable_energy_share": renewable_energy_share,
                 "compatible_essence": compatible_essence,
                 "compatible_diesel": compatible_diesel,
+                "compatible_gpl": compatible_gpl,
                 "description": description,
             },
         )

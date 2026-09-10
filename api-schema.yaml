@@ -11109,10 +11109,12 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
+                - GPL_C
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
+            * `GPL_C` - GPL_C
           explode: true
           style: form
         - in: query
@@ -11698,10 +11700,12 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
+                - GPL_C
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
+            * `GPL_C` - GPL_C
           explode: true
           style: form
         - in: query
@@ -11984,10 +11988,12 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
+                - GPL_C
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
+            * `GPL_C` - GPL_C
           explode: true
           style: form
         - in: query
@@ -12314,10 +12320,12 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
+                - GPL_C
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
+            * `GPL_C` - GPL_C
           explode: true
           style: form
         - in: query
@@ -19404,11 +19412,13 @@ components:
         - ESSENCE
         - GAZOLE
         - CARBURÉACTEUR
+        - GPL_C
       type: string
       description: |-
         * `ESSENCE` - ESSENCE
         * `GAZOLE` - GAZOLE
         * `CARBURÉACTEUR` - CARBURÉACTEUR
+        * `GPL_C` - GPL_C
     Operation:
       type: object
       properties:

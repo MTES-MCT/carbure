@@ -42,6 +42,7 @@ class OperationManager(models.Manager.from_queryset(OperationQuerySet)):
                 "biofuel__pci_litre",
                 "biofuel__compatible_essence",
                 "biofuel__compatible_diesel",
+                "biofuel__compatible_gpl",
                 "biofuel__masse_volumique",
                 "biofuel__renewable_energy_share",
                 "credited_entity__name",
@@ -123,10 +124,12 @@ class Operation(models.Model):
     ESSENCE = "ESSENCE"
     GAZOLE = "GAZOLE"
     CARBUREACTEUR = "CARBURÉACTEUR"
+    GPL_C = "GPL_C"
     SECTOR_CODE_CHOICES = (
         (ESSENCE, ESSENCE),
         (GAZOLE, GAZOLE),
         (CARBUREACTEUR, CARBUREACTEUR),
+        (GPL_C, GPL_C),
     )
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)

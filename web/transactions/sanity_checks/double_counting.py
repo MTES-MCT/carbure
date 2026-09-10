@@ -1,5 +1,6 @@
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import CarbureLot
+from core.models.feedstock import GPL_BIOFUEL_TYPES
 from saf.models.constants import SAF_BIOFUEL_TYPES
 
 from .helpers import generic_error
@@ -8,8 +9,9 @@ from .helpers import generic_error
 def check_missing_ref_dbl_counting(lot: CarbureLot):
     is_dc = lot.feedstock and lot.feedstock.is_double_compte
     is_saf = lot.biofuel and lot.biofuel.code in SAF_BIOFUEL_TYPES
+    is_gpl = lot.biofuel and lot.biofuel.code in GPL_BIOFUEL_TYPES
 
-    if is_dc and not is_saf:
+    if is_dc and not is_saf and not is_gpl:
         if not lot.production_site_double_counting_certificate:
             return generic_error(
                 error=CarbureSanityCheckErrors.MISSING_REF_DBL_COUNTING,
