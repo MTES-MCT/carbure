@@ -13,7 +13,6 @@ filename = "%s/web/fixtures/csv/biocarburants.csv" % (os.environ["CARBURE_HOME"]
 with open(filename, newline="", encoding="utf-8-sig") as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
-        print(row)
         code = row["code"]
         name = row["name"]
         name_en = row["name_en"]
