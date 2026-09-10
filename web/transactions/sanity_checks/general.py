@@ -61,7 +61,22 @@ def check_delivery_in_the_future(lot: CarbureLot):
 
 
 def check_mac_bc_wrong(lot: CarbureLot):
-    mac_biofuels = ("ED95", "B100", "ETH", "EMHV", "EMHU", "HVOC", "HVOE", "HVOG", "HOE", "HOG", "HOC")
+    mac_biofuels = (
+        "ED95",
+        "B100",
+        "ETH",
+        "EMHV",
+        "EMHU",
+        "HVOC",
+        "HVOE",
+        "HVOG",
+        "HOE",
+        "HOG",
+        "HOC",
+        "HOGPL",
+        "HVOGPL",
+        "HCGPL",
+    )
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel and lot.biofuel.code not in mac_biofuels:
         return generic_error(
             error=CarbureSanityCheckErrors.MAC_BC_WRONG,
