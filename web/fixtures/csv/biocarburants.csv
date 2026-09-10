@@ -1,19 +1,19 @@
-code,name,name_en,is_displayed,is_alcool,is_graisse,masse_volumique,pci_kg,pci_litre,renewable_energy_share,compatible_diesel,compatible_essence,compatible_gpl,description
-BG,Biogaz,Biogas,0,0,0,0.000,50,0,1,0,0,0,Biogaz purifié jusqu'à obtention d'une qualité équivalente à celle du gaz naturel
+﻿code,name,name_en,is_displayed,is_alcool,is_graisse,masse_volumique,pci_kg,pci_litre,renewable_energy_share,compatible_diesel,compatible_essence,compatible_gpl,description
+BG,Biogaz,Biogas,0,0,0,0,50,0,1,0,0,0,Biogaz purifié jusqu'à obtention d'une qualité équivalente à celle du gaz naturel
 BGS,Biogazole de synthèse (Hors HVO),Synthetic biodiesel (non HVO),0,0,0,0.773,44,34,1,1,0,0,Gazole filière Fischer-Tropsch (hydrocarbure synthétique ou mélange d'hydrocarbures synthétiques) - gazole
 EMHA,EMHA,AFME,1,0,1,0.892,37,33,1,1,0,0,Biogazole-ester méthylique d'acide gras - produit à partir d'une huile/graisse animale
 EMHU,EMHU,UCOME,1,0,1,0.892,37,33,1,1,0,0,Biogazole-ester méthylique d'acide gras - produit à partir d'une huile usagé
 EMHV,EMHV,VOME,1,0,1,0.892,37,33,1,1,0,0,Biogazole-ester - ester méthylique produit à partir d'une huile végétale
-ETBE,ETBE,ETBE,1,1,0,0.750,36,27,0.37,0,1,0,Éthyl-tertio-butyl-éther produit à partir d'éthanol
+ETBE,ETBE,ETBE,1,1,0,0.75,36,27,0.37,0,1,0,Éthyl-tertio-butyl-éther produit à partir d'éthanol
 MTBE,MTBE,MTBE,1,1,0,0.743,35,26,0.22,0,1,0,Méthyl-tertio-butyl-éther produit à partir de méthanol
 TAEE,TAEE,TAEE,1,0,0,0.763,38,29,0.29,0,0,0,Tertioamyléthyléther produit à partir d'éthanol)
 HVP,Huile végétale pure,Pure vegetable oil,0,0,1,0.919,37,34,1,0,0,0,Huile végétale pure
-HCU,Huile provenant d'huiles de cuisson usagées,UCO Oil,0,0,1,0.000,0,0,1,0,0,0,Huile provenant d'huiles de cuisson usagées
+HCU,Huile provenant d'huiles de cuisson usagées,UCO Oil,0,0,1,0,0,0,1,0,0,0,Huile provenant d'huiles de cuisson usagées
 HOG,Autres Huiles Hydrotraitées - Gazole,Hydrotreated oil - Diesel,1,0,1,0.773,44,34,1,1,0,0,Huile provenant de la biomasse hydrotraitée (ayant subi un traitement thermochimique à l'hydrogène) - gazole
 HOE,Autres Huiles Hydrotraitées - Essence,Hydrotreated oil - Gasoline,1,0,1,0.667,45,30,1,0,1,0,Huile provenant de la biomasse hydrotraitée (ayant subi un traitement thermochimique à l'hydrogène) - essence
 HVOG,Huiles Végétales Hydrotraitées - Gazole,Hydrotreated vegetable oil - Diesel,1,0,1,0.773,44,34,1,1,0,0,Huile végétale hydrotraitée (ayant subi un traitement thermochimique à l'hydrogène) - gazole
 HVOE,Huiles Végétales Hydrotraitées - Essence,Hydrotreated vegetable oil - Gasoline,1,0,1,0.667,45,30,1,0,1,0,Huile provenant de la biomasse hydrotraitée (ayant subi un traitement thermochimique à l'hydrogène) essence
-MT,Méthanol,Methanol,0,1,0,0.800,20,16,1,0,1,0,Méthanol provenant de sources renouvelables
+MT,Méthanol,Methanol,0,1,0,0.8,20,16,1,0,1,0,Méthanol provenant de sources renouvelables
 BT,Butanol,Butanol,0,1,0,0.818,33,27,1,0,1,0,Butanol provenant de sources renouvelables
 EMAG,EMAG,FAME,1,0,1,0.892,37,33,1,1,0,0,Biogazole-ester méthylique d'acide gras - produit à partir d'une huile/graisse provenant de la biomasse
 ED95,Éthanol pour ED95,ED95's ethanol,1,1,0,0.778,27,21,1,0,1,0,Bio-diesel Éthanol provenant de sources renouvelables 
@@ -21,15 +21,15 @@ ETH,Éthanol,Ethanol,1,1,0,0.778,27,21,1,0,1,0,Éthanol provenant de sources ren
 B100,B100,B100,1,0,1,0.892,37,33,1,1,0,0,Biogazole-ester méthylique d'acide gras 100% bio
 HOC,Autres Huiles Hydrotraitées - Kérosène,Hydrotreated oil - Jet,1,0,1,0.773,44,34,1,0,0,0,Huile provenant de la biomasse hydrotraitée (ayant subi un traitement thermochimique à l'hydrogène) carburéacteur (filière HEFA et HC-HEFA-SPK)
 HVOC,Huiles Végétales Hydrotraitées - Kérosène,Hydrotreated vegetable oil - Jet,1,0,1,0.773,44,34,1,0,0,0,Huile végétale hydrotraitée (ayant subi un traitement thermochimique à l'hydrogène) - carburéacteur (filière HEFA et HC-HEFA-SPK)
-HCE,Huiles co-traitées - Essence,Co-processed oils – Gasoline,1,0,1,0.727,44,32,1,0,1,0,Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles) provenant de la biomasse ou de la biomasse pyrolysée essence
-HCG,Huiles co-traitées - Gazole,Co-processed oils – Diesel,1,0,1,0.837,43,36,1,1,0,0,Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles) provenant de la biomasse ou de la biomasse pyrolysée -gazole
-HCC,Huiles co-traitées - Kérosène,Co-processed oils – Jet,1,0,1,0.767,43,33,1,0,0,0,Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles) provenant de la biomasse ou de la biomasse pyrolysée - carburéacteur
-EEHA,EEHA,,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras produit à partir d'une huile/graisse animale
-EEHU,EEHU,,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras produit à partir d'une huile usagé
-EEHV,EEHV,,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras produit à partir d'une huile végétale
+HCE,Huiles co-traitées - Essence,Co-processed oils - Gasoline,1,0,1,0.727,44,32,1,0,1,0,Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles) provenant de la biomasse ou de la biomasse pyrolysée essence
+HCG,Huiles co-traitées - Gazole,Co-processed oils - Diesel,1,0,1,0.837,43,36,1,1,0,0,Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles) provenant de la biomasse ou de la biomasse pyrolysée -gazole
+HCC,Huiles co-traitées - Kérosène,Co-processed oils - Jet,1,0,1,0.767,43,33,1,0,0,0,Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles) provenant de la biomasse ou de la biomasse pyrolysée - carburéacteur
+EEHA,EEHA,AFEE,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras produit à partir d'une huile/graisse animale
+EEHU,EEHU,UEE,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras produit à partir d'une huile usagé
+EEHV,EEHV,VOEE,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras produit à partir d'une huile végétale
 TAME,TAME,TAME,0,0,1,0.778,36,28,0.18,1,0,0,Ertioamylméthyléther produit à partir de méthanol
-BES,Bio-essence de synthèse,,1,1,0,0.750,44,33,1,0,1,0,Essence filière Fischer-Tropsch (hydrocarbure synthétique ou mélange d'hydrocarbures synthétiques produit à partir de la biomasse - l'essence
-EEAG,EEAG,,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras 
+BES,Bio-essence de synthèse,Synthetic biogasoline,1,1,0,0.75,44,33,1,0,1,0,Essence filière Fischer-Tropsch (hydrocarbure synthétique ou mélange d'hydrocarbures synthétiques produit à partir de la biomasse - l'essence
+EEAG,EEAG,FAEE,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras
 HOGPL,Autres Huiles Hydrotraitées - GPL,Hydrotreated oil - LPG,0,0,1,0.522,46,24,1,0,0,1,Huile provenant de la biomasse hydrotraitée (ayant subi un traitement thermochimique à l'hydrogène - gaz de pétrole liquéfié carburant (GPL)
 HVOGPL,Huiles Végétales Hydrotraitées - GPL,Hydrotreated vegetable oil - LPG,0,0,1,0.522,46,24,1,0,0,1,Huile végétale hydrotraitée  (ayant subi un traitement thermochimique à l'hydrogène - gaz de pétrole liquéfié carburant (GPL)
 HCGPL,Huiles co-traitées - GPL,Co-processed oils - LPG,0,0,1,0.500,46,23,1,0,0,1,Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles) provenant de la biomasse ou de la biomasse pyrolysée - gaz de pétrole liquéfié carburant (GPL)
