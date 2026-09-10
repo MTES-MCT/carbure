@@ -33,13 +33,13 @@ class ActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = "__all__"
+        exclude = ["file"]
 
 
 class ActionInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = "__all__"
+        exclude = ["file"]
         read_only_fields = ["id", "industry", "holder", "parent"]
 
     def create(self, validated_data):
