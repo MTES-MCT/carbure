@@ -1,6 +1,7 @@
-id,name,pci_litre
-1,Essence,32
-2,Gazole,36
-3,Carburéacteur,34
-4,Fioul lourd,33.2
-5,Gaz,24
+id,name,pci_litre,pci_kg
+1,Essence,32,44
+2,Gazole,36,43
+3,Carburéacteur,34,43
+4,Fioul lourd,33.2,40
+5,Gaz,24,50
+6,Maritime,36,43
