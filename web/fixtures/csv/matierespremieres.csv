@@ -49,6 +49,7 @@ TRITICALE,Triticale,1,0,0,0,1,0,CONV
 AMIDON_RESIDUEL_DECHETS,Amidons résiduels déchets,1,0,1,0,1,1,ANN-IX-A
 RAW_METHANOL_KRAFT_PULPING,Méthanol brut issu de la pâte kraft obtenue à partir de la pulpe de bois,1,0,1,0,1,0,ANN-IX-A
 CIVE,Culture intermédiaire,1,1,1,1,0,0,ANN-IX-B
+PFAD,PFAD,0,0,0,0,0,0,CONV
 HUILES_DE_FUSEL,Huiles de fusel,1,0,1,1,1,1,ANN-IX-A
 MAUVAIS_GOUTS,Alcools mauvais goûts,1,0,1,1,1,1,ANN-IX-A
 HUILES_ACIDES_DE_PLUMES_DE_VOLAILLES,Huiles acides de plumes de volailles,0,1,1,1,1,1,ANN-IX-A
@@ -79,3 +80,7 @@ HUILES_OU_GRAISSES_ISSUES_DES_EAUX_USEES_PROVENANT_DU_TRANSPORT_MARITIME,Huiles 
 ETHANOL_CONTAMINE_UTILISE_POUR_L_EXTRACTION_DE_PROTEINES_DE_CEREALES,Ethanol contaminé utilisé pour l'extraction de protéines de céréales,1,0,1,0,1,1,ANN-IX-A
 DECHETS_DE_CRIBLAGE_DU_MAIS_DE_MOULIN_HUMIDE,Déchets de criblage du maïs de moulin humide,1,0,1,0,1,1,ANN-IX-A
 BOUES_ISSUES_DU_STOCKAGE_INDUSTRIEL,Boues issues du stockage industriel,0,1,1,0,1,1,ANN-IX-A
+RESIDUS_DE_LA_TRANSFORMATION_DE_FRUITS_EN_PRODUITS_ALIMENTAIRES,Résidus de la transformation de fruits en produits alimentaires,1,0,1,0,1,1,ANN-IX-A
+ACIDES_GRAS_LIBRES_RESIDUS_DU_TRAITEMENT_D_HUILE,Acides gras libres résidus du traitement d'huile,0,1,1,0,1,1,ANN-IX-A
+RESIDUS_DE_SEPARATION_D_ACIDE_ISSU_DU_BEURRE_DE_KARITE,Résidus de séparation d'acide issu du beurre de karité,0,1,1,0,1,1,ANN-IX-A
+RESIDUS_DE_MATIERES_GRASSES_UTILISEES_DANS_LA_PRODUCTION_DE_LAIT_INFANTILE,Résidus de matières grasses utilisées dans la production de lait infantile,0,1,1,0,1,1,ANN-IX-A
