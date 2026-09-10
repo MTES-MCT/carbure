@@ -5,7 +5,13 @@ from core.utils import truncate
 from tiruert.services.energy import energy_mj
 
 
-class OperationManager(models.Manager):
+class OperationQuerySet(models.QuerySet):
+    def exclude_informative(self):
+        """Drop operations that only carry information and must not impact any computation."""
+        return self.exclude(type__in=Operation.BALANCE_EXCLUDED_TYPES)
+
+
+class OperationManager(models.Manager.from_queryset(OperationQuerySet)):
     def get_queryset(self):
         return (
             super()
@@ -55,6 +61,7 @@ class Operation(models.Model):
     CORRECTED = "CORRECTED"  # By customs
     VALIDATED = "VALIDATED"  # By customs
     DRAFT = "DRAFT"  # For transfert operations
+    AUTO = "AUTO"
 
     OPERATION_STATUSES = (
         (PENDING, PENDING),
@@ -65,6 +72,7 @@ class Operation(models.Model):
         (CORRECTED, CORRECTED),
         (VALIDATED, VALIDATED),
         (DRAFT, DRAFT),
+        (AUTO, AUTO),
     )
 
     INCORPORATION = "INCORPORATION"
@@ -80,6 +88,7 @@ class Operation(models.Model):
     EXPEDITION = "EXPEDITION"
     EXPIRATION = "EXPIRATION"
     REPORT = "REPORT"  # Used once for switching from TIRUERT to IRICC regulation
+    YEARLY_BALANCE = "YEARLY_BALANCE"  # Snapshot of the balance at the closing of a declaration year
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -93,6 +102,7 @@ class Operation(models.Model):
         (TRANSFERT, TRANSFERT),
         (EXPIRATION, EXPIRATION),
         (REPORT, REPORT),
+        (YEARLY_BALANCE, YEARLY_BALANCE),
     )
 
     API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION]
@@ -100,6 +110,9 @@ class Operation(models.Model):
 
     # Types that generate initial credit volumes (from physical operations)
     CREDIT_TYPES = [INCORPORATION, MAC_BIO, LIVRAISON_DIRECTE]
+
+    # Informative types: they are listed in the API but must never impact any volume computation
+    BALANCE_EXCLUDED_TYPES = [YEARLY_BALANCE]
 
     # Statuses considered active in balance calculation (credits + debits)
     ACTIVE_STATUSES = [PENDING, ACCEPTED, VALIDATED, DECLARED, DRAFT]

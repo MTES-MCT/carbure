@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 from django.test import TestCase
 
+from tiruert.models import Operation
 from tiruert.views.operation.operation import OperationPagination
 
 
@@ -111,13 +112,30 @@ class OperationPaginationTest(TestCase):
 
         self.assertEqual(result["total_volume"], 1000.0)
 
+    def test_get_extra_metadata_excludes_yearly_balance_operations(self):
+        """Should ignore informative YEARLY_BALANCE operations in total_volume."""
+        operation = Mock()
+        operation._volume = 1000.0
+        operation.type = Operation.INCORPORATION
+
+        snapshot = Mock()
+        snapshot._volume = 500.0
+        snapshot.type = Operation.YEARLY_BALANCE
+
+        self.pagination.queryset = [operation, snapshot]
+
+        result = self.pagination.get_extra_metadata()
+
+        self.assertEqual(result["total_volume"], 1000.0)
+
     def test_get_extra_metadata_uses_queryset_aggregate_when_available(self):
         """Should delegate total_volume computation to the ORM queryset when possible."""
         queryset = Mock()
-        queryset.aggregate.return_value = {"total_volume": 1234.5}
+        queryset.exclude_informative.return_value.aggregate.return_value = {"total_volume": 1234.5}
         self.pagination.queryset = queryset
 
         result = self.pagination.get_extra_metadata()
 
-        queryset.aggregate.assert_called_once()
+        queryset.exclude_informative.assert_called_once_with()
+        queryset.exclude_informative.return_value.aggregate.assert_called_once()
         self.assertEqual(result, {"total_volume": 1234.5})
