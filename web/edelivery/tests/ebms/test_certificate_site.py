@@ -25,7 +25,13 @@ class CertificateSiteTest(TestCase):
 
     def test_is_not_main_site_when_created_from_carbure_site(self):
         country = Pays(code_pays="BE")
-        carbure_site = Site(country=country)
+        carbure_site = Site(
+            name="Site name",
+            address="Some address",
+            postal_code="Some zipcode",
+            city="Some city",
+            country=country,
+        )
         site = CertificateSite.from_carbure_site(carbure_site)
         is_main_site = site.xml_root_element.find("./MAIN_SITE")
         self.assertEqual("false", is_main_site.text)
@@ -48,8 +54,27 @@ class CertificateSiteTest(TestCase):
         self.assertEqual("BE", site.country_code())
 
     def test_is_main_site_when_created_from_carbure_entity(self):
-        carbure_entity = EntityFactory.build()
+        country = Pays(code_pays="BE")
+        carbure_entity = EntityFactory.build(registered_country=country)
         site = CertificateSite.from_carbure_entity(carbure_entity)
         is_main_site = site.xml_root_element.find("./MAIN_SITE")
         self.assertEqual("true", is_main_site.text)
         self.assertTrue(site.is_main_site())
+
+    def test_raises_value_error_when_address_infos_missing(self):
+        default_data = {
+            "name": "Site name",
+            "address": "1 rue du Chat-Perché",
+            "zipcode": "75000",
+            "city": "Paris",
+            "country_code": "FR",
+            "is_main_site": True,
+        }
+
+        params_to_check = ["address", "zipcode", "city", "country_code"]
+        for p in params_to_check:
+            with self.assertRaises(ValueError) as context:
+                params = {**default_data, p: ""}
+                CertificateSite.from_raw_data(**params)
+
+            self.assertEqual(f"Param `{p}` should not be empty", context.exception.args[0])
