@@ -47,6 +47,9 @@ class CertificateSite(UDBElement):
     def country_code(self):
         return self.xml_root_element.find("./COUNTRY_CODE").text
 
+    def is_main_site(self):
+        return self.xml_root_element.find("./MAIN_SITE").text == "true"
+
     def name(self):
         return self.xml_root_element.find("./SITE_NAME").text
 
@@ -55,11 +58,3 @@ class CertificateSite(UDBElement):
 
     def zipcode(self):
         return self.xml_root_element.find("./POST_CODE").text
-
-    def to_site_attributes(self):
-        return {
-            "address": self.street_line(),
-            "city": self.city(),
-            "name": self.name(),
-            "postal_code": self.zipcode(),
-        }
