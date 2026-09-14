@@ -12,6 +12,7 @@ class UpdateLotError:
     MALFORMED_PARAMS = "MALFORMED_PARAMS"
     LOT_NOT_FOUND = "LOT_NOT_FOUND"
     FIELD_UPDATE_FORBIDDEN = "FIELD_UPDATE_FORBIDDEN"
+    ENTITY_NOT_ALLOWED = "ENTITY_NOT_ALLOWED"
 
 
 class UpdateLotForm(forms.Form):
@@ -46,6 +47,10 @@ def update_lot(request, *args, **kwargs):
 
     entity_id = params_form.cleaned_data["entity_id"]
     entity = Entity.objects.get(pk=entity_id)
+    # LotForm.LOTS is unfiltered: check ownership before any stock write in do_update_lot.
+    if lot_to_update.added_by_id != entity.id:
+        return ErrorResponse(403, UpdateLotError.ENTITY_NOT_ALLOWED)
+
     update_data = get_update_data(lot_to_update, lot_form)
 
     try:
