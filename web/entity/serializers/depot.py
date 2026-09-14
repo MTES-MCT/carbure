@@ -12,7 +12,6 @@ from .users import PaysSerializer
 
 class CreateDepotSerializer(serializers.ModelSerializer):
     country_code = serializers.SlugRelatedField(slug_field="code_pays", queryset=Pays.objects.all(), write_only=True)
-    entity_id = serializers.SlugRelatedField(slug_field="id", queryset=Entity.objects.all(), write_only=True)
     depot_id = serializers.CharField(source="customs_id")
     depot_type = serializers.CharField(source="site_type")
     ownership_type = serializers.ChoiceField(choices=EntitySite.TYPE_OWNERSHIP, required=True)
@@ -21,20 +20,34 @@ class CreateDepotSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Depot
-        fields = "__all__"
+        fields = [
+            "country_code",
+            "depot_id",
+            "depot_type",
+            "ownership_type",
+            "blending_is_outsourced",
+            "blending_entity_id",
+            "name",
+            "city",
+            "address",
+            "postal_code",
+            "electrical_efficiency",
+            "thermal_efficiency",
+            "useful_temperature",
+        ]
 
     def create(self, validated_data):
+        entity = self.context["entity"]
+
         with transaction.atomic():
             validated_data["country"] = validated_data.pop("country_code")
-            validated_data["created_by"] = validated_data.pop("entity_id")
+            validated_data["created_by"] = entity
             validated_data["is_enabled"] = False
 
-            # Data for entity_site instance
             entity_site_data = {
                 "ownership_type": validated_data.pop("ownership_type"),
                 "blending_is_outsourced": validated_data.pop("blending_is_outsourced"),
-                "entity": validated_data["created_by"],
-                # "status": EntitySite.PENDING,
+                "entity": entity,
             }
             blending_entity_id = validated_data.pop("blending_entity_id")
             blender = None

@@ -4855,7 +4855,6 @@ export interface components {
         };
         CreateDepotRequest: {
             country_code: string;
-            entity_id: number;
             depot_id: string;
             depot_type: string;
             ownership_type: components["schemas"]["OwnershipTypeEnum"];
@@ -4863,26 +4862,12 @@ export interface components {
             blending_is_outsourced: boolean;
             blending_entity_id?: number;
             name: string;
-            /** SIRET */
-            site_siret?: string;
-            site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Commune */
+            city?: string;
             /** Adresse */
             address?: string;
             /** Code postal */
             postal_code?: string;
-            /** Commune */
-            city?: string;
-            /** Coordonnées GPS */
-            gps_coordinates?: string | null;
-            private?: boolean;
-            is_enabled?: boolean;
-            /**
-             * Date de mise en service
-             * Format: date
-             */
-            commissioning_date?: string | null;
-            customs_id?: string;
-            accise?: string;
             /**
              * Format: double
              * @description Entre 0 et 1
@@ -4898,9 +4883,6 @@ export interface components {
              * @description En degrés Celsius
              */
             useful_temperature?: number | null;
-            /** Pays */
-            country?: number | null;
-            created_by?: number | null;
         };
         /** @description Optional fields for entity creation (DREAL only). */
         CreateEntityRequest: {

@@ -16378,9 +16378,6 @@ components:
           type: string
           minLength: 1
           writeOnly: true
-        entity_id:
-          type: integer
-          writeOnly: true
         depot_id:
           type: string
           minLength: 1
@@ -16398,12 +16395,10 @@ components:
           type: string
           minLength: 1
           maxLength: 128
-        site_siret:
+        city:
           type: string
-          title: SIRET
-          maxLength: 64
-        site_type:
-          $ref: "#/components/schemas/SiteTypeEnum"
+          title: Commune
+          maxLength: 128
         address:
           type: string
           title: Adresse
@@ -16411,30 +16406,6 @@ components:
         postal_code:
           type: string
           title: Code postal
-          maxLength: 32
-        city:
-          type: string
-          title: Commune
-          maxLength: 128
-        gps_coordinates:
-          type: string
-          nullable: true
-          title: Coordonnées GPS
-          maxLength: 64
-        private:
-          type: boolean
-        is_enabled:
-          type: boolean
-        commissioning_date:
-          type: string
-          format: date
-          nullable: true
-          title: Date de mise en service
-        customs_id:
-          type: string
-          maxLength: 32
-        accise:
-          type: string
           maxLength: 32
         electrical_efficiency:
           type: number
@@ -16455,18 +16426,10 @@ components:
           format: double
           nullable: true
           description: En degrés Celsius
-        country:
-          type: integer
-          nullable: true
-          title: Pays
-        created_by:
-          type: integer
-          nullable: true
       required:
         - country_code
         - depot_id
         - depot_type
-        - entity_id
         - name
         - ownership_type
     CreateEntityRequest:
