@@ -22104,8 +22104,7 @@ components:
         request_id:
           type: integer
         role:
-          type: string
-          minLength: 1
+          $ref: "#/components/schemas/RoleEnum"
       required:
         - request_id
         - role
