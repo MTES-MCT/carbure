@@ -5772,7 +5772,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -5943,7 +5944,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -6114,7 +6116,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -6294,7 +6297,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -9694,7 +9698,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10151,7 +10156,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10406,7 +10412,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -13695,10 +13702,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Road transport
+            * `ROAD` - Transport routier
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Maritime transport
+            * `SEA` - Transport maritime
           explode: true
           style: form
         - in: query
@@ -14104,10 +14111,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Road transport
+            * `ROAD` - Transport routier
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Maritime transport
+            * `SEA` - Transport maritime
           explode: true
           style: form
         - in: query
@@ -14406,10 +14413,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Road transport
+            * `ROAD` - Transport routier
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Maritime transport
+            * `SEA` - Transport maritime
           explode: true
           style: form
         - in: query
@@ -14678,39 +14685,39 @@ components:
         eec:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         el:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         ei:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         ep:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         etd:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eu:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eccs:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         esca:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eccr:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
       required:
         - carbure_id
         - certificate
@@ -14820,39 +14827,39 @@ components:
         eec:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         el:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         ei:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         ep:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         etd:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eu:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eccs:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         esca:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eccr:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
       required:
         - holder
         - quantity
@@ -14912,10 +14919,10 @@ components:
         - SEA
       type: string
       description: |-
-        * `ROAD` - Road transport
+        * `ROAD` - Transport routier
         * `PIPELINE` - Pipeline
         * `RAILROAD` - Rail
-        * `SEA` - Maritime transport
+        * `SEA` - Transport maritime
     ActionSite:
       type: object
       properties:
@@ -14967,52 +14974,52 @@ components:
         eec:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         el:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         ei:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         ep:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         etd:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         eu:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         eccs:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         esca:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         eccr:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         total:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
       required:
         - eccr
@@ -19759,7 +19766,8 @@ components:
 
         * `Unknown` - Unknown
 
-        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        (biomasse liquide)
 
         * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
         chaleur (biomasse solide)
@@ -22217,12 +22225,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password
+          title: Mot de passe
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password confirmation
+          title: Confirmation du mot de passe
       required:
         - password1
         - password2
@@ -23573,12 +23581,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password
+          title: Mot de passe
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password confirmation
+          title: Confirmation du mot de passe
       required:
         - email
         - name
@@ -23727,6 +23735,7 @@ components:
           type: string
           format: email
           minLength: 1
+          title: Adresse email
       required:
         - email
     UserRights:
