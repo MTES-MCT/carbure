@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from unittest.mock import Mock, patch
 
 from django.db.models import Q
@@ -487,34 +488,24 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
             self.assertEqual(entry["quantity"]["debit"], 0)
             self.assertEqual(entry["quantity"]["credit"], 0)
 
-    def test_calculate_balance_respects_date_from_filter(self):
-        """Test calculate_balance filters quantity updates by date_from."""
-        from datetime import datetime, timezone
-
-        # Create operation with specific date
+    def test_calculate_balance_includes_all_operations(self):
+        """Test calculate_balance computes the complete balance without a date filter."""
         op = self._create_operation_with_details(
             debited_entity=self.entity,
             type=Operation.CESSION,
             status=Operation.VALIDATED,
         )
-        # Set created_at to past date
-        op.created_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
-        op.save()
-
         operations = Operation.objects.filter(id=op.id)
 
-        # Request balance with date_from after operation date
         result = BalanceService.calculate_balance(
             operations,
             self.entity.id,
             BalanceService.GROUP_BY_SECTOR,
             "liters",
-            date_from=datetime(2024, 6, 1, tzinfo=timezone.utc),
         )
 
-        # Quantity should not be updated (date_from filter)
         for entry in result.values():
-            self.assertEqual(entry["quantity"]["debit"], 0)
+            self.assertGreater(entry["quantity"]["debit"], 0)
 
     def test_calculate_balance_groups_by_category(self):
         """Test calculate_balance groups by customs_category correctly."""
@@ -798,6 +789,23 @@ class BalanceServiceObjectiveSectorTest(TestCase):
 
         if Operation.ESSENCE in result:
             self.assertEqual(result[Operation.ESSENCE]["pending_teneur"], 0)
+
+    def test_teneur_uses_declaration_year_before_period_start(self):
+        """A TENEUR assigned to a year is counted even when created before that period starts."""
+        op = self._create_teneur_with_details(self.biofuel_essence)
+        op.declaration_year = 2026
+        op.save(update_fields=["declaration_year"])
+        Operation.objects.filter(id=op.id).update(created_at=datetime(2026, 7, 30, tzinfo=timezone.utc))
+
+        result = BalanceService.calculate_balance(
+            Operation.objects.filter(id=op.id),
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "mj",
+            declaration_year=2026,
+        )
+
+        self.assertGreater(result[Operation.ESSENCE]["pending_teneur"], 0)
 
     def test_default_grouping_keeps_teneur_in_natural_sector(self):
         """Default grouping must keep teneur in the biofuel natural sector even when objective_sector differs."""

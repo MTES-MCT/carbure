@@ -131,13 +131,13 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
             if snapshot_data is not None:
                 return snapshot_data
 
-        # Derive date_from from the declaration period for the requested year
+        # Get the declaration period start used by the electrical balance calculation
         if "period" not in self._execution_cache:
             self._execution_cache["period"] = DeclarationPeriodService.get_period_by_year(requested_year)
         period = self._execution_cache["period"]
         if period is None:
             return None
-        date_from = period.start_date
+        period_start = period.start_date
 
         # Objectives (shared across all entities for the same request)
         if "objectives" in self._execution_cache:
@@ -163,5 +163,5 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
         ).qs.filter(created_at__lte=date_to)
 
         return ObjectiveService.build_objectives_result(
-            objectives, macs, operations, elec_ops, target_entity_id, date_from, year=query_params.get("year")
+            objectives, macs, operations, elec_ops, target_entity_id, period_start, year=query_params.get("year")
         )
