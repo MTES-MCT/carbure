@@ -356,7 +356,7 @@ class ObjectiveService:
                             aggregated[code]["objective"][key] += item["objective"][key]
 
     @staticmethod
-    def build_objectives_result(objectives, macs, operations, elec_ops, entity_id, date_from, year):
+    def build_objectives_result(objectives, macs, operations, elec_ops, entity_id, period_start, year):
         """
         Core computation of objectives from pre-built querysets.
         Returns the dict {'main', 'sectors', 'categories'} or None if energy_basis is missing.
@@ -367,7 +367,7 @@ class ObjectiveService:
             operations: Queryset of Operation (already filtered)
             elec_ops: Queryset of ElecOperation (already filtered)
             entity_id: ID of the entity
-            date_from: Start of the teneur period (date object)
+            period_start: Start of the declaration period for teneur (date object)
             year: Declaration year (int or str)
         """
         # 1. Calculate "assiette" used for objectives calculation (global, for categories and main objective)
@@ -376,9 +376,9 @@ class ObjectiveService:
             return None
 
         # 2. Calculate the balances per category and sector
-        date_from_dt = make_aware(datetime.combine(date_from, time.min))
+        period_start_dt = make_aware(datetime.combine(period_start, time.min))
         balance_per_category, balance_per_sector = ObjectiveService.get_balances_for_objectives_calculation(
-            operations, entity_id, date_from_dt
+            operations, entity_id, year
         )
 
         # 3. Calculate the objectives per category (using global energy_basis)
@@ -399,11 +399,11 @@ class ObjectiveService:
         )
 
         # 5. Calculate elec category
-        elec_category = ObjectiveService.get_elec_category(elec_ops, entity_id, date_from_dt)
+        elec_category = ObjectiveService.get_elec_category(elec_ops, entity_id, period_start_dt)
 
         # 6. Merge elec operations attributed to other sectors
         merged_objective_per_sector = ObjectiveService.add_elec_teneur_to_objectives_per_sector(
-            biofuel_objective_per_sector, elec_ops, entity_id, date_from_dt
+            biofuel_objective_per_sector, elec_ops, entity_id, period_start_dt
         )
 
         # 7. Calculate the global objective (aggregated from sectors + elec)
@@ -418,9 +418,13 @@ class ObjectiveService:
         }
 
     @staticmethod
-    def get_balances_for_objectives_calculation(operations, entity_id, date_from):
-        balance_per_category = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from)
-        balance_per_sector = BalanceService.calculate_balance(operations, entity_id, "sector", "mj", date_from)
+    def get_balances_for_objectives_calculation(operations, entity_id, declaration_year=None):
+        balance_per_category = BalanceService.calculate_balance(
+            operations, entity_id, "customs_category", "mj", declaration_year=declaration_year
+        )
+        balance_per_sector = BalanceService.calculate_balance(
+            operations, entity_id, "sector", "mj", declaration_year=declaration_year
+        )
 
         return balance_per_category, balance_per_sector
 

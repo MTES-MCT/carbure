@@ -790,7 +790,7 @@ class ObjectiveServiceBuildObjectivesResultTest(TestCase):
             Mock(),
             Mock(),
             entity_id=1,
-            date_from=date(2025, 1, 1),
+            period_start=date(2025, 1, 1),
             year=2025,
         )
 
@@ -926,7 +926,7 @@ class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):
         """Test get_balances_for_objectives_calculation returns both balances."""
         mock_balance.side_effect = [{"category": "data"}, {"sector": "data"}]
 
-        result = ObjectiveService.get_balances_for_objectives_calculation(Mock(), 1, "2025-01-01")
+        result = ObjectiveService.get_balances_for_objectives_calculation(Mock(), 1, 2025)
 
         self.assertEqual(len(result), 2)
         self.assertEqual(mock_balance.call_count, 2)
@@ -938,7 +938,7 @@ class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):
         mock_operations = Mock()
         entity_id = 42
 
-        ObjectiveService.get_balances_for_objectives_calculation(mock_operations, entity_id, "2025-06-15")
+        ObjectiveService.get_balances_for_objectives_calculation(mock_operations, entity_id, 2025)
 
         # Should be called twice: once for category, once for sector
         self.assertEqual(mock_balance.call_count, 2)
