@@ -78,7 +78,7 @@ export const formatOperationType = (type: string, year?: number) => {
     case OperationType.EXPIRATION:
       return i18next.t("Expiration")
     case OperationType.REPORT:
-      return i18next.t("Report 2026")
+      return i18next.t("Report Tiruert 2026")
     case OperationType.YEARLY_BALANCE:
       return year ? i18next.t("Reliquat " + (year! - 1)) : i18next.t("Reliquat")
     default:
