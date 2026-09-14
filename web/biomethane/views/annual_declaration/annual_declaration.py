@@ -116,7 +116,7 @@ class BiomethaneAnnualDeclarationViewSet(
         is_dreal = permission.has_permission(request, self)
 
         try:
-            declaration = self.filter_queryset(self.get_queryset()).get()
+            declaration = self.get_object()
             serializer = self.get_serializer(
                 declaration,
                 data=request.data,
