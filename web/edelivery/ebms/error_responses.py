@@ -9,7 +9,14 @@ class BaseErrorResponse(BaseRequestResponse):
 
     def error_message(self):
         response_header_attributes = self.parsed_XML.find("./RESPONSE_HEADER").attrib
-        return response_header_attributes.get("OBSERVATION", None)
+        result = response_header_attributes.get("OBSERVATION", "")
+
+        observation_element = self.parsed_XML.find(".//OBSERVATION")
+        additional_observation = observation_element is not None and observation_element.text
+        if additional_observation:
+            result += f" / {additional_observation}"
+
+        return result or None
 
     def post_retrieval_action_result(self):
         additional_infos_to_log = None

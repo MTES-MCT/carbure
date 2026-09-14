@@ -62,6 +62,28 @@ data = {
                 "valid_until": "2028-01-08",
             },
         },
+        {
+            "registration_id": "000001789",
+            "name": "ANOTHER_CARBURE_EO_THROUGH_API",
+            "registered_address": "1 rue du site principal",
+            "registered_zipcode": "69000",
+            "registered_city": "Lyon",
+            "sites": [
+                {
+                    "name": "Some Site",
+                    "address": "1 impasse des Planches",
+                    "postal_code": "69100",
+                    "city": "Villeurbanne",
+                },
+            ],
+            "certificate": {
+                "id": "SN_UN_2026_1789",
+                "type": GenericCertificate.SYSTEME_NATIONAL,
+                "issuer": "Control Union",
+                "valid_from": "2026-01-08",
+                "valid_until": "2028-01-08",
+            },
+        },
     ],
 }
 
@@ -95,6 +117,7 @@ if settings.WITH_UDB_ACCEPTANCE_DATA:
             defaults={
                 "certificate_holder": producer_data["name"],
                 "certificate_issuer": certificate_data["issuer"],
+                "scope": "FSP, PB",
                 "status": GenericCertificate.VALID,
                 "valid_from": certificate_data["valid_from"],
                 "valid_until": certificate_data["valid_until"],
