@@ -7,13 +7,14 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
-from core.models import Entity
+from core.models import Entity, StoredFile
 from core.tests_utils import assert_object_contains_data, setup_current_user
 from traceability.factories import MaterialFactory
 from traceability.handlers.registry import ACTION_HANDLERS
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
 from traceability.services.action_excel import build_action_import_template
+from traceability.services.action_import_file import ACTION_IMPORT_UPLOAD_DIR
 from traceability.tests.excel import GenericExcelHandler, filled_generic_template
 from traceability.views.mixins.excel_import import ExcelImportActionMixinErrors
 from transactions.factories.certificate import GenericCertificateFactory
@@ -29,7 +30,7 @@ class ActionExcelImportViewTest(APITestCase):
         self.addCleanup(self.handler_patch.stop)
 
         self.entity = Entity.objects.create(name="Opérateur", entity_type=Entity.OPERATOR)
-        setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.entity, "RW")])
+        self.user = setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.entity, "RW")])
         self.url = reverse("traceability-action-import-actions")
         self.material = MaterialFactory(code="MAT-001", name="Matière")
         self.site = Site.objects.create(name="Site", site_type=Site.EFS, created_by=self.entity)
@@ -57,6 +58,7 @@ class ActionExcelImportViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Action.objects.count(), 0)
+        self.assertEqual(StoredFile.objects.count(), 0)
         self.assertEqual(response.data, {"error": ExcelImportActionMixinErrors.EMPTY_FILE})
 
     def test_import_creates_an_init_action_for_the_entity(self):
@@ -89,6 +91,14 @@ class ActionExcelImportViewTest(APITestCase):
                 "status": ActionStatus.PENDING,
             },
         )
+
+        stored_file = StoredFile.objects.get()
+        self.assertEqual(action.file_id, stored_file.id)
+        self.assertEqual(stored_file.name, "import.xlsx")
+        self.assertEqual(stored_file.entity, self.entity)
+        self.assertEqual(stored_file.user, self.user)
+        self.assertTrue(stored_file.url.name.startswith(f"{ACTION_IMPORT_UPLOAD_DIR}/{self.entity.id}/"))
+        self.assertTrue(stored_file.url.name.endswith(".xlsx"))
 
     def test_import_accepts_shipping_date_as_day_month_year(self):
         response = self._post(
@@ -140,6 +150,7 @@ class ActionExcelImportViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Action.objects.count(), 0)
+        self.assertEqual(StoredFile.objects.count(), 0)
         self.assertTrue(response.data["validation_errors"])
 
     def test_import_rejects_unknown_certificate(self):
@@ -153,4 +164,5 @@ class ActionExcelImportViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Action.objects.count(), 0)
+        self.assertEqual(StoredFile.objects.count(), 0)
         self.assertTrue(response.data["validation_errors"])

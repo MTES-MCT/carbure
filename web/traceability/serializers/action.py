@@ -11,6 +11,7 @@ from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField,
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
 from traceability.serializers.total_emissions import ActionTotalEmissionsSerializer
+from traceability.services.action_import_file import store_action_import_file
 
 
 class ActionParentSerializer(serializers.ModelSerializer):
@@ -65,14 +66,22 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
     def create(self, validated_data):
         holder = self.context["entity"]
         industry = self.context["handler"].industry
+        stored_file = store_action_import_file(
+            self.context["import_file"],
+            entity=holder,
+            user=self.context["request"].user,
+        )
+        for action_data in validated_data:
+            action_data["file"] = stored_file
+
         actions = [
             Action(
-                **{key: value for key, value in attrs.items() if key in _ACTION_MODEL_FIELDS},
+                **{key: value for key, value in action_data.items() if key in _ACTION_MODEL_FIELDS},
                 holder=holder,
                 industry=industry,
                 type=Action.INIT,
             )
-            for attrs in validated_data
+            for action_data in validated_data
         ]
 
         return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
