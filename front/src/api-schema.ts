@@ -7288,7 +7288,7 @@ export interface components {
         };
         UpdateUserRoleRequest: {
             request_id: number;
-            role: string;
+            role: components["schemas"]["RoleEnum"];
         };
         UpdatedQuotasRequest: {
             approved_quotas: number[][];
