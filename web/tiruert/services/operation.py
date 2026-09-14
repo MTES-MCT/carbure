@@ -1,11 +1,9 @@
 from collections import defaultdict
 from copy import copy
-from datetime import datetime, time
 from decimal import Decimal
 
 from django.db import transaction
 from django.db.models import Q
-from django.utils.timezone import make_aware
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -15,7 +13,6 @@ from core.utils import truncate
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
-from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.energy import energy_mj
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import TeneurService
@@ -151,14 +148,13 @@ class OperationService:
         request.GET["customs_category"] = customs_category
         operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
 
-        period = DeclarationPeriodService.get_period_by_year(declaration_year)
-        if period is None:
-            return
-
-        date_from = period.start_date
-        date_from_dt = make_aware(datetime.combine(date_from, time.min))
-
-        balance = BalanceService.calculate_balance(operations, entity_id, "customs_category", "mj", date_from_dt)
+        balance = BalanceService.calculate_balance(
+            operations,
+            entity_id,
+            "customs_category",
+            "mj",
+            declaration_year=declaration_year,
+        )
 
         balance = list(balance.values())[0]  # keep the first (and only one) element
 

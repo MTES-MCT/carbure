@@ -15,7 +15,7 @@ class ObjectiveSnapshotService:
     def compute(entity_id, year):
         """
         Compute objectives for an entity/year without needing a ViewSet or request.
-        Dates (date_from, date_to) are derived from the TiruertDeclarationPeriod for the given year.
+        Dates are derived from the TiruertDeclarationPeriod for the given year.
 
         Args:
             entity_id: ID of the entity
@@ -31,7 +31,7 @@ class ObjectiveSnapshotService:
             log_info(f"No declaration period found for year {year}, skipping snapshot for entity {entity_id}.")
             return None
 
-        date_from = period.start_date
+        period_start = period.start_date
         date_to = make_aware(datetime.combine(period.end_date, time.max))
         # Objectives
         objectives = Objective.objects.filter(year=year)
@@ -61,7 +61,7 @@ class ObjectiveSnapshotService:
         ).distinct()
 
         return ObjectiveService.build_objectives_result(
-            objectives, macs, operations, elec_ops, entity_id, date_from, year=year
+            objectives, macs, operations, elec_ops, entity_id, period_start, year=year
         )
 
     @staticmethod
