@@ -43,6 +43,9 @@ data = {
         {
             "registration_id": "000004807",
             "name": "CARBURE_EO_THROUGH_API",
+            "registered_address": "1 boulevard du Siège Social",
+            "registered_zipcode": "75001",
+            "registered_city": "Paris",
             "sites": [
                 {
                     "name": "Some Site",
@@ -76,7 +79,13 @@ if settings.WITH_UDB_ACCEPTANCE_DATA:
         entity, _ = Entity.objects.update_or_create(
             registered_country=france,
             registration_id=producer_data["registration_id"],
-            defaults={"entity_type": Entity.PRODUCER, "name": producer_data["name"]},
+            defaults={
+                "entity_type": Entity.PRODUCER,
+                "name": producer_data["name"],
+                "registered_address": producer_data.get("registered_address", ""),
+                "registered_zipcode": producer_data.get("registered_zipcode", ""),
+                "registered_city": producer_data.get("registered_city", ""),
+            },
         )
 
         certificate_data = producer_data["certificate"]

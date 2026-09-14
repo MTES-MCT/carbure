@@ -2,51 +2,79 @@ from unittest import TestCase
 
 from core.models.geography import Pays
 from edelivery.ebms.certificate_site import CertificateSite
-from edelivery.tests.ebms.fixtures.certificate_site_xml_data import certificate_site_xml_data
+from entity.factories.entity import EntityFactory
 from transactions.models.site import Site
 
 
 class CertificateSiteTest(TestCase):
-    def check_carbure_attribute_corresponds_to_UDB_attribute(self, carbure_attribute, udb_attribute, value):
-        xml_data = certificate_site_xml_data(**{udb_attribute: value})
-        site = CertificateSite.from_xml(xml_data)
-        site_value = getattr(site, udb_attribute)()
-        self.assertEqual(value, site_value)
-
-        site_attributes = site.to_site_attributes()
-        self.assertEqual(value, site_attributes[carbure_attribute])
-
-    def check_UDB_attribute_corresponds_to_carbure_attribute(self, carbure_attribute, udb_attribute, value):
-        carbure_site = Site(**{carbure_attribute: value})
-        site = CertificateSite.from_carbure_site(carbure_site)
-        site_value = getattr(site, udb_attribute)()
-        self.assertEqual(value, site_value)
-
-    def check_attributes_correspondance(self, carbure_attribute, udb_attribute):
-        self.check_carbure_attribute_corresponds_to_UDB_attribute(carbure_attribute, udb_attribute, value="Some value")
-        self.check_UDB_attribute_corresponds_to_carbure_attribute(carbure_attribute, udb_attribute, value="Some value")
-
-    def test_knows_its_name(self):
-        self.check_attributes_correspondance("name", "name")
-
-    def test_knows_its_address(self):
-        self.check_attributes_correspondance("address", "street_line")
-
-    def test_knows_its_zipcode(self):
-        self.check_attributes_correspondance("postal_code", "zipcode")
-
-    def test_knows_its_city(self):
-        self.check_attributes_correspondance("city", "city")
-
-    def test_knows_its_country_code(self):
-        xml_data = certificate_site_xml_data(country_code="BE")
-        site = CertificateSite.from_xml(xml_data)
-        country_code = site.country_code()
-        self.assertEqual("BE", country_code)
-
-    def test_knows_country_code_from_carbure_site(self):
+    def test_builds_from_carbure_site(self):
         country = Pays(code_pays="BE")
-        carbure_site = Site(country=country)
+        carbure_site = Site(
+            name="Site name",
+            address="Some address",
+            postal_code="Some zipcode",
+            city="Some city",
+            country=country,
+        )
         site = CertificateSite.from_carbure_site(carbure_site)
-        country_code = site.country_code()
-        self.assertEqual("BE", country_code)
+        self.assertEqual("Site name", site.name())
+        self.assertEqual("Some address", site.street_line())
+        self.assertEqual("Some zipcode", site.zipcode())
+        self.assertEqual("Some city", site.city())
+        self.assertEqual("BE", site.country_code())
+
+    def test_is_not_main_site_when_created_from_carbure_site(self):
+        country = Pays(code_pays="BE")
+        carbure_site = Site(
+            name="Site name",
+            address="Some address",
+            postal_code="Some zipcode",
+            city="Some city",
+            country=country,
+        )
+        site = CertificateSite.from_carbure_site(carbure_site)
+        is_main_site = site.xml_root_element.find("./MAIN_SITE")
+        self.assertEqual("false", is_main_site.text)
+        self.assertFalse(site.is_main_site())
+
+    def test_builds_from_carbure_entity(self):
+        country = Pays(code_pays="BE")
+        carbure_entity = EntityFactory.build(
+            name="Site name",
+            registered_address="Some address",
+            registered_zipcode="Some zipcode",
+            registered_city="Some city",
+            registered_country=country,
+        )
+        site = CertificateSite.from_carbure_entity(carbure_entity)
+        self.assertEqual("Site name", site.name())
+        self.assertEqual("Some address", site.street_line())
+        self.assertEqual("Some zipcode", site.zipcode())
+        self.assertEqual("Some city", site.city())
+        self.assertEqual("BE", site.country_code())
+
+    def test_is_main_site_when_created_from_carbure_entity(self):
+        country = Pays(code_pays="BE")
+        carbure_entity = EntityFactory.build(registered_country=country)
+        site = CertificateSite.from_carbure_entity(carbure_entity)
+        is_main_site = site.xml_root_element.find("./MAIN_SITE")
+        self.assertEqual("true", is_main_site.text)
+        self.assertTrue(site.is_main_site())
+
+    def test_raises_value_error_when_address_infos_missing(self):
+        default_data = {
+            "name": "Site name",
+            "address": "1 rue du Chat-Perché",
+            "zipcode": "75000",
+            "city": "Paris",
+            "country_code": "FR",
+            "is_main_site": True,
+        }
+
+        params_to_check = ["address", "zipcode", "city", "country_code"]
+        for p in params_to_check:
+            with self.assertRaises(ValueError) as context:
+                params = {**default_data, p: ""}
+                CertificateSite.from_raw_data(**params)
+
+            self.assertEqual(f"Param `{p}` should not be empty", context.exception.args[0])
