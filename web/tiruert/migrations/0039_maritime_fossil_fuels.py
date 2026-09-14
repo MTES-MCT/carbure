@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("tiruert", "0037_alter_operationdetail_lot_nullable"),
+        ("tiruert", "0038_merge_20260910_1745"),
     ]
 
     operations = [
@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
                     ("ESSENCE", "ESSENCE"),
                     ("GAZOLE", "GAZOLE"),
                     ("CARBURÉACTEUR", "CARBURÉACTEUR"),
+                    ("GPL_C", "GPL_C"),
                     ("MARITIME", "MARITIME"),
                 ],
                 max_length=20,
@@ -38,6 +39,7 @@ class Migration(migrations.Migration):
                     ("ESSENCE", "ESSENCE"),
                     ("GAZOLE", "GAZOLE"),
                     ("CARBURÉACTEUR", "CARBURÉACTEUR"),
+                    ("GPL_C", "GPL_C"),
                     ("MARITIME", "MARITIME"),
                 ],
                 max_length=20,
