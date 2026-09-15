@@ -1,4 +1,3 @@
-import logging
 from os import environ
 
 from django.conf import settings
@@ -12,10 +11,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import CharField
 
+from adapters.logger import log_exception
 from auth.serializers import ChangeEmailErrors, ConfirmEmailChangeSerializer, RequestEmailChangeSerializer
 from core.helpers import send_mail
-
-logger = logging.getLogger(__name__)
 
 
 def create_email_change_device(user, new_email):
@@ -124,11 +122,8 @@ class ChangeEmailActionMixin:
             send_email_change_token(request, device, new_email)
 
             return Response({"status": "otp_sent"})
-        except Exception:
-            logger.exception(
-                "Unexpected error while requesting email change for user_id=%s",
-                request.user.pk,
-            )
+        except Exception as e:
+            log_exception(e)
             return Response(
                 {
                     "error": ChangeEmailErrors.INTERNAL_ERROR,

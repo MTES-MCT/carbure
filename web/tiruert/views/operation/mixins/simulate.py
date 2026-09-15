@@ -3,13 +3,27 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from adapters.logger import log_exception
 from tiruert.serializers.teneur import (
     SimulationInputSerializer,
     SimulationMinMaxInputSerializer,
     SimulationMinMaxOutputSerializer,
     SimulationOutputSerializer,
 )
-from tiruert.services.teneur import TeneurService
+from tiruert.services.teneur import TeneurService, TeneurServiceError
+
+
+class SimulationError:
+    SIMULATION_FAILED = "SIMULATION_FAILED"
+
+    @classmethod
+    def response(cls, exc):
+        if isinstance(exc, TeneurServiceError):
+            error = exc.code
+        else:
+            log_exception(exc)
+            error = cls.SIMULATION_FAILED
+        return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SimulateActionMixin:
@@ -34,8 +48,8 @@ class SimulateActionMixin:
 
             try:
                 selected_lots, lot_ids, fun = TeneurService.prepare_data_and_optimize(data)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return SimulationError.response(e)
 
             detail_operations_data = []
             for idx, lot_volume in selected_lots.items():
@@ -74,8 +88,8 @@ class SimulateActionMixin:
 
             try:
                 min, max = TeneurService.get_min_and_max_emissions(data)
-            except ValueError as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return SimulationError.response(e)
 
             output_serializer = output_serializer_class(
                 {

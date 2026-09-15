@@ -196,10 +196,7 @@ class ChangePasswordTestCase(TestCase):
         }
         url = reverse("auth-change-password")
 
-        with (
-            self.assertLogs("auth.views.mixins.change_password", level="ERROR"),
-            self.assertLogs("django.request", level="ERROR"),
-        ):
+        with self.assertLogs("django.request", level="ERROR"):
             response = self.client.post(url, data, format="json")
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR

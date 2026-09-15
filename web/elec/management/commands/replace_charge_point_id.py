@@ -1,13 +1,9 @@
-import logging
-
 import pandas as pd
 from django.core.management.base import BaseCommand, CommandError
 from simple_history.utils import bulk_update_with_history
 
 from elec.models.elec_charge_point import ElecChargePoint
 from elec.services.transport_data_gouv import TransportDataGouv
-
-logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
