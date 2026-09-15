@@ -12,12 +12,7 @@ import * as api from "common/api"
 import * as norm from "common/utils/normalizers"
 import { LotFormValue } from "./lot-form"
 import { UserCheck } from "common/components/icons"
-import {
-  Country,
-  ProductionSite,
-  ProductionSitePreview,
-  EntityPreview,
-} from "common/types"
+import { Country, ProductionSite, EntityPreview } from "common/types"
 import CertificateIcon from "transaction-details/components/lots/certificate"
 import { compact, uniqueBy } from "common/utils/collection"
 import { isSAF } from "saf/utils/guards"
@@ -101,7 +96,7 @@ export const ProducerField = (
 }
 
 export const ProductionSiteField = (
-  props: AutocompleteProps<ProductionSite | ProductionSitePreview | string>
+  props: AutocompleteProps<ProductionSite | string>
 ) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
@@ -133,7 +128,7 @@ export const ProductionSiteField = (
       icon={isKnown ? UserCheck : undefined}
       defaultOptions={isKnown ? [productionSite] : undefined}
       getOptions={(query) => api.findProductionSites(query, producer)}
-      normalize={norm.normalizeProductionSiteOrUnknownWithPreview}
+      normalize={norm.normalizeProductionSiteOrUnknown}
       {...bound}
       {...props}
     />

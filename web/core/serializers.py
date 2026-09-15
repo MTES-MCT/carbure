@@ -204,15 +204,6 @@ class ProductionSiteSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProductionSitePreviewSerializer(serializers.ModelSerializer):
-    country = CountrySerializer(read_only=True)
-
-    class Meta:
-        model = ProductionSite
-        fields = ["id", "name", "country", "date_mise_en_service", "dc_reference"]
-        read_only_fields = fields
-
-
 class GenericErrorSerializer(serializers.ModelSerializer):
     class Meta:
         model = GenericError

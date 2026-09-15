@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from core.permissions import IsVerified
-from core.serializers import ProductionSitePreviewSerializer
+from core.serializers import ProductionSiteSerializer
 from transactions.models.production_site import ProductionSite
 
 
@@ -22,7 +22,7 @@ from transactions.models.production_site import ProductionSite
             type=int,
         ),
     ],
-    responses=ProductionSitePreviewSerializer(many=True),
+    responses=ProductionSiteSerializer(many=True),
 )
 @api_view(["GET"])
 @permission_classes([IsVerified])
@@ -38,5 +38,5 @@ def get_production_sites(request, *args, **kwargs):
     if producer_id:
         psites = psites.filter(created_by_id=producer_id)
 
-    serializer = ProductionSitePreviewSerializer(psites, many=True)
+    serializer = ProductionSiteSerializer(psites, many=True)
     return Response(serializer.data)
