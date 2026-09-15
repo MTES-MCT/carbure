@@ -58,6 +58,10 @@ class TestAdminRightsRequestScope(TestCase):
             query_params={"entity_id": self.airline_admin.pk},
         )
 
+    def list_rights_requests(self, **params):
+        url = reverse("api-entity-users-rights-requests")
+        return self.client.get(url, {"entity_id": self.airline_admin.pk, **params})
+
     def create_right_request(self, entity, request_status="PENDING", role=UserRights.RO):
         return UserRightsRequests.objects.create(
             user=self.target_user,
@@ -123,3 +127,22 @@ class TestAdminRightsRequestScope(TestCase):
         user_right.refresh_from_db()
         self.assertEqual(right_request.role, UserRights.ADMIN)
         self.assertEqual(user_right.role, UserRights.ADMIN)
+
+    def test_rights_requests_are_limited_to_external_admin_scope(self):
+        in_scope_request = self.create_right_request(self.airline)
+        out_of_scope_request = self.create_right_request(self.producer)
+
+        response = self.list_rights_requests()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual([request["id"] for request in response.data], [in_scope_request.id])
+        self.assertNotIn(out_of_scope_request.id, [request["id"] for request in response.data])
+
+    def test_forged_company_id_cannot_expand_external_admin_scope(self):
+        out_of_scope_request = self.create_right_request(self.producer)
+
+        response = self.list_rights_requests(company_id=self.producer.pk)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])
+        self.assertNotIn(out_of_scope_request.id, [request["id"] for request in response.data])
