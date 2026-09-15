@@ -74,17 +74,21 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
         for action_data in validated_data:
             action_data["file"] = stored_file
 
-        actions = [
-            Action(
-                **{key: value for key, value in action_data.items() if key in _ACTION_MODEL_FIELDS},
-                holder=holder,
-                industry=industry,
-                type=Action.INIT,
-            )
-            for action_data in validated_data
-        ]
+        try:
+            actions = [
+                Action(
+                    **{key: value for key, value in action_data.items() if key in _ACTION_MODEL_FIELDS},
+                    holder=holder,
+                    industry=industry,
+                    type=Action.INIT,
+                )
+                for action_data in validated_data
+            ]
 
-        return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
+            return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
+        except Exception:
+            stored_file.url.delete(save=False)
+            raise
 
 
 class ActionExcelImportSerializer(serializers.ModelSerializer):

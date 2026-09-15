@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from io import BytesIO
+from logging import getLogger
 from unittest.mock import patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -166,3 +167,25 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertEqual(Action.objects.count(), 0)
         self.assertEqual(StoredFile.objects.count(), 0)
         self.assertTrue(response.data["validation_errors"])
+
+    def test_import_deletes_file_when_action_create_fails(self):
+        with (
+            patch(
+                "traceability.serializers.action.Action.bulk_create",
+                side_effect=RuntimeError("db down"),
+            ),
+            patch("django.db.models.fields.files.FieldFile.delete") as mock_delete,
+            patch.object(getLogger("django.request"), "error"),
+        ):
+            with self.assertRaises(RuntimeError):
+                self._post(
+                    filled_generic_template(
+                        material_name=self.material.name,
+                        site_name=self.site.name,
+                        certificate_id=self.certificate.certificate_id,
+                    )
+                )
+
+        mock_delete.assert_called_once_with(save=False)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertEqual(StoredFile.objects.count(), 0)
