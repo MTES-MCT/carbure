@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -180,6 +182,29 @@ class ChangePasswordTestCase(TestCase):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "new_password" in response.data["errors"]
+
+        self.user.refresh_from_db()
+        assert self.user.check_password("testpassword123")
+
+    @patch.object(User, "save")
+    def test_change_password_does_not_expose_internal_exception(self, mock_save):
+        mock_save.side_effect = RuntimeError()
+        data = {
+            "current_password": "testpassword123",
+            "new_password": "newpassword456",
+            "confirm_new_password": "newpassword456",
+        }
+        url = reverse("auth-change-password")
+
+        with (
+            self.assertLogs("auth.views.mixins.change_password", level="ERROR"),
+            self.assertLogs("django.request", level="ERROR"),
+        ):
+            response = self.client.post(url, data, format="json")
+
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.data["error"] == ChangePasswordErrors.INTERNAL_ERROR
+        assert response.data["message"] == ChangePasswordErrors.INTERNAL_ERROR_MESSAGE
 
         self.user.refresh_from_db()
         assert self.user.check_password("testpassword123")
