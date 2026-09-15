@@ -10,23 +10,25 @@ class OperationConstantsTest(TestCase):
     """Tests for Operation constants."""
 
     def test_api_creatable_types_contains_expected_values(self):
-        """Should contain only TRANSFERT, EXPORTATION, EXPEDITION, TENEUR."""
+        """Should contain only TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION."""
         expected = [
             Operation.TRANSFERT,
             Operation.EXPORTATION,
             Operation.EXPEDITION,
             Operation.TENEUR,
+            Operation.DEVALUATION,
         ]
         self.assertCountEqual(Operation.API_CREATABLE_TYPES, expected)
 
     def test_api_deletable_types_contains_expected_values(self):
-        """Should contain only CESSION, TENEUR, TRANSFERT, EXPORTATION, EXPEDITION."""
+        """Should contain only CESSION, TENEUR, TRANSFERT, EXPORTATION, EXPEDITION, DEVALUATION."""
         expected = [
             Operation.CESSION,
             Operation.TENEUR,
             Operation.TRANSFERT,
             Operation.EXPORTATION,
             Operation.EXPEDITION,
+            Operation.DEVALUATION,
         ]
         self.assertCountEqual(Operation.API_DELETABLE_TYPES, expected)
 

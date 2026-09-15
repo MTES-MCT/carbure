@@ -226,7 +226,7 @@ class BiomethaneSupplyInputSerializerTests(TestCase):
         }
         serializer = BiomethaneSupplyInputCreateSerializer(data=data)
         self.assertTrue(serializer.is_valid())
-        self.assertIsNone(serializer.validated_data["collection_type"])
+        self.assertEqual(serializer.validated_data["collection_type"], "")
 
 
 class BiomethaneSupplyInputExportSerializerTests(TestCase):
@@ -272,7 +272,7 @@ class BiomethaneSupplyInputExportSerializerTests(TestCase):
             feedstock=self.feedstock,
             material_unit=None,
             type_cive=None,
-            collection_type=None,
+            collection_type="",
             source=None,
         )
         serializer = BiomethaneSupplyInputExportSerializer(supply_input)

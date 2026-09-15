@@ -8,6 +8,7 @@ import { NavigationLayout } from "common/layouts/navigation/navigation-layout"
 import { YearsProvider } from "common/providers/years-provider"
 import { lazy, Suspense } from "react"
 import { BiomethaneRoutes } from "biomethane/routes"
+import { H2Routes } from "h2/routes"
 import { useCacheBuster } from "./hooks/cache-buster"
 import { ExternalAdminPages } from "./types"
 import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
@@ -132,6 +133,7 @@ const Org = () => {
     isCPO,
     isPowerOrHeatProducer,
     isSafTrader,
+    isHRS,
     has_saf,
   } = entity
   const isAdminDC = isExternal && entity.hasAdminRight(ExternalAdminPages.DCA)
@@ -257,6 +259,13 @@ const Org = () => {
         <>
           <Route path="biomethane/*" element={<BiomethaneRoutes />} />
           <Route path="*" element={<Navigate replace to="biomethane" />} />
+        </>
+      )}
+
+      {isHRS && (
+        <>
+          <Route path="h2/*" element={<H2Routes />} />
+          <Route path="*" element={<Navigate replace to="h2/stations" />} />
         </>
       )}
 

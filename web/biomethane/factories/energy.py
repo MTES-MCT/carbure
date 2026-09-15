@@ -15,6 +15,7 @@ faker = Faker()
 class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneEnergy
+        django_get_or_create = ("producer", "year")
 
     producer = factory.SubFactory(EntityFactory, entity_type=Entity.BIOMETHANE_PRODUCER)
     year = faker.random_int(2000, 2024)
@@ -76,6 +77,7 @@ class BiomethaneEnergyFactory(factory.django.DjangoModelFactory):
 class BiomethaneEnergyMonthlyReportFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = BiomethaneEnergyMonthlyReport
+        django_get_or_create = ("energy", "month")
 
     energy = factory.SubFactory(BiomethaneEnergyFactory)
     month = faker.random_int(1, 12)

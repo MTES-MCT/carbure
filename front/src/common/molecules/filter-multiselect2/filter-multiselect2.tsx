@@ -21,6 +21,7 @@ const getEmptyFilters = <Key extends string>(filters: Key[]) => {
 const _hasFiltersValues = (filters: QueryFilters) => {
   return Object.values(filters ?? {}).some((filter) => filter.length > 0)
 }
+
 export interface FilterMultiSelectProps2<
   Key extends string,
   Value extends string = Key,
@@ -29,7 +30,7 @@ export interface FilterMultiSelectProps2<
   selected: QueryFilters
   onSelect: (filters: QueryFilters) => void
   getFilterOptions: (filter: Key) => Promise<any[]>
-  normalizers?: Partial<Record<string, Normalizer<Key, Value>>>
+  normalizers?: Partial<Record<Key, Normalizer<any, Value>>>
 }
 
 export const FilterMultiSelect2 = <

@@ -9,7 +9,9 @@ from resources.views import (
     get_entities,
     get_feedstocks,
     get_fossil_fuels,
+    get_materials,
     get_production_sites,
+    get_sites,
     get_systeme_national_certificates,
 )
 
@@ -23,7 +25,9 @@ urlpatterns = [
     path("entities", get_entities, name="resources-entities"),
     path("feedstocks", get_feedstocks, name="resources-feedstocks"),
     path("fossil-fuels", get_fossil_fuels, name="resources-fossil-fuels"),
+    path("materials", get_materials, name="resources-materials"),
     path("production-sites", get_production_sites, name="resources-production-sites"),
+    path("sites", get_sites, name="resources-sites"),
     path("airports", get_airports, name="resources-airports"),
     path("systeme-national", get_systeme_national_certificates, name="resources-systeme-national"),
 ]

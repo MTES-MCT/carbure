@@ -17,6 +17,8 @@ urlpatterns = [
     path("metabase-status", get_metabase_status, name="carbure-metabase-status"),
     path("tiruert/", include("tiruert.urls")),
     path("biomethane/", include("biomethane.urls")),
+    path("h2/", include("h2.urls")),
+    path("traceability/", include("traceability.urls")),
     path("feedstocks/", include("feedstocks.urls")),
     path("nav-stats", get_nav_stats, name="carbure-nav-stats"),
 ]

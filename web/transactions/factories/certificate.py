@@ -10,6 +10,7 @@ from entity.factories.entity import EntityFactory
 class GenericCertificateFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = GenericCertificate
+        django_get_or_create = ("certificate_id",)
 
     certificate_id = factory.Faker("lexify", text="??????????")
     certificate_type = fuzzy.FuzzyChoice(GenericCertificate.CERTIFICATE_TYPES, getter=lambda x: x[0])

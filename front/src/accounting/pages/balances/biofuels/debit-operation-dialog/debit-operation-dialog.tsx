@@ -9,6 +9,7 @@ import { Balance, OperationType } from "accounting/types"
 import { formatOperationType } from "accounting/utils/formatters"
 import { TransfertDialog } from "./transfert-dialog"
 import { ExportationDialog } from "./exportation-dialog"
+import { DevaluationDialog } from "./devaluation-dialog"
 
 interface DebitOperationDialogProps {
   onClose: () => void
@@ -21,7 +22,9 @@ export const DebitOperationDialog = ({
 }: DebitOperationDialogProps) => {
   const portal = usePortal()
   const [currentOperation, setCurrentOperation] = useState<
-    OperationType.TRANSFERT | OperationType.EXPORTATION
+    | OperationType.TRANSFERT
+    | OperationType.EXPORTATION
+    | OperationType.DEVALUATION
   >(OperationType.TRANSFERT)
 
   const handleNext = () => {
@@ -38,6 +41,15 @@ export const DebitOperationDialog = ({
       case OperationType.EXPORTATION:
         portal((close) => (
           <ExportationDialog
+            onClose={close}
+            balance={balance}
+            onOperationCreated={onClose}
+          />
+        ))
+        break
+      case OperationType.DEVALUATION:
+        portal((close) => (
+          <DevaluationDialog
             onClose={close}
             balance={balance}
             onOperationCreated={onClose}
@@ -79,6 +91,12 @@ export const DebitOperationDialog = ({
                 label: formatOperationType(OperationType.EXPORTATION),
                 value: OperationType.EXPORTATION,
               },
+              // {
+              //   label:
+              //     formatOperationType(OperationType.DEVALUATION) +
+              //     " (pertes, déclassement, autres cas éventuels)",
+              //   value: OperationType.DEVALUATION,
+              // },
             ]}
             onChange={setCurrentOperation}
             value={currentOperation}

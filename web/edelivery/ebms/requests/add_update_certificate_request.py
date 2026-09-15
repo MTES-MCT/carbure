@@ -1,11 +1,27 @@
+import xml.etree.ElementTree as ET
+
 from core.models.certificate import GenericCertificate
 from edelivery.adapters.clock import to_date_isoformat
+from edelivery.ebms.certificate_site import CertificateSite
 from edelivery.ebms.converters import CertificateIssuerConverter, CertificateStatusConverter
 
 from .base_request import BaseRequest
 
 
 class AddUpdateCertificateRequest(BaseRequest):
+    @staticmethod
+    def eo_scope_xml_elements(scopes):
+        return "\n".join([f"<EO_SCOPE><ORGANISATION_SCOPE>{s}</ORGANISATION_SCOPE></EO_SCOPE>" for s in scopes])
+
+    @staticmethod
+    def site_xml_elements(sites):
+        for i, s in enumerate(sites):
+            main_site_element = ET.Element("MAIN_SITE")
+            main_site_element.text = "true" if (i == 0) else "false"
+            s.xml_root_element.append(main_site_element)
+
+        return "\n".join([f"{s.to_xml()}" for s in sites])
+
     def __init__(self, entity_certificate):
         certificate = entity_certificate.certificate
         certificate_type = certificate.certificate_type
@@ -15,6 +31,8 @@ class AddUpdateCertificateRequest(BaseRequest):
         entity = entity_certificate.entity
         certificate_body_number = CertificateIssuerConverter().to_udb(certificate.certificate_issuer)
         validity_status = CertificateStatusConverter().to_udb(certificate.status)
+        scopes = certificate.scope.split(", ")
+        sites = [CertificateSite.from_carbure_site(s) for s in entity.get_sites()]
         payload = f"""\
 <udb:AddUpdateCertificateRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
   <EO_CERTIFICATE_HEADER>
@@ -28,6 +46,8 @@ class AddUpdateCertificateRequest(BaseRequest):
       <CERT_DATE_TO>{to_date_isoformat(certificate.valid_until)}</CERT_DATE_TO>
       <VALIDITY_STATUS>{validity_status}</VALIDITY_STATUS>
       <GROUP_CERTIFICATION>NO</GROUP_CERTIFICATION>
+      {self.eo_scope_xml_elements(scopes)}
+      {self.site_xml_elements(sites)}
       {self.stubbed_additional_mandatory_fields()}
     </EO_CERTIFICATE>
   </EO_CERTIFICATE_HEADER>
@@ -37,17 +57,6 @@ class AddUpdateCertificateRequest(BaseRequest):
 
     def stubbed_additional_mandatory_fields(self):
         return """\
-<EO_SCOPE>
-  <ORGANISATION_SCOPE>BG</ORGANISATION_SCOPE>
-</EO_SCOPE>
-<EO_CERTIFICATE_SITE>
-  <SITE_NAME>CarbureSite1</SITE_NAME>
-  <STREET_LINE>CarbureAddress1</STREET_LINE>
-  <POST_CODE>1230</POST_CODE>
-  <CITY>Paris</CITY>
-  <COUNTRY_CODE>FR</COUNTRY_CODE>
-  <MAIN_SITE>true</MAIN_SITE>
-</EO_CERTIFICATE_SITE>
 <CHAIN_OF_CUSTODIES>
   <CHAIN_OF_CUSTODY>Segregation</CHAIN_OF_CUSTODY>
 </CHAIN_OF_CUSTODIES>

@@ -1,7 +1,7 @@
 .PHONY: \
-	up down restart logs-django_cmd open \
+	up down restart logs-django_cmd open restart-backend restart-frontend \
 	test-backend test-frontend \
-	makemigrations migrate ipython \
+	makemigrations migrate seed ipython \
 	lint-fix translate translate-missing \
 	check-diff check-types generate-and-check-types
 
@@ -26,6 +26,12 @@ down:
 restart:
 	$(docker_cmd) down && $(docker_cmd) up -d
 
+restart-backend:
+	$(docker_cmd) restart carbure-django
+
+restart-frontend:
+	$(docker_cmd) restart carbure-frontend
+
 open:
 	open http://carbure.local:8090/
 
@@ -42,6 +48,9 @@ makemigrations:
 
 migrate:
 	$(django_cmd) migrate
+
+seed:
+	$(django_cmd) create_sample_data $(app)
 
 ipython:
 	$(django_cmd) shell --interface ipython
@@ -71,4 +80,3 @@ check-diff:
 
 check-types:
 	$(npm_cmd) run check-types
-

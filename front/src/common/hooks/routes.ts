@@ -36,7 +36,8 @@ export const useRoutes = () => {
 
     SAF: (year: number = currentYear) => ROUTE_URLS.SAF(entity.id, year),
 
-    HYDROGEN: () => ROUTE_URLS.HYDROGEN(entity.id),
+    HYDROGEN: (year: number = currentYear) =>
+      ROUTE_URLS.HYDROGEN(entity.id, year),
 
     SETTINGS: ROUTE_URLS.SETTINGS(entity.id),
     STATISTICS: ROUTE_URLS.STATISTICS(entity.id),

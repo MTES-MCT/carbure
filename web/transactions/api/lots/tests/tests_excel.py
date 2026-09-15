@@ -233,6 +233,25 @@ class LotsExcelImportTest(TestCase):
         assert lots.filter(carbure_delivery_site=self.owner_depot).count() == 1
         assert lots.filter(carbure_delivery_site=self.other_depot).count() == 5
 
+    def test_bulk_import_reads_usage_fields_from_excel(self):
+        """Test that the bulk import correctly reads usage fields from the Excel file."""
+        self.owner.entity_type = Entity.PRODUCER
+        self.owner.has_trading = True
+        self.owner.has_stocks = True
+        self.owner.save()
+
+        # add production site, remove depot
+        EntitySite.objects.update_or_create(entity=self.owner, site=self.owner_production_site)
+        EntitySite.objects.filter(entity=self.owner, site=self.owner_depot).delete()
+
+        lots = self.send_excel(self.owner, "test_lot_template.xlsx")
+        assert lots.filter(usage="").count() == 7
+
+        lot_rfc = lots.filter(delivery_type="RFC")
+        assert lot_rfc.count() == 1
+        assert lot_rfc.first().usage == "OTHER"
+        assert lot_rfc.first().usage_precision == "precisions"
+
     def test_excel_unknown_stock_id_returns_400(self):
         # When a row references a carbure_stock_id that does not exist,
         # the import should be rejected with a 400 and an explicit error message.

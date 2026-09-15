@@ -238,6 +238,8 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot["biofuel_code"] = lot_row.get("biocarburant_code", "").strip()
         lot["country_code"] = lot_row.get("pays_origine_code", "").strip()
         lot["delivery_type"] = lot_row.get("delivery_type", CarbureLot.UNKNOWN)
+        lot["usage"] = str(lot_row.get("usage", "")).strip()
+        lot["usage_precision"] = str(lot_row.get("usage_precision", "")).strip()
         for key in ["el"]:  # negative value allowed
             try:
                 lot[key] = float(lot_row.get(key, 0))

@@ -6,6 +6,7 @@ from django.urls import reverse
 from core.models import Biocarburant, Entity, MatierePremiere, Pays
 from core.tests_utils import setup_current_user
 from tiruert.models import FossilFuel, FossilFuelCategory
+from traceability.models import Material
 from transactions.models import Depot, ProductionSite, Site
 
 
@@ -101,6 +102,35 @@ class ResourcesTest(TestCase):
         data = response.json()
 
         assert len(data) == 1
+
+    def test_get_materials(self):
+        Material.objects.create(name="Bio-H2", code="H2-BIO")
+        Material.objects.create(name="RFNBO-H2", code="H2-RFNBO")
+
+        response = self.client.get(reverse("resources-materials"))
+        assert response.status_code == 200
+        assert [material["code"] for material in response.json()] == ["H2-BIO", "H2-RFNBO"]
+
+        response = self.client.get(reverse("resources-materials") + "?query=bio")
+        assert response.status_code == 200
+        assert response.json()[0]["code"] == "H2-BIO"
+
+    def test_get_sites(self):
+        country = Pays.objects.get(code_pays="FR")
+        Site.objects.create(name="Hydrogen station", site_type=Site.H2_REFUELING_STATION, country=country)
+        Site.objects.create(name="Other site", site_type=Site.OTHER, country=country)
+
+        response = self.client.get(reverse("resources-sites"), {"site_type": Site.H2_REFUELING_STATION})
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["name"] == "Hydrogen station"
+        assert all(site["site_type"] == Site.H2_REFUELING_STATION for site in data)
+
+        response = self.client.get(reverse("resources-sites"), {"query": "other"})
+        assert response.status_code == 200
+        assert response.json()[0]["name"] == "Other site"
 
     def test_get_fossil_fuels(self):
         category = FossilFuelCategory.objects.create(name="Essence", pci_litre=32.0)
@@ -292,7 +322,12 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()) >= 2
+        data = response.json()
+        assert len(data) >= 2
+        assert set(data[0]) == {"id", "name", "country", "date_mise_en_service", "dc_reference"}
+        assert "producer" not in data[0]
+        assert "manager_email" not in data[0]
+        assert "address" not in data[0]
         # check if querying works
         response = self.client.get(reverse(url) + "?query=ne3")
         assert response.status_code == 200

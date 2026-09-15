@@ -64,7 +64,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         self.assertEqual(errors, {})
         self.assertIsNone(data["type_cive"])
         self.assertIsNone(data["culture_details"])
-        self.assertIsNone(data["collection_type"])
+        self.assertEqual(data["collection_type"], "")
         self.assertIsNone(data["volume"])
 
     def test_no_input_name_returns_no_errors(self):
@@ -86,7 +86,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         errors = apply_feedstock_field_rules(data)
         self.assertIn("type_cive", errors)
         self.assertIsNone(data["culture_details"])
-        self.assertIsNone(data["collection_type"])
+        self.assertEqual(data["collection_type"], "")
 
     def test_type_cive_valid_when_classification_category_matches(self):
         """When input has CIVE category and type_cive is set, no error."""
@@ -210,7 +210,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         }
         errors = apply_feedstock_field_rules(data)
         self.assertEqual(errors, {})
-        self.assertIsNone(data["collection_type"])
+        self.assertEqual(data["collection_type"], "")
 
     def test_input_matching_no_rule_clears_all_conditional_fields(self):
         """When input matches no rule (e.g. Maïs), all conditional fields are cleared."""
@@ -228,7 +228,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         self.assertEqual(errors, {})
         self.assertIsNone(data["type_cive"])
         self.assertIsNone(data["culture_details"])
-        self.assertIsNone(data["collection_type"])
+        self.assertEqual(data["collection_type"], "")
         self.assertEqual(data["volume"], 100.0)
 
     def test_multiple_rules_match_returns_multiple_errors(self):

@@ -6,5 +6,7 @@ from .depots import get_depots as get_depots
 from .entity import get_entities as get_entities
 from .feedstocks import get_feedstocks as get_feedstocks
 from .fossil_fuels import get_fossil_fuels as get_fossil_fuels
+from .materials import get_materials as get_materials
 from .production_sites import get_production_sites as get_production_sites
+from .site import get_sites as get_sites
 from .systeme_national import get_systeme_national_certificates as get_systeme_national_certificates
