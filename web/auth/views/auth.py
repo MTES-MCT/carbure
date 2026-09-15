@@ -27,9 +27,9 @@ class AuthViewSet(viewsets.ViewSet, AuthActionMixin):
         if self.action in [
             "register",
             "request_otp",
-            "request-activation-link",
-            "verify-otp",
-            "request-password-reset",
+            "request_activation_link",
+            "verify_otp",
+            "request_password_reset",
         ]:
             self.throttle_scope = "10/day"
         else:
