@@ -150,3 +150,19 @@ def check_admin_rights(allow_external=None, allow_role=None):
         return wrap
 
     return decorator
+
+
+def throttle_scope(scope):
+    """Set DRF ``throttle_scope`` on a function-based ``@api_view``.
+
+    Must be applied above ``@api_view``: DRF copies ``throttle_classes`` from
+    the wrapped function, but not ``throttle_scope``.
+    """
+
+    def decorator(view):
+        if not hasattr(view, "cls"):
+            raise TypeError("@throttle_scope must be applied above @api_view")
+        view.cls.throttle_scope = scope
+        return view
+
+    return decorator
