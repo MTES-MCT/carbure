@@ -1,3 +1,4 @@
+import logging
 from os import environ
 
 from django.conf import settings
@@ -13,6 +14,8 @@ from rest_framework.serializers import CharField
 
 from auth.serializers import ChangeEmailErrors, ConfirmEmailChangeSerializer, RequestEmailChangeSerializer
 from core.helpers import send_mail
+
+logger = logging.getLogger(__name__)
 
 
 def create_email_change_device(user, new_email):
@@ -121,11 +124,18 @@ class ChangeEmailActionMixin:
             send_email_change_token(request, device, new_email)
 
             return Response({"status": "otp_sent"})
-        except Exception as e:
-            import traceback
-
-            traceback.print_exc()
-            return Response({"error": f"Erreur interne: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception:
+            logger.exception(
+                "Unexpected error while requesting email change for user_id=%s",
+                request.user.pk,
+            )
+            return Response(
+                {
+                    "error": ChangeEmailErrors.INTERNAL_ERROR,
+                    "message": ChangeEmailErrors.INTERNAL_ERROR_MESSAGE,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @extend_schema(
         request=ConfirmEmailChangeSerializer,

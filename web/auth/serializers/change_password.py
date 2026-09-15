@@ -10,6 +10,8 @@ class ChangePasswordErrors:
     WRONG_CURRENT_PASSWORD = "WRONG_CURRENT_PASSWORD"
     PASSWORDS_MATCH = "PASSWORDS_MATCH"
     CONFIRM_PASSWORD_MISMATCH = "CONFIRM_PASSWORD_MISMATCH"
+    INTERNAL_ERROR = "INTERNAL_ERROR"
+    INTERNAL_ERROR_MESSAGE = "Une erreur interne est survenue."
 
 
 class ChangePasswordSerializer(serializers.Serializer):

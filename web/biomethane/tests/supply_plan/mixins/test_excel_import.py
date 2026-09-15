@@ -1,4 +1,5 @@
 import io
+from unittest.mock import patch
 
 import pandas as pd
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -8,6 +9,7 @@ from rest_framework.test import APITestCase
 from biomethane.factories import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.services.supply_plan_excel_template import KEY_ROW, MAIN_SHEET_NAME
+from biomethane.views.supply_plan.mixins.excel_import import FILE_PROCESSING_ERROR, FILE_PROCESSING_ERROR_MESSAGE
 from core.models import Entity, MatierePremiere
 from core.tests_utils import setup_current_user
 
@@ -135,3 +137,20 @@ class ExcelImportActionMixinTests(APITestCase):
             response.content.startswith(b"PK"),
             msg="Response content should be a valid xlsx (ZIP signature)",
         )
+
+    @patch("biomethane.views.supply_plan.mixins.excel_import.ExcelImporter.parse")
+    def test_import_does_not_expose_internal_exception(self, mock_parse):
+        mock_parse.side_effect = RuntimeError()
+        excel_file = self.create_test_excel_file()
+
+        with self.assertLogs("biomethane.views.supply_plan.mixins.excel_import", level="ERROR"):
+            response = self.client.post(
+                self.url,
+                {"file": excel_file},
+                query_params={"entity_id": self.producer_entity.id, "year": self.current_year},
+                format="multipart",
+            )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["error"], FILE_PROCESSING_ERROR)
+        self.assertEqual(response.data["message"], FILE_PROCESSING_ERROR_MESSAGE)
