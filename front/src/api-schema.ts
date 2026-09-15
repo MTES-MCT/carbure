@@ -6741,27 +6741,11 @@ export interface components {
         ProcessTypeEnum: ProcessTypeEnum;
         ProductionSite: {
             readonly id: number;
-            readonly producer: components["schemas"]["Entity"];
             name: string;
             readonly country: components["schemas"]["Country"];
             /** Format: date */
             date_mise_en_service?: string | null;
-            ges_option?: components["schemas"]["GesOptionEnum"];
-            eligible_dc?: boolean;
             dc_reference?: string;
-            /** SIRET */
-            site_siret?: string;
-            /** Adresse */
-            address?: string;
-            /** Commune */
-            city?: string;
-            /** Code postal */
-            postal_code?: string;
-            /** Coordonnées GPS */
-            gps_coordinates?: string | null;
-            manager_name?: string;
-            manager_phone?: string;
-            manager_email?: string;
         };
         ProductionSiteCertificateSertificate: {
             readonly type: string;

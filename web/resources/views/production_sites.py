@@ -30,7 +30,7 @@ def get_production_sites(request, *args, **kwargs):
     query = request.query_params.get("query")
     producer_id = request.query_params.get("producer_id", False)
 
-    psites = ProductionSite.objects.select_related("country", "created_by").all().order_by("name")
+    psites = ProductionSite.objects.select_related("country").all().order_by("name")
 
     if query:
         psites = psites.filter(name__icontains=query)
