@@ -25,7 +25,7 @@ class VerifyOTPAction:
             ),
         ],
     )
-    @action(detail=False, methods=["post"], url_path="verify-otp")
+    @action(detail=False, methods=["post"], url_path="verify-otp", throttle_scope="otp")
     def verify_otp(self, request):
         # for old users that did not register when 2fa was introduced
         if not user_has_device(request.user):

@@ -137,7 +137,7 @@ class EntityRegistrationAddCompanyTest(TestCase):
 class EntityRegistrationAddCompanyThrottlingTest(TestCase):
     def setUp(self):
         self.throttle_classes_patcher = patch.object(add_company_view.cls, "throttle_classes", [ScopedRateThrottle])
-        self.throttle_rates_patcher = patch.object(ScopedRateThrottle, "THROTTLE_RATES", {"10/day": "2/minute"})
+        self.throttle_rates_patcher = patch.object(ScopedRateThrottle, "THROTTLE_RATES", {"add-company": "2/minute"})
         self.throttle_classes_patcher.start()
         self.throttle_rates_patcher.start()
         self.addCleanup(self.throttle_classes_patcher.stop)
@@ -153,7 +153,7 @@ class EntityRegistrationAddCompanyThrottlingTest(TestCase):
         self.url = reverse("api-entity-registration-add-company")
 
     def test_throttle_scope_is_set(self):
-        self.assertEqual(add_company_view.cls.throttle_scope, "10/day")
+        self.assertEqual(add_company_view.cls.throttle_scope, "add-company")
 
     def test_burst_returns_429_without_creating_entity_or_sending_email(self):
         first = self.client.post(self.url, {**self.entity_data, "name": "Company One"})

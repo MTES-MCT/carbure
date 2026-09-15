@@ -88,7 +88,7 @@ class ApplyForNewCompanyError:
         ),
     ],
 )
-@throttle_scope("10/day")
+@throttle_scope("add-company")
 @api_view(["POST"])
 @permission_classes([IsVerified])
 def add_company_view(request):
