@@ -6767,6 +6767,14 @@ export interface components {
             readonly type: string;
             readonly certificate_id: string;
         };
+        ProductionSitePreview: {
+            readonly id: number;
+            readonly name: string;
+            readonly country: components["schemas"]["Country"];
+            /** Format: date */
+            readonly date_mise_en_service: string | null;
+            readonly dc_reference: string;
+        };
         ProvisionCertificateBulkRequest: {
             entity: string;
             siren: string;
@@ -12896,7 +12904,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ProductionSite"][];
+                    "application/json": components["schemas"]["ProductionSitePreview"][];
                 };
             };
         };

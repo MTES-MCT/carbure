@@ -31,6 +31,8 @@ export type Country = apiTypes["Country"]
 
 export type ProductionSite = apiTypes["ProductionSite"]
 
+export type ProductionSitePreview = apiTypes["ProductionSitePreview"]
+
 export type ProductionSiteDetails = apiTypes["EntityProductionSite"]
 
 export type Depot = apiTypes["Depot"]

@@ -16,6 +16,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
+  ProductionSitePreview,
   Certificate,
   EntityCertificate,
   EntityDepot,
@@ -105,6 +106,25 @@ export const normalizeProductionSite: Normalizer<ProductionSite> = (ps) => ({
 
 // prettier-ignore
 export const normalizeProductionSiteOrUnknown: Normalizer<ProductionSite | string> = (ps) => ({
+  value: ps,
+  label: isString(ps) ? ps : ps.name,
+})
+
+export const normalizeProductionSitePreview: Normalizer<
+  ProductionSitePreview
+> = (ps) => ({
+  value: ps,
+  label: ps.name,
+})
+
+// prettier-ignore
+export const normalizeProductionSitePreviewOrUnknown: Normalizer<ProductionSitePreview | string> = (ps) => ({
+  value: ps,
+  label: isString(ps) ? ps : ps.name,
+})
+
+// prettier-ignore
+export const normalizeProductionSiteOrUnknownWithPreview: Normalizer<ProductionSite | ProductionSitePreview | string> = (ps) => ({
   value: ps,
   label: isString(ps) ? ps : ps.name,
 })

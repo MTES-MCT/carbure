@@ -7996,7 +7996,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ProductionSite"
+                  $ref: "#/components/schemas/ProductionSitePreview"
           description: ""
   /api/resources/sites:
     get:
@@ -20738,6 +20738,33 @@ components:
       required:
         - certificate_id
         - type
+    ProductionSitePreview:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        country:
+          allOf:
+            - $ref: "#/components/schemas/Country"
+          readOnly: true
+        date_mise_en_service:
+          type: string
+          format: date
+          readOnly: true
+          nullable: true
+        dc_reference:
+          type: string
+          readOnly: true
+      required:
+        - country
+        - date_mise_en_service
+        - dc_reference
+        - id
+        - name
     ProvisionCertificateBulkRequest:
       type: object
       properties:

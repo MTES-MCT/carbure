@@ -9,6 +9,7 @@ import {
   Depot,
   Feedstock,
   ProductionSite,
+  ProductionSitePreview,
   Unit,
   EntityPreview,
 } from "common/types"
@@ -258,7 +259,11 @@ export const defaultLot = {
   free_field: undefined as string | undefined,
 
   producer: undefined as EntityPreview | string | undefined,
-  production_site: undefined as ProductionSite | string | undefined,
+  production_site: undefined as
+    | ProductionSite
+    | ProductionSitePreview
+    | string
+    | undefined,
   production_site_certificate: undefined as string | undefined,
   production_country: undefined as Country | undefined,
   production_site_double_counting_certificate: undefined as string | undefined,

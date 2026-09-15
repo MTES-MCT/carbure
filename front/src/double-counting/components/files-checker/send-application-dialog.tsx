@@ -1,6 +1,6 @@
 import { findProducers, findProductionSites } from "common/api"
 import useEntity from "common/hooks/entity"
-import { ProductionSite, EntityPreview } from "common/types"
+import { ProductionSitePreview, EntityPreview } from "common/types"
 import * as norm from "common/utils/normalizers"
 import { Notice } from "common/components/notice"
 import { Autocomplete } from "common/components/autocomplete2"
@@ -133,7 +133,7 @@ export const SendApplicationAdminDialog = ({
         required
         label={t("Site de production")}
         getOptions={(query) => findProductionSites(query, producer)}
-        normalize={norm.normalizeProductionSite}
+        normalize={norm.normalizeProductionSitePreview}
         {...bind("productionSite")}
       />
       <TextInput
@@ -154,7 +154,7 @@ export const SendApplicationAdminDialog = ({
 }
 
 const defaultProductionForm = {
-  productionSite: undefined as ProductionSite | undefined,
+  productionSite: undefined as ProductionSitePreview | undefined,
   producer: undefined as EntityPreview | undefined,
   certificate_id: undefined as string | undefined,
 }
