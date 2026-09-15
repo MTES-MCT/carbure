@@ -283,7 +283,7 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
             biofuel=self.biofuel_eth,
             lot_status="ACCEPTED",
             delivery_type="RFC",
-            usage=CarbureLot.USAGE_HEATING,
+            usage=CarbureLot.USAGE_COMBUSTIBLE,
             volume=700,
             carbure_delivery_site=self.depot,
         )
@@ -303,7 +303,7 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
             biofuel=self.biofuel_eth,
             lot_status="ACCEPTED",
             delivery_type="BLENDING",
-            usage=CarbureLot.USAGE_HEATING,
+            usage=CarbureLot.USAGE_COMBUSTIBLE,
             volume=650,
             carbure_delivery_site=self.depot,
         )

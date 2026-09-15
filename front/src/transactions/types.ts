@@ -239,7 +239,7 @@ export enum DeliveryType {
 
 export enum FuelUsage {
   Road = "ROAD",
-  Heating = "HEATING",
+  Combustible = "COMBUSTIBLE",
   Agriculture = "AGRICULTURE",
   Construction = "CONSTRUCTION",
   Maritime = "MARITIME",
