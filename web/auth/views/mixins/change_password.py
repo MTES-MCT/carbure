@@ -1,5 +1,3 @@
-import logging
-
 from django.contrib.auth import update_session_auth_hash
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import status
@@ -7,9 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import CharField
 
+from adapters.logger import log_exception
 from auth.serializers import ChangePasswordErrors, ChangePasswordSerializer
-
-logger = logging.getLogger(__name__)
 
 
 class ChangePasswordActionMixin:
@@ -101,11 +98,8 @@ class ChangePasswordActionMixin:
 
             return Response({"status": "success"}, status=status.HTTP_200_OK)
 
-        except Exception:
-            logger.exception(
-                "Unexpected error while changing password for user_id=%s",
-                request.user.pk,
-            )
+        except Exception as e:
+            log_exception(e)
             return Response(
                 {
                     "error": ChangePasswordErrors.INTERNAL_ERROR,

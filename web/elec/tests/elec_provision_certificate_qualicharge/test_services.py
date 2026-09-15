@@ -271,16 +271,15 @@ class PrepareCertificatesBulkTest(TestCase):
     def test_prepare_does_not_expose_internal_exception(self, mock_cert):
         mock_cert.side_effect = RuntimeError()
 
-        with self.assertLogs("elec.services.qualicharge", level="ERROR"):
-            errors = _prepare_certificates_bulk(
-                self.unit_data,
-                self.cpo,
-                None,
-                self.double_validated,
-                self.existing_certs,
-                self.to_create,
-                self.to_update,
-            )
+        errors = _prepare_certificates_bulk(
+            self.unit_data,
+            self.cpo,
+            None,
+            self.double_validated,
+            self.existing_certs,
+            self.to_create,
+            self.to_update,
+        )
 
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0]["station_id"], "FRXYZP123456")

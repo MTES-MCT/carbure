@@ -143,13 +143,12 @@ class ExcelImportActionMixinTests(APITestCase):
         mock_parse.side_effect = RuntimeError()
         excel_file = self.create_test_excel_file()
 
-        with self.assertLogs("biomethane.views.supply_plan.mixins.excel_import", level="ERROR"):
-            response = self.client.post(
-                self.url,
-                {"file": excel_file},
-                query_params={"entity_id": self.producer_entity.id, "year": self.current_year},
-                format="multipart",
-            )
+        response = self.client.post(
+            self.url,
+            {"file": excel_file},
+            query_params={"entity_id": self.producer_entity.id, "year": self.current_year},
+            format="multipart",
+        )
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data["error"], FILE_PROCESSING_ERROR)

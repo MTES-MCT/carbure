@@ -114,10 +114,7 @@ class ChangeEmailTestCase(TestCase):
         data = {"new_email": "newemail@example.com", "password": "testpassword123"}
         url = reverse("auth-request-email-change")
 
-        with (
-            self.assertLogs("auth.views.mixins.change_email", level="ERROR"),
-            self.assertLogs("django.request", level="ERROR"),
-        ):
+        with self.assertLogs("django.request", level="ERROR"):
             response = self.client.post(url, data, format="json")
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR

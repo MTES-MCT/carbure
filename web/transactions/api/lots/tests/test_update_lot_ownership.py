@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -100,3 +102,30 @@ class TestUpdateLotOwnership(TestCase):
         self.assertEqual(GenericError.objects.filter(lot=self.lot).count(), error_count)
         self.assertEqual(CarbureLotEvent.objects.filter(lot=self.lot).count(), event_count)
         self.assertFalse(CarbureLotEvent.objects.filter(lot=self.lot, entity=self.attacker).exists())
+
+    @patch("transactions.api.lots.update.do_update_lot")
+    def test_update_does_not_expose_internal_exception(self, mock_update):
+        mock_update.side_effect = RuntimeError("secret table xyz")
+        own_lot = CarbureLotFactory.create(
+            lot_status=CarbureLot.DRAFT,
+            added_by=self.attacker,
+            carbure_client=self.attacker,
+            carbure_supplier=self.attacker,
+            biofuel=self.eth,
+            volume=10000,
+        )
+
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            {
+                "entity_id": self.attacker.id,
+                "lot_id": own_lot.id,
+                "volume": 5000,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        payload = response.json()
+        self.assertEqual(payload["error"], "FIELD_UPDATE_FORBIDDEN")
+        self.assertNotIn("secret", str(payload))
+        self.assertNotIn("xyz", str(payload))

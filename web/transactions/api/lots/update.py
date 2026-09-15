@@ -1,5 +1,6 @@
 from django import forms
 
+from adapters.logger import log_exception
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import Entity, UserRights
@@ -58,6 +59,7 @@ def update_lot(request, *args, **kwargs):
     except LotUpdateFailure as f:
         return ErrorResponse(400, f.message, f.data)
     except Exception as e:
-        return ErrorResponse(400, UpdateLotError.FIELD_UPDATE_FORBIDDEN, {"message": str(e)})
+        log_exception(e)
+        return ErrorResponse(400, UpdateLotError.FIELD_UPDATE_FORBIDDEN)
 
     return SuccessResponse()

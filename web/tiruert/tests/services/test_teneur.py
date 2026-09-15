@@ -4,7 +4,7 @@ import numpy as np
 from django.test import SimpleTestCase, TestCase
 
 from tiruert.models import Operation
-from tiruert.services.teneur import TeneurService, TeneurServiceErrors
+from tiruert.services.teneur import TeneurService, TeneurServiceError
 
 
 class TeneurServiceOptimizeBiofuelBlendingTest(SimpleTestCase):
@@ -64,34 +64,34 @@ class TeneurServiceOptimizeBiofuelBlendingTest(SimpleTestCase):
         self.assertLessEqual(len(selected_batches), max_n_batches)
 
     def test_optimize_biofuel_blending_insufficient_volume_raises_error(self):
-        """Test that insufficient total volume raises ValueError"""
+        """Test that insufficient total volume raises TeneurServiceError"""
         batches_volumes = np.array([100.0, 50.0])
         batches_emissions = np.array([50.0, 60.0])
         target_volume = 200.0  # More than available
         target_emission = 55.0
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TeneurServiceError) as context:
             TeneurService.optimize_biofuel_blending(batches_volumes, batches_emissions, target_volume, target_emission)
 
-        self.assertEqual(str(context.exception), TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
+        self.assertEqual(context.exception.code, TeneurServiceError.INSUFFICIENT_INPUT_VOLUME)
 
     def test_optimize_biofuel_blending_enforced_volumes_too_high_raises_error(self):
-        """Test that enforced volumes exceeding batch volumes raises ValueError"""
+        """Test that enforced volumes exceeding batch volumes raises TeneurServiceError"""
         batches_volumes = np.array([100.0, 150.0])
         batches_emissions = np.array([50.0, 60.0])
         target_volume = 200.0
         target_emission = 55.0
         enforced_volumes = np.array([150.0, 0.0])  # Exceeds first batch volume
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TeneurServiceError) as context:
             TeneurService.optimize_biofuel_blending(
                 batches_volumes, batches_emissions, target_volume, target_emission, enforced_volumes
             )
 
-        self.assertEqual(str(context.exception), TeneurServiceErrors.ENFORCED_VOLUMES_TOO_HIGH)
+        self.assertEqual(context.exception.code, TeneurServiceError.ENFORCED_VOLUMES_TOO_HIGH)
 
     def test_optimize_biofuel_blending_incoherent_max_n_batches_raises_error(self):
-        """Test that max_n_batches less than enforced batches count raises ValueError"""
+        """Test that max_n_batches less than enforced batches count raises TeneurServiceError"""
         batches_volumes = np.array([100.0, 150.0, 200.0])
         batches_emissions = np.array([50.0, 60.0, 70.0])
         target_volume = 250.0
@@ -99,12 +99,12 @@ class TeneurServiceOptimizeBiofuelBlendingTest(SimpleTestCase):
         enforced_volumes = np.array([50.0, 75.0, 0.0])  # 2 enforced batches
         max_n_batches = 1  # Less than enforced count
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TeneurServiceError) as context:
             TeneurService.optimize_biofuel_blending(
                 batches_volumes, batches_emissions, target_volume, target_emission, enforced_volumes, max_n_batches
             )
 
-        self.assertEqual(str(context.exception), TeneurServiceErrors.INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES)
+        self.assertEqual(context.exception.code, TeneurServiceError.INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES)
 
     def test_optimize_biofuel_blending_rounds_volumes_to_2_decimals(self):
         """Test that selected volumes are rounded to 2 decimal places"""
@@ -200,15 +200,15 @@ class TeneurServiceEmissionBoundsTest(SimpleTestCase):
         self.assertAlmostEqual(max_emission, expected_max)
 
     def test_emission_bounds_insufficient_volume_raises_error(self):
-        """Test that insufficient volume raises ValueError"""
+        """Test that insufficient volume raises TeneurServiceError"""
         batches_volumes = np.array([100.0, 50.0])
         batches_emissions = np.array([50.0, 60.0])
         target_volume = 200.0  # More than available
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(TeneurServiceError) as context:
             TeneurService.emission_bounds(batches_volumes, batches_emissions, target_volume)
 
-        self.assertEqual(str(context.exception), TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
+        self.assertEqual(context.exception.code, TeneurServiceError.INSUFFICIENT_INPUT_VOLUME)
 
 
 class TeneurServiceConvertEmissionsTest(SimpleTestCase):

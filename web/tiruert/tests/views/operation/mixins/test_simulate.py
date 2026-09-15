@@ -7,7 +7,8 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
 from core.models import Biocarburant, Entity, MatierePremiere
-from tiruert.views.operation.mixins.simulate import SimulateActionMixin
+from tiruert.services.teneur import TeneurServiceError
+from tiruert.views.operation.mixins.simulate import SimulateActionMixin, SimulationError
 from transactions.models import Depot
 
 
@@ -105,8 +106,8 @@ class SimulateActionMixinTest(TestCase):
 
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
     def test_simulate_handles_service_value_error(self, mock_service):
-        """Test that simulate returns 400 when service raises ValueError"""
-        mock_service.side_effect = ValueError("NO_SUITABLE_LOTS_FOUND")
+        """Test that simulate returns 400 when service raises TeneurServiceError"""
+        mock_service.side_effect = TeneurServiceError(TeneurServiceError.NO_SUITABLE_LOTS_FOUND)
 
         data = self._create_valid_data()
         request = self._create_request(data)
@@ -115,6 +116,18 @@ class SimulateActionMixinTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)
         self.assertEqual(response.data["error"], "NO_SUITABLE_LOTS_FOUND")
+
+    @patch("tiruert.views.operation.mixins.simulate.TeneurService.prepare_data_and_optimize")
+    def test_simulate_does_not_expose_internal_exception(self, mock_service):
+        mock_service.side_effect = ValueError("secret optimizer dump")
+
+        data = self._create_valid_data()
+        request = self._create_request(data)
+        response = self.view.simulate(request)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["error"], SimulationError.SIMULATION_FAILED)
+        self.assertNotIn("secret", str(response.data))
 
     def test_simulate_with_missing_required_field_returns_400(self):
         """Test that simulate returns 400 when required field is missing"""
@@ -308,8 +321,8 @@ class SimulateMinMaxActionMixinTest(TestCase):
 
     @patch("tiruert.views.operation.mixins.simulate.TeneurService.get_min_and_max_emissions")
     def test_simulate_min_max_handles_service_value_error(self, mock_service):
-        """Test that simulate_min_max returns 400 when service raises ValueError"""
-        mock_service.side_effect = ValueError("INSUFFICIENT_INPUT_VOLUME")
+        """Test that simulate_min_max returns 400 when service raises TeneurServiceError"""
+        mock_service.side_effect = TeneurServiceError(TeneurServiceError.INSUFFICIENT_INPUT_VOLUME)
 
         data = self._create_valid_data()
         request = self._create_request(data)
@@ -318,6 +331,18 @@ class SimulateMinMaxActionMixinTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)
         self.assertEqual(response.data["error"], "INSUFFICIENT_INPUT_VOLUME")
+
+    @patch("tiruert.views.operation.mixins.simulate.TeneurService.get_min_and_max_emissions")
+    def test_simulate_min_max_does_not_expose_internal_exception(self, mock_service):
+        mock_service.side_effect = ValueError("secret optimizer dump")
+
+        data = self._create_valid_data()
+        request = self._create_request(data)
+        response = self.view.simulate_min_max(request)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["error"], SimulationError.SIMULATION_FAILED)
+        self.assertNotIn("secret", str(response.data))
 
     def test_simulate_min_max_with_missing_required_field_returns_400(self):
         """Test that simulate_min_max returns 400 when required field is missing"""

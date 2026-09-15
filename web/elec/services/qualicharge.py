@@ -1,14 +1,11 @@
-import logging
-
 from django.db import models
 from django.db.models import Q
 from rest_framework import serializers
 
+from adapters.logger import log_exception
 from core.models import Entity
 from elec.models import ElecProvisionCertificate, ElecProvisionCertificateQualicharge
 from elec.repositories.meter_reading_repository import MeterReadingRepository
-
-logger = logging.getLogger(__name__)
 
 CERTIFICATE_PROCESSING_ERROR = "CERTIFICATE_PROCESSING_ERROR"
 CERTIFICATE_PROCESSING_ERROR_MESSAGE = "Unable to process this certificate."
@@ -219,12 +216,8 @@ def _prepare_certificates_bulk(unit, cpo, unknown_siren, double_validated, exist
                         enr_ratio=enr_ratio,
                     )
                 )
-        except Exception:
-            logger.exception(
-                "Unexpected error while preparing Qualicharge certificate for station_id=%s operating_unit=%s",
-                station_id,
-                code,
-            )
+        except Exception as e:
+            log_exception(e)
             errors.append(
                 {
                     "station_id": station_id,

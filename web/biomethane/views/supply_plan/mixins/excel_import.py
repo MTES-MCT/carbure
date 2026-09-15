@@ -1,15 +1,12 @@
-import logging
-
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from adapters.logger import log_exception
 from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateFromExcelSerializer, BiomethaneUploadExcelSerializer
 from biomethane.services.supply_plan_excel_template import KEY_ROW, MAIN_SHEET_NAME
 from core.excel_importer import ExcelImporter, ExcelValidationError
-
-logger = logging.getLogger(__name__)
 
 FILE_PROCESSING_ERROR = "FILE_PROCESSING_ERROR"
 FILE_PROCESSING_ERROR_MESSAGE = "Unable to process the uploaded file."
@@ -111,13 +108,8 @@ class ExcelImportActionMixin:
                 },
                 status=400,
             )
-        except Exception:
-            entity = getattr(request, "entity", None)
-            logger.exception(
-                "Unexpected error while importing supply plan from Excel for entity_id=%s year=%s",
-                getattr(entity, "id", None),
-                request.query_params.get("year"),
-            )
+        except Exception as e:
+            log_exception(e)
             return Response(
                 {
                     "error": FILE_PROCESSING_ERROR,
