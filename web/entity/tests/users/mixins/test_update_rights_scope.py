@@ -26,7 +26,7 @@ class TestAdminRightsRequestScope(TestCase):
         cls.producer = EntityFactory.create(name="Out of scope producer", entity_type=Entity.PRODUCER)
 
     def setUp(self):
-        setup_current_user(
+        self.user = setup_current_user(
             self,
             email="airline-admin@carbure.local",
             name="Airline Admin",
@@ -114,6 +114,19 @@ class TestAdminRightsRequestScope(TestCase):
         right_request.refresh_from_db()
         self.assertEqual(right_request.status, "ACCEPTED")
         self.assertTrue(UserRights.objects.filter(user=self.target_user, entity=self.airline, role=UserRights.RO).exists())
+
+    def test_reject_in_scope_removes_target_user_rights_without_revoking_admin(self):
+        right_request = self.create_right_request(self.airline, request_status="ACCEPTED", role=UserRights.RO)
+        UserRights.objects.create(user=self.target_user, entity=self.airline, role=UserRights.RO)
+
+        response = self.update_right_request(right_request.pk, "REJECTED")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        right_request.refresh_from_db()
+        self.assertEqual(right_request.status, "REJECTED")
+        self.assertFalse(UserRights.objects.filter(user=self.target_user, entity=self.airline).exists())
+        self.assertTrue(UserRights.objects.filter(user=self.user, entity=self.airline_admin, role=UserRights.ADMIN).exists())
 
     def test_can_change_role_in_scope(self):
         right_request = self.create_right_request(self.airline, request_status="ACCEPTED", role=UserRights.RO)

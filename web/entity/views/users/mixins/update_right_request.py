@@ -81,7 +81,7 @@ class UpdateRightsRequestsActionMixin:
             )
             self.send_rights_update_notification(right_request)
         else:
-            UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()
+            UserRights.objects.filter(entity=right_request.entity, user=right_request.user).delete()
         return Response({"status": "success"})
 
     @staticmethod
