@@ -12,8 +12,10 @@ import {
 } from "common/components/inputs2"
 import { Select } from "common/components/selects2"
 import { EntityManager } from "common/hooks/entity"
-import { EntityPreview, Unit } from "common/types"
+import { EntityPreview } from "common/types"
 import { normalizeEntityPreview } from "common/utils/normalizers"
+import { getStepFromFractionDigits } from "common/utils/formatters"
+import { SiteTypeEnum } from "api-schema"
 import {
   Action,
   ActionHolder,
@@ -25,13 +27,12 @@ import {
   normalizeActionMaterial,
   normalizeActionSite,
 } from "traceability/normalizers"
-import { SiteTypeEnum } from "api-schema"
-import { getStepFromFractionDigits } from "common/utils/formatters"
 import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
+import { quantityField } from "./quantity-field"
 import {
   ACTION_EMISSIONS_UNIT,
   formatUnitActionDecimal,
-} from "traceability/utils"
+} from "traceability/utils/formatters"
 
 const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
 
@@ -111,17 +112,10 @@ export function useActionFields() {
       },
     },
 
-    quantity: {
-      key: "quantity",
-      label: t("Quantité"),
-      field: ({ form, props }) => (
-        <ActionDecimalInput
-          {...props}
-          {...form.bind("quantity")}
-          readOnlyValue={formatUnitActionDecimal(form.value.quantity, Unit.kg)}
-        />
-      ),
-    },
+    quantity: quantityField(),
+    mass: quantityField("mass"),
+    volume: quantityField("volume"),
+    energy: quantityField("energy"),
 
     site: {
       key: "site",

@@ -34,7 +34,9 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 
-Côté front, les hooks génériques (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.).
+Côté front, les catalogues (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.).
+
+`quantity` affiche la quantité **stockée** (`quantity` + `unit`, saisissable). `mass` en est la vue convertie (kg, lecture seule, `null` si le facteur manque). Ce sont des factories privées de `hooks/action-fields` et `hooks/action-columns`. La page choisit lequel poser — lots H2 : `mass`. `volume` / `energy` suivront le même modèle.
 
 ---
 

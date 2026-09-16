@@ -21,11 +21,11 @@ import {
   ActionQueryBuilder,
 } from "traceability/types"
 import { ActionFilterDisplay } from "traceability/hooks/use-action-filters"
-import { ActionColumn } from "traceability/hooks/use-action-columns"
+import { ActionColumn } from "traceability/hooks/action-columns"
 import { useCombinedQuery } from "traceability/hooks/use-combined-query"
 import { ActionModal } from "traceability/components/action-modal"
 import { ActionExcelImportDialog } from "traceability/components/action-excel-import-dialog"
-import { ActionFieldset } from "traceability/hooks/use-action-fields"
+import { ActionFieldset } from "traceability/hooks/action-fields"
 import { Button, ButtonProps } from "common/components/button2"
 import { FrIconClassName } from "@codegouvfr/react-dsfr"
 import { SearchInput } from "common/components/inputs2"
