@@ -6,17 +6,19 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 | Concept | Rôle |
 |---|---|
-| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité (MJ), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`). Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
+| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité + unité (`l` / `kg` / `MJ`, obligatoire, sans défaut), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`). Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
+| `Material` | Catalogue matières (`code`, `name`) |
 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
-| `Material` | Catalogue matières (`code`, `name`) |
 
 Le catalogue est chargé au déploiement (`bin/post_deploy.sh`) depuis [`fixtures/materials.csv`](fixtures/materials.csv) :
 
 ```bash
 uv run python web/traceability/fixtures/load_materials.py
 ```
+
+L’import Excel des actions `INIT` pose `kg` (pas encore de colonne dédiée). Les valorisations créées par `valorize()` sont en `MJ`.
 
 ## Ce que la filière personnalise
 

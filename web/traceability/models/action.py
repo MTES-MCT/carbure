@@ -49,6 +49,13 @@ class Action(models.Model):
     TYPES = [(INIT, "INIT"), (VALORIZE, "VALORIZE")]
     type = models.CharField(verbose_name="Type d'action", choices=TYPES, max_length=16)
 
+    # Duplicated from Entity.UNIT_CHOICE: sharing is impractical (different contexts).
+    L = "l"
+    KG = "kg"
+    MJ = "MJ"
+    UNIT_CHOICE = ((L, "litres"), (KG, "kg"), (MJ, "MJ"))
+    unit = models.CharField(verbose_name="Unité", choices=UNIT_CHOICE, max_length=8)
+
     parent = models.ForeignKey(
         "self", verbose_name="Action parente", null=True, blank=True, on_delete=models.PROTECT, related_name="children"
     )
@@ -64,7 +71,6 @@ class Action(models.Model):
         related_name="actions",
     )
 
-    # Quantity in MJ
     quantity = models.DecimalField(verbose_name="Quantité de matière", max_digits=13, decimal_places=3)
 
     site = models.ForeignKey("transactions.Site", on_delete=models.PROTECT, verbose_name="Site", null=True)
