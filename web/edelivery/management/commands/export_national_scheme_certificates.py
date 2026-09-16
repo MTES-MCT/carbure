@@ -33,16 +33,18 @@ class Command(BaseCommand):
             requester = Requester(request, timeout=30)
             requester.do_request()
 
-        def export_certificate(entity):
-            ec = EntityCertificate.objects.get(entity=entity)
-            self.stdout.write(f"Exporting certificate '{ec.certificate.certificate_id}'…")
-            request = AddUpdateCertificateRequest(ec)
-            requester = Requester(request, timeout=30)
-            return requester.do_request()
+        def export_certificates(entity):
+            result = []
+            for ec in EntityCertificate.objects.filter(entity=entity):
+                self.stdout.write(f"Exporting certificate '{ec.certificate.certificate_id}'…")
+                request = AddUpdateCertificateRequest(ec)
+                requester = Requester(request, timeout=30)
+                result.append(requester.do_request())
+            return result
 
         entity = Entity.objects.get(name=options["entity_name"])
         if entity_not_in_udb(entity):
             export_entity(entity)
 
-        result = export_certificate(entity)
+        result = export_certificates(entity)
         self.stdout.write(str(result))
