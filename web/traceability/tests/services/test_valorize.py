@@ -17,8 +17,8 @@ class ValorizeTest(TestCase):
         return action
 
     def _with_lhv(self, action, lhv=Decimal("120")):
-        action.material.lhv = lhv
-        action.material.save()
+        action.lhv = lhv
+        action.save(update_fields=["lhv"])
         return action
 
     def test_creates_valorize_child_and_accepts_pending_init(self):
@@ -33,6 +33,8 @@ class ValorizeTest(TestCase):
         self.assertEqual(child.holder_id, action.holder_id)
         self.assertEqual(child.unit, Action.MJ)
         self.assertEqual(child.quantity, Decimal("12000.000"))
+        self.assertEqual(child.lhv, action.lhv)
+        self.assertEqual(child.density, action.density)
         self.assertEqual(Action.objects.get(pk=action.pk).status, ActionStatus.ACCEPTED)
 
     def test_skips_ineligible_actions(self):
@@ -51,7 +53,7 @@ class ValorizeTest(TestCase):
             valorize(Action.objects.all())
 
     def test_raises_when_energy_cannot_be_converted(self):
-        action = self._pending_init(unit=Action.KG)
+        action = self._pending_init(unit=Action.KG, lhv=None)
 
         with self.assertRaises(ConversionError) as ctx:
             valorize(Action.objects.filter(pk=action.pk))
@@ -62,7 +64,7 @@ class ValorizeTest(TestCase):
 
     def test_conversion_error_aborts_the_whole_batch(self):
         convertible = self._with_lhv(self._pending_init())
-        blocked = self._pending_init(unit=Action.KG)
+        blocked = self._pending_init(unit=Action.KG, lhv=None)
 
         with self.assertRaises(ConversionError) as ctx:
             valorize(Action.objects.filter(pk__in=[convertible.pk, blocked.pk]))
