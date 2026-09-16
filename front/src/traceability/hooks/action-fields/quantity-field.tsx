@@ -1,15 +1,20 @@
 import i18next from "i18next"
 
 import { DecimalInput } from "common/components/inputs2"
-import { ReadOnlyValue } from "common/components/inputs2/base-input"
-import { formatUnit, getStepFromFractionDigits } from "common/utils/formatters"
+import {
+  formatUnitOnly,
+  getStepFromFractionDigits,
+} from "common/utils/formatters"
 import type { ActionField } from "./use-action-fields"
 import {
   ACTION_CONVERTED_QUANTITY,
   ActionQuantityKey,
 } from "traceability/utils/quantities"
 
-const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
+const ACTION_DECIMAL_FRACTION_DIGITS = 3
+const ACTION_DECIMAL_STEP = getStepFromFractionDigits(
+  ACTION_DECIMAL_FRACTION_DIGITS
+)
 
 export function quantityField(
   key: ActionQuantityKey = "quantity"
@@ -22,25 +27,22 @@ export function quantityField(
         return (
           <DecimalInput
             step={ACTION_DECIMAL_STEP}
+            fractionDigits={ACTION_DECIMAL_FRACTION_DIGITS}
+            unit={form.value.unit ? formatUnitOnly(form.value.unit) : undefined}
             {...props}
             {...form.bind("quantity")}
           />
         )
       }
 
-      const value = form.value[key]
-
       return (
-        <ReadOnlyValue
-          label={props.label}
+        <DecimalInput
+          step={ACTION_DECIMAL_STEP}
+          fractionDigits={ACTION_DECIMAL_FRACTION_DIGITS}
+          unit={formatUnitOnly(ACTION_CONVERTED_QUANTITY[key])}
+          {...props}
           readOnly
-          value={
-            value
-              ? formatUnit(Number(value), ACTION_CONVERTED_QUANTITY[key], {
-                  fractionDigits: 3,
-                })
-              : ""
-          }
+          value={form.value[key] ?? ""}
         />
       )
     },
