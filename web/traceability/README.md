@@ -4,7 +4,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 ## Choix de conception
 
-- **Facteurs figés sur l’action, pas sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont copiés depuis le catalogue à la **création de la racine** (import Excel aujourd’hui, qui pose aussi `unit=kg`). Toute la chaîne de traçabilité convertit avec **ces** valeurs : un changement de PCI sur `Material` ne réécrit pas l’historique.
+- **Facteurs figés sur l’action, pas sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont copiés depuis le catalogue à la **création de la racine** (import Excel aujourd’hui, qui pose aussi `unit=kg`). Toute la chaîne de traçabilité convertit avec **ces** valeurs : un changement de PCI sur `Material` ne réécrit pas l’historique. À l’import Excel, une matière sans `lhv` **et** sans `density` lève une erreur interne (oubli catalogue, pas une erreur de cellule).
 - **Le certificat fige le MJ à la valorisation.** `valorize()` écrit l’énergie du parent dans le `VALORIZE` (`unit=MJ`) et recopie `lhv` / `density` pour que toute la chaîne garde les mêmes facteurs. C’est le seul moment où une quantité convertie est **stockée**. Sans facteur sur la racine → `ConversionError`.
 - **Le reste est calculé, pas persisté.** `mass` / `volume` / `energy` sont des annotations SQL (NULL si le facteur manque) :
 

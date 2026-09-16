@@ -46,3 +46,31 @@ class AnnotateQuantitiesTest(TestCase):
         self.assertIsNone(annotated_mj.mass)
         self.assertIsNone(annotated_mj.volume)
         self.assertEqual(annotated_mj.energy, Decimal("12000.000"))
+
+    def test_annotates_from_litre_with_factors(self):
+        action = ActionFactory.create(
+            type=Action.INIT,
+            unit=Action.L,
+            quantity=Decimal("50.000"),
+            lhv=Decimal("120"),
+            density=Decimal("0.8"),
+        )
+
+        annotated = Action.objects.get(pk=action.pk)
+        self.assertEqual(annotated.mass, Decimal("40.000"))
+        self.assertEqual(annotated.volume, Decimal("50.000"))
+        self.assertEqual(annotated.energy, Decimal("4800.000"))
+
+    def test_annotates_from_mj_with_factors(self):
+        action = ActionFactory.create(
+            type=Action.VALORIZE,
+            unit=Action.MJ,
+            quantity=Decimal("12000.000"),
+            lhv=Decimal("120"),
+            density=Decimal("0.8"),
+        )
+
+        annotated = Action.objects.get(pk=action.pk)
+        self.assertEqual(annotated.mass, Decimal("100.000"))
+        self.assertEqual(annotated.volume, Decimal("125.000"))
+        self.assertEqual(annotated.energy, Decimal("12000.000"))

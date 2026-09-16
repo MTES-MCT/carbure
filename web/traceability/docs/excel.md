@@ -43,7 +43,7 @@ class ExampleIndustryHandler(ActionIndustryHandler):
     excel_columns = [
         excel_column("pos_id"),
         excel_column("material", header="Nature de la matière"),
-        excel_column("quantity", header="Quantité consommée (MJ)"),
+        excel_column("quantity", header="Quantité consommée (kg)"),
         excel_column("site", comment="Liste de choix — nom du site dans Carbure"),
     ]
 ```
