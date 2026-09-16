@@ -2,12 +2,12 @@ import { useTranslation } from "react-i18next"
 
 import { ActionsPage } from "traceability/components/actions-page"
 import { DeleteActionButton } from "traceability/components/delete-action-button"
-import { useActionColumns } from "traceability/hooks/use-action-columns"
+import { useActionColumns } from "traceability/hooks/action-columns"
 import { useActionFilters } from "traceability/hooks/use-action-filters"
 import {
   ActionSiteFieldOptions,
   useActionFields,
-} from "traceability/hooks/use-action-fields"
+} from "traceability/hooks/action-fields"
 import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 import { SiteTypeEnum } from "api-schema"
 import { Text } from "common/components/text"
@@ -69,7 +69,7 @@ const LotsPage = () => {
         columns.pos_id,
         { ...columns.site, header: t("Station") },
         { ...columns.material, header: t("Nature d'H2") },
-        columns.quantity,
+        columns.mass,
         columns.total_emissions,
       ]}
       fieldsets={[
@@ -97,7 +97,7 @@ const LotsPage = () => {
               label: t("Station"),
               options: H2_SITE_FIELD_OPTIONS,
             },
-            { ...fields.quantity, label: t("Quantité consommée") },
+            { ...fields.mass, label: t("Quantité consommée") },
             { ...fields.working_date, label: t("Date de consommation") },
           ],
         },
