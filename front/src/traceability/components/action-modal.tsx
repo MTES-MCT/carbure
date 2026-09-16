@@ -11,7 +11,7 @@ import useEntity from "common/hooks/entity"
 import { getActionDetail } from "traceability/api"
 import type { DetailAction } from "traceability/components/actions-page"
 import { ActionForm } from "traceability/components/action-form"
-import { ActionFieldset } from "traceability/hooks/use-action-fields"
+import { ActionFieldset } from "traceability/hooks/action-fields"
 import { ActionIndustry } from "traceability/types"
 
 export type ActionModalProps = {

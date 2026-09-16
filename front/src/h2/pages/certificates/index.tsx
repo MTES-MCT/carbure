@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next"
 
 import { ActionsPage } from "traceability/components/actions-page"
-import { useActionColumns } from "traceability/hooks/use-action-columns"
+import { useActionColumns } from "traceability/hooks/action-columns"
 import { useActionFilters } from "traceability/hooks/use-action-filters"
-import { useActionFields } from "traceability/hooks/use-action-fields"
+import { useActionFields } from "traceability/hooks/action-fields"
 import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 
 const H2_CERTIFICATE_QUERY: Partial<ActionQuery> = {
@@ -38,7 +38,7 @@ const CertificatesPage = () => {
           legend: t("Certificat"),
           fields: [
             fields.pos_id,
-            { ...fields.quantity, label: t("Quantité certifiée") },
+            { ...fields.energy, label: t("Quantité certifiée") },
             { ...fields.working_date, label: t("Date de création") },
           ],
         },
