@@ -1,7 +1,7 @@
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge"
 
 import { ActionStatus } from "traceability/types"
-import { getActionStatusLabel } from "traceability/utils"
+import { getActionStatusLabel } from "traceability/utils/formatters"
 
 const severityMapping: Record<ActionStatus, BadgeProps["severity"]> = {
   [ActionStatus.CREATED]: "info",

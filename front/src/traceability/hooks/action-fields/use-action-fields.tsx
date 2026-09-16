@@ -14,6 +14,8 @@ import { Select } from "common/components/selects2"
 import { EntityManager } from "common/hooks/entity"
 import { EntityPreview } from "common/types"
 import { normalizeEntityPreview } from "common/utils/normalizers"
+import { getStepFromFractionDigits } from "common/utils/formatters"
+import { SiteTypeEnum } from "api-schema"
 import {
   Action,
   ActionHolder,
@@ -25,9 +27,8 @@ import {
   normalizeActionMaterial,
   normalizeActionSite,
 } from "traceability/normalizers"
-import { SiteTypeEnum } from "api-schema"
-import { getStepFromFractionDigits } from "common/utils/formatters"
-import { ACTION_EMISSIONS_UNIT } from "traceability/utils"
+import { quantityField } from "./quantity-field"
+import { ACTION_EMISSIONS_UNIT } from "traceability/utils/formatters"
 
 const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
 
@@ -60,6 +61,7 @@ export type ActionSiteFieldOptions = {
 
 export function useActionFields() {
   const { t } = useTranslation()
+
   return {
     holder: {
       key: "holder",
@@ -97,13 +99,10 @@ export function useActionFields() {
       },
     },
 
-    quantity: {
-      key: "quantity",
-      label: t("Quantité"),
-      field: ({ form, props }) => (
-        <ActionDecimalInput {...props} {...form.bind("quantity")} />
-      ),
-    },
+    quantity: quantityField(),
+    mass: quantityField("mass"),
+    volume: quantityField("volume"),
+    energy: quantityField("energy"),
 
     site: {
       key: "site",
