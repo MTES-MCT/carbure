@@ -5,6 +5,8 @@ export type NumberInputProps = InputProps & {
   min?: number
   max?: number
   step?: number
+  unit?: string
+  fractionDigits?: number
   value?: number | null
   onChange?: (value: number | undefined) => void
 }
