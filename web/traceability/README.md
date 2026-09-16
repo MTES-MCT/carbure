@@ -2,13 +2,24 @@
 
 Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : elle branche un **handler**.
 
+## Choix de conception
+
+- **Facteurs figés sur l’action, pas sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont copiés depuis le catalogue à la **création de la racine** (import Excel aujourd’hui, qui pose aussi `unit=kg`). Toute la chaîne de traçabilité convertit avec **ces** valeurs : un changement de PCI sur `Material` ne réécrit pas l’historique.
+- **Le certificat fige le MJ à la valorisation.** `valorize()` écrit l’énergie du parent dans le `VALORIZE` (`unit=MJ`) et recopie `lhv` / `density` pour que toute la chaîne garde les mêmes facteurs. C’est le seul moment où une quantité convertie est **stockée**. Sans facteur sur la racine → `ConversionError`.
+- **Le reste est calculé, pas persisté.** `mass` / `volume` / `energy` sont des annotations SQL (NULL si le facteur manque) :
+
+```
+mass   = volume × density
+energy = mass × lhv
+```
+
 ## Modèle
 
 | Concept | Rôle |
 |---|---|
-| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité + unité (`l` / `kg` / `MJ`, obligatoire, sans défaut), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`). Annotée avec `mass` / `volume` / `energy` (NULL si le facteur manque). Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
+| `Action` | POS, détenteur, matière, quantité + unité, snapshot `lhv` / `density`, site, logistique, GES. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
-| `Material` | Catalogue matières (`code`, `name`, `lhv` en MJ/kg, `density` en kg/l). Les facteurs sont optionnels, ou strictement > 0 |
+| `Material` | Catalogue (`code`, `name`, `lhv`, `density`). Facteurs optionnels, ou strictement > 0 |
 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 
@@ -16,13 +27,6 @@ Le catalogue est chargé au déploiement (`bin/post_deploy.sh`) depuis [`fixture
 
 ```bash
 uv run python web/traceability/fixtures/load_materials.py
-```
-
-L’import Excel des actions `INIT` pose `kg` (pas encore de colonne dédiée). `valorize()` écrit l’**énergie** du parent dans le certificat (`unit=MJ`). Sans `lhv` (et `density` si litres), conversion impossible → `ConversionError`.
-
-```
-mass   = volume × density
-energy = mass × lhv
 ```
 
 ## Ce que la filière personnalise

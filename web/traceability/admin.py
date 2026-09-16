@@ -87,6 +87,8 @@ class ActionAdmin(admin.ModelAdmin):
         "material__name",
         "quantity",
         "unit",
+        "lhv",
+        "density",
         "site",
         "shipping_date",
         "working_date",
