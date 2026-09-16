@@ -6,11 +6,16 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 | Concept | Rôle |
 |---|---|
-| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité + unité (`l` / `kg` / `MJ`, obligatoire, sans défaut), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`) |
+| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité + unité (`l` / `kg` / `MJ`, obligatoire, sans défaut), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`). Annotée avec `mass` / `volume` / `energy` (NULL si le facteur manque) |
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
-| `Material` | Catalogue matières (`code`, `name`) |
+| `Material` | Catalogue matières (`code`, `name`, `lhv` en MJ/kg, `density` en kg/l). Les facteurs sont optionnels, ou strictement > 0 |
 
-L’import Excel des actions `INIT` pose `kg` (pas encore de colonne dédiée). Les valorisations créées par `valorize()` sont en `MJ`.
+L’import Excel des actions `INIT` pose `kg` (pas encore de colonne dédiée). `valorize()` écrit l’**énergie** du parent dans le certificat (`unit=MJ`). Sans `lhv` (et `density` si litres), conversion impossible → `ConversionError`.
+
+```
+mass   = volume × density
+energy = mass × lhv
+```
 
 ## Ce que la filière personnalise
 

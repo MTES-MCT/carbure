@@ -30,6 +30,9 @@ class ActionSerializer(serializers.ModelSerializer):
     certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
 
     total_emissions = ActionTotalEmissionsSerializer(read_only=True, allow_null=True)
+    mass = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
+    volume = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
+    energy = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
 
     class Meta:
         model = Action
