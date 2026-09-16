@@ -234,9 +234,9 @@ export function useActionFields() {
       field: ({ form, props }) => (
         <ActionDecimalInput
           {...props}
-          hintText={ACTION_EMISSIONS_UNIT}
           readOnly
           value={form.value.total_emissions?.total ?? ""}
+          unit={ACTION_EMISSIONS_UNIT}
         />
       ),
     },

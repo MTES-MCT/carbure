@@ -6,6 +6,8 @@ export type NumberInputProps = InputProps & {
   min?: number
   max?: number
   step?: number
+  unit?: string
+  fractionDigits?: number
   value?: number | null
   onChange?: (value: number | undefined) => void
 }
@@ -16,16 +18,27 @@ export const NumberInput = ({
   min,
   max,
   step,
+  unit,
+  fractionDigits,
   ...props
 }: NumberInputProps) => {
   if (props.readOnly) {
+    let formatted = ""
+    if (value !== undefined && value !== null) {
+      formatted = formatNumber(
+        value,
+        fractionDigits === undefined ? undefined : { fractionDigits }
+      )
+      if (unit) formatted = `${formatted} ${unit}`
+    }
+
     return (
       <ReadOnlyValue
         label={props.label}
         hasTooltip={props.hasTooltip}
         title={props.title}
         readOnly={props.readOnly}
-        value={value !== undefined && value !== null ? formatNumber(value) : ""}
+        value={formatted}
       />
     )
   }
