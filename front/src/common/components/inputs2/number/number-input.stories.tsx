@@ -56,3 +56,12 @@ export const ReadOnly: Story = {
     value: 1458,
   },
 }
+
+export const ReadOnlyWithUnit: Story = {
+  args: {
+    readOnly: true,
+    value: 1234.567,
+    fractionDigits: 3,
+    unit: "kg",
+  },
+}
