@@ -21,6 +21,15 @@ energy = mass × lhv
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
 | `Material` | Catalogue (`code`, `name`, `lhv`, `density`). Facteurs optionnels, ou strictement > 0 |
 
+Import des matières  :
+
+```bash
+uv run python web/manage.py import_materials # dry-run
+uv run python web/manage.py import_materials --dry-run=false
+```
+
+Fichier : [`fixtures/materials.csv`](fixtures/materials.csv). Un changement de PCI au catalogue **ne réécrit pas** les snapshots déjà posés sur les actions.
+
 ## Ce que la filière personnalise
 
 Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`handlers/registry.py`).
