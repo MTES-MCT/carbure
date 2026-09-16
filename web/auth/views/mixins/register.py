@@ -22,7 +22,7 @@ class UserCreationAction:
             ),
         ],
     )
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=["post"], throttle_scope="auth-anon")
     def register(self, request):
         serializer = UserCreationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

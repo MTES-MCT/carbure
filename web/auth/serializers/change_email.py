@@ -11,6 +11,8 @@ class ChangeEmailErrors:
     NO_CHANGE_REQUEST = "NO_CHANGE_REQUEST"
     OTP_CODE_EXPIRED = "OTP_CODE_EXPIRED"
     INVALID_OTP = "INVALID_OTP"
+    INTERNAL_ERROR = "INTERNAL_ERROR"
+    INTERNAL_ERROR_MESSAGE = "Une erreur interne est survenue."
 
 
 class RequestEmailChangeSerializer(serializers.Serializer):

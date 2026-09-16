@@ -1,18 +1,22 @@
 # test with : python web/manage.py test entity.api.registration.tests_add_company.EntityRegistrationAddCompanyTest --keepdb
 
 import datetime
+from unittest.mock import patch
 
+from django.core import mail
+from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.throttling import ScopedRateThrottle
 
 from core.models import Entity, EntityCertificate, Pays, UserRights, UserRightsRequests
 from core.tests_utils import assert_object_contains_data, setup_current_user
 from entity.factories.entity import EntityFactory
 from entity.services.enable_entity import enable_entity
-from entity.views.registration.add_company import EntityCompanySerializer
+from entity.views.registration.add_company import EntityCompanySerializer, add_company_view
 from transactions.factories.certificate import GenericCertificateFactory
 
 
@@ -128,3 +132,41 @@ class EntityRegistrationAddCompanyTest(TestCase):
                 entity,
                 {"default_certificate": ""},
             )
+
+
+class EntityRegistrationAddCompanyThrottlingTest(TestCase):
+    def setUp(self):
+        self.throttle_classes_patcher = patch.object(add_company_view.cls, "throttle_classes", [ScopedRateThrottle])
+        self.throttle_rates_patcher = patch.object(ScopedRateThrottle, "THROTTLE_RATES", {"add-company": "2/minute"})
+        self.throttle_classes_patcher.start()
+        self.throttle_rates_patcher.start()
+        self.addCleanup(self.throttle_classes_patcher.stop)
+        self.addCleanup(self.throttle_rates_patcher.stop)
+        cache.clear()
+
+        Pays.objects.create(code_pays="FR", name="France", name_en="France")
+        setup_current_user(self, "tester@carbure.local", "Tester", "gogogo")
+        self.entity_data = model_to_dict(
+            EntityFactory.build(entity_type=Entity.CPO), exclude=["id", "parent_entity", "closed_at"]
+        )
+        self.entity_data["registered_country"] = "FR"
+        self.url = reverse("api-entity-registration-add-company")
+
+    def test_throttle_scope_is_set(self):
+        self.assertEqual(add_company_view.cls.throttle_scope, "add-company")
+
+    def test_burst_returns_429_without_creating_entity_or_sending_email(self):
+        first = self.client.post(self.url, {**self.entity_data, "name": "Company One"})
+        second = self.client.post(self.url, {**self.entity_data, "name": "Company Two"})
+        self.assertEqual(first.status_code, status.HTTP_200_OK)
+        self.assertEqual(second.status_code, status.HTTP_200_OK)
+
+        entity_count = Entity.objects.count()
+        email_count = len(mail.outbox)
+        self.assertGreater(email_count, 0)
+
+        third = self.client.post(self.url, {**self.entity_data, "name": "Company Three"})
+        self.assertEqual(third.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+        self.assertEqual(Entity.objects.count(), entity_count)
+        self.assertFalse(Entity.objects.filter(name="Company Three").exists())
+        self.assertEqual(len(mail.outbox), email_count)

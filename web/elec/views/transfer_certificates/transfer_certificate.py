@@ -46,7 +46,7 @@ class TransferCertificateViewSet(ActionMixin, RetrieveModelMixin, ListModelMixin
     lookup_field = "id"
     search_fields = ["supplier__name", "client__name", "certificate_id"]
 
-    def get_permission(self):
+    def get_permissions(self):
         if self.action in ("accept", "reject"):
             return [HasElecOperatorWriteRights()]
         if self.action == "cancel":

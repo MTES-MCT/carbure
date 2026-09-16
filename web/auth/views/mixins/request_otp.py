@@ -77,7 +77,7 @@ class RequestOTPAction:
             ),
         ],
     )
-    @action(detail=False, methods=["get"], url_path="request-otp")
+    @action(detail=False, methods=["get"], url_path="request-otp", throttle_scope="otp")
     def request_otp(self, request):
         user = request.user
         device = device_with_updated_validity(user)

@@ -62,6 +62,7 @@ class EOGetTransactionResponse(BaseRequestResponse):
                 "Failed to update CarbuRe lot from UDB transaction data due to unmet integrity checks", e.data
             )
 
+        # Safe to return str(e): this runs via cron or a manual command, not an HTTP endpoint.
         except Exception as e:
             return self.handle_error("CarbuRe lot field update forbidden", str(e))
 
