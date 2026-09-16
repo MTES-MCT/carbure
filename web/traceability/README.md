@@ -21,14 +21,16 @@ energy = mass × lhv
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
 | `Material` | Catalogue (`code`, `name`, `lhv`, `density`). Facteurs optionnels, ou strictement > 0 |
 
-Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
-
-Le catalogue est chargé au déploiement (`bin/post_deploy.sh`) depuis [`fixtures/materials.csv`](fixtures/materials.csv) :
+Import des matières  :
 
 ```bash
-uv run python web/traceability/fixtures/load_materials.py
+uv run python web/manage.py import_materials # dry-run
+uv run python web/manage.py import_materials --dry-run=false
 ```
 
+Fichier : [`fixtures/materials.csv`](fixtures/materials.csv). Un changement de PCI au catalogue **ne réécrit pas** les snapshots déjà posés sur les actions.
+
+Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 ## Ce que la filière personnalise
 
 Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`handlers/registry.py`).
