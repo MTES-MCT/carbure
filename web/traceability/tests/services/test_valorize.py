@@ -21,6 +21,7 @@ class ValorizeTest(TestCase):
         self.assertEqual(child.parent_id, action.pk)
         self.assertEqual(child.holder_id, action.holder_id)
         self.assertEqual(child.quantity, action.quantity)
+        self.assertEqual(child.unit, Action.MJ)
         self.assertEqual(Action.objects.get(pk=action.pk).status, ActionStatus.ACCEPTED)
 
     def test_skips_ineligible_actions(self):

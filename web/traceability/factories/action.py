@@ -21,6 +21,7 @@ class ActionFactory(factory.django.DjangoModelFactory):
     holder = factory.SubFactory(EntityFactory, entity_type=Entity.HRS)
     industry = fuzzy.FuzzyChoice(Action.INDUSTRIES, getter=lambda x: x[0])
     type = fuzzy.FuzzyChoice(Action.TYPES, getter=lambda x: x[0])
+    unit = factory.LazyAttribute(lambda o: Action.KG if o.type == Action.INIT else Action.MJ)
     working_date = factory.Faker("date_between", start_date="-2y", end_date="today")
     parent = None
     material = factory.SubFactory(MaterialFactory)
