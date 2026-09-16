@@ -3465,6 +3465,8 @@ export interface components {
             industry: components["schemas"]["IndustryEnum"];
             /** Type d'action */
             type: components["schemas"]["ActionTypeEnum"];
+            /** Unité */
+            unit: components["schemas"]["PreferredUnitEnum"];
             /**
              * Quantité de matière
              * Format: decimal

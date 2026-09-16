@@ -6,9 +6,11 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 | Concept | Rôle |
 |---|---|
-| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité (MJ), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`) |
+| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité + unité (`l` / `kg` / `MJ`, obligatoire, sans défaut), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`) |
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
 | `Material` | Catalogue matières (`code`, `name`) |
+
+L’import Excel des actions `INIT` pose `kg` (pas encore de colonne dédiée). Les valorisations créées par `valorize()` sont en `MJ`.
 
 ## Ce que la filière personnalise
 

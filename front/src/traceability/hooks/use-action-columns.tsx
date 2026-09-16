@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 
 import { Cell, Column } from "common/components/table2"
 import { EntityManager } from "common/hooks/entity"
-import { formatDate } from "common/utils/formatters"
+import { formatDate, formatUnitOnly } from "common/utils/formatters"
 import { ActionStatusBadge } from "traceability/components/action-status-badge"
 import { Action } from "traceability/types"
 import {
@@ -50,7 +50,10 @@ export function useActionColumns() {
       key: "quantity",
       header: t("Quantité"),
       cell: (action) => (
-        <Cell text={formatActionDecimal(action.quantity)} sub="MJ" />
+        <Cell
+          text={formatActionDecimal(action.quantity)}
+          sub={formatUnitOnly(action.unit)}
+        />
       ),
     },
 

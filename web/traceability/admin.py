@@ -62,6 +62,7 @@ class ActionAdmin(admin.ModelAdmin):
         "holder",
         "material__name",
         "quantity",
+        "unit",
         "site",
         "shipping_date",
         "working_date",
@@ -69,6 +70,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_filter = (
         "industry",
         "type",
+        "unit",
         LatestStatusFilter,
         "material__name",
         "shipping_method",

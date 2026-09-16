@@ -13519,6 +13519,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/ActionTypeEnum"
           title: Type d'action
+        unit:
+          allOf:
+            - $ref: "#/components/schemas/PreferredUnitEnum"
+          title: Unité
         quantity:
           type: string
           format: decimal
@@ -13593,6 +13597,7 @@ components:
         - status
         - total_emissions
         - type
+        - unit
         - working_date
     ActionCertificate:
       type: object

@@ -71,6 +71,7 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
                 holder=holder,
                 industry=industry,
                 type=Action.INIT,
+                unit=Action.KG,
             )
             for attrs in validated_data
         ]
