@@ -43,7 +43,7 @@ class ActionInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         fields = "__all__"
-        read_only_fields = ["id", "industry", "holder", "parent"]
+        read_only_fields = ["id", "industry", "holder", "parent", "lhv", "density"]
 
     def create(self, validated_data):
         validated_data["industry"] = self.context["handler"].industry
@@ -68,16 +68,20 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
     def create(self, validated_data):
         holder = self.context["entity"]
         industry = self.context["handler"].industry
-        actions = [
-            Action(
-                **{key: value for key, value in attrs.items() if key in _ACTION_MODEL_FIELDS},
-                holder=holder,
-                industry=industry,
-                type=Action.INIT,
-                unit=Action.KG,
+        actions = []
+        for attrs in validated_data:
+            material = attrs.get("material")
+            actions.append(
+                Action(
+                    **{key: value for key, value in attrs.items() if key in _ACTION_MODEL_FIELDS},
+                    holder=holder,
+                    industry=industry,
+                    type=Action.INIT,
+                    unit=Action.KG,
+                    lhv=getattr(material, "lhv", None),
+                    density=getattr(material, "density", None),
+                )
             )
-            for attrs in validated_data
-        ]
 
         return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
 

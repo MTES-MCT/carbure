@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import CharField, OuterRef, QuerySet, Subquery, Value
+from django.db.models import CharField, OuterRef, Q, QuerySet, Subquery, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
@@ -75,6 +75,20 @@ class Action(models.Model):
     )
 
     quantity = models.DecimalField(verbose_name="Quantité de matière", max_digits=13, decimal_places=3)
+    lhv = models.DecimalField(
+        verbose_name="PCI (MJ/kg)",
+        max_digits=12,
+        decimal_places=6,
+        null=True,
+        blank=True,
+    )
+    density = models.DecimalField(
+        verbose_name="Masse volumique (kg/l)",
+        max_digits=12,
+        decimal_places=6,
+        null=True,
+        blank=True,
+    )
 
     site = models.ForeignKey("transactions.Site", on_delete=models.PROTECT, verbose_name="Site", null=True)
 
@@ -126,3 +140,13 @@ class Action(models.Model):
         verbose_name = "Action"
         verbose_name_plural = "Actions"
         ordering = ["id"]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(lhv__isnull=True) | Q(lhv__gt=0),
+                name="action_lhv_null_or_positive",
+            ),
+            models.CheckConstraint(
+                condition=Q(density__isnull=True) | Q(density__gt=0),
+                name="action_density_null_or_positive",
+            ),
+        ]

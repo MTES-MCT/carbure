@@ -31,7 +31,7 @@ class ActionExcelImportViewTest(APITestCase):
         self.entity = Entity.objects.create(name="Opérateur", entity_type=Entity.OPERATOR)
         setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.entity, "RW")])
         self.url = reverse("traceability-action-import-actions")
-        self.material = MaterialFactory(code="MAT-001", name="Matière")
+        self.material = MaterialFactory(code="MAT-001", name="Matière", lhv=Decimal("120"), density=Decimal("0.8"))
         self.site = Site.objects.create(name="Site", site_type=Site.EFS, created_by=self.entity)
         self.certificate = GenericCertificateFactory.create(certificate_id="CERT-001")
 
@@ -80,6 +80,8 @@ class ActionExcelImportViewTest(APITestCase):
                 "industry": Action.H2,
                 "type": Action.INIT,
                 "unit": Action.KG,
+                "lhv": Decimal("120"),
+                "density": Decimal("0.8"),
                 "material": self.material,
                 "certificate": self.certificate,
                 "site_id": self.site.id,

@@ -13546,6 +13546,18 @@ components:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           title: Quantité de matière
+        lhv:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,6})?$
+          nullable: true
+          title: PCI (MJ/kg)
+        density:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,6})?$
+          nullable: true
+          title: Masse volumique (kg/l)
         shipping_date:
           type: string
           format: date
