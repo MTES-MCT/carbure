@@ -1,7 +1,9 @@
 from django.contrib import admin, messages
 
+from traceability.exceptions import NoEligibleActionError
 from traceability.models import Action, ActionStatus, Material
-from traceability.services.valorize import NoEligibleActionError, valorize
+from traceability.services.refuse import refuse
+from traceability.services.valorize import valorize
 
 
 class ActionStatusInline(admin.TabularInline):
@@ -40,6 +42,16 @@ def valorize_actions_into_certificates(modeladmin, request, queryset):
     modeladmin.message_user(request, f"{len(created)} certificat(s) créé(s).")
 
 
+@admin.action(description="Refuser les actions sélectionnées")
+def refuse_selected_actions(modeladmin, request, queryset):
+    try:
+        refused = refuse(queryset)
+    except NoEligibleActionError:
+        modeladmin.message_user(request, "Aucune action éligible à refuser", messages.WARNING)
+        return
+    modeladmin.message_user(request, f"{len(refused)} action(s) refusée(s).")
+
+
 @admin.register(Action)
 class ActionAdmin(admin.ModelAdmin):
     list_display = (
@@ -73,7 +85,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_select_related = ("holder", "material", "site", "certificate")
     date_hierarchy = "working_date"
     inlines = (ActionStatusInline,)
-    actions = [valorize_actions_into_certificates]
+    actions = [valorize_actions_into_certificates, refuse_selected_actions]
 
     @admin.display(description="Statut", ordering="status")
     def latest_status(self, obj):

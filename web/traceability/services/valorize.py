@@ -3,11 +3,8 @@ import uuid
 from django.db import transaction
 from django.db.models import QuerySet
 
+from traceability.exceptions import NoEligibleActionError
 from traceability.models import Action, ActionStatus
-
-
-class NoEligibleActionError(Exception):
-    pass
 
 
 @transaction.atomic

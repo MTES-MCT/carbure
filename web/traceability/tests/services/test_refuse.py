@@ -3,38 +3,36 @@ from django.test import TestCase
 from traceability.exceptions import NoEligibleActionError
 from traceability.factories import ActionFactory
 from traceability.models import Action, ActionStatus
-from traceability.services.valorize import valorize
+from traceability.services.refuse import refuse
 
 
-class ValorizeTest(TestCase):
+class RefuseTest(TestCase):
     fixtures = ["json/countries.json"]
 
-    def test_creates_valorize_child_and_accepts_pending_init(self):
+    def test_rejects_pending_init(self):
         action = ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None)
         ActionStatus.objects.create(action=action, status=ActionStatus.PENDING)
 
-        created = valorize(Action.objects.filter(pk=action.pk))
+        refused = refuse(Action.objects.filter(pk=action.pk))
 
-        self.assertEqual(len(created), 1)
-        child = created[0]
-        self.assertEqual(child.type, Action.VALORIZE)
-        self.assertEqual(child.parent_id, action.pk)
-        self.assertEqual(child.holder_id, action.holder_id)
-        self.assertEqual(child.quantity, action.quantity)
-        self.assertEqual(Action.objects.get(pk=action.pk).status, ActionStatus.ACCEPTED)
+        self.assertEqual(len(refused), 1)
+        self.assertEqual(refused[0].pk, action.pk)
+        self.assertEqual(Action.objects.get(pk=action.pk).status, ActionStatus.REJECTED)
 
     def test_skips_ineligible_actions(self):
         pending = ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None)
         ActionStatus.objects.create(action=pending, status=ActionStatus.PENDING)
         ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, status=ActionStatus.CREATED)
+        ActionFactory.create(type=Action.VALORIZE, industry=Action.H2, parent=None, status=ActionStatus.PENDING)
 
-        created = valorize(Action.objects.filter(type=Action.INIT))
+        refused = refuse(Action.objects.all())
 
-        self.assertEqual(len(created), 1)
-        self.assertEqual(created[0].parent_id, pending.pk)
+        self.assertEqual(len(refused), 1)
+        self.assertEqual(refused[0].pk, pending.pk)
+        self.assertEqual(Action.objects.get(pk=pending.pk).status, ActionStatus.REJECTED)
 
     def test_raises_when_nothing_is_eligible(self):
         ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, status=ActionStatus.CREATED)
 
         with self.assertRaises(NoEligibleActionError):
-            valorize(Action.objects.all())
+            refuse(Action.objects.all())
