@@ -22,6 +22,7 @@ def valorize(actions: QuerySet[Action]) -> list[Action]:
             Action(
                 pos_id=str(uuid.uuid4()),
                 type=Action.VALORIZE,
+                unit=Action.MJ,
                 holder=action.holder,
                 industry=action.industry,
                 working_date=action.working_date,
