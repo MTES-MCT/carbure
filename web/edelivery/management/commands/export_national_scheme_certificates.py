@@ -34,12 +34,14 @@ class Command(BaseCommand):
             requester.do_request()
 
         def export_certificates(entity):
-            result = []
-            for ec in EntityCertificate.objects.filter(entity=entity):
-                self.stdout.write(f"Exporting certificate '{ec.certificate.certificate_id}'…")
-                request = AddUpdateCertificateRequest(ec)
-                requester = Requester(request, timeout=30)
-                result.append(requester.do_request())
+            entity_certificates = EntityCertificate.objects.filter(entity=entity)
+            entity_certificate_ids = ", ".join([f"'{ec.certificate.certificate_id}'" for ec in entity_certificates])
+            self.stdout.write(
+                f"Exporting certificate{'s' if len(entity_certificates) > 1 else ''} {entity_certificate_ids}…"
+            )
+            request = AddUpdateCertificateRequest(*entity_certificates)
+            requester = Requester(request, timeout=30)
+            result = requester.do_request()
             return result
 
         entity = Entity.objects.get(name=options["entity_name"])
