@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import CharField
 
+from adapters.logger import log_exception
 from auth.serializers import ChangeEmailErrors, ConfirmEmailChangeSerializer, RequestEmailChangeSerializer
 from core.helpers import send_mail
 
@@ -122,10 +123,14 @@ class ChangeEmailActionMixin:
 
             return Response({"status": "otp_sent"})
         except Exception as e:
-            import traceback
-
-            traceback.print_exc()
-            return Response({"error": f"Erreur interne: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            log_exception(e)
+            return Response(
+                {
+                    "error": ChangeEmailErrors.INTERNAL_ERROR,
+                    "message": ChangeEmailErrors.INTERNAL_ERROR_MESSAGE,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @extend_schema(
         request=ConfirmEmailChangeSerializer,

@@ -2,14 +2,79 @@ import datetime
 
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import status
 
-from core.models import Entity
-from core.tests_utils import FiltersActionTestMixin, setup_current_user
+from core.models import Entity, UserRights
+from core.tests_utils import FiltersActionTestMixin, PermissionTestMixin, setup_current_user
 from elec.models.elec_certificate_readjustment import ElecCertificateReadjustment
 from elec.models.elec_provision_certificate import ElecProvisionCertificate
 from elec.models.elec_transfer_certificate import ElecTransferCertificate
+from elec.permissions import (
+    HasCpoRights,
+    HasCpoWriteRights,
+    HasElecAdminRights,
+    HasElecOperatorRights,
+    HasElecOperatorWriteRights,
+    HasElecTransferAdminRights,
+)
 from elec.services.certificate_balance import get_certificate_balance
 from elec.views import ProvisionCertificateViewSet, TransferCertificateViewSet
+
+
+class TransferCertificatePermissionsTest(TestCase, PermissionTestMixin):
+    def setUp(self):
+        self.cpo = Entity.objects.create(name="CPO", entity_type=Entity.CPO, has_elec=True)
+        self.operator = Entity.objects.create(
+            name="Operator",
+            entity_type=Entity.OPERATOR,
+            has_elec=True,
+            is_tiruert_liable=True,
+        )
+        self.user = setup_current_user(
+            self,
+            "readonly@carbure.local",
+            "Read-only user",
+            "gogogo",
+            [(self.cpo, UserRights.RO), (self.operator, UserRights.RO)],
+        )
+
+    def create_transfer(self):
+        return ElecTransferCertificate.objects.create(
+            supplier=self.cpo,
+            client=self.operator,
+            transfer_date=datetime.date(2026, 1, 1),
+            energy_amount=100,
+        )
+
+    def test_permissions(self):
+        read_permissions = [(HasCpoRights | HasElecOperatorRights | HasElecAdminRights | HasElecTransferAdminRights)()]
+        self.assertViewPermissions(
+            TransferCertificateViewSet,
+            [
+                (["list", "retrieve", "filters", "export_to_excel"], read_permissions),
+                (["accept", "reject"], [HasElecOperatorWriteRights()]),
+                (["cancel"], [HasCpoWriteRights()]),
+            ],
+        )
+
+    def test_read_only_user_cannot_accept_reject_or_cancel_transfer_certificate(self):
+        actions = [
+            ("accept", self.operator, {"used_in_tiruert": "false"}),
+            ("reject", self.operator, {"comment": "Rejected"}),
+            ("cancel", self.cpo, {}),
+        ]
+
+        for action, entity, data in actions:
+            with self.subTest(action=action):
+                transfer = self.create_transfer()
+                response = self.client.post(
+                    reverse(f"transfer-certificates-{action}", kwargs={"id": transfer.id}),
+                    {"entity_id": entity.id, **data},
+                )
+
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                transfer.refresh_from_db()
+                self.assertEqual(transfer.status, ElecTransferCertificate.PENDING)
 
 
 class ElecCPOTest(TestCase, FiltersActionTestMixin):

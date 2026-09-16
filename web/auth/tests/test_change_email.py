@@ -1,9 +1,13 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
 from rest_framework import status
 from rest_framework.test import APIClient
+
+from auth.serializers import ChangeEmailErrors
 
 User = get_user_model()
 
@@ -103,3 +107,16 @@ class ChangeEmailTestCase(TestCase):
         response = self.client.post(url, data, format="json")
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    @patch("auth.views.mixins.change_email.send_email_change_token")
+    def test_request_email_change_does_not_expose_internal_exception(self, mock_send):
+        mock_send.side_effect = RuntimeError()
+        data = {"new_email": "newemail@example.com", "password": "testpassword123"}
+        url = reverse("auth-request-email-change")
+
+        with self.assertLogs("django.request", level="ERROR"):
+            response = self.client.post(url, data, format="json")
+
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.data["error"] == ChangeEmailErrors.INTERNAL_ERROR
+        assert response.data["message"] == ChangeEmailErrors.INTERNAL_ERROR_MESSAGE

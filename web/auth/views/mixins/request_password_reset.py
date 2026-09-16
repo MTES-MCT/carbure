@@ -56,7 +56,7 @@ class RequestPasswordResetAction:
             ),
         ],
     )
-    @action(detail=False, methods=["post"], url_path="request-password-reset")
+    @action(detail=False, methods=["post"], url_path="request-password-reset", throttle_scope="auth-anon")
     def request_password_reset(self, request):
         try:
             email = retrieve_email(request.data)

@@ -94,39 +94,42 @@ def do_update_lot(user, entity, lot_to_update, update_data):
     def persist_changes(user, entity, lot_node, stock_error):
         prefetched_data = get_prefetched_data(entity)
 
-        with transaction.atomic():
-            lot = lot_node.data
-            lot.save()
+        lot = lot_node.data
+        lot.save()
 
-            bulk_sanity_checks([lot], prefetched_data)
-            background_bulk_scoring([lot], prefetched_data)
+        bulk_sanity_checks([lot], prefetched_data)
+        background_bulk_scoring([lot], prefetched_data)
 
-            if stock_error:
-                stock_error.save()
+        if stock_error:
+            stock_error.save()
 
-            if len(lot_node.diff) > 0:
-                CarbureLotEvent.objects.create(
-                    event_type=CarbureLotEvent.UPDATED,
-                    lot=lot,
-                    user=user,
-                    metadata=diff_to_metadata(lot_node.diff),
-                    entity=entity,
-                )
+        if len(lot_node.diff) > 0:
+            CarbureLotEvent.objects.create(
+                event_type=CarbureLotEvent.UPDATED,
+                lot=lot,
+                user=user,
+                metadata=diff_to_metadata(lot_node.diff),
+                entity=entity,
+            )
 
-    update_data |= double_counting_certificate_data(update_data)
+    # Stock is saved in enforce_stock_integrity before LotNode.update() may reject the change.
+    # Keep both writes (and persist_changes, called below) in one transaction so a later
+    # failure rolls the parent stock back.
+    with transaction.atomic():
+        update_data |= double_counting_certificate_data(update_data)
 
-    nodes = get_traceability_nodes([lot_to_update])
-    lot_node = nodes[0]
+        nodes = get_traceability_nodes([lot_to_update])
+        lot_node = nodes[0]
 
-    stock_reset, stock_error = enforce_stock_integrity(lot_node, update_data)
-    update_data |= stock_reset
+        stock_reset, stock_error = enforce_stock_integrity(lot_node, update_data)
+        update_data |= stock_reset
 
-    lot_node.update(update_data, entity.id)
-    lot_node.data.update_ghg()
+        lot_node.update(update_data, entity.id)
+        lot_node.data.update_ghg()
 
-    integrity_errors = lot_node.check_integrity(ignore_diff=True)
-    if len(integrity_errors) > 0:
-        errors = serialize_integrity_errors(integrity_errors)
-        raise LotUpdateFailure(LotUpdateFailure.INTEGRITY_CHECKS_FAILED, {"errors": errors})
+        integrity_errors = lot_node.check_integrity(ignore_diff=True)
+        if len(integrity_errors) > 0:
+            errors = serialize_integrity_errors(integrity_errors)
+            raise LotUpdateFailure(LotUpdateFailure.INTEGRITY_CHECKS_FAILED, {"errors": errors})
 
-    persist_changes(user, entity, lot_node, stock_error)
+        persist_changes(user, entity, lot_node, stock_error)

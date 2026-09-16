@@ -2,10 +2,14 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schem
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from adapters.logger import log_exception
 from biomethane.models.biomethane_supply_input import BiomethaneSupplyInput
 from biomethane.serializers import BiomethaneSupplyInputCreateFromExcelSerializer, BiomethaneUploadExcelSerializer
 from biomethane.services.supply_plan_excel_template import KEY_ROW, MAIN_SHEET_NAME
 from core.excel_importer import ExcelImporter, ExcelValidationError
+
+FILE_PROCESSING_ERROR = "FILE_PROCESSING_ERROR"
+FILE_PROCESSING_ERROR_MESSAGE = "Unable to process the uploaded file."
 
 
 class ExcelImportActionMixin:
@@ -105,6 +109,13 @@ class ExcelImportActionMixin:
                 status=400,
             )
         except Exception as e:
-            return Response({"file": str(e)}, status=400)
+            log_exception(e)
+            return Response(
+                {
+                    "error": FILE_PROCESSING_ERROR,
+                    "message": FILE_PROCESSING_ERROR_MESSAGE,
+                },
+                status=400,
+            )
 
         return Response({"rows_imported": len(data)}, status=201)
