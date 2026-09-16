@@ -19,7 +19,12 @@ export function quantityColumn(
       const { value, unit } = getActionQuantity(action, key)
       const text = formatActionDecimal(value)
 
-      return <Cell text={text} sub={text ? formatUnitOnly(unit) : undefined} />
+      return (
+        <Cell
+          text={text || "-"}
+          sub={text ? formatUnitOnly(unit) : undefined}
+        />
+      )
     },
   }
 }
