@@ -56,8 +56,8 @@ class Action(models.Model):
     L = "l"
     KG = "kg"
     MJ = "MJ"
-    UNIT_CHOICE = ((L, "litres"), (KG, "kg"), (MJ, "MJ"))
-    unit = models.CharField(verbose_name="Unité", choices=UNIT_CHOICE, max_length=8)
+    ACTION_UNIT_CHOICE = ((L, "litres"), (KG, "kg"), (MJ, "MJ"))
+    unit = models.CharField(verbose_name="Unité", choices=ACTION_UNIT_CHOICE, max_length=8)
 
     parent = models.ForeignKey(
         "self", verbose_name="Action parente", null=True, blank=True, on_delete=models.PROTECT, related_name="children"

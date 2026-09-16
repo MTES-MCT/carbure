@@ -192,3 +192,31 @@ class ActionExcelImportViewTest(APITestCase):
         mock_delete.assert_called_once_with(save=False)
         self.assertEqual(Action.objects.count(), 0)
         self.assertEqual(StoredFile.objects.count(), 0)
+
+    def test_import_errors_when_material_is_missing_conversion_factors(self):
+        material = MaterialFactory(code="MAT-NO", name="Sans facteur", lhv=None, density=None)
+
+        with self.assertRaises(RuntimeError):
+            self._post(
+                filled_generic_template(
+                    material_name=material.name,
+                    site_name=self.site.name,
+                    certificate_id=self.certificate.certificate_id,
+                )
+            )
+
+        self.assertEqual(Action.objects.count(), 0)
+
+    def test_import_accepts_material_with_lhv_only(self):
+        material = MaterialFactory(code="H2-ONLY", name="Hydrogène sans densité", lhv=Decimal("120"), density=None)
+
+        response = self._post(
+            filled_generic_template(
+                material_name=material.name,
+                site_name=self.site.name,
+                certificate_id=self.certificate.certificate_id,
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="ACT-001").lhv, Decimal("120"))

@@ -72,3 +72,37 @@ class ValorizeTest(TestCase):
         self.assertEqual(ctx.exception.actions, [blocked])
         self.assertEqual(Action.objects.filter(type=Action.VALORIZE).count(), 0)
         self.assertEqual(Action.objects.get(pk=convertible.pk).status, ActionStatus.PENDING)
+
+    def test_valorizes_litre_init_using_converted_energy(self):
+        action = self._pending_init(
+            quantity=Decimal("50.000"),
+            unit=Action.L,
+            lhv=Decimal("120"),
+            density=Decimal("0.8"),
+        )
+
+        created = valorize(Action.objects.filter(pk=action.pk))
+
+        child = created[0]
+        self.assertEqual(child.unit, Action.MJ)
+        self.assertEqual(child.quantity, Decimal("4800.000"))
+        self.assertEqual(child.energy, Decimal("4800.000"))
+        self.assertEqual(child.mass, Decimal("40.000"))
+        self.assertEqual(child.volume, Decimal("50.000"))
+
+    def test_valorizes_mj_init_keeping_quantity(self):
+        action = self._pending_init(
+            quantity=Decimal("12000.000"),
+            unit=Action.MJ,
+            lhv=Decimal("120"),
+            density=Decimal("0.8"),
+        )
+
+        created = valorize(Action.objects.filter(pk=action.pk))
+
+        child = created[0]
+        self.assertEqual(child.unit, Action.MJ)
+        self.assertEqual(child.quantity, Decimal("12000.000"))
+        self.assertEqual(child.energy, Decimal("12000.000"))
+        self.assertEqual(child.mass, Decimal("100.000"))
+        self.assertEqual(child.volume, Decimal("125.000"))
