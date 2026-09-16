@@ -2,20 +2,24 @@
 
 Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : elle branche un **handler**.
 
-## Modèle
+## Choix de conception
 
-| Concept | Rôle |
-|---|---|
-| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité + unité (`l` / `kg` / `MJ`, obligatoire, sans défaut), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`). Annotée avec `mass` / `volume` / `energy` (NULL si le facteur manque) | | Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
-| `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
-| `Material` | Catalogue matières (`code`, `name`, `lhv` en MJ/kg, `density` en kg/l). Les facteurs sont optionnels, ou strictement > 0 |
-
-L’import Excel des actions `INIT` pose `kg` (pas encore de colonne dédiée). `valorize()` écrit l’**énergie** du parent dans le certificat (`unit=MJ`). Sans `lhv` (et `density` si litres), conversion impossible → `ConversionError`.
+- **Facteurs figés sur l’action, pas sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont copiés depuis le catalogue à la **création de la racine** (import Excel aujourd’hui, qui pose aussi `unit=kg`). Toute la chaîne de traçabilité convertit avec **ces** valeurs : un changement de PCI sur `Material` ne réécrit pas l’historique.
+- **Le certificat fige le MJ à la valorisation.** `valorize()` écrit l’énergie du parent dans le `VALORIZE` (`unit=MJ`) et recopie `lhv` / `density` pour que toute la chaîne garde les mêmes facteurs. C’est le seul moment où une quantité convertie est **stockée**. Sans facteur sur la racine → `ConversionError`.
+- **Le reste est calculé, pas persisté.** `mass` / `volume` / `energy` sont des annotations SQL (NULL si le facteur manque) :
 
 ```
 mass   = volume × density
 energy = mass × lhv
 ```
+
+## Modèle
+
+| Concept | Rôle |
+|---|---|
+| `Action` | POS, détenteur, matière, quantité + unité, snapshot `lhv` / `density`, site, logistique, GES |
+| `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
+| `Material` | Catalogue (`code`, `name`, `lhv`, `density`). Facteurs optionnels, ou strictement > 0 |
 
 ## Ce que la filière personnalise
 

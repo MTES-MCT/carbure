@@ -33,6 +33,8 @@ def valorize(actions: QuerySet[Action]) -> list[Action]:
                 working_date=action.working_date,
                 quantity=action.energy,
                 parent=action,
+                lhv=action.lhv,
+                density=action.density,
             )
             for action in pending_inits
         ]

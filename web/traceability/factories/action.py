@@ -25,6 +25,8 @@ class ActionFactory(factory.django.DjangoModelFactory):
     working_date = factory.Faker("date_between", start_date="-2y", end_date="today")
     parent = None
     material = factory.SubFactory(MaterialFactory)
+    lhv = factory.LazyAttribute(lambda o: o.material.lhv if o.material else None)
+    density = factory.LazyAttribute(lambda o: o.material.density if o.material else None)
     quantity = factory.Faker("pydecimal", left_digits=4, right_digits=3, positive=True)
     site = factory.SubFactory(SiteFactory)
     shipping_date = factory.Faker("date_this_year")

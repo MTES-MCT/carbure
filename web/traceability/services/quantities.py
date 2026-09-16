@@ -9,18 +9,19 @@ def _expression_wrapper(expression: Expression) -> ExpressionWrapper:
 
 
 def quantities_db_annotation() -> dict:
-    """Annotate mass (kg), volume (l) and energy (MJ) from the action's own material.
+    """Annotate mass (kg), volume (l) and energy (MJ) from the action's snapped factors.
 
     mass   = volume × density
     energy = mass × lhv
 
-    Missing factors yield NULL. Does not walk the parent chain.
+    Uses `action.lhv` / `action.density` (copied at tree root creation), not the material.
+    Missing factors yield NULL.
     """
     from traceability.models.action import Action
 
     quantity = F("quantity")
-    lhv = F("material__lhv")
-    density = F("material__density")
+    lhv = F("lhv")
+    density = F("density")
     empty = Value(None, output_field=QUANTITY_FIELD)
 
     mass = Round(
