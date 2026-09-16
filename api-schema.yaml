@@ -13507,6 +13507,24 @@ components:
             - $ref: "#/components/schemas/ActionTotalEmissions"
           readOnly: true
           nullable: true
+        mass:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+          nullable: true
+        volume:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+          nullable: true
+        energy:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+          nullable: true
         pos_id:
           type: string
           title: N° de POS
@@ -13586,9 +13604,11 @@ components:
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
       required:
         - certificate
+        - energy
         - holder
         - id
         - industry
+        - mass
         - material
         - parent
         - pos_id
@@ -13598,6 +13618,7 @@ components:
         - total_emissions
         - type
         - unit
+        - volume
         - working_date
     ActionCertificate:
       type: object
@@ -19178,6 +19199,18 @@ components:
         name:
           type: string
           maxLength: 64
+        lhv:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,6})?$
+          nullable: true
+          title: PCI (MJ/kg)
+        density:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,6})?$
+          nullable: true
+          title: Masse volumique (kg/l)
       required:
         - code
         - id

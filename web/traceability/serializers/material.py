@@ -6,4 +6,4 @@ from traceability.models import Material
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material
-        fields = ["id", "code", "name"]
+        fields = ["id", "code", "name", "lhv", "density"]
