@@ -3479,6 +3479,16 @@ export interface components {
              */
             quantity: string;
             /**
+             * PCI (MJ/kg)
+             * Format: decimal
+             */
+            lhv?: string | null;
+            /**
+             * Masse volumique (kg/l)
+             * Format: decimal
+             */
+            density?: string | null;
+            /**
              * Date d'expédition
              * Format: date
              */
