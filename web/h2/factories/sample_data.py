@@ -57,15 +57,13 @@ def setup_h2_stations() -> tuple[H2Station, H2Station]:
 
 def setup_h2_materials() -> tuple[Material, Material]:
     h2_rfnbo, _ = Material.objects.get_or_create(
-        code="H2-RFBNO",
-        defaults={"name": "Hydrogène RFNBO"},
+        code="H2-RFNBO",
+        defaults={"name": "Hydrogène RFNBO", "lhv": Decimal("120")},
     )
-
     h2_bio, _ = Material.objects.get_or_create(
         code="H2-BIO",
-        defaults={"name": "Bio-H2"},
+        defaults={"name": "Bio-H2", "lhv": Decimal("120")},
     )
-
     return h2_rfnbo, h2_bio
 
 
