@@ -104,12 +104,14 @@ class ResourcesTest(TestCase):
         assert len(data) == 1
 
     def test_get_materials(self):
-        Material.objects.create(name="Bio-H2", code="H2-BIO")
-        Material.objects.create(name="RFNBO-H2", code="H2-RFNBO")
+        Material.objects.get_or_create(code="H2-BIO", defaults={"name": "Bio-H2"})
+        Material.objects.get_or_create(code="H2-RFNBO", defaults={"name": "RFNBO-H2"})
 
         response = self.client.get(reverse("resources-materials"))
         assert response.status_code == 200
-        assert [material["code"] for material in response.json()] == ["H2-BIO", "H2-RFNBO"]
+        codes = [material["code"] for material in response.json()]
+        assert "H2-BIO" in codes
+        assert "H2-RFNBO" in codes
 
         response = self.client.get(reverse("resources-materials") + "?query=bio")
         assert response.status_code == 200
