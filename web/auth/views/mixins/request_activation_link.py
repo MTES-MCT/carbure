@@ -58,7 +58,7 @@ class UserResendActivationLinkAction:
             ),
         ],
     )
-    @action(detail=False, methods=["post"], url_path="request-activation-link")
+    @action(detail=False, methods=["post"], url_path="request-activation-link", throttle_scope="auth-anon")
     def request_activation_link(self, request):
         try:
             user = retrieve_user(request.data)

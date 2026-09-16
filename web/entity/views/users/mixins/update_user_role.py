@@ -2,6 +2,7 @@ from django.db import transaction
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from core.models import UserRights, UserRightsRequests
@@ -9,7 +10,7 @@ from core.models import UserRights, UserRightsRequests
 
 class UpdateUserRoleSerializer(serializers.Serializer):
     request_id = serializers.PrimaryKeyRelatedField(queryset=UserRightsRequests.objects.all())
-    role = serializers.CharField(required=True)
+    role = serializers.ChoiceField(choices=UserRightsRequests.ROLES)
 
 
 class UpdatUserRoleActionMixin:
@@ -55,6 +56,9 @@ class UpdatUserRoleActionMixin:
         serializer.is_valid(raise_exception=True)
         right_request = serializer.validated_data.get("request_id")
         role = serializer.validated_data.get("role")
+
+        if not request.entity.get_allowed_entities().filter(pk=right_request.entity_id).exists():
+            raise PermissionDenied()
 
         with transaction.atomic():
             right_request.role = role

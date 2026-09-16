@@ -35,7 +35,7 @@ class RightsRequestsActionMixin:
         q = self.request.query_params.get("q")
         statuses = self.request.query_params.getlist("statuses")
         company_id = self.request.query_params.get("company_id")
-        requests = UserRightsRequests.objects.all()
+        requests = UserRightsRequests.objects.filter(entity__in=request.entity.get_allowed_entities())
 
         if company_id:
             requests = requests.filter(entity__id=company_id)

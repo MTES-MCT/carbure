@@ -8,6 +8,7 @@ from drf_spectacular.utils import (
 )
 from rest_framework import serializers
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from core.helpers import send_mail
@@ -63,6 +64,9 @@ class UpdateRightsRequestsActionMixin:
         right_request = serializer.validated_data.get("id")
         status = serializer.validated_data.get("status")
 
+        if not request.entity.get_allowed_entities().filter(pk=right_request.entity_id).exists():
+            raise PermissionDenied()
+
         right_request.status = status
         right_request.save()
 
@@ -77,7 +81,7 @@ class UpdateRightsRequestsActionMixin:
             )
             self.send_rights_update_notification(right_request)
         else:
-            UserRights.objects.filter(entity=right_request.entity, user=request.user).delete()
+            UserRights.objects.filter(entity=right_request.entity, user=right_request.user).delete()
         return Response({"status": "success"})
 
     @staticmethod

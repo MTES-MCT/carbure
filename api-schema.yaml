@@ -16360,9 +16360,6 @@ components:
           type: string
           minLength: 1
           writeOnly: true
-        entity_id:
-          type: integer
-          writeOnly: true
         depot_id:
           type: string
           minLength: 1
@@ -16380,12 +16377,10 @@ components:
           type: string
           minLength: 1
           maxLength: 128
-        site_siret:
+        city:
           type: string
-          title: SIRET
-          maxLength: 64
-        site_type:
-          $ref: "#/components/schemas/SiteTypeEnum"
+          title: Commune
+          maxLength: 128
         address:
           type: string
           title: Adresse
@@ -16393,30 +16388,6 @@ components:
         postal_code:
           type: string
           title: Code postal
-          maxLength: 32
-        city:
-          type: string
-          title: Commune
-          maxLength: 128
-        gps_coordinates:
-          type: string
-          nullable: true
-          title: Coordonnées GPS
-          maxLength: 64
-        private:
-          type: boolean
-        is_enabled:
-          type: boolean
-        commissioning_date:
-          type: string
-          format: date
-          nullable: true
-          title: Date de mise en service
-        customs_id:
-          type: string
-          maxLength: 32
-        accise:
-          type: string
           maxLength: 32
         electrical_efficiency:
           type: number
@@ -16437,18 +16408,10 @@ components:
           format: double
           nullable: true
           description: En degrés Celsius
-        country:
-          type: integer
-          nullable: true
-          title: Pays
-        created_by:
-          type: integer
-          nullable: true
       required:
         - country_code
         - depot_id
         - depot_type
-        - entity_id
         - name
         - ownership_type
     CreateEntityRequest:
@@ -20600,10 +20563,6 @@ components:
         id:
           type: integer
           readOnly: true
-        producer:
-          allOf:
-            - $ref: "#/components/schemas/Entity"
-          readOnly: true
         name:
           type: string
           maxLength: 128
@@ -20615,48 +20574,13 @@ components:
           type: string
           format: date
           nullable: true
-        ges_option:
-          $ref: "#/components/schemas/GesOptionEnum"
-        eligible_dc:
-          type: boolean
         dc_reference:
-          type: string
-          maxLength: 64
-        site_siret:
-          type: string
-          title: SIRET
-          maxLength: 64
-        address:
-          type: string
-          title: Adresse
-          maxLength: 256
-        city:
-          type: string
-          title: Commune
-          maxLength: 128
-        postal_code:
-          type: string
-          title: Code postal
-          maxLength: 32
-        gps_coordinates:
-          type: string
-          nullable: true
-          title: Coordonnées GPS
-          maxLength: 64
-        manager_name:
-          type: string
-          maxLength: 64
-        manager_phone:
-          type: string
-          maxLength: 64
-        manager_email:
           type: string
           maxLength: 64
       required:
         - country
         - id
         - name
-        - producer
     ProductionSiteCertificateSertificate:
       type: object
       properties:
@@ -22072,8 +21996,7 @@ components:
         request_id:
           type: integer
         role:
-          type: string
-          minLength: 1
+          $ref: "#/components/schemas/RoleEnum"
       required:
         - request_id
         - role
@@ -22093,7 +22016,7 @@ components:
     UsageEnum:
       enum:
         - ROAD
-        - HEATING
+        - COMBUSTIBLE
         - AGRICULTURE
         - CONSTRUCTION
         - MARITIME
@@ -22104,7 +22027,7 @@ components:
       type: string
       description: |-
         * `ROAD` - ROAD
-        * `HEATING` - HEATING
+        * `COMBUSTIBLE` - COMBUSTIBLE
         * `AGRICULTURE` - AGRICULTURE
         * `CONSTRUCTION` - CONSTRUCTION
         * `MARITIME` - MARITIME

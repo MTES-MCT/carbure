@@ -180,27 +180,15 @@ class DepotSerializer(serializers.ModelSerializer):
 
 class ProductionSiteSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
-    producer = EntitySerializer(read_only=True)
 
     class Meta:
         model = ProductionSite
         fields = [
             "id",
-            "producer",
             "name",
             "country",
             "date_mise_en_service",
-            "ges_option",
-            "eligible_dc",
             "dc_reference",
-            "site_siret",
-            "address",
-            "city",
-            "postal_code",
-            "gps_coordinates",
-            "manager_name",
-            "manager_phone",
-            "manager_email",
         ]
 
 

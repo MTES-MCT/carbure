@@ -1,8 +1,9 @@
 import datetime
-import unicodedata
+import os
 
 from django.db import transaction
 from django.http.response import JsonResponse
+from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 from carbure.tasks import background_bulk_scoring
@@ -35,9 +36,8 @@ def add_excel(request, *args, **kwargs):
     # save file
     directory = get_uploaded_files_directory()
     now = datetime.datetime.now()
-    filename = "%s_%s.xlsx" % (now.strftime("%Y%m%d.%H%M%S"), entity.name.upper())
-    filename = "".join((c for c in unicodedata.normalize("NFD", filename) if unicodedata.category(c) != "Mn"))
-    filepath = "%s/%s" % (directory, filename)
+    filename = f"{now.strftime('%Y%m%d.%H%M%S')}_{slugify(entity.name)}.xlsx"
+    filepath = os.path.join(directory, filename)
     with open(filepath, "wb+") as destination:
         for chunk in f.chunks():
             destination.write(chunk)
