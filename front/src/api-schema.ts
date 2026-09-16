@@ -3540,6 +3540,12 @@ export interface components {
             readonly site: components["schemas"]["ActionSite"];
             readonly certificate: components["schemas"]["ActionCertificate"] | null;
             readonly total_emissions: components["schemas"]["ActionTotalEmissions"] | null;
+            /** Format: decimal */
+            readonly mass: string | null;
+            /** Format: decimal */
+            readonly volume: string | null;
+            /** Format: decimal */
+            readonly energy: string | null;
             /** N° de POS */
             pos_id: string;
             /** Filière */
@@ -6088,6 +6094,16 @@ export interface components {
             readonly id: number;
             code: string;
             name: string;
+            /**
+             * PCI (MJ/kg)
+             * Format: decimal
+             */
+            lhv?: string | null;
+            /**
+             * Masse volumique (kg/l)
+             * Format: decimal
+             */
+            density?: string | null;
         };
         /**
          * @description * `DRY` - Sèche
