@@ -31,7 +31,7 @@ class ActivateLoginAccountTest(APITestCase):
     def test_activate_and_login_account_success(self):
         """Activate a user account without auto-login, then allow explicit credential login."""
         "_auth_user_id" not in self.client.session
-        data = {"uidb64": self.uidb64, "token": self.token, "invite": 0}
+        data = {"uidb64": self.uidb64, "token": self.token}
         response = self.client.post(self.active_url, data)
         assert response.status_code == status.HTTP_200_OK
         self.user.refresh_from_db()
@@ -48,7 +48,7 @@ class ActivateLoginAccountTest(APITestCase):
 
     def test_activate_and_login_account_invalid_token(self):
         assert "_auth_user_id" not in self.client.session
-        data = {"uidb64": self.uidb64, "token": "invalidtoken", "invite": 0}
+        data = {"uidb64": self.uidb64, "token": "invalidtoken"}
         response = self.client.post(self.active_url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -69,7 +69,7 @@ class ActivateLoginAccountTest(APITestCase):
     def test_activate_and_login_account_user_not_found(self):
         assert "_auth_user_id" not in self.client.session
         invalid_uidb64 = urlsafe_base64_encode(force_bytes(9999))
-        data = {"uidb64": invalid_uidb64, "token": self.token, "invite": 0}
+        data = {"uidb64": invalid_uidb64, "token": self.token}
         response = self.client.post(self.active_url, data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -90,7 +90,7 @@ class ActivateLoginAccountTest(APITestCase):
         """Ignore client invite flag for regular profiles and never mint a reset token."""
         assert "_auth_user_id" not in self.client.session
 
-        data = {"uidb64": self.uidb64, "token": self.token, "invite": 1}
+        data = {"uidb64": self.uidb64, "token": self.token}
         response = self.client.post(self.active_url, data)
 
         assert response.status_code == status.HTTP_200_OK
@@ -138,7 +138,7 @@ class ActivateLoginAccountTest(APITestCase):
 
             response = self.client.post(
                 self.active_url,
-                {"uidb64": invited_uidb64, "token": invited_token, "invite": 0},
+                {"uidb64": invited_uidb64, "token": invited_token},
             )
 
         assert response.status_code == status.HTTP_200_OK
