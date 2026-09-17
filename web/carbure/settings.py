@@ -92,6 +92,7 @@ CSRF_COOKIE_SECURE = env("IMAGE_TAG") in ("dev", "staging", "prod") and not env(
 # OTP Email Configuration
 OTP_EMAIL_TOKEN_VALIDITY = 1800  # 30 minutes
 OTP_EMAIL_THROTTLE_FACTOR = 2
+PASSWORD_RESET_TIMEOUT = 60 * 60  # 1 hour, used for password reset and account activation tokens validity
 
 # Application definition
 INSTALLED_APPS = [
