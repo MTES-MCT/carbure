@@ -19,6 +19,9 @@ data = {
         {
             "registration_id": "123456789",
             "name": "CARBURE",
+            "registered_address": "12 rue des Affiches",
+            "registered_zipcode": "13000",
+            "registered_city": "Marseille",
             "sites": [],
             "certificate": {
                 "id": "EU-ISCC-Cert-Test-FR004",
@@ -31,6 +34,9 @@ data = {
         {
             "registration_id": "000000011",
             "name": "CARBURE_FR_FAME_PRODUCER",
+            "registered_address": "11bis boulevard du Siège Social",
+            "registered_zipcode": "75001",
+            "registered_city": "Paris",
             "sites": [],
             "certificate": {
                 "id": "EU-ISCC-Cert-FR999-00000011",

@@ -1,3 +1,5 @@
+from xml.etree import ElementTree as ET
+
 from core.models.entity import Entity
 from core.models.geography import Pays
 from edelivery.ebms.requests.add_organisation_request import AddOrganisationRequest
@@ -26,3 +28,19 @@ class AddOrganisationRequestTest(BaseRequestTest):
 </udb:AddOrganisationRequest>"""
 
         self.assertEqual(expected_body, request.body)
+
+    def test_exports_several_entities_at_once(self):
+        france = Pays(code_pays="FR")
+        e1 = Entity(name="Entity 1", registration_id="111111111", registered_country=france)
+        e2 = Entity(name="Entity 2", registration_id="222222222", registered_country=france)
+        request = AddOrganisationRequest(e1, e2)
+
+        xml = ET.fromstring(request.body)
+        eo_number_elements = xml.findall(".//ECONOMIC_OPERATOR_NUMBER")
+        self.assertEqual(["FR_SIREN_CD111111111", "FR_SIREN_CD222222222"], [e.text for e in eo_number_elements])
+
+    def test_must_export_at_least_one_entity(self):
+        with self.assertRaises(ValueError) as context:
+            AddOrganisationRequest()
+
+        self.assertEqual("Request should export at least one entity", context.exception.args[0])
