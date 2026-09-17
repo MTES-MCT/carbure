@@ -23,7 +23,7 @@ class ResetPasswordAction:
             ),
         ],
     )
-    @action(detail=False, methods=["post"], url_path="reset-password")
+    @action(detail=False, methods=["post"], url_path="reset-password", throttle_scope="auth-anon")
     def reset_password(self, request):
         serializer = ResetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

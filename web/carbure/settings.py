@@ -434,7 +434,7 @@ REST_FRAMEWORK = {
         # Authenticated 2FA (request-otp + verify-otp share this bucket, per user).
         "otp": "30/hour",
         # Anonymous auth (register + activation + password-reset share this bucket, per IP).
-        "auth-anon": "10/hour",
+        "auth-anon": "20/hour",
         # Company creation (isolated from auth, per user).
         "add-company": "10/day",
     },

@@ -46,7 +46,7 @@ class ActivateAccountAction:
             ),
         ],
     )
-    @action(detail=False, methods=["post"])
+    @action(detail=False, methods=["post"], throttle_scope="auth-anon")
     def activate(self, request):
         serializer = ActivateAccountSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
