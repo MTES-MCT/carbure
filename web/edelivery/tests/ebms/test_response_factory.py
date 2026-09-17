@@ -36,6 +36,10 @@ class ResponseFactoryTest(TestCase):
         response = factory.response()
         self.assertIs(type(response), BaseRequestResponse)
 
+    def test_accepts_partial_status_as_success(self):
+        factory = ResponseFactory(BaseRequestResponse, self.payload(status="PARTIAL"))
+        self.assertTrue(factory.response_status_ok())
+
     def test_returns_an_error_response_on_UDB_response_status_not_found(self):
         factory = ResponseFactory(BaseRequestResponse, self.payload(status="NOT_FOUND"))
         response = factory.response()
