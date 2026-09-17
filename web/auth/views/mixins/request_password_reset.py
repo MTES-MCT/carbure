@@ -2,7 +2,6 @@ from os import environ
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -11,6 +10,7 @@ from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from auth.tokens import password_reset_token
 from core.helpers import send_mail
 
 
@@ -19,13 +19,12 @@ class RequestPasswordResetSerializer(serializers.Serializer):
 
 
 def send_notification_mail(user, request):
-    prtg = PasswordResetTokenGenerator()
     email_subject = "Carbure - Réinitialisation du mot de passe"
     email_context = {
         "user": user,
         "domain": environ.get("BASE_URL"),
         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-        "token": prtg.make_token(user),
+        "token": password_reset_token.make_token(user),
     }
     html_message = loader.render_to_string("emails/password_reset_email.html", email_context)
     text_message = loader.render_to_string("emails/password_reset_email.txt", email_context)
