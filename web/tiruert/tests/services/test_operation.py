@@ -1050,7 +1050,13 @@ class OperationServiceDefineSectorTest(TestCase):
 
     def test_define_sector_returns_none_when_no_sector_matches(self):
         """Should return None when the biofuel matches no sector."""
-        biofuel = Mock(code="UNKNOWN", compatible_essence=False, compatible_diesel=False, compatible_gpl=False)
+        biofuel = Mock(
+            code="UNKNOWN",
+            compatible_essence=False,
+            compatible_diesel=False,
+            compatible_gpl=False,
+            compatible_maritime=False,
+        )
 
         result = OperationService.define_sector(biofuel)
 
