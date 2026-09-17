@@ -126,7 +126,10 @@ const DeclareTeneurDialogContent = ({
           <>
             <Box spacing="md">
               <RecapOperationGrid>
-                <RecapOperation balance={form.value.balance!} />
+                <RecapOperation
+                  balance={form.value.balance!}
+                  sector={form.value.objective_sector}
+                />
                 {currentStepIndex > 2 && (
                   <QuantitySummary values={form.value} />
                 )}
