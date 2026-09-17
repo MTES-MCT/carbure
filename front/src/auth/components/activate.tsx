@@ -35,7 +35,7 @@ export const Activate = () => {
 
   const activate = useQuery(api.activateAccount, {
     key: "activate-account",
-    params: [uidb64, token, isUserInvited],
+    params: [uidb64, token],
   })
 
   const isSuccess = activate.status === "success"

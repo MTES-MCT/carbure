@@ -70,11 +70,7 @@ export function requestActivateAccount(email: string) {
 
 export function activateAccount(
   uidb64: string | undefined,
-  token: string | undefined,
-
-  // When a user (not existing in the database) is invited by a company, they need to set a new password.
-  // To simplify this process, during the account activation, we retrieve the password token required for the password update.
-  inviteUser?: boolean
+  token: string | undefined
 ) {
   if (uidb64 === undefined || token === undefined) {
     throw new Error("Missing token for account activation")
@@ -84,7 +80,6 @@ export function activateAccount(
     body: {
       uidb64,
       token,
-      ...(inviteUser ? { invite: 1 } : {}),
     },
   })
 }
