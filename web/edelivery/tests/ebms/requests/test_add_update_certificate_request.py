@@ -14,10 +14,9 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         request = AddUpdateCertificateRequest(entity_certificate)
         return ET.fromstring(request.body)
 
-    def setUp(self):
-        super().setUp()
-        self.entity = MagicMock(**{"ntr_id.return_value": "", "get_sites.return_value": []})
-        self.certificate = MagicMock(
+    def create_mock_entity_certificate(self):
+        entity = MagicMock(**{"ntr_id.return_value": "", "get_sites.return_value": []})
+        certificate = MagicMock(
             certificate_id="",
             certificate_type="SYSTEME_NATIONAL",
             certificate_issuer="",
@@ -26,7 +25,11 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
             valid_from=datetime(2026, 1, 31),
             valid_until=datetime(2027, 2, 17),
         )
-        self.entity_certificate = MagicMock(entity=self.entity, certificate=self.certificate)
+        entity_certificate = MagicMock(entity=entity, certificate=certificate)
+        return entity_certificate
+
+    def setUp(self):
+        super().setUp()
 
         module_to_patch = "edelivery.ebms.requests.add_update_certificate_request"
 
@@ -39,6 +42,10 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         self.patched_CertificateSite = patch(f"{module_to_patch}.CertificateSite").start()
         self.patched_CertificateSite.from_carbure_site.side_effect = lambda _: CertificateSite.from_xml("<SOME_TAG />")
         self.patched_CertificateSite.from_carbure_entity.side_effect = lambda _: CertificateSite.from_xml("<SOME_TAG />")
+
+        self.entity_certificate = self.create_mock_entity_certificate()
+        self.entity = self.entity_certificate.entity
+        self.certificate = self.entity_certificate.certificate
 
     def tearDown(self):
         patch.stopall()
@@ -158,3 +165,11 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
 
         sites = root_xml_element.findall("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/SOME_TAG")
         self.assertEqual(["Main site", "Site 1", "Site 2"], [s.text for s in sites])
+
+    def test_handles_several_certificates(self):
+        ec1 = self.create_mock_entity_certificate()
+        ec2 = self.create_mock_entity_certificate()
+        request = AddUpdateCertificateRequest(ec1, ec2)
+        root_xml_element = ET.fromstring(request.body)
+        certificates = root_xml_element.findall("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE")
+        self.assertEqual(2, len(certificates))

@@ -31,16 +31,16 @@ class CertificateSite(UDBElement):
     @staticmethod
     def from_raw_data(name, address, zipcode, city, country_code, is_main_site):
         if not address:
-            raise ValueError("Param `address` should not be empty")
+            raise ValueError(f"Param `address` for entity/site '{name}' should not be empty")
 
         if not zipcode:
-            raise ValueError("Param `zipcode` should not be empty")
+            raise ValueError(f"Param `zipcode` for entity/site '{name}' should not be empty")
 
         if not city:
-            raise ValueError("Param `city` should not be empty")
+            raise ValueError(f"Param `city` for entity/site '{name}' should not be empty")
 
         if not country_code:
-            raise ValueError("Param `country_code` should not be empty")
+            raise ValueError(f"Param `country_code` for entity/site '{name}' should not be empty")
 
         return CertificateSite.from_xml(f"""\
 <EO_CERTIFICATE_SITE>

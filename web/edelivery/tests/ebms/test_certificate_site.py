@@ -77,4 +77,4 @@ class CertificateSiteTest(TestCase):
                 params = {**default_data, p: ""}
                 CertificateSite.from_raw_data(**params)
 
-            self.assertEqual(f"Param `{p}` should not be empty", context.exception.args[0])
+            self.assertEqual(f"Param `{p}` for entity/site 'Site name' should not be empty", context.exception.args[0])

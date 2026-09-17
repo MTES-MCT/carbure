@@ -11,16 +11,28 @@ from edelivery.ebms.error_responses import (
 
 class FailedErrorResponseTest(TestCase):
     @staticmethod
-    def payload(message="Error!"):
+    def payload(message="Error!", additional_observation=None):
+        additional_observation_fragment = ""
+        if additional_observation is not None:
+            additional_observation_fragment = f"""\
+<SOME_TAGS>
+    <OBSERVATION>{additional_observation}</OBSERVATION>
+</SOME_TAGS>"""
+
         return f"""\
 <?xml version="1.0" encoding="UTF-8"?>
 <udb:ErrorResponse xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
   <RESPONSE_HEADER REQUEST_ID="123" STATUS="FAILED" OBSERVATION="{message}" />
+  {additional_observation_fragment}
 </udb:ErrorResponse>"""
 
     def test_knows_its_error_message(self):
         response = FailedErrorResponse(self.payload(message="Oops"))
         self.assertEqual("Oops", response.error_message())
+
+    def test_appends_additional_observation_message_to_header_observation_message(self):
+        response = FailedErrorResponse(self.payload(message="Oops", additional_observation="Boom"))
+        self.assertEqual("Oops / Boom", response.error_message())
 
     @patch("edelivery.ebms.error_responses.log_error")
     def test_sends_sentry_alert_as_post_retrieval_action(self, patched_log_error):

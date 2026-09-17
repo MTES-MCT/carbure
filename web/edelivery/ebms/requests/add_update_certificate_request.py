@@ -15,7 +15,14 @@ class AddUpdateCertificateRequest(BaseRequest):
     def site_xml_elements(main_site, other_sites):
         return "\n".join([f"{s.to_xml()}" for s in [main_site, *other_sites]])
 
-    def __init__(self, entity_certificate):
+    def eo_certificate_element(self, entity_certificate):
+        def stubbed_additional_mandatory_fields():
+            return """\
+    <CHAIN_OF_CUSTODIES>
+      <CHAIN_OF_CUSTODY>Segregation</CHAIN_OF_CUSTODY>
+    </CHAIN_OF_CUSTODIES>
+            """
+
         certificate = entity_certificate.certificate
         certificate_type = certificate.certificate_type
         if certificate_type != GenericCertificate.SYSTEME_NATIONAL:
@@ -27,31 +34,30 @@ class AddUpdateCertificateRequest(BaseRequest):
         scopes = certificate.scope.split(", ")
         main_site = CertificateSite.from_carbure_entity(entity)
         other_sites = [CertificateSite.from_carbure_site(s) for s in entity.get_sites()]
+        return f"""\
+<EO_CERTIFICATE>
+  <ECONOMIC_OPERATOR_NUMBER>{entity.ntr_id()}</ECONOMIC_OPERATOR_NUMBER>
+  <CERTIFICATE_NUMBER>{certificate.certificate_id}</CERTIFICATE_NUMBER>
+  <CERTIFICATE_BODY_NUMBER>{certificate_body_number}</CERTIFICATE_BODY_NUMBER>
+  <DATE_OF_ISSUE>{to_date_isoformat(certificate.valid_from)}</DATE_OF_ISSUE>
+  <PLACE_OF_ISSUE>France</PLACE_OF_ISSUE>
+  <CERT_DATE_FROM>{to_date_isoformat(certificate.valid_from)}</CERT_DATE_FROM>
+  <CERT_DATE_TO>{to_date_isoformat(certificate.valid_until)}</CERT_DATE_TO>
+  <VALIDITY_STATUS>{validity_status}</VALIDITY_STATUS>
+  <GROUP_CERTIFICATION>NO</GROUP_CERTIFICATION>
+  {self.eo_scope_xml_elements(scopes)}
+  {self.site_xml_elements(main_site, other_sites)}
+  {stubbed_additional_mandatory_fields()}
+</EO_CERTIFICATE>"""
+
+    def __init__(self, *entity_certificates):
+        eo_certificate_elements = [self.eo_certificate_element(ec) for ec in entity_certificates]
+
         payload = f"""\
 <udb:AddUpdateCertificateRequest xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
   <EO_CERTIFICATE_HEADER>
-    <EO_CERTIFICATE>
-      <ECONOMIC_OPERATOR_NUMBER>{entity.ntr_id()}</ECONOMIC_OPERATOR_NUMBER>
-      <CERTIFICATE_NUMBER>{certificate.certificate_id}</CERTIFICATE_NUMBER>
-      <CERTIFICATE_BODY_NUMBER>{certificate_body_number}</CERTIFICATE_BODY_NUMBER>
-      <DATE_OF_ISSUE>{to_date_isoformat(certificate.valid_from)}</DATE_OF_ISSUE>
-      <PLACE_OF_ISSUE>France</PLACE_OF_ISSUE>
-      <CERT_DATE_FROM>{to_date_isoformat(certificate.valid_from)}</CERT_DATE_FROM>
-      <CERT_DATE_TO>{to_date_isoformat(certificate.valid_until)}</CERT_DATE_TO>
-      <VALIDITY_STATUS>{validity_status}</VALIDITY_STATUS>
-      <GROUP_CERTIFICATION>NO</GROUP_CERTIFICATION>
-      {self.eo_scope_xml_elements(scopes)}
-      {self.site_xml_elements(main_site, other_sites)}
-      {self.stubbed_additional_mandatory_fields()}
-    </EO_CERTIFICATE>
+    {"\n".join(eo_certificate_elements)}
   </EO_CERTIFICATE_HEADER>
 </udb:AddUpdateCertificateRequest>"""
 
         super().__init__(payload)
-
-    def stubbed_additional_mandatory_fields(self):
-        return """\
-<CHAIN_OF_CUSTODIES>
-  <CHAIN_OF_CUSTODY>Segregation</CHAIN_OF_CUSTODY>
-</CHAIN_OF_CUSTODIES>
-        """
