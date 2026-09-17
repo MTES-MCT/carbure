@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from drf_spectacular.utils import OpenApiExample, extend_schema
@@ -9,6 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from auth.serializers import ResetPasswordSerializer
+from auth.tokens import password_reset_token
 from core.carburetypes import CarbureError
 
 
@@ -39,8 +39,7 @@ class ResetPasswordAction:
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
-        prtg = PasswordResetTokenGenerator()
-        if prtg.check_token(user, token):
+        if password_reset_token.check_token(user, token):
             user.set_password(password)
             user.save()
             return Response({"status": "success"})

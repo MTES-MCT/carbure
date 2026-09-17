@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema, inline_serializer
@@ -9,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import CharField
 
 from auth.serializers import ActivateAccountSerializer
-from auth.tokens import account_activation_token
+from auth.tokens import account_activation_token, password_reset_token
 from core.carburetypes import CarbureError
 
 
@@ -73,8 +72,7 @@ class ActivateAccountAction:
 
         # Invited users are created without a profile name and must set a password after activation.
         if not user.name:
-            prtg = PasswordResetTokenGenerator()
-            passtoken = prtg.make_token(user)
+            passtoken = password_reset_token.make_token(user)
             data = {"token": passtoken}
 
         return Response(data=data)

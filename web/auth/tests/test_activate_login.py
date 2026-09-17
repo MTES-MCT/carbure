@@ -85,7 +85,7 @@ class ActivateLoginAccountTest(APITestCase):
 
         assert "_auth_user_id" not in self.client.session
 
-    @patch("django.contrib.auth.tokens.PasswordResetTokenGenerator.make_token")
+    @patch("auth.tokens.password_reset_token.make_token")
     def test_activate_does_not_issue_reset_token_for_regular_user(self, mock_make_token):
         """Ignore client invite flag for regular profiles and never mint a reset token."""
         assert "_auth_user_id" not in self.client.session
@@ -133,7 +133,7 @@ class ActivateLoginAccountTest(APITestCase):
         invited_uidb64 = urlsafe_base64_encode(force_bytes(invited_user.pk))
         invited_token = account_activation_token.make_token(invited_user)
 
-        with patch("django.contrib.auth.tokens.PasswordResetTokenGenerator.make_token") as mock_make_token:
+        with patch("auth.tokens.password_reset_token.make_token") as mock_make_token:
             mock_make_token.return_value = "mockedpasstoken"
 
             response = self.client.post(
