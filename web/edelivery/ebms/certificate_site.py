@@ -1,3 +1,5 @@
+from html import escape
+
 from edelivery.ebms.udb_element import UDBElement
 
 
@@ -44,10 +46,10 @@ class CertificateSite(UDBElement):
 
         return CertificateSite.from_xml(f"""\
 <EO_CERTIFICATE_SITE>
-    <SITE_NAME>{name}</SITE_NAME>
-    <STREET_LINE>{address}</STREET_LINE>
-    <POST_CODE>{zipcode}</POST_CODE>
-    <CITY>{city}</CITY>
+    <SITE_NAME>{escape(name)}</SITE_NAME>
+    <STREET_LINE>{escape(address)}</STREET_LINE>
+    <POST_CODE>{escape(zipcode)}</POST_CODE>
+    <CITY>{escape(city)}</CITY>
     <COUNTRY_CODE>{country_code}</COUNTRY_CODE>
     <MAIN_SITE>{str(is_main_site).lower()}</MAIN_SITE>
 </EO_CERTIFICATE_SITE>
