@@ -33,6 +33,7 @@ def _get_sector_expression():
         When(operation__biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
         When(operation__biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
         When(operation__biofuel__compatible_gpl=True, then=Value(Operation.GPL_C)),
+        When(operation__biofuel__compatible_maritime=True, then=Value(Operation.MARITIME)),
         default=Value(None),
         output_field=CharField(),
     )

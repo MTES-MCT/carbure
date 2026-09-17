@@ -4,6 +4,10 @@ import { CategoryEnum } from "common/types"
 export const balanceBiofuel: Balance["biofuel"] = {
   id: 33,
   code: "ETH",
+  compatible_essence: true,
+  compatible_diesel: false,
+  compatible_gpl: false,
+  compatible_maritime: false,
   renewable_energy_share: 0,
   pci_litre: 21.1,
   masse_volumique: 0.79,

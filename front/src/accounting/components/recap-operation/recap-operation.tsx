@@ -7,17 +7,18 @@ import { ExtendedUnit } from "common/types"
 
 type RecapOperationProps = {
   balance: Balance
+  sector?: string
   unit?: ExtendedUnit
 }
 
-export const RecapOperation = ({ balance }: RecapOperationProps) => {
+export const RecapOperation = ({ balance, sector }: RecapOperationProps) => {
   const { t } = useTranslation()
 
   return (
     <>
       <OperationText
         title={t("Filière")}
-        description={formatSector(balance.sector)}
+        description={formatSector(sector ?? balance.sector)}
       />
       <OperationText
         title={t("Catégorie")}

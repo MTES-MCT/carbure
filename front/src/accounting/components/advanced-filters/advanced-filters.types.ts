@@ -14,6 +14,7 @@ export type Filters = Record<AdvancedFilterField, string[]>
 export type AdvancedFiltersFormProps = Partial<Filters> &
   GHGRangeFormProps & {
     balance?: Balance
+    objective_sector?: Balance["sector"]
   }
 
 export type AdvancedFiltersWithBalanceFormProps = AdvancedFiltersFormProps & {
