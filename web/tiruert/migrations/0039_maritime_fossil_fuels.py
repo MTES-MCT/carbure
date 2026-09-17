@@ -9,11 +9,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name="fossilfuelcategory",
-            name="pci_kg",
-            field=models.FloatField(default=0),
-        ),
         migrations.AlterField(
             model_name="operation",
             name="objective_sector",
