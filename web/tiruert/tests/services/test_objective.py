@@ -1036,7 +1036,7 @@ class ObjectiveServiceCalculateEnergyBasisTest(TestCase):
         """Test maritime MACs use the Maritime category PCI in MJ/L."""
         from tiruert.models import FossilFuel, FossilFuelCategory, MacFossilFuel
 
-        maritime_category = FossilFuelCategory.objects.create(name="Maritime", pci_litre=36.0, pci_kg=43.0)
+        maritime_category = FossilFuelCategory.objects.create(name="Maritime", pci_litre=36.0)
         maritime_fuel = FossilFuel.objects.create(
             label="Fioul lourd Maritime",
             nomenclature="FOL_maritime",
