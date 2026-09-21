@@ -1,4 +1,4 @@
-from core.models.certificate import GenericCertificate
+from core.models.certificate import GenericCertificate, valid_certificate_scope
 from edelivery.adapters.clock import to_date_isoformat
 from edelivery.ebms.certificate_site import CertificateSite
 from edelivery.ebms.converters import CertificateIssuerConverter, CertificateStatusConverter
@@ -7,6 +7,18 @@ from .base_request import BaseRequest
 
 
 class AddUpdateCertificateRequest(BaseRequest):
+    @staticmethod
+    def check_certificate_validity(certificate):
+        certificate_type = certificate.certificate_type
+        if certificate_type != GenericCertificate.SYSTEME_NATIONAL:
+            raise NotImplementedError(f"Certificate export to UDB not implemented for certificate type {certificate_type}")
+
+        scheme = certificate.certificate_type
+        scope = certificate.scope
+        certificate_id = certificate.certificate_id
+        if not valid_certificate_scope(scheme, scope):
+            raise ValueError(f"Scope '{scope}' for certificate '{certificate_id}' has invalid format")
+
     @staticmethod
     def eo_scope_xml_elements(scopes):
         return "\n".join([f"<EO_SCOPE><ORGANISATION_SCOPE>{s}</ORGANISATION_SCOPE></EO_SCOPE>" for s in scopes])
@@ -24,9 +36,7 @@ class AddUpdateCertificateRequest(BaseRequest):
             """
 
         certificate = entity_certificate.certificate
-        certificate_type = certificate.certificate_type
-        if certificate_type != GenericCertificate.SYSTEME_NATIONAL:
-            raise NotImplementedError(f"Certificate export to UDB not implemented for certificate type {certificate_type}")
+        self.check_certificate_validity(certificate)
 
         entity = entity_certificate.entity
         certificate_body_number = CertificateIssuerConverter().to_udb(certificate.certificate_issuer)

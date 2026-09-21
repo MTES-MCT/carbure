@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
+from core.models.certificate import GenericCertificate
 from edelivery.ebms.certificate_site import CertificateSite
 from edelivery.ebms.requests.add_update_certificate_request import AddUpdateCertificateRequest
 
@@ -97,6 +98,16 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         self.certificate.certificate_type = "ISCC"
         with self.assertRaises(NotImplementedError):
             AddUpdateCertificateRequest(self.entity_certificate)
+
+    def test_raises_an_error_if_certificate_scope_format_is_invalid(self):
+        self.certificate.certificate_id = "CERT_ID"
+        self.certificate.scope = "INVALID_FORMAT"
+        self.assertEqual(GenericCertificate.SYSTEME_NATIONAL, self.certificate.certificate_type)
+
+        with self.assertRaises(ValueError) as context:
+            AddUpdateCertificateRequest(self.entity_certificate)
+
+        self.assertEqual("Scope 'INVALID_FORMAT' for certificate 'CERT_ID' has invalid format", context.exception.args[0])
 
     def test_sets_validity_start_date(self):
         self.certificate.valid_from = datetime(2026, 6, 15, tzinfo=timezone.utc)
