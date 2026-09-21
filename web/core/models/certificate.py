@@ -9,7 +9,7 @@ from .entity import Entity
 
 def valid_certificate_scope(scheme, scope):
     if scheme != GenericCertificate.SYSTEME_NATIONAL:
-        return True
+        return False
 
     iscc_accepted_scopes_for_national_scheme = ["BP", "EP", "ET", "FSP", "HEFA", "HVO", "PB", "TR", "TRS"]
     possible_scopes = f"({'|'.join(iscc_accepted_scopes_for_national_scheme)})"
