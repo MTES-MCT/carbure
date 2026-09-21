@@ -46,6 +46,7 @@ env = environ.Env(
     WITH_EMAIL_DECORATED_AS_TEST=(bool, False),
     WITH_SENTRY=(bool, False),
     WITH_UDB_ACCEPTANCE_DATA=(bool, False),
+    WITH_CSRF=(bool, True),
     ELEC_READJUSTMENT_ENTITY=(str, ""),
     ENABLE_SAF_LOGISTICS=(bool, True),
     FILE_UPLOAD_MAX_MEMORY_SIZE_MB=(int, 10),
@@ -485,9 +486,15 @@ if env("IMAGE_TAG") in ("dev", "local"):
 
     factory.Faker._DEFAULT_LOCALE = "fr_FR"
 
-if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
+if not env("WITH_CSRF"):
     MIDDLEWARE.remove("django.middleware.csrf.CsrfViewMiddleware")
+    # DRF SessionAuthentication enforces CSRF on its own, even without the middleware.
+    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"] = [
+        "carbure.authentication.CsrfExemptSessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ]
 
+if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
     # Disable throtting in local
     REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
     REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
