@@ -3,7 +3,10 @@ from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from core.serializers import check_fields_required
 from traceability.serializers.action import ActionExcelImportSerializer
+
+TRANSPORT_FIELDS = ("shipping_method", "shipping_distance", "shipping_date", "etd1")
 
 
 class H2ActionExcelImportSerializer(ActionExcelImportSerializer):
@@ -17,7 +20,9 @@ class H2ActionExcelImportSerializer(ActionExcelImportSerializer):
         write_only=True,
         error_messages={"invalid_choice": _("La valeur doit être Oui ou Non.")},
     )
-    etd1 = serializers.DecimalField(max_digits=7, decimal_places=3, min_value=Decimal("0"), write_only=True)
+    etd1 = serializers.DecimalField(
+        max_digits=7, decimal_places=3, min_value=Decimal("0"), required=False, allow_null=True, write_only=True
+    )
     etd2 = serializers.DecimalField(max_digits=7, decimal_places=3, min_value=Decimal("0"), write_only=True)
 
     class Meta(ActionExcelImportSerializer.Meta):
@@ -33,5 +38,8 @@ class H2ActionExcelImportSerializer(ActionExcelImportSerializer):
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
-        attrs["etd"] = attrs.pop("etd1") + attrs.pop("etd2")
+        if attrs.get("consumed_on_production_site") == "Non":
+            check_fields_required(attrs, TRANSPORT_FIELDS)
+        etd1 = attrs.pop("etd1", None) or Decimal("0")
+        attrs["etd"] = etd1 + attrs.pop("etd2")
         return attrs
