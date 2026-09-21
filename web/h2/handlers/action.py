@@ -35,8 +35,10 @@ class H2ActionHandler(ActionIndustryHandler):
         excel_column("ei"),
         excel_column("ep"),
         {
+            "key": "consumed_on_production_site",
             "header": "L'H2 est-il consommé sur le site de production",
             "comment": "Si oui, passer directement à la section consommation — Oui/Non",
+            "options": ["Oui", "Non"],
             "color": EXCEL_TRANSPORT_COLOR,
         },
         excel_column("shipping_method"),

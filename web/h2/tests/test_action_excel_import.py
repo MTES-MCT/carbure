@@ -65,7 +65,7 @@ class H2ActionExcelImportViewTest(APITestCase):
         self.assertEqual(Action.objects.get(pos_id="H2-001").etd, Decimal("2.000"))
 
     def test_import_rejects_missing_h2_extra_fields(self):
-        for field in ("lot_id", "lot_quantity", "producer", "etd1", "etd2"):
+        for field in ("lot_id", "lot_quantity", "producer", "consumed_on_production_site", "etd1", "etd2"):
             with self.subTest(field=field):
                 response = self._post(
                     filled_h2_template(
@@ -80,6 +80,21 @@ class H2ActionExcelImportViewTest(APITestCase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(Action.objects.count(), 0)
                 self.assertTrue(any(field in row["errors"] for row in response.data["validation_errors"]))
+
+    def test_import_rejects_invalid_consumed_on_production_site(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.station.name,
+                certificate_id=self.certificate.certificate_id,
+                consumed_on_production_site="Peut-être",
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertTrue(any("consumed_on_production_site" in row["errors"] for row in response.data["validation_errors"]))
 
     def test_import_rejects_material_from_another_industry(self):
         MaterialFactory(code="BIO-WOOD", name="Bois")

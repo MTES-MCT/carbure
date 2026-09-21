@@ -18,6 +18,7 @@ def filled_h2_template(
     working_date=date(2026, 2, 1),
     etd1=Decimal("1.250"),
     etd2=Decimal("0.750"),
+    consumed_on_production_site="Non",
     extra_headers=None,
 ):
     return fill_action_template(
@@ -26,6 +27,7 @@ def filled_h2_template(
             "lot_id": lot_id,
             "lot_quantity": lot_quantity,
             "producer": producer,
+            "consumed_on_production_site": consumed_on_production_site,
             "pos_id": pos_id,
             "material": material_name,
             "certificate": certificate_id,

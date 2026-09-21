@@ -61,6 +61,7 @@ class H2ActionExcelTemplateTest(TestCase):
         self.assertNotIn("Station Lyon", reference_values("site"))
         self.assertIn(certifhy.certificate_id, reference_values("certificate"))
         self.assertNotIn("ISCC-001", reference_values("certificate"))
+        self.assertEqual(reference_values("consumed_on_production_site"), ["Oui", "Non"])
 
 
 class ParseH2ActionImportFileTest(TestCase):
@@ -74,6 +75,7 @@ class ParseH2ActionImportFileTest(TestCase):
         rows = parse_action_import_file(buffer, H2ActionHandler())
 
         self.assertEqual(rows[0]["lot_id"], "LOT-001")
+        self.assertEqual(rows[0]["consumed_on_production_site"], "Non")
         self.assertIn("etd1", rows[0])
         self.assertIn("etd2", rows[0])
         self.assertNotIn("etd", rows[0])
