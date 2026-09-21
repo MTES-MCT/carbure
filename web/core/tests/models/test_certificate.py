@@ -7,7 +7,7 @@ class ValidCertificateScopeTest(TestCase):
     national_scheme = GenericCertificate.SYSTEME_NATIONAL
 
     def test_returns_true_if_valid_scope_format(self):
-        valid_scopes = ["BP", "EP", "FSP", "HEFA", "HVO", "PB", "TR", "TRS", "PB, FSP", "BP, EP, TRS"]
+        valid_scopes = ["BP", "EP", "ET", "FSP", "HEFA", "HVO", "PB", "TR", "TRS", "PB, FSP", "BP, EP, TRS"]
         for scope in valid_scopes:
             with self.subTest(scope):
                 self.assertTrue(valid_certificate_scope(self.national_scheme, scope))
@@ -18,5 +18,5 @@ class ValidCertificateScopeTest(TestCase):
             with self.subTest(scope):
                 self.assertFalse(valid_certificate_scope(self.national_scheme, scope))
 
-    def test_returns_true_if_not_national_scheme(self):
-        self.assertTrue(valid_certificate_scope(GenericCertificate.ISCC, "XX"))
+    def test_returns_false_if_not_national_scheme(self):
+        self.assertFalse(valid_certificate_scope(GenericCertificate.ISCC, "FSP"))

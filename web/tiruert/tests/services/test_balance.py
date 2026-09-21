@@ -1,9 +1,10 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
+from django.db.models import Q
 from django.test import TestCase
 
 from core.models import MatierePremiere
-from tiruert.models import Operation
+from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
 
 
@@ -73,6 +74,25 @@ class BalanceServiceLotVolumeRuleTest(TestCase):
         mock_detail.volume = 100.0
 
         self.assertEqual(mock_detail.volume, 100.0)
+
+
+class BalanceServiceFilterOperationsTest(TestCase):
+    """Unit tests for filtering operations by the current declaration year."""
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_filter_operations_for_current_year_excludes_next_year(self, mock_current_year):
+        operations = Mock()
+        filtered_operations = Mock()
+        operations.filter.return_value = filtered_operations
+
+        result = BalanceService._filter_operations_for_current_year(operations)
+
+        self.assertIs(result, filtered_operations)
+        operations.filter.assert_called_once_with(
+            (Q(durability_period__isnull=True) | Q(durability_period__lt="2026"))
+            & (Q(declaration_year__isnull=True) | Q(declaration_year__lte=2025))
+        )
+        mock_current_year.assert_called_once_with()
 
 
 class OperationDetailAvoidedEmissionsTest(TestCase):
@@ -259,6 +279,39 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         self.assertGreater(result[Operation.ESSENCE]["quantity"]["debit"], 0)
         self.assertGreater(result[Operation.GAZOLE]["quantity"]["debit"], 0)
 
+    def test_calculate_balance_groups_gpl_compatible_operations_by_gpl_sector(self):
+        """Test calculate_balance maps GPL-compatible biofuels to GPL_C."""
+        from core.models import Biocarburant
+
+        biofuel_gpl = Biocarburant.objects.create(
+            code="TEST-GPL",
+            name="Test GPL",
+            name_en="Test GPL",
+            description="Test GPL",
+            pci_litre=24,
+            compatible_essence=False,
+            compatible_diesel=False,
+            compatible_gpl=True,
+        )
+        operation = self._create_operation_with_details(
+            credited_entity=self.entity,
+            type=Operation.INCORPORATION,
+            status=Operation.VALIDATED,
+            biofuel=biofuel_gpl,
+        )
+        operation.details.first().lot.biofuel = biofuel_gpl
+        operation.details.first().lot.save(update_fields=["biofuel"])
+
+        result = BalanceService.calculate_balance(
+            Operation.objects.filter(id=operation.id),
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "l",
+        )
+
+        self.assertIn(Operation.GPL_C, result)
+        self.assertGreater(result[Operation.GPL_C]["quantity"]["credit"], 0)
+
     def test_calculate_balance_filters_operations_by_status(self):
         """Test calculate_balance only includes operations with allowed statuses."""
 
@@ -301,6 +354,37 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
                             self.assertEqual(
                                 entry["quantity"]["credit"], 0, f"Status {status_code} should not contribute to credit"
                             )
+
+    def test_calculate_balance_excludes_informative_operations(self):
+        """YEARLY_BALANCE operations must not contribute to balance calculations."""
+        from core.models import Biocarburant
+
+        biofuel = Biocarburant.objects.filter(compatible_essence=True).first()
+
+        if not biofuel:
+            self.skipTest("Missing compatible_essence biofuel in fixtures")
+
+        credit_operation = self.OperationFactory.create_incorporation(
+            entity=self.entity,
+            biofuel=biofuel,
+        )
+        self.OperationDetailFactory.create_for_operation(credit_operation, volume=1000.0)
+
+        yearly_balance = self.OperationFactory(
+            type=Operation.YEARLY_BALANCE,
+            status=Operation.ACCEPTED,
+            customs_category=MatierePremiere.CONV,
+            biofuel=biofuel,
+            credited_entity=self.entity,
+        )
+        OperationDetail.objects.create(operation=yearly_balance, lot=None, volume=500.0)
+
+        operations = Operation.objects.filter(id__in=[credit_operation.id, yearly_balance.id])
+
+        result = BalanceService.calculate_balance(operations, self.entity.id, None, "l")
+        total = sum(entry["available_balance"] for entry in result.values())
+
+        self.assertEqual(total, 1000.0)  # 500 from YEARLY_BALANCE should be excluded
 
     def test_calculate_balance_applies_credit_and_debit_logic(self):
         """Test calculate_balance correctly applies credit/debit based on entity relationship."""
@@ -347,6 +431,31 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         # Pending credit operations should not update available_balance
         for entry in result.values():
             self.assertEqual(entry["available_balance"], 0)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_calculate_balance_excludes_operations_from_next_year(self, mock_current_year):
+        """Balance only includes operations up to the current durability year."""
+        current_year_operation = self._create_operation_with_details(
+            credited_entity=self.entity,
+            type=Operation.INCORPORATION,
+            status=Operation.ACCEPTED,
+            durability_period="202512",
+        )
+        next_year_operation = self._create_operation_with_details(
+            credited_entity=self.entity,
+            type=Operation.INCORPORATION,
+            status=Operation.ACCEPTED,
+            durability_period="202601",
+        )
+
+        operations = Operation.objects.filter(id__in=[current_year_operation.id, next_year_operation.id])
+
+        result = BalanceService.calculate_balance(operations, self.entity.id, BalanceService.GROUP_BY_SECTOR, "l")
+
+        total_credit = sum(entry["quantity"]["credit"] for entry in result.values())
+        current_year_volume = sum(detail.volume for detail in current_year_operation.details.all())
+        self.assertEqual(total_credit, current_year_volume)
+        mock_current_year.assert_called_once_with()
 
     def test_calculate_balance_applies_ges_filtering(self):
         """Test calculate_balance filters lots by GHG reduction bounds."""

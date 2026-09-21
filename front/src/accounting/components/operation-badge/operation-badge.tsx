@@ -16,6 +16,7 @@ export const OperationBadge = ({
     [OperationsStatus.CORRECTED]: "success",
     [OperationsStatus.VALIDATED]: "success",
     [OperationsStatus.DRAFT]: "info",
+    [OperationsStatus.AUTO]: "info",
   }
 
   if (!status) return null

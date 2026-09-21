@@ -1,12 +1,14 @@
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 from django.forms.models import model_to_dict
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from core.models import Entity
 from traceability.factories import ActionFactory
 from traceability.models import Action
 from traceability.serializers import ActionInputSerializer
+from traceability.serializers.fields import LookupSlugRelatedField
 
 
 class ActionInputSerializerTest(TestCase):
@@ -57,3 +59,21 @@ class ActionInputSerializerTest(TestCase):
         self.assertEqual(action.industry, Action.H2)
         self.assertEqual(action.holder, self.entity)
         self.assertIsNone(action.parent_id)
+
+
+class LookupSlugRelatedFieldTest(SimpleTestCase):
+    def test_get_queryset_is_called_once_when_context_is_shared(self):
+        material = SimpleNamespace(name="Hydrogène gazeux")
+        context = {}
+
+        first = LookupSlugRelatedField(slug_field="name", lookup="material")
+        second = LookupSlugRelatedField(slug_field="name", lookup="material")
+        first._context = context
+        second._context = context
+        first.get_queryset = Mock(return_value=[material])
+        second.get_queryset = Mock(return_value=[material])
+
+        self.assertEqual(first.to_internal_value("Hydrogène gazeux"), material)
+        self.assertEqual(second.to_internal_value("Hydrogène gazeux"), material)
+        first.get_queryset.assert_called_once()
+        second.get_queryset.assert_not_called()

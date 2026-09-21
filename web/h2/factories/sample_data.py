@@ -8,6 +8,7 @@ from h2.factories import H2StationFactory
 from h2.models import H2Station
 from traceability.factories import ActionFactory
 from traceability.models import Action, Material
+from traceability.models.action_status import ActionStatus
 
 
 def setup_h2_entity() -> Entity:
@@ -104,8 +105,85 @@ def setup_h2_lots_init() -> tuple[Action, Action]:
     return h2_lot_01, h2_lot_02
 
 
+def setup_h2_certificates() -> tuple[Action, Action]:
+    holder = setup_h2_entity()
+    paris_station, lyon_station = setup_h2_stations()
+    h2_rfnbo, h2_bio = setup_h2_materials()
+
+    h2_lot_03 = ActionFactory(
+        pos_id="H2-DEMO-INIT-003",
+        holder=holder,
+        industry=Action.H2,
+        type=Action.INIT,
+        material=h2_rfnbo,
+        quantity=Decimal("180000.000"),
+        site=paris_station,
+        shipping_date=date(2026, 3, 15),
+        shipping_distance=40,
+        shipping_method=Action.ROAD,
+        working_date=date(2026, 3, 15),
+        ei=Decimal("1"),
+        etd=Decimal("3"),
+    )
+
+    h2_lot_04 = ActionFactory(
+        pos_id="H2-DEMO-INIT-004",
+        holder=holder,
+        industry=Action.H2,
+        type=Action.INIT,
+        material=h2_bio,
+        quantity=Decimal("300000.000"),
+        site=lyon_station,
+        shipping_date=date(2026, 4, 20),
+        shipping_distance=120,
+        shipping_method=Action.ROAD,
+        working_date=date(2026, 4, 20),
+        ep=Decimal("2"),
+        eu=Decimal("4"),
+        eccs=Decimal("5"),
+    )
+
+    ActionStatus.objects.create(action=h2_lot_03, status=ActionStatus.ACCEPTED)
+    ActionStatus.objects.create(action=h2_lot_04, status=ActionStatus.ACCEPTED)
+
+    h2_certificate_01 = ActionFactory(
+        parent=h2_lot_03,
+        status=ActionStatus.CREATED,
+        industry=Action.H2,
+        type=Action.VALORIZE,
+        pos_id="H2-DEMO-VALORIZE-001",
+        holder=h2_lot_03.holder,
+        quantity=h2_lot_03.quantity,
+        working_date=h2_lot_03.working_date,
+        material=None,
+        site=None,
+        shipping_date=None,
+        shipping_distance=None,
+        shipping_method=None,
+    )
+
+    h2_certificate_02 = ActionFactory(
+        parent=h2_lot_04,
+        status=ActionStatus.CREATED,
+        industry=Action.H2,
+        type=Action.VALORIZE,
+        pos_id="H2-DEMO-VALORIZE-002",
+        holder=h2_lot_04.holder,
+        quantity=h2_lot_04.quantity,
+        working_date=h2_lot_04.working_date,
+        material=None,
+        site=None,
+        shipping_date=None,
+        shipping_distance=None,
+        shipping_method=None,
+    )
+
+    return h2_certificate_01, h2_certificate_02
+
+
 def create_sample_data():
     setup_h2_entity()
     setup_h2_stations()
     setup_h2_materials()
     setup_h2_lots_init()
+    setup_h2_certificates()

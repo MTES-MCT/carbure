@@ -35,4 +35,4 @@ from .supply_plan import (
 )
 from .annual_declaration import BiomethaneAnnualDeclarationSerializer
 
-from .fields import LabelChoiceField, EuropeanFloatField, DepartmentField
+from .fields import EuropeanFloatField, DepartmentField

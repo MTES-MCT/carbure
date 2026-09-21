@@ -108,10 +108,12 @@ if env.get("IMAGE_TAG") == "prod":
 
     # Tiruert update operations
     @db_periodic_task(crontab(hour=0, minute=0))
-    def run_tiruert_expiration_tasks() -> None:
+    def run_tiruert_period_closing_tasks() -> None:
         call_command("cancel_closed_period_operations")
         # Only runs if cancel_closed_period_operations succeeds (no exception raised)
         call_command("set_operations_expired")
+        # Only runs if set_operations_expired succeeds (no exception raised)
+        call_command("create_yearly_balance_operations")
 
     # Tiruert snapshot objectives
     @db_periodic_task(crontab(hour=0, minute=0))

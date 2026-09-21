@@ -3,11 +3,13 @@ import tempfile
 from datetime import datetime
 
 from drf_spectacular.utils import OpenApiTypes, extend_schema
+from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from core.excel import ExcelResponse, export_to_excel
 from core.utils import truncate
-from tiruert.models import OperationDetail
+from tiruert.models import Operation, OperationDetail
 
 
 class OperationDetailExcelExportActionMixin:
@@ -22,6 +24,9 @@ class OperationDetailExcelExportActionMixin:
     )
     def export_operation_details_to_excel(self, request, *args, **kwargs):
         operation = self.get_object()
+
+        if operation.type in Operation.BALANCE_EXCLUDED_TYPES:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
         details = (
             OperationDetail._base_manager.filter(operation_id=operation.pk)

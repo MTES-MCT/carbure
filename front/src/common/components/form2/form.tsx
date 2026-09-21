@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useContext, useState } from "react"
 import cl from "clsx"
 import css from "./form.module.css"
 
-export type FormVariant = "inline" | "columns"
+export type FormVariant = "inline" | "columns" | "modal"
 
 export interface FormProps<T> {
   id?: string

@@ -2,7 +2,14 @@ import { useTranslation } from "react-i18next"
 
 import { Cell, Column } from "common/components/table2"
 import { EntityManager } from "common/hooks/entity"
+import { formatDate } from "common/utils/formatters"
+import { ActionStatusBadge } from "traceability/components/action-status-badge"
 import { Action } from "traceability/types"
+import {
+  ACTION_EMISSIONS_UNIT,
+  formatActionDecimal,
+  formatActionTotalEmissions,
+} from "traceability/utils"
 
 export type ActionColumn = Column<Action> & {
   condition?: (entity: EntityManager) => boolean
@@ -12,6 +19,11 @@ export function useActionColumns() {
   const { t } = useTranslation()
 
   return {
+    status: {
+      key: "status",
+      header: t("Statut"),
+      cell: (action) => <ActionStatusBadge status={action.status} />,
+    },
     holder: {
       key: "holder",
       header: t("Détenteur"),
@@ -23,19 +35,60 @@ export function useActionColumns() {
     material: {
       key: "material",
       header: t("Matière"),
-      cell: (action) => <Cell text={action.material.name} />,
+      cell: (action) => <Cell text={action.material?.name} />,
+    },
+
+    certificate: {
+      key: "certificate",
+      header: t("N° de certificat"),
+      cell: (action) => (
+        <Cell text={action.certificate?.certificate_id ?? ""} />
+      ),
     },
 
     quantity: {
       key: "quantity",
       header: t("Quantité"),
-      cell: (action) => <Cell text={action.quantity} />,
+      cell: (action) => (
+        <Cell text={formatActionDecimal(action.quantity)} sub="MJ" />
+      ),
     },
 
     site: {
       key: "site",
       header: t("Site"),
-      cell: (action) => <Cell text={action.site.name} />,
+      cell: (action) => <Cell text={action.site?.name} />,
+    },
+
+    pos_id: {
+      key: "pos_id",
+      header: t("N° de POS"),
+      cell: (action) => <Cell text={action.pos_id} />,
+    },
+
+    period: {
+      key: "working_date",
+      header: t("Période"),
+      cell: (action) => (
+        <Cell text={formatDate(action.working_date, "MM/yyyy")} />
+      ),
+    },
+
+    working_date: {
+      key: "working_date",
+      header: t("Date de création"),
+      cell: (action) => <Cell text={formatDate(action.working_date)} />,
+    },
+
+    total_emissions: {
+      key: "total_emissions",
+      header: t("Emissions"),
+      cell: (action) => (
+        <Cell
+          text={formatActionTotalEmissions(action.total_emissions)}
+          sub={ACTION_EMISSIONS_UNIT}
+        />
+      ),
     },
   } satisfies Record<string, ActionColumn>
 }

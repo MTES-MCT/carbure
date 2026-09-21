@@ -10978,6 +10978,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -10991,6 +10992,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11107,10 +11109,12 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
+                - GPL_C
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
+            * `GPL_C` - GPL_C
           explode: true
           style: form
         - in: query
@@ -11125,6 +11129,7 @@ paths:
               type: string
               enum:
                 - ACCEPTED
+                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -11141,6 +11146,7 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -11563,6 +11569,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11576,6 +11583,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11692,10 +11700,12 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
+                - GPL_C
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
+            * `GPL_C` - GPL_C
           explode: true
           style: form
         - in: query
@@ -11710,6 +11720,7 @@ paths:
               type: string
               enum:
                 - ACCEPTED
+                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -11726,6 +11737,7 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -11857,6 +11869,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11870,6 +11883,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11974,10 +11988,12 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
+                - GPL_C
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
+            * `GPL_C` - GPL_C
           explode: true
           style: form
         - in: query
@@ -11992,6 +12008,7 @@ paths:
               type: string
               enum:
                 - ACCEPTED
+                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -12008,6 +12025,7 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -12183,6 +12201,7 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
+                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -12196,6 +12215,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12300,10 +12320,12 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
+                - GPL_C
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
+            * `GPL_C` - GPL_C
           explode: true
           style: form
         - in: query
@@ -12318,6 +12340,7 @@ paths:
               type: string
               enum:
                 - ACCEPTED
+                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -12334,6 +12357,7 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
+            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -12687,6 +12711,14 @@ paths:
           description: Number of results to return per page.
           schema:
             type: integer
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -12699,6 +12731,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -12751,7 +12784,10 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-          description: "* `INIT` - INIT"
+                - VALORIZE
+          description: |-
+            * `INIT` - INIT
+            * `VALORIZE` - VALORIZE
           explode: true
           style: form
         - in: query
@@ -12770,54 +12806,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedActionList"
-          description: ""
-    post:
-      operationId: traceability_actions_create
-      description: Add a years action based on an action's working date.
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - in: query
-          name: industry
-          schema:
-            enum:
-              - H2
-            type: string
-            minLength: 1
-          description: "* `H2` - Hydrogène"
-          required: true
-        - in: query
-          name: year
-          schema:
-            type: integer
-          description: Filter actions by working date year.
-      tags:
-        - traceability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ActionInputRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/ActionInputRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/ActionInputRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "201":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ActionInput"
           description: ""
   /api/traceability/actions/{id}/:
     get:
@@ -12861,113 +12849,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Action"
-          description: ""
-    put:
-      operationId: traceability_actions_update
-      description: Add a years action based on an action's working date.
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Action.
-          required: true
-        - in: query
-          name: industry
-          schema:
-            enum:
-              - H2
-            type: string
-            minLength: 1
-          description: "* `H2` - Hydrogène"
-          required: true
-        - in: query
-          name: year
-          schema:
-            type: integer
-          description: Filter actions by working date year.
-      tags:
-        - traceability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ActionInputRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/ActionInputRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/ActionInputRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ActionInput"
-          description: ""
-    patch:
-      operationId: traceability_actions_partial_update
-      description: Add a years action based on an action's working date.
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Action.
-          required: true
-        - in: query
-          name: industry
-          schema:
-            enum:
-              - H2
-            type: string
-            minLength: 1
-          description: "* `H2` - Hydrogène"
-          required: true
-        - in: query
-          name: year
-          schema:
-            type: integer
-          description: Filter actions by working date year.
-      tags:
-        - traceability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PatchedActionInputRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/PatchedActionInputRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/PatchedActionInputRequest"
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ActionInput"
           description: ""
     delete:
       operationId: traceability_actions_destroy
@@ -13026,6 +12907,7 @@ paths:
               - holder
               - material
               - order_by
+              - period
               - shipping_method
               - site
               - status
@@ -13104,6 +12986,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -13116,6 +13006,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -13168,7 +13059,10 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-          description: "* `INIT` - INIT"
+                - VALORIZE
+          description: |-
+            * `INIT` - INIT
+            * `VALORIZE` - VALORIZE
           explode: true
           style: form
         - in: query
@@ -13195,10 +13089,103 @@ paths:
                     - holder
                     - material
                     - order_by
+                    - period
                     - shipping_method
-                    - site
                   summary: Example of filters response.
           description: ""
+  /api/traceability/actions/import/:
+    post:
+      operationId: import_actions_from_excel
+      description: Create actions from an Excel import template.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionExcelUploadRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionExcelUploadRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionExcelUploadRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+          description: ""
+  /api/traceability/actions/import/template/:
+    get:
+      operationId: download_actions_import_template
+      description: Download the action import Excel template for the given industry.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
+      tags:
+        - traceability
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: Generated Excel file
   /api/traceability/actions/years/:
     get:
       operationId: traceability_actions_years_retrieve
@@ -13281,6 +13268,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -13293,6 +13288,7 @@ paths:
             type: array
             items:
               type: string
+              nullable: true
               title: Mode de transport
               enum:
                 - PIPELINE
@@ -13345,7 +13341,10 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-          description: "* `INIT` - INIT"
+                - VALORIZE
+          description: |-
+            * `INIT` - INIT
+            * `VALORIZE` - VALORIZE
           explode: true
           style: form
         - in: query
@@ -13477,8 +13476,10 @@ components:
           type: integer
           readOnly: true
         status:
-          type: string
+          allOf:
+            - $ref: "#/components/schemas/ActionStatusEnum"
           readOnly: true
+          nullable: true
         holder:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -13496,6 +13497,16 @@ components:
           allOf:
             - $ref: "#/components/schemas/ActionSite"
           readOnly: true
+        certificate:
+          allOf:
+            - $ref: "#/components/schemas/ActionCertificate"
+          readOnly: true
+          nullable: true
+        total_emissions:
+          allOf:
+            - $ref: "#/components/schemas/ActionTotalEmissions"
+          readOnly: true
+          nullable: true
         pos_id:
           type: string
           title: N° de POS
@@ -13516,20 +13527,31 @@ components:
         shipping_date:
           type: string
           format: date
+          nullable: true
           title: Date d'expédition
         shipping_distance:
           type: integer
           maximum: 2147483647
           minimum: -2147483648
+          nullable: true
           title: Distance de livraison
         shipping_method:
           allOf:
             - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          nullable: true
           title: Mode de transport
         working_date:
           type: string
           format: date
           title: Date de référence
+        eec:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        el:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
         ei:
           type: string
           format: decimal
@@ -13550,7 +13572,16 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        esca:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eccr:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
       required:
+        - certificate
         - holder
         - id
         - industry
@@ -13558,171 +13589,38 @@ components:
         - parent
         - pos_id
         - quantity
-        - shipping_date
-        - shipping_distance
-        - shipping_method
         - site
         - status
+        - total_emissions
         - type
         - working_date
-    ActionInput:
+    ActionCertificate:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        pos_id:
+        certificate_id:
           type: string
-          title: N° de POS
-          maxLength: 48
-        industry:
-          allOf:
-            - $ref: "#/components/schemas/IndustryEnum"
-          readOnly: true
-          title: Filière
-        type:
-          allOf:
-            - $ref: "#/components/schemas/ActionTypeEnum"
-          title: Type d'action
-        quantity:
+          maxLength: 96
+        certificate_type:
+          $ref: "#/components/schemas/CertificateTypeEnum"
+        certificate_holder:
           type: string
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
-          title: Quantité de matière
-        shipping_date:
-          type: string
-          format: date
-          title: Date d'expédition
-        shipping_distance:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-          title: Distance de livraison
-        shipping_method:
-          allOf:
-            - $ref: "#/components/schemas/ActionShippingMethodEnum"
-          title: Mode de transport
-        working_date:
-          type: string
-          format: date
-          title: Date de référence
-        ei:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        ep:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        etd:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        eu:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        eccs:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        holder:
-          type: integer
-          readOnly: true
-          title: Entité détentrice de la quantité de l'action
-        parent:
-          type: integer
-          readOnly: true
-          nullable: true
-          title: Action parente
-        material:
-          type: integer
-          title: Matière
-        site:
-          type: integer
+          maxLength: 512
       required:
-        - holder
+        - certificate_holder
+        - certificate_id
+        - certificate_type
         - id
-        - industry
-        - material
-        - parent
-        - pos_id
-        - quantity
-        - shipping_date
-        - shipping_distance
-        - shipping_method
-        - site
-        - type
-        - working_date
-    ActionInputRequest:
+    ActionExcelUploadRequest:
       type: object
       properties:
-        pos_id:
+        file:
           type: string
-          minLength: 1
-          title: N° de POS
-          maxLength: 48
-        type:
-          allOf:
-            - $ref: "#/components/schemas/ActionTypeEnum"
-          title: Type d'action
-        quantity:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
-          title: Quantité de matière
-        shipping_date:
-          type: string
-          format: date
-          title: Date d'expédition
-        shipping_distance:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-          title: Distance de livraison
-        shipping_method:
-          allOf:
-            - $ref: "#/components/schemas/ActionShippingMethodEnum"
-          title: Mode de transport
-        working_date:
-          type: string
-          format: date
-          title: Date de référence
-        ei:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        ep:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        etd:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        eu:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        eccs:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        material:
-          type: integer
-          title: Matière
-        site:
-          type: integer
+          format: binary
       required:
-        - material
-        - pos_id
-        - quantity
-        - shipping_date
-        - shipping_distance
-        - shipping_method
-        - site
-        - type
-        - working_date
+        - file
     ActionParent:
       type: object
       description: Small representation used for the parent action relation.
@@ -13763,11 +13661,95 @@ components:
       required:
         - id
         - name
+    ActionStatusEnum:
+      enum:
+        - CREATED
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+        - BLOCKED
+        - DELETED
+      type: string
+      description: |-
+        * `CREATED` - CREATED
+        * `PENDING` - PENDING
+        * `ACCEPTED` - ACCEPTED
+        * `REJECTED` - REJECTED
+        * `BLOCKED` - BLOCKED
+        * `DELETED` - DELETED
+    ActionTotalEmissions:
+      type: object
+      description: Cumulative GES along the parent chain (gCO₂eq/MJ).
+      properties:
+        eec:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        el:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        ei:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        ep:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        etd:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        eu:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        esca:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        eccr:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
+      required:
+        - eccr
+        - eccs
+        - eec
+        - ei
+        - el
+        - ep
+        - esca
+        - etd
+        - eu
+        - total
     ActionTypeEnum:
       enum:
         - INIT
+        - VALORIZE
       type: string
-      description: "* `INIT` - INIT"
+      description: |-
+        * `INIT` - INIT
+        * `VALORIZE` - VALORIZE
     ActivateAccountRequest:
       type: object
       properties:
@@ -19393,11 +19375,13 @@ components:
         - ESSENCE
         - GAZOLE
         - CARBURÉACTEUR
+        - GPL_C
       type: string
       description: |-
         * `ESSENCE` - ESSENCE
         * `GAZOLE` - GAZOLE
         * `CARBURÉACTEUR` - CARBURÉACTEUR
+        * `GPL_C` - GPL_C
     Operation:
       type: object
       properties:
@@ -19801,6 +19785,7 @@ components:
         - CORRECTED
         - VALIDATED
         - DRAFT
+        - AUTO
       type: string
       description: |-
         * `PENDING` - PENDING
@@ -19811,6 +19796,7 @@ components:
         * `CORRECTED` - CORRECTED
         * `VALIDATED` - VALIDATED
         * `DRAFT` - DRAFT
+        * `AUTO` - AUTO
     OperationTypeEnum:
       enum:
         - INCORPORATION
@@ -19825,6 +19811,7 @@ components:
         - TRANSFERT
         - EXPIRATION
         - REPORT
+        - YEARLY_BALANCE
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -19839,6 +19826,7 @@ components:
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT
+        * `YEARLY_BALANCE` - YEARLY_BALANCE
     OperationUpdate:
       type: object
       properties:
@@ -19908,6 +19896,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Action"
+        total_count:
+          type: integer
     PaginatedBalanceResponseList:
       type: object
       required:
@@ -20300,65 +20290,6 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
-    PatchedActionInputRequest:
-      type: object
-      properties:
-        pos_id:
-          type: string
-          minLength: 1
-          title: N° de POS
-          maxLength: 48
-        type:
-          allOf:
-            - $ref: "#/components/schemas/ActionTypeEnum"
-          title: Type d'action
-        quantity:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
-          title: Quantité de matière
-        shipping_date:
-          type: string
-          format: date
-          title: Date d'expédition
-        shipping_distance:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
-          title: Distance de livraison
-        shipping_method:
-          allOf:
-            - $ref: "#/components/schemas/ActionShippingMethodEnum"
-          title: Mode de transport
-        working_date:
-          type: string
-          format: date
-          title: Date de référence
-        ei:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        ep:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        etd:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        eu:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        eccs:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
-        material:
-          type: integer
-          title: Matière
-        site:
-          type: integer
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:

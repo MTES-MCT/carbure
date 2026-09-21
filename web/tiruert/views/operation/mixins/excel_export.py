@@ -15,7 +15,7 @@ class ExcelExportActionMixin:
         url_path="export",
     )
     def export_operations_to_excel(self, request, *args, **kwargs):
-        operations = self.filter_queryset(self.get_queryset())
+        operations = self.filter_queryset(self.get_queryset()).exclude_informative()
 
         filename = f"tiruert_operations_{request.entity}_{time.strftime('%Y-%m-%d_%H%M%S')}.xlsx"
         file_path = f"{tempfile.gettempdir()}/{filename}"

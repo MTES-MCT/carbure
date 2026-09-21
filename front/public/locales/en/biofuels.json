@@ -24,5 +24,8 @@
   "HVP": "Pure vegetable oil",
   "MT": "Methanol",
   "MTBE": "MTBE",
-  "TAEE": "TAEE"
+  "TAEE": "TAEE",
+  "HCGPL": "Co-processed oils - LPG",
+  "HOGPL": "Hydrotreated oil - LPG",
+  "HVOGPL": "Hydrotreated vegetable oil - LPG"
 }

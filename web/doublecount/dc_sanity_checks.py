@@ -8,12 +8,12 @@ from transactions.sanity_checks.biofuel_feedstock import get_biofuel_feedstock_i
 
 
 # check a line in the sourcing section of an imported dc excel file
-def check_sourcing_row(data: SourcingRow) -> List[DcError]:
+def check_sourcing_row(data: SourcingRow, feedstocks: dict[str, MatierePremiere]) -> List[DcError]:
     errors: List[DcError] = []
     line = data["line"]
     meta = {"year": data["year"]}
 
-    if not data["feedstock"]:
+    if not data["feedstock"] or data["feedstock"] not in feedstocks:
         errors.append(error(DoubleCountingError.MISSING_FEEDSTOCK, line, meta))
 
     if not data["origin_country"]:

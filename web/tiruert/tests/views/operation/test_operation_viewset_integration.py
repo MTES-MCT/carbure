@@ -138,6 +138,34 @@ class OperationViewSetIntegrationTest(TestCase):
         self.assertIn("results", data)
         self.assertEqual(data["count"], 4)
 
+    def test_list_operations_returns_gpl_sector_for_gpl_compatible_biofuel(self):
+        """The list annotation should expose GPL_C for GPL-compatible biofuels."""
+        biofuel_gpl = Biocarburant.objects.create(
+            code="TEST-GPL-LIST",
+            name="Test GPL",
+            name_en="Test GPL",
+            description="Test GPL",
+            pci_litre=24,
+            compatible_essence=False,
+            compatible_diesel=False,
+            compatible_gpl=True,
+        )
+        operation = Operation.objects.create(
+            type=Operation.INCORPORATION,
+            status=Operation.VALIDATED,
+            customs_category=MatierePremiere.CONV,
+            biofuel=biofuel_gpl,
+            credited_entity=self.entity,
+            to_depot=self.depot,
+            renewable_energy_share=1.0,
+        )
+
+        response = self.client.get(self.url, {"entity_id": self.entity.id})
+
+        self.assertEqual(response.status_code, 200)
+        result = next(item for item in response.json()["results"] if item["id"] == operation.id)
+        self.assertEqual(result["sector"], Operation.GPL_C)
+
     def test_list_queryset_clears_details_prefetch_when_details_not_requested(self):
         """List queryset should not keep the default details prefetch unless details are requested."""
         django_request = self.factory.get(self.url, {"entity_id": self.entity.id})

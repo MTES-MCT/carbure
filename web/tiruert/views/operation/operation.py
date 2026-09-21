@@ -33,7 +33,7 @@ class OperationPagination(MetadataPageNumberPagination):
     def get_extra_metadata(self):
         queryset = getattr(self, "queryset", None)
         if callable(getattr(queryset, "aggregate", None)):
-            return queryset.aggregate(
+            return queryset.exclude_informative().aggregate(
                 total_volume=Round(
                     Coalesce(
                         Sum(
@@ -51,6 +51,8 @@ class OperationPagination(MetadataPageNumberPagination):
         metadata = {"total_volume": 0}
 
         for operation in queryset or []:
+            if operation.type in Operation.BALANCE_EXCLUDED_TYPES:
+                continue
             metadata["total_volume"] += operation._volume
         metadata["total_volume"] = round(metadata["total_volume"], 2)
         return metadata
@@ -155,6 +157,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
                 When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
                 When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
+                When(biofuel__compatible_gpl=True, then=Value("GPL_C")),
                 default=Value(None),
                 output_field=CharField(),
             ),

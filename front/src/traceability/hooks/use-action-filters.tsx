@@ -54,5 +54,10 @@ export function useActionFilters() {
       key: ActionFilter.year,
       label: t("Année"),
     },
+
+    period: {
+      key: ActionFilter.period,
+      label: t("Période"),
+    },
   } satisfies Record<ActionFilter, ActionFilterDisplay>
 }

@@ -1,22 +1,14 @@
-DC_FEEDSTOCK_UNRECOGNIZED = "__unrecognized__"
+import re
+import unicodedata
 
 dc_feedstock_to_carbure_feedstock = {
     "alcool pur de marc de raisin": "ETHANOL_PUR_MARC_RAISIN",
     "alcool pur de lies de vin": "ETHANOL_PUR_LIES_VIN",
-    "algues": "ALGUES",
-    "bagasse": "BAGASSE",
     "balles (enveloppes)": "BALLES",
-    "betterave": "BETTERAVE",
-    "blé": "BLE",
     "boues de stations d'épuration": "BOUES_EPURATION",
     "brai de tallol": "BRAI_TALLOL",
-    "canne à sucre": "CANNE_A_SUCRE",
-    "colza": "COLZA",
-    "coques": "COQUES",
     "déchets de bois": "DECHETS_BOIS",
-    "déchets industriels": "DECHETS_INDUSTRIELS",
     "déchets municipaux en mélange (hors déchets ménagers triés)": "DECHETS_MUNICIPAUX_MELANGE",
-    "déchets organiques ménagers": "DECHETS_ORGANIQUES_MENAGERS",
     "distillat d'acide gras de palme": "DISTILLAT_ACIDE_GRAS_PALME",
     "effluents d'huileries de palme et rafles": "EFFLUENTS_HUILERIES_PALME_RAFLE",
     "effluents d'huileries de palme et rafles (pome)": "EFFLUENTS_HUILERIES_PALME_RAFLE",
@@ -24,56 +16,23 @@ dc_feedstock_to_carbure_feedstock = {
     "ethanol de lies de vin": "ETHANOL_PUR_LIES_VIN",
     "ethanol pur de lies de vin": "ETHANOL_PUR_LIES_VIN",
     "ethanol pur de marc de raisin": "ETHANOL_PUR_MARC_RAISIN",
-    "fumier humide": "FUMIER_HUMIDE",
-    "fumier sec": "FUMIER_SEC",
-    "glycérine brute": "GLYCERINE_BRUTE",
     "graisses de flotation": "GRAISSES_FLOTTATION",
-    "huile alimentaire usagée": "HUILE_ALIMENTAIRE_USAGEE",
     "huile de palme": "HUILE_PALME",
     "huiles ou graisses animales (c i)": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
     "huiles ou graisses animales (c ii)": "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2",
     "huiles ou graisses animales (c iii)": "HUILES_OU_GRAISSES_ANIMALES_CAT3",
-    "lies de vin": "LIES_DE_VIN",
-    "maïs": "MAIS",
     "marcs de raisin": "MARC_DE_RAISIN",
     "mat. cellulosiques d'origine non alimentaire": "MAT_CELLULOSIQUE_NON_ALIMENTAIRE",
     "mat. ligno-cellulosiques (hors grumes de sciage & de placage)": "MAT_LIGNO_CELLULOSIQUE",
-    "orge": "ORGE",
-    "paille": "PAILLE",
-    "râpes": "RAPES",
-    "seigle": "SEIGLE",
-    "soja": "SOJA",
-    "tallol": "TALLOL",
-    "tournesol": "TOURNESOL",
-    "triticale": "TRITICALE",
     "amidons résiduels déchets": "AMIDON_RESIDUEL_DECHETS",
     "méthanol brut issu de la pâte kraft obtenue à partir de la pulpe de bois": "RAW_METHANOL_KRAFT_PULPING",
     "culture intermédiaire": "CIVE",
-    "carinata": "CARINATA",
-    "huiles de fusel": "HUILES_DE_FUSEL",
     "alcools mauvais goûts": "MAUVAIS_GOUTS",
-    "huiles acides de plumes de volailles": "HUILES_ACIDES_DE_PLUMES_DE_VOLAILLES",
     "huiles acides de pâtes de neutralisation": "PATES_DE_NEUTRALISATION",
-    "huiles de terres de blanchiment usagées": "HUILES_DE_TERRES_DE_BLANCHIMENT_USAGEES",
-    "résidus de cristallisation d'hydrolysats de dextrose": "RESIDUS_DE_CRISTALLISATION_D_HYDROLYSATS_DE_DEXTROSE",
-    "rétentats de microfiltration de solution de glucose": "RETENTATS_DE_MICROFILTRATION_DE_SOLUTION_DE_GLUCOSE",
-    "huile de coque de noix de cajou": "HUILE_DE_COQUE_DE_NOIX_DE_CAJOU",
     "ethanol de rinçage de lignes de production de l'industrie cosmétique": "ETHANOL_DE_RINÇAGE",
     "alcool résiduel de synthèse pharmaceutique": "ALCOOL_DE_SYNTHESE_PHARMACEUTIQUE",
-    "résidus de transestérification d'huiles": "RESIDUS_DE_TRANSESTERIFICATION_D_HUILES",
-    "huiles acides neutralisées ayant une haute teneur en soufre": "HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE",  # noqa: E501
-    "huiles acides ayant une haute teneur en soufre": "HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE",  # noqa: E501
-    "graisses brunes": "GRAISSES_BRUNES",
-    "graisses d'insectes": "GRAISSES_D_INSECTES",
-    "levures usagées": "LEVURES_USAGEES",
-    "poussières de maïs contaminées": "POUSSIERES_DE_MAIS_CONTAMINEES",
-    "déchets alcooliques issus du traitement de plasma sanguin": "DECHETS_ALCOOLIQUES_ISSUS_DU_TRAITEMENT_DE_PLASMA_SANGUIN",
-    "acides gras de noix de coco distillés": "ACIDES_GRAS_DE_NOIX_DE_COCO_DISTILLES",
-    "rafles de fruits vides": "RAFLES_DE_FRUITS_VIDES",
-    "sucres déchets contenant de l'amidon": "SUCRES_DECHETS_CONTENANT_DE_L_AMIDON",
-    "fraction lourde issue de la fabrication de farine": "FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE",
+    "huiles acides ayant une haute teneur en soufre": "HUILES_ACIDES_NEUTRALISEES_AYANT_UNE_HAUTE_TENEUR_EN_SOUFRE",
     "déchets industriels autres": "DECHETS_INDUSTRIELS",
-    "déchets alimentaires": "DECHETS_ALIMENTAIRES",
 }
 
 
@@ -84,56 +43,52 @@ dc_biofuel_to_carbure_biofuel = {
     "bioessence de synthèse": "BES",
     "bioetbe": "ETBE",
     "biogazole de synthèse": "BG",
-    "eeag": "EEAG",
-    "eeha": "EEHA",
-    "eehu": "EEHU",
-    "eehv": "EEHV",
     "emag de pome": "EMAG",
-    "emag": "EMAG",
-    "emha": "EMHA",
-    "emhu": "EMHU",
-    "emhv": "EMHV",
-    "etbe": "ETBE",
     "ethanol d'ep2": "ETH",
     "ethanol pour ed95": "ED95",
     "ethanol": "ETH",
-    "hvoc": "HVOC",
-    "hvoe": "HVOE",
-    "hvog": "HVOG",
     "hccc": "HCC",
     "hcce": "HCE",
     "hccg": "HCG",
     "méthanol": "MT",
-    "mtbe": "MTBE",
-    "taee": "TAEE",
-    "tame": "TAME",
-    "ester ethylique d'huiles animales": "eeha",
-    "ester ethylique d'huiles usagées": "eehu",
-    "ester ethylique d'huiles végétales": "eehv",
-    "ester méthylique d'acide gras": "emag",
-    "ester méthylique d'acide gras d'effluents d'huilerie de palme": "emag",
-    "ester méthylique d'huiles animales": "emha",
-    "ester méthylique d'huiles usagées": "emhu",
-    "ester méthylique d'huiles végétales": "emhv",
-    "ethyl tert-butyl ether": "etbe",
-    "huiles hydrotraitées carburéacteur": "hvoc",
-    "huiles hydrotraitées essences": "hvoe",
-    "huiles hydrotraitées gazoles": "hvog",
-    "methyl tert-butyl ether": "mtbe",
-    "tert-amyl ethyl ether": "taee",
-    "tert-amyl methyl ether": "tame",
+    "ester ethylique d'huiles animales": "EEHA",
+    "ester ethylique d'huiles usagées": "EEHU",
+    "ester ethylique d'huiles végétales": "EEHV",
+    "ester méthylique d'acide gras": "EMAG",
+    "ester méthylique d'acide gras d'effluents d'huilerie de palme": "EMAG",
+    "ester méthylique d'huiles animales": "EMHA",
+    "ester méthylique d'huiles usagées": "EMHU",
+    "ester méthylique d'huiles végétales": "EMHV",
+    "ethyl tert-butyl ether": "ETBE",
+    "huiles hydrotraitées carburéacteur": "HVOC",
+    "huiles hydrotraitées essences": "HVOE",
+    "huiles hydrotraitées gazoles": "HVOG",
+    "methyl tert-butyl ether": "MTBE",
+    "tert-amyl ethyl ether": "TAEE",
+    "tert-amyl methyl ether": "TAME",
 }
+
+
+def to_upper_snake_case(value: str) -> str:
+    value = value.strip()
+    value = value.translate(str.maketrans({"œ": "oe", "Œ": "OE", "æ": "ae", "Æ": "AE"}))
+    value = unicodedata.normalize("NFKD", value)
+    value = "".join(character for character in value if not unicodedata.combining(character))
+    value = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", value)
+    value = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", value)
+    value = re.sub(r"[^A-Za-z0-9]+", "_", value)
+    return value.strip("_").upper()
 
 
 def get_feedstock_from_dc_feedstock(feedstock_name: str) -> str | None:
     if not feedstock_name:
         return None
     feedstock_name = feedstock_name.replace("’", "'").strip().lower()
-    return dc_feedstock_to_carbure_feedstock.get(feedstock_name, None)
+    return dc_feedstock_to_carbure_feedstock.get(feedstock_name, to_upper_snake_case(feedstock_name))
 
 
 def get_biofuel_from_dc_biofuel(biofuel_name: str) -> str | None:
     if not biofuel_name:
         return None
     biofuel_name = biofuel_name.replace("’", "'").replace("-", "").strip().lower()
-    return dc_biofuel_to_carbure_biofuel.get(biofuel_name, None)
+    return dc_biofuel_to_carbure_biofuel.get(biofuel_name, to_upper_snake_case(biofuel_name))

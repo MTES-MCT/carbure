@@ -19,16 +19,16 @@ class ResponseFactory:
         self.response_class = response_class
         self.payload = payload
         self.parsed_XML = ET.fromstring(payload)
+        self.response_status = self.udb_response_status()
+
+    def response_status_ok(self):
+        return self.response_status in ["FOUND", "PARTIAL", "SUCCESS"]
 
     def response(self):
-        def is_success(status):
-            return status in ["FOUND", "SUCCESS"]
-
-        response_status = self.udb_response_status()
         response_class = (
             self.response_class
-            if is_success(response_status)
-            else self._ERROR_RESPONSE_CLASSES.get(response_status, UnknownStatusErrorResponse)
+            if self.response_status_ok()
+            else self._ERROR_RESPONSE_CLASSES.get(self.response_status, UnknownStatusErrorResponse)
         )
 
         return response_class(self.payload)

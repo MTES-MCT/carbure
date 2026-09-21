@@ -219,6 +219,7 @@ class FilterActionMixin:
                 When(operation__biofuel__compatible_essence=True, then=Value(Operation.ESSENCE)),
                 When(operation__biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
                 When(operation__biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
+                When(operation__biofuel__compatible_gpl=True, then=Value(Operation.GPL_C)),
                 default=Value(None),
                 output_field=CharField(),
             ),

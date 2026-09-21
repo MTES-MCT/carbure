@@ -1,0 +1,2 @@
+class NoEligibleActionError(Exception):
+    pass

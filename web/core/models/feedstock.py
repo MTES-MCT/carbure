@@ -1,11 +1,13 @@
 from django.db import models
 from django.utils import timezone
 
+GPL_BIOFUEL_TYPES = ["HVOGPL", "HOGPL", "HCGPL"]
+
 
 class Biocarburant(models.Model):
     name = models.CharField(max_length=64)
     name_en = models.CharField(max_length=64)
-    description = models.CharField(max_length=128)
+    description = models.CharField(max_length=320)
     date_added = models.DateField(default=timezone.now)
     code = models.CharField(max_length=16, unique=True)
     pci_kg = models.FloatField(default=0)
@@ -19,6 +21,7 @@ class Biocarburant(models.Model):
     compatible_diesel = models.BooleanField(default=False)
     dgddi_category = models.CharField(max_length=8, blank=True, null=True, default=None)
     renewable_energy_share = models.FloatField(blank=True, null=True, help_text="saisir 0,50 pour 50%", default=1.0)
+    compatible_gpl = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -72,7 +75,7 @@ class MatierePremiere(models.Model):
     name_en = models.CharField(max_length=256)
     description = models.CharField(max_length=128)
     date_added = models.DateField(default=timezone.now)
-    code = models.CharField(max_length=64, unique=True)
+    code = models.CharField(max_length=128, unique=True)
     compatible_alcool = models.BooleanField(default=False)
     compatible_graisse = models.BooleanField(default=False)
     is_double_compte = models.BooleanField(default=False)
