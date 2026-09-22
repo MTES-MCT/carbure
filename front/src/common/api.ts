@@ -11,9 +11,9 @@ export function extract<T>(res: AxiosResponse<Api<T[]>>) {
   return res.data ?? []
 }
 
-export async function findBiofuels(query: string) {
+export async function findBiofuels(query: string, entity_id?: number) {
   const res = await apiFetch.GET("/resources/biofuels", {
-    params: { query: { query } },
+    params: { query: { query, entity_id } },
   })
 
   return res.data ?? []

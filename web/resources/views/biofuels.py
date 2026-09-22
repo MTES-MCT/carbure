@@ -16,6 +16,7 @@ from core.serializers import BiofuelSerializer
             required=False,
             type=str,
         ),
+        OpenApiParameter(name="entity_id", required=False, type=int),
     ],
     responses=BiofuelSerializer(many=True),
 )
@@ -23,9 +24,12 @@ from core.serializers import BiofuelSerializer
 @permission_classes([IsVerified])
 def get_biofuels(request, *args, **kwargs):
     query = request.query_params.get("query")
+    bcs = Biocarburant.objects.filter(Q(is_displayed=True)).order_by("name")
 
-    bcs = Biocarburant.objects.filter(is_displayed=True).order_by("name")
+    if not request.entity or not request.entity.has_biogpl:
+        bcs = bcs.exclude(compatible_gpl=True)
     if query:
         bcs = bcs.filter(Q(name__icontains=query) | Q(name_en__icontains=query) | Q(code__icontains=query))
+
     serializer = BiofuelSerializer(bcs, many=True)
     return Response(serializer.data)
