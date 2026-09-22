@@ -139,7 +139,7 @@ class OperationViewSetIntegrationTest(TestCase):
         self.assertEqual(data["count"], 4)
 
     def test_list_operations_returns_gpl_sector_for_gpl_compatible_biofuel(self):
-        """The list annotation should expose GPL_C for GPL-compatible biofuels."""
+        """The list annotation should expose GPL for GPL-compatible biofuels."""
         biofuel_gpl = Biocarburant.objects.create(
             code="TEST-GPL-LIST",
             name="Test GPL",
@@ -164,7 +164,7 @@ class OperationViewSetIntegrationTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         result = next(item for item in response.json()["results"] if item["id"] == operation.id)
-        self.assertEqual(result["sector"], Operation.GPL_C)
+        self.assertEqual(result["sector"], Operation.GPL)
 
     def test_list_operations_filters_teneur_by_objective_sector(self):
         """The sector filter should use objective_sector for TENEUR operations."""
