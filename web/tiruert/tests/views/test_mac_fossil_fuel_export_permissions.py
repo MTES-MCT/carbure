@@ -32,7 +32,7 @@ class MacFossilFuelExportEndpointSecurityTest(TestCase):
             has_mac=False,
         )
 
-        category = FossilFuelCategory.objects.create(name="Essence", pci_litre=32.0)
+        category = FossilFuelCategory.objects.create(name="Essence")
         self.fuel = FossilFuel.objects.create(
             label="SP95",
             nomenclature="SP95",
