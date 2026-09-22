@@ -28,13 +28,6 @@ class AddUpdateCertificateRequest(BaseRequest):
         return "\n".join([f"{s.to_xml()}" for s in [main_site, *other_sites]])
 
     def eo_certificate_element(self, entity_certificate):
-        def stubbed_additional_mandatory_fields():
-            return """\
-    <CHAIN_OF_CUSTODIES>
-      <CHAIN_OF_CUSTODY>Segregation</CHAIN_OF_CUSTODY>
-    </CHAIN_OF_CUSTODIES>
-            """
-
         certificate = entity_certificate.certificate
         self.check_certificate_validity(certificate)
 
@@ -57,7 +50,9 @@ class AddUpdateCertificateRequest(BaseRequest):
   <GROUP_CERTIFICATION>NO</GROUP_CERTIFICATION>
   {self.eo_scope_xml_elements(scopes)}
   {self.site_xml_elements(main_site, other_sites)}
-  {stubbed_additional_mandatory_fields()}
+  <CHAIN_OF_CUSTODIES>
+    <CHAIN_OF_CUSTODY>Mass Balance</CHAIN_OF_CUSTODY>
+  </CHAIN_OF_CUSTODIES>
 </EO_CERTIFICATE>"""
 
     def __init__(self, *entity_certificates):
