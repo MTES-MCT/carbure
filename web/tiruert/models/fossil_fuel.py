@@ -14,6 +14,7 @@ class FossilFuel(models.Model):
     )
     pci_litre = models.FloatField(default=0.0)
     masse_volumique = models.FloatField(default=0.0)
+    pci_kg = models.FloatField(default=0.0)
 
     objects = FossilFuelManager()
 

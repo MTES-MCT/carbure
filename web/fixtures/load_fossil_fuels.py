@@ -21,11 +21,13 @@ with open(filename) as csvfile:
         label = row[2]
         pci_litre = row[3]
         masse_volumique = row[4]
+        pci_kg = row[5]
         obj, created = FossilFuel.objects.update_or_create(
             nomenclature=nomenclature,
             defaults={
                 "fuel_category": fuel_category,
                 "pci_litre": pci_litre,
+                "pci_kg": pci_kg,
                 "masse_volumique": masse_volumique,
                 "label": label,
             },

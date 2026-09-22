@@ -967,8 +967,8 @@ class ObjectiveServiceCalculateEnergyBasisTest(TestCase):
         self.entity = Entity.objects.create(name="Test Entity")
 
         # Create fossil fuel categories
-        self.category_essence = FossilFuelCategory.objects.create(name="Essence", pci_litre=32.0)  # MJ/L
-        self.category_gazole = FossilFuelCategory.objects.create(name="Gazole", pci_litre=36.0)  # MJ/L
+        self.category_essence = FossilFuelCategory.objects.create(name="Essence")
+        self.category_gazole = FossilFuelCategory.objects.create(name="Gazole")
 
         # Create fossil fuels
         self.fuel_essence = FossilFuel.objects.create(
@@ -1036,7 +1036,7 @@ class ObjectiveServiceCalculateEnergyBasisTest(TestCase):
         """Test maritime MACs use the Maritime category PCI in MJ/L."""
         from tiruert.models import FossilFuel, FossilFuelCategory, MacFossilFuel
 
-        maritime_category = FossilFuelCategory.objects.create(name="Maritime", pci_litre=36.0)
+        maritime_category = FossilFuelCategory.objects.create(name="Maritime")
         maritime_fuel = FossilFuel.objects.create(
             label="Fioul lourd Maritime",
             nomenclature="FOL_maritime",

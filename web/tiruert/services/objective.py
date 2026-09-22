@@ -24,7 +24,7 @@ class ObjectiveService:
 
         total_energy = mac_queryset.annotate(
             energy=models.F("volume")
-            * models.F("fuel__fuel_category__pci_litre")
+            * models.F("fuel__pci_litre")
             * models.Case(
                 models.When(
                     fuel__fuel_category__consideration_rates__year=year,

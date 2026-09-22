@@ -19,7 +19,6 @@ class MacFossilFuelManager(models.Manager):
                 "fuel__label",
                 "fuel__nomenclature",
                 "fuel__fuel_category__name",
-                "fuel__fuel_category__pci_litre",
                 "fuel__pci_litre",
                 "fuel__masse_volumique",
                 "operator__name",
