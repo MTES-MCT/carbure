@@ -1,13 +1,30 @@
 import { useTranslation } from "react-i18next"
-import { MenuSection } from "../sidebar.types"
+import { MenuItem, MenuSection } from "../sidebar.types"
 import { useRoutes } from "common/hooks/routes"
 import useEntity from "common/hooks/entity"
+import { useH2Permissions } from "h2/hooks/use-h2-permissions"
 
 export const useHydrogen = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
   const h2Routes = routes.HYDROGEN()
   const { isHRS } = useEntity()
+  const { canAccessAdmin } = useH2Permissions()
+
+  const baseMenu: Record<"lot" | "certificate", MenuItem> = {
+    lot: {
+      path: h2Routes.LOTS,
+      title: t("Lots"),
+      icon: "ri-inbox-archive-line",
+      iconActive: "ri-inbox-archive-fill",
+    },
+    certificate: {
+      path: h2Routes.CERTIFICATES,
+      title: t("Certificats"),
+      icon: "ri-send-plane-line",
+      iconActive: "ri-send-plane-fill",
+    },
+  }
 
   const menu: MenuSection[] = [
     {
@@ -25,22 +42,27 @@ export const useHydrogen = () => {
     {
       title: t("Lots d'hydrogène"),
       condition: isHRS,
+      children: [baseMenu.lot, baseMenu.certificate],
+    },
+  ]
+
+  const adminMenu: MenuSection[] = [
+    {
+      title: t("Hydrogène"),
       children: [
         {
-          path: h2Routes.LOTS,
-          title: t("Lots"),
-          icon: "ri-inbox-archive-line",
-          iconActive: "ri-inbox-archive-fill",
+          ...baseMenu.lot,
+          path: h2Routes.ADMIN.LOTS,
         },
         {
-          path: h2Routes.CERTIFICATES,
-          title: t("Certificats"),
-          icon: "ri-send-plane-line",
-          iconActive: "ri-send-plane-fill",
+          ...baseMenu.certificate,
+          path: h2Routes.ADMIN.CERTIFICATES,
         },
       ],
     },
   ]
+
+  if (canAccessAdmin) return adminMenu
 
   return menu
 }

@@ -5685,6 +5685,7 @@ export interface components {
          *     * `ADEME` - ADEME
          *     * `DGDDI` - DGDDI
          *     * `DGDDI_NATIONAL` - DGDDI_NATIONAL
+         *     * `H2` - H2
          * @enum {string}
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
@@ -16326,7 +16327,8 @@ export enum ExtAdminPagesEnum {
     DREAL = "DREAL",
     ADEME = "ADEME",
     DGDDI = "DGDDI",
-    DGDDI_NATIONAL = "DGDDI_NATIONAL"
+    DGDDI_NATIONAL = "DGDDI_NATIONAL",
+    H2 = "H2"
 }
 export enum FileTypeEnum {
     EXCEL = "EXCEL",

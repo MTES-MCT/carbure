@@ -55,7 +55,8 @@ const EntityDetails = () => {
   const canEnable =
     entity.isAdmin ||
     entity.hasAdminRight("ELEC") ||
-    entity.hasAdminRight("AIRLINE")
+    entity.hasAdminRight("AIRLINE") ||
+    entity.hasAdminRight("H2")
 
   // web/entity/views/users/users.py:48
   const canApprove =
@@ -63,7 +64,8 @@ const EntityDetails = () => {
     entity.hasAdminRight("ELEC") ||
     entity.hasAdminRight("AIRLINE") ||
     entity.hasAdminRight("DCA") ||
-    entity.hasAdminRight("DREAL")
+    entity.hasAdminRight("DREAL") ||
+    entity.hasAdminRight("H2")
 
   return (
     <Main>
