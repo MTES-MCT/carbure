@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core import private_storage
@@ -15,7 +16,7 @@ ENTITY_REQUIRED = _("Une entité est requise pour enregistrer un fichier.")
 def stored_file_upload_to(instance, filename):
     """Build a collision-free private-storage path.
 
-    Layout: ``{directory}/{entity_id}/{uuid}{ext}``.
+    Layout: ``{directory}/{entity_id}/{YYYYMMDD_HHMMSS}_{uuid}{ext}``.
 
     ``directory`` defaults to ``files`` and can be overridden per instance via
     the non-persisted ``upload_to_dir`` attribute, e.g. ``traceability/actions``.
@@ -26,7 +27,8 @@ def stored_file_upload_to(instance, filename):
 
     directory = getattr(instance, "upload_to_dir", None) or DEFAULT_UPLOAD_DIR
     extension = Path(filename).suffix.lower()
-    return f"{directory}/{instance.entity_id}/{uuid4().hex}{extension}"
+    timestamp = timezone.localtime().strftime("%Y%m%d_%H%M%S")
+    return f"{directory}/{instance.entity_id}/{timestamp}_{uuid4().hex}{extension}"
 
 
 class StoredFile(models.Model):
