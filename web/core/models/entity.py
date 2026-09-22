@@ -59,6 +59,7 @@ class Entity(models.Model):
     has_stocks = models.BooleanField(default=False)
     has_direct_deliveries = models.BooleanField(default=False)
     has_elec = models.BooleanField(default=False)
+    has_biogpl = models.BooleanField(default=False, verbose_name="L'entité produit du bio-GPL")
 
     legal_name = models.CharField(max_length=128, blank=True, default="")
     registration_id = models.CharField(max_length=64, blank=True, default="")

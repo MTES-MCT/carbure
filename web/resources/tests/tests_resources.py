@@ -103,6 +103,29 @@ class ResourcesTest(TestCase):
 
         assert len(data) == 1
 
+    def test_get_bcs_with_biogpl(self):
+        """Return displayed GPL biofuels only to producers with the Bio-GPL flag."""
+        visible_gpl = Biocarburant.objects.create(name="Bio-GPL", code="BIOGPL", compatible_gpl=True)
+        hidden_gpl = Biocarburant.objects.create(
+            name="Bio-GPL hidden", code="BIOGPL_HIDDEN", is_displayed=False, compatible_gpl=True
+        )
+        producer = Entity.objects.create(name="Biofuel producer", entity_type=Entity.PRODUCER)
+        url = reverse("resources-biofuels") + f"?entity_id={producer.id}"
+
+        response = self.client.get(url)
+        assert response.status_code == 200
+        biofuel_codes = [biofuel["code"] for biofuel in response.json()]
+        assert visible_gpl.code not in biofuel_codes
+        assert hidden_gpl.code not in biofuel_codes
+
+        producer.has_biogpl = True
+        producer.save(update_fields=["has_biogpl"])
+        response = self.client.get(url)
+        assert response.status_code == 200
+        biofuel_codes = [biofuel["code"] for biofuel in response.json()]
+        assert visible_gpl.code in biofuel_codes
+        assert hidden_gpl.code not in biofuel_codes
+
     def test_get_materials(self):
         Material.objects.create(name="Bio-H2", code="H2-BIO")
         Material.objects.create(name="RFNBO-H2", code="H2-RFNBO")
@@ -133,9 +156,9 @@ class ResourcesTest(TestCase):
         assert response.json()[0]["name"] == "Other site"
 
     def test_get_fossil_fuels(self):
-        category = FossilFuelCategory.objects.create(name="Essence", pci_litre=32.0)
-        FossilFuel.objects.create(label="Supercarburant SP95", nomenclature="SP95", fuel_category=category)
-        FossilFuel.objects.create(label="Gazole routier", nomenclature="GO", fuel_category=category)
+        category = FossilFuelCategory.objects.create(name="Essence")
+        FossilFuel.objects.create(label="Supercarburant SP95", nomenclature="SP95", fuel_category=category, pci_litre=32.0)
+        FossilFuel.objects.create(label="Gazole routier", nomenclature="GO", fuel_category=category, pci_litre=32.0)
 
         response = self.client.get(reverse("resources-fossil-fuels"))
 
