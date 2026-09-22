@@ -227,6 +227,8 @@ class Entity(models.Model):
             filter_condition |= Q(entity_type=Entity.PRODUCER)
         if self.has_external_admin_right(ExternalAdminRights.TRANSFERRED_ELEC):
             filter_condition |= Q(entity_type=Entity.CPO) | Q(is_tiruert_liable=True, has_elec=True)
+        if self.has_external_admin_right(ExternalAdminRights.H2):
+            filter_condition |= Q(entity_type=Entity.HRS)
 
         has_dreal_right = self.has_external_admin_right(ExternalAdminRights.DREAL)
         has_ademe_right = self.has_external_admin_right(ExternalAdminRights.ADEME)
@@ -273,6 +275,7 @@ class ExternalAdminRights(models.Model):
     ADEME = "ADEME"
     DGDDI = "DGDDI"
     DGDDI_NATIONAL = "DGDDI_NATIONAL"
+    H2 = "H2"
 
     RIGHTS = (
         (DOUBLE_COUNTING, DOUBLE_COUNTING),
@@ -286,6 +289,7 @@ class ExternalAdminRights(models.Model):
         (ADEME, ADEME),
         (DGDDI, DGDDI),
         (DGDDI_NATIONAL, DGDDI_NATIONAL),
+        (H2, H2),
     )
     entity = models.ForeignKey(Entity, on_delete=models.CASCADE)
     right = models.CharField(max_length=32, choices=RIGHTS, default="", blank=False, null=False)

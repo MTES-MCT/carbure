@@ -147,6 +147,20 @@ class EntityListActionTest(TestCase):
         expected_entities = [self.producer1, self.producer2, self.producer_elec]
         expect_entities(self, expected_entities, entities_data)
 
+    def test_list_with_h2_right_filters_hrs_only(self):
+        hrs1 = EntityFactory.create(name="HRS 1", entity_type=Entity.HRS)
+        hrs2 = EntityFactory.create(name="HRS 2", entity_type=Entity.HRS)
+        EntityFactory.create(name="Operator", entity_type=Entity.OPERATOR)
+
+        ext_admin_h2 = EntityFactory.create(name="Ext Admin H2", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=ext_admin_h2, right=ExternalAdminRights.H2)
+
+        setup_current_user(self, "h2_admin@test.com", "H2 Admin", "test", [(ext_admin_h2, "RW")], True)
+        response = self.client.get(reverse("entity-list") + f"?entity_id={ext_admin_h2.id}")
+
+        entities_data = response.json()
+        expect_entities(self, [hrs1, hrs2], entities_data)
+
     def test_list_with_query_param_q_filters_by_name(self):
         """Test that q parameter filters by name"""
         setup_current_user(self, "admin@test.com", "Admin", "test", [(self.admin, "RW")], True)

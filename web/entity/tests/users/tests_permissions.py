@@ -28,6 +28,7 @@ class UserPermissionTest(TestCase, PermissionTestMixin):
                                 ExternalAdminRights.ELEC,
                                 ExternalAdminRights.DOUBLE_COUNTING,
                                 ExternalAdminRights.DREAL,
+                                ExternalAdminRights.H2,
                             ],
                         )
                     ],
@@ -43,6 +44,7 @@ class UserPermissionTest(TestCase, PermissionTestMixin):
                                 ExternalAdminRights.DOUBLE_COUNTING,
                                 ExternalAdminRights.DREAL,
                                 ExternalAdminRights.ADEME,
+                                ExternalAdminRights.H2,
                             ]
                         )
                     ],

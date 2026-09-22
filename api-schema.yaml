@@ -18414,6 +18414,7 @@ components:
         - ADEME
         - DGDDI
         - DGDDI_NATIONAL
+        - H2
       type: string
       description: |-
         * `DCA` - DCA
@@ -18427,6 +18428,7 @@ components:
         * `ADEME` - ADEME
         * `DGDDI` - DGDDI
         * `DGDDI_NATIONAL` - DGDDI_NATIONAL
+        * `H2` - H2
     FeedStock:
       type: object
       properties:
