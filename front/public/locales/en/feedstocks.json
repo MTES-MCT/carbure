@@ -68,5 +68,17 @@
   "RAFLES_DE_FRUITS_VIDES": "Empty fruit bunch",
   "SUCRES_DECHETS_CONTENANT_DE_L_AMIDON": "Waste sugars containing starch",
   "FRACTION_LOURDE_ISSUE_DE_LA_FABRICATION_DE_FARINE": "Heavy fraction obtained from pea flour extraction",
-  "DECHETS_ALIMENTAIRES": "Food waste"
+  "DECHETS_ALIMENTAIRES": "Food waste",
+  "DESALCOOLISATS_DE_BIERE": "Beer dealcoholisates",
+  "DISTILLATS_DE_DESODORISATION_DES_HUILES_VEGETALES": "Vegetable oil deodoriser distillate",
+  "GERMES_DE_BLE_DEGRAISSES": "Defatted wheat germ",
+  "ALCOOL_ISSU_DE_LA_DESALCOOLISATION_DU_VIN": "Alcohol from wine dealcoholisation",
+  "HUILES_OU_GRAISSES_ISSUES_DES_EAUX_USEES_PROVENANT_DU_TRANSPORT_MARITIME": "Oils or fats from maritime transport wastewater",
+  "ETHANOL_CONTAMINE_UTILISE_POUR_L_EXTRACTION_DE_PROTEINES_DE_CEREALES": "Contaminated ethanol used for cereal protein extraction",
+  "DECHETS_DE_CRIBLAGE_DU_MAIS_DE_MOULIN_HUMIDE": "Wet-milled corn screenings",
+  "BOUES_ISSUES_DU_STOCKAGE_INDUSTRIEL": "Sludge from industrial storage",
+  "RESIDUS_DE_LA_TRANSFORMATION_DE_FRUITS_EN_PRODUITS_ALIMENTAIRES": "Residues from processing fruit into food products",
+  "ACIDES_GRAS_LIBRES_RESIDUS_DU_TRAITEMENT_D_HUILE": "Free fatty acid residues from oil processing",
+  "RESIDUS_DE_SEPARATION_D_ACIDE_ISSU_DU_BEURRE_DE_KARITE": "Acid separation residues from shea butter",
+  "RESIDUS_DE_MATIERES_GRASSES_UTILISEES_DANS_LA_PRODUCTION_DE_LAIT_INFANTILE": "Fat residues used in infant formula production"
 }
