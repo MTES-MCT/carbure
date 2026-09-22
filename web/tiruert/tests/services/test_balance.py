@@ -386,7 +386,7 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         self.assertGreater(result[Operation.GAZOLE]["quantity"]["debit"], 0)
 
     def test_calculate_balance_groups_gpl_compatible_operations_by_gpl_sector(self):
-        """Test calculate_balance maps GPL-compatible biofuels to GPL_C."""
+        """Test calculate_balance maps GPL-compatible biofuels to GPL."""
         from core.models import Biocarburant
 
         biofuel_gpl = Biocarburant.objects.create(
@@ -415,8 +415,8 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
             "l",
         )
 
-        self.assertIn(Operation.GPL_C, result)
-        self.assertGreater(result[Operation.GPL_C]["quantity"]["credit"], 0)
+        self.assertIn(Operation.GPL, result)
+        self.assertGreater(result[Operation.GPL]["quantity"]["credit"], 0)
 
     def test_calculate_balance_filters_operations_by_status(self):
         """Test calculate_balance only includes operations with allowed statuses."""

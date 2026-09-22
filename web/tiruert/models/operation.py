@@ -124,13 +124,13 @@ class Operation(models.Model):
     ESSENCE = "ESSENCE"
     GAZOLE = "GAZOLE"
     CARBUREACTEUR = "CARBURÉACTEUR"
-    GPL_C = "GPL_C"
+    GPL = "GPL"
     MARITIME = "MARITIME"
     SECTOR_CODE_CHOICES = (
         (ESSENCE, ESSENCE),
         (GAZOLE, GAZOLE),
         (CARBUREACTEUR, CARBUREACTEUR),
-        (GPL_C, GPL_C),
+        (GPL, GPL),
         (MARITIME, MARITIME),
     )
 
