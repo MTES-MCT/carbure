@@ -6408,7 +6408,7 @@ export interface components {
          * @description * `ESSENCE` - ESSENCE
          *     * `GAZOLE` - GAZOLE
          *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-         *     * `GPL_C` - GPL_C
+         *     * `GPL` - GPL
          *     * `MARITIME` - MARITIME
          * @enum {string}
          */
@@ -13419,6 +13419,7 @@ export interface operations {
     resources_biofuels_list: {
         parameters: {
             query?: {
+                entity_id?: number;
                 /** @description Search within the fields `name`, `name_en`, and `code` */
                 query?: string;
             };
@@ -15252,7 +15253,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15629,7 +15630,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15746,7 +15747,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15886,7 +15887,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -17054,7 +17055,7 @@ export enum PathsApiTiruertOperationsGetParametersQuerySector {
     CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
     ESSENCE = "ESSENCE",
     GAZOLE = "GAZOLE",
-    GPL_C = "GPL_C",
+    GPL = "GPL",
     MARITIME = "MARITIME"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {

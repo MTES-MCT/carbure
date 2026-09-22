@@ -8624,6 +8624,10 @@ paths:
       operationId: resources_biofuels_list
       parameters:
         - in: query
+          name: entity_id
+          schema:
+            type: integer
+        - in: query
           name: query
           schema:
             type: string
@@ -12064,13 +12068,13 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - GPL_C
+                - GPL
                 - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
-            * `GPL_C` - GPL_C
+            * `GPL` - GPL
             * `MARITIME` - MARITIME
           explode: true
           style: form
@@ -12647,13 +12651,13 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - GPL_C
+                - GPL
                 - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
-            * `GPL_C` - GPL_C
+            * `GPL` - GPL
             * `MARITIME` - MARITIME
           explode: true
           style: form
@@ -12933,13 +12937,13 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - GPL_C
+                - GPL
                 - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
-            * `GPL_C` - GPL_C
+            * `GPL` - GPL
             * `MARITIME` - MARITIME
           explode: true
           style: form
@@ -13263,13 +13267,13 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - GPL_C
+                - GPL
                 - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
-            * `GPL_C` - GPL_C
+            * `GPL` - GPL
             * `MARITIME` - MARITIME
           explode: true
           style: form
@@ -20792,14 +20796,14 @@ components:
         - ESSENCE
         - GAZOLE
         - CARBURÉACTEUR
-        - GPL_C
+        - GPL
         - MARITIME
       type: string
       description: |-
         * `ESSENCE` - ESSENCE
         * `GAZOLE` - GAZOLE
         * `CARBURÉACTEUR` - CARBURÉACTEUR
-        * `GPL_C` - GPL_C
+        * `GPL` - GPL
         * `MARITIME` - MARITIME
     Operation:
       type: object
