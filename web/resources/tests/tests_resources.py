@@ -322,7 +322,12 @@ class ResourcesTest(TestCase):
         # api works
         assert response.status_code == 200
         # and returns 4 entries
-        assert len(response.json()) >= 2
+        data = response.json()
+        assert len(data) >= 2
+        assert set(data[0]) == {"id", "name", "country", "date_mise_en_service", "dc_reference"}
+        assert "producer" not in data[0]
+        assert "manager_email" not in data[0]
+        assert "address" not in data[0]
         # check if querying works
         response = self.client.get(reverse(url) + "?query=ne3")
         assert response.status_code == 200

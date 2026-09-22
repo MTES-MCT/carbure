@@ -1,8 +1,9 @@
 from django.test import TestCase
 
+from traceability.exceptions import NoEligibleActionError
 from traceability.factories import ActionFactory
 from traceability.models import Action, ActionStatus
-from traceability.services.valorize import NoEligibleActionError, valorize
+from traceability.services.valorize import valorize
 
 
 class ValorizeTest(TestCase):

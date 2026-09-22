@@ -47,7 +47,6 @@ export function createNewDeliverySite(
   return apiFetch.POST("/entities/depots/create-depot/", {
     params: { query: { entity_id } },
     body: {
-      entity_id,
       name,
       city,
       country_code: country.code_pays,

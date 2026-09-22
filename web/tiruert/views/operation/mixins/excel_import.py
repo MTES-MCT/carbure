@@ -4,11 +4,15 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from adapters.logger import log_exception
 from core.excel import ExcelResponse
 from tiruert.serializers.operation import OperationExcelImportRequestSerializer, OperationImportResponseSerializer
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation_excel_import import OperationExcelImportService
 from tiruert.services.operation_excel_template import create_operation_import_template
+
+FILE_PROCESSING_ERROR = "FILE_PROCESSING_ERROR"
+FILE_PROCESSING_ERROR_MESSAGE = "Unable to process the uploaded file."
 
 
 class ExcelImportActionMixin:
@@ -63,6 +67,13 @@ class ExcelImportActionMixin:
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            log_exception(e)
+            return Response(
+                {
+                    "error": FILE_PROCESSING_ERROR,
+                    "message": FILE_PROCESSING_ERROR_MESSAGE,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         return Response(result, status=status.HTTP_200_OK)

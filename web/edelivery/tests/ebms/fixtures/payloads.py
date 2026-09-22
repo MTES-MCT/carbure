@@ -13,3 +13,22 @@ def eo_get_transaction_response_payload(nb_transactions=1, **kwargs):
     {transactions}
   </EO_TRANS_HEADER>
 </udb:EOGetTransactionResponse>"""
+
+
+def get_organisation_by_id_response_payload(*ntr_ids, status):
+    def eo_detail_element(ntr_id):
+        return f"""\
+<EO_DETAIL>
+  <ECONOMIC_OPERATOR_NUMBER>{ntr_id}</ECONOMIC_OPERATOR_NUMBER>
+  <!-- … -->
+</EO_DETAIL>"""
+
+    eo_detail_elements = [eo_detail_element(ntr_id) for ntr_id in ntr_ids]
+    return f"""\
+<udb:GetOrganisationByIDResponse xmlns:udb="http://udb.ener.ec.europa.eu/services/udbModelService/udbService/v1">
+  <RESPONSE_HEADER REQUEST_ID="5ab49022-da26-4b0c-8740-1a51952e83f7"
+                   PROCESSING_DATE="2026-09-16T19:29:01.222+02:00" STATUS="{status}" />
+  <EO_DETAIL_HEADER>
+    {"\n".join(eo_detail_elements)}
+  </EO_DETAIL_HEADER>
+</udb:GetOrganisationByIDResponse>"""

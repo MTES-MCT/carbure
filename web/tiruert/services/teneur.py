@@ -13,11 +13,15 @@ from tiruert.services.balance import BalanceService
 from tiruert.services.energy import avoided_emissions_tco2, energy_mj
 
 
-class TeneurServiceErrors:
+class TeneurServiceError(Exception):
     NO_SUITABLE_LOTS_FOUND = "NO_SUITABLE_LOTS_FOUND"
     INSUFFICIENT_INPUT_VOLUME = "INSUFFICIENT_INPUT_VOLUME"
     ENFORCED_VOLUMES_TOO_HIGH = "ENFORCED_VOLUMES_TOO_HIGH"
     INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES = "INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES"
+
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
 
 
 GHG_REFERENCE_RED_II = 94  # gCO2/MJ
@@ -75,17 +79,17 @@ class TeneurService:
         target_volume = truncate(target_volume)
 
         if truncate(batches_volumes.sum()) < target_volume:
-            raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
+            raise TeneurServiceError(TeneurServiceError.INSUFFICIENT_INPUT_VOLUME)
 
         if enforced_volumes is not None:
             if (enforced_volumes > batches_volumes).any():
-                raise ValueError(TeneurServiceErrors.ENFORCED_VOLUMES_TOO_HIGH)
+                raise TeneurServiceError(TeneurServiceError.ENFORCED_VOLUMES_TOO_HIGH)
         else:
             enforced_volumes = np.zeros_like(batches_volumes)
 
         if max_n_batches is not None:
             if max_n_batches < (enforced_volumes != 0).sum():
-                raise ValueError(TeneurServiceErrors.INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES)
+                raise TeneurServiceError(TeneurServiceError.INCOHERENT_ENFORCED_VOLUMES_WITH_MAX_N_BATCHES)
 
         n = len(batches_volumes)
         use_binary = max_n_batches is not None
@@ -215,7 +219,7 @@ class TeneurService:
         result_array = res.x
 
         if not res.success:
-            raise ValueError(TeneurServiceErrors.NO_SUITABLE_LOTS_FOUND)
+            raise TeneurServiceError(TeneurServiceError.NO_SUITABLE_LOTS_FOUND)
 
         # Find the indices of the nonzero elements
         nonzero_indices = np.nonzero(result_array[0 : len(batches_volumes)])[0]
@@ -273,7 +277,7 @@ class TeneurService:
         total_volume = truncate(batches_volumes.sum())
 
         if total_volume < target_volume:
-            raise ValueError(TeneurServiceErrors.INSUFFICIENT_INPUT_VOLUME)
+            raise TeneurServiceError(TeneurServiceError.INSUFFICIENT_INPUT_VOLUME)
 
         emissions_sorter = np.argsort(batches_emissions)
         emissions_inv_sorter = emissions_sorter[::-1]

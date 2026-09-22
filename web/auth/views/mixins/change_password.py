@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import CharField
 
+from adapters.logger import log_exception
 from auth.serializers import ChangePasswordErrors, ChangePasswordSerializer
 
 
@@ -98,7 +99,11 @@ class ChangePasswordActionMixin:
             return Response({"status": "success"}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            import traceback
-
-            traceback.print_exc()
-            return Response({"error": f"Erreur interne: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            log_exception(e)
+            return Response(
+                {
+                    "error": ChangePasswordErrors.INTERNAL_ERROR,
+                    "message": ChangePasswordErrors.INTERNAL_ERROR_MESSAGE,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

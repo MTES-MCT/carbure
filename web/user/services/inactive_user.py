@@ -1,10 +1,7 @@
-import logging
-
 from django.db import transaction
 
+from adapters.logger import log_info
 from user.models import InactiveUser
-
-logger = logging.getLogger(__name__)
 
 
 class UserAnonymizationService:
@@ -24,10 +21,10 @@ class UserAnonymizationService:
         """
         # First anonymize GDPR accounts (3+ years)
         count_anonymized = InactiveUser.anonymize_gdpr_accounts()
-        logger.info(f"{count_anonymized} users anonymized for GDPR compliance")
+        log_info(f"{count_anonymized} users anonymized for GDPR compliance")
 
         # Then deactivate security accounts (18+ months to 3 years)
         count_deactivated = InactiveUser.deactivate_security_accounts()
-        logger.info(f"{count_deactivated} users deactivated for security reasons")
+        log_info(f"{count_deactivated} users deactivated for security reasons")
 
         return count_deactivated, count_anonymized

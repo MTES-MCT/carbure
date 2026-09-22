@@ -77,4 +77,20 @@ class CertificateSiteTest(TestCase):
                 params = {**default_data, p: ""}
                 CertificateSite.from_raw_data(**params)
 
-            self.assertEqual(f"Param `{p}` should not be empty", context.exception.args[0])
+            self.assertEqual(f"Param `{p}` for entity/site 'Site name' should not be empty", context.exception.args[0])
+
+    def test_escapes_XML_special_characters(self):
+        country = Pays(code_pays="BE")
+        carbure_entity = EntityFactory.build(
+            name="Site name & more",
+            registered_address="Some address & more",
+            registered_zipcode="Some zipcode & more",
+            registered_city="Some city & more",
+            registered_country=country,
+        )
+        site = CertificateSite.from_carbure_entity(carbure_entity)
+        self.assertEqual("Site name & more", site.name())
+        self.assertEqual("Some address & more", site.street_line())
+        self.assertEqual("Some zipcode & more", site.zipcode())
+        self.assertEqual("Some city & more", site.city())
+        self.assertEqual("BE", site.country_code())

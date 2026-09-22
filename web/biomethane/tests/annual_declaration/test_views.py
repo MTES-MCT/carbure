@@ -255,6 +255,44 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["year"], self.current_declaration_year)
 
+    def test_dreal_cannot_update_declaration_outside_accessible_departments(self):
+        accessible_department = Department.objects.create(code_dept="31", name="Haute-Garonne")
+        inaccessible_department = Department.objects.create(code_dept="09", name="Ariège")
+        inaccessible_producer = Entity.objects.create(
+            name="Out-of-scope producer",
+            entity_type=Entity.BIOMETHANE_PRODUCER,
+        )
+        BiomethaneProductionUnitFactory.create(producer=inaccessible_producer, department=inaccessible_department)
+        inaccessible_declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=inaccessible_producer,
+            year=self.current_declaration_year,
+            is_open=True,
+        )
+
+        dreal = Entity.objects.create(name="Scoped DREAL", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=accessible_department.id,
+        )
+        setup_current_user(self, "scoped-dreal@carbure.local", "Scoped DREAL", "gogogo", [(dreal, "ADMIN")])
+
+        response = self.client.patch(
+            self.annual_declaration_url,
+            {"is_open": False},
+            content_type="application/json",
+            query_params={
+                "entity_id": dreal.id,
+                "producer_id": inaccessible_producer.id,
+                "year": self.current_declaration_year,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        inaccessible_declaration.refresh_from_db()
+        self.assertTrue(inaccessible_declaration.is_open)
+
     def test_retrieve_does_not_create_declaration_for_dreal_target_producer(self):
         """Test DREAL retrieve does not create declaration for producer_id target when missing."""
         department = Department.objects.create(code_dept="31", name="Haute-Garonne")

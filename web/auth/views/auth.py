@@ -15,6 +15,8 @@ def admin_login_redirect(request):
 class AuthViewSet(viewsets.ViewSet, AuthActionMixin):
     serializer_class = UserCreationSerializer  # default for schema
     permission_classes = []
+    # Declared so @action(throttle_scope=...) is accepted by ViewSet.as_view().
+    throttle_scope = None
 
     def get_permissions(self):
         if self.action in ["request_otp", "verify_otp"]:
@@ -22,17 +24,3 @@ class AuthViewSet(viewsets.ViewSet, AuthActionMixin):
         if self.action in ["request_email_change", "confirm_email_change", "change_password"]:
             return [IsVerified()]
         return super().get_permissions()
-
-    def get_throttles(self):
-        if self.action in [
-            "register",
-            "request_otp",
-            "request-activation-link",
-            "verify-otp",
-            "request-password-reset",
-        ]:
-            self.throttle_scope = "10/day"
-        else:
-            self.throttle_scope = None
-
-        return super().get_throttles()

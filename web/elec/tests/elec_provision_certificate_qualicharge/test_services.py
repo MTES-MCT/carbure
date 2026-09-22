@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 
 from django.test import TestCase
 
@@ -6,6 +7,8 @@ from core.models import Entity
 from elec.factories.provision_certificate_qualicharge import ElecProvisionCertificateQualichargeFactory
 from elec.models import ElecProvisionCertificate, ElecProvisionCertificateQualicharge
 from elec.services.qualicharge import (
+    CERTIFICATE_PROCESSING_ERROR,
+    CERTIFICATE_PROCESSING_ERROR_MESSAGE,
     _prepare_certificates_bulk,
     create_provision_certificates_from_qualicharge,
     process_certificates_batch,
@@ -263,6 +266,27 @@ class PrepareCertificatesBulkTest(TestCase):
         cert = self.to_update[0]
         self.assertEqual(cert.energy_amount, 1000.0)  # Updated
         self.assertTrue(cert.is_controlled_by_qualicharge)  # Updated
+
+    @patch("elec.services.qualicharge.ElecProvisionCertificateQualicharge")
+    def test_prepare_does_not_expose_internal_exception(self, mock_cert):
+        mock_cert.side_effect = RuntimeError()
+
+        errors = _prepare_certificates_bulk(
+            self.unit_data,
+            self.cpo,
+            None,
+            self.double_validated,
+            self.existing_certs,
+            self.to_create,
+            self.to_update,
+        )
+
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0]["station_id"], "FRXYZP123456")
+        self.assertEqual(errors[0]["error"], CERTIFICATE_PROCESSING_ERROR)
+        self.assertEqual(errors[0]["message"], CERTIFICATE_PROCESSING_ERROR_MESSAGE)
+        self.assertEqual(len(self.to_create), 0)
+        self.assertEqual(len(self.to_update), 0)
 
 
 class CreateProvisionCertificatesFromQualichargeTest(TestCase):

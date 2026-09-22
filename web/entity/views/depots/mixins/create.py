@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
 from core.carburetypes import CarbureSanityCheckErrors
 from core.helpers import send_mail
-from core.models import CarbureLot, Entity, GenericError
+from core.models import CarbureLot, GenericError
 from entity.serializers.depot import CreateDepotSerializer
 
 
@@ -58,9 +58,8 @@ class CreateDepotActionMixin:
     )
     @action(detail=False, methods=["post"], url_path="create-depot")
     def create_depot(self, request):
-        entity_id = self.request.query_params.get("entity_id")
-        entity = Entity.objects.get(id=entity_id)
-        serializer = CreateDepotSerializer(data=request.data)
+        entity = request.entity
+        serializer = CreateDepotSerializer(data=request.data, context={"entity": entity})
         serializer.is_valid(raise_exception=True)
         depot = serializer.save()
 

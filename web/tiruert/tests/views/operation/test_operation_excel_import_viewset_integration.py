@@ -9,6 +9,7 @@ from core.excel_importer import ExcelValidationError
 from core.models import DeclarationPeriod, Entity
 from core.tests_utils import setup_current_user
 from tiruert.models import Operation
+from tiruert.views.operation.mixins.excel_import import FILE_PROCESSING_ERROR, FILE_PROCESSING_ERROR_MESSAGE
 
 
 class OperationExcelImportViewSetIntegrationTest(TestCase):
@@ -103,3 +104,20 @@ class OperationExcelImportViewSetIntegrationTest(TestCase):
             },
         )
         mock_execute.assert_called_once()
+
+    @patch("tiruert.views.operation.mixins.excel_import.OperationExcelImportService.execute")
+    def test_import_does_not_expose_internal_exception(self, mock_execute):
+        mock_execute.side_effect = RuntimeError("secret parser crash")
+        payload = {"file": self._build_excel_upload(), "mode": "validate"}
+
+        response = self.client.post(self.url, data=payload, QUERY_STRING=f"entity_id={self.entity.id}")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json(),
+            {
+                "error": FILE_PROCESSING_ERROR,
+                "message": FILE_PROCESSING_ERROR_MESSAGE,
+            },
+        )
+        self.assertNotIn("secret", response.content.decode())

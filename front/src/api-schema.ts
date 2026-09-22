@@ -4857,7 +4857,6 @@ export interface components {
         };
         CreateDepotRequest: {
             country_code: string;
-            entity_id: number;
             depot_id: string;
             depot_type: string;
             ownership_type: components["schemas"]["OwnershipTypeEnum"];
@@ -4865,26 +4864,12 @@ export interface components {
             blending_is_outsourced: boolean;
             blending_entity_id?: number;
             name: string;
-            /** SIRET */
-            site_siret?: string;
-            site_type?: components["schemas"]["SiteTypeEnum"];
+            /** Commune */
+            city?: string;
             /** Adresse */
             address?: string;
             /** Code postal */
             postal_code?: string;
-            /** Commune */
-            city?: string;
-            /** Coordonnées GPS */
-            gps_coordinates?: string | null;
-            private?: boolean;
-            is_enabled?: boolean;
-            /**
-             * Date de mise en service
-             * Format: date
-             */
-            commissioning_date?: string | null;
-            customs_id?: string;
-            accise?: string;
             /**
              * Format: double
              * @description Entre 0 et 1
@@ -4900,9 +4885,6 @@ export interface components {
              * @description En degrés Celsius
              */
             useful_temperature?: number | null;
-            /** Pays */
-            country?: number | null;
-            created_by?: number | null;
         };
         /** @description Optional fields for entity creation (DREAL only). */
         CreateEntityRequest: {
@@ -6709,27 +6691,11 @@ export interface components {
         ProcessTypeEnum: ProcessTypeEnum;
         ProductionSite: {
             readonly id: number;
-            readonly producer: components["schemas"]["Entity"];
             name: string;
             readonly country: components["schemas"]["Country"];
             /** Format: date */
             date_mise_en_service?: string | null;
-            ges_option?: components["schemas"]["GesOptionEnum"];
-            eligible_dc?: boolean;
             dc_reference?: string;
-            /** SIRET */
-            site_siret?: string;
-            /** Adresse */
-            address?: string;
-            /** Commune */
-            city?: string;
-            /** Code postal */
-            postal_code?: string;
-            /** Coordonnées GPS */
-            gps_coordinates?: string | null;
-            manager_name?: string;
-            manager_phone?: string;
-            manager_email?: string;
         };
         ProductionSiteCertificateSertificate: {
             readonly type: string;
@@ -7290,14 +7256,14 @@ export interface components {
         };
         UpdateUserRoleRequest: {
             request_id: number;
-            role: string;
+            role: components["schemas"]["RoleEnum"];
         };
         UpdatedQuotasRequest: {
             approved_quotas: number[][];
         };
         /**
          * @description * `ROAD` - ROAD
-         *     * `HEATING` - HEATING
+         *     * `COMBUSTIBLE` - COMBUSTIBLE
          *     * `AGRICULTURE` - AGRICULTURE
          *     * `CONSTRUCTION` - CONSTRUCTION
          *     * `MARITIME` - MARITIME
@@ -16516,7 +16482,7 @@ export enum UnitTypeEnum {
 }
 export enum UsageEnum {
     ROAD = "ROAD",
-    HEATING = "HEATING",
+    COMBUSTIBLE = "COMBUSTIBLE",
     AGRICULTURE = "AGRICULTURE",
     CONSTRUCTION = "CONSTRUCTION",
     MARITIME = "MARITIME",

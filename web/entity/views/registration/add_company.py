@@ -6,6 +6,7 @@ from rest_framework import serializers, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
+from core.decorators import throttle_scope
 from core.helpers import send_mail
 from core.models import (
     Entity,
@@ -87,6 +88,7 @@ class ApplyForNewCompanyError:
         ),
     ],
 )
+@throttle_scope("add-company")
 @api_view(["POST"])
 @permission_classes([IsVerified])
 def add_company_view(request):

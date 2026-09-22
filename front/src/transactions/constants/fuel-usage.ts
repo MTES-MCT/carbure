@@ -5,7 +5,7 @@ import { FuelUsage } from "transactions/types"
 
 export const FUEL_USAGES: FuelUsage[] = [
   FuelUsage.Road,
-  FuelUsage.Heating,
+  FuelUsage.Combustible,
   FuelUsage.Agriculture,
   FuelUsage.Construction,
   FuelUsage.Maritime,
@@ -18,7 +18,7 @@ export const FUEL_USAGES: FuelUsage[] = [
 export const getFuelUsageNormalizer = (t: TFunction): Normalizer<FuelUsage> => {
   const labels: Record<FuelUsage, string> = {
     [FuelUsage.Road]: t("Routier (éligible)"),
-    [FuelUsage.Heating]: t("Combustible (non éligible)"),
+    [FuelUsage.Combustible]: t("Combustible (non éligible)"),
     [FuelUsage.Agriculture]: t("Agricole (éligible)"),
     [FuelUsage.Construction]: t("BTP (éligible)"),
     [FuelUsage.Maritime]: t("Maritime (éligible)"),

@@ -2,6 +2,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
+from core.models.certificate import GenericCertificate
 from edelivery.ebms.certificate_site import CertificateSite
 from edelivery.ebms.requests.add_update_certificate_request import AddUpdateCertificateRequest
 
@@ -14,10 +15,9 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         request = AddUpdateCertificateRequest(entity_certificate)
         return ET.fromstring(request.body)
 
-    def setUp(self):
-        super().setUp()
-        self.entity = MagicMock(**{"ntr_id.return_value": "", "get_sites.return_value": []})
-        self.certificate = MagicMock(
+    def create_mock_entity_certificate(self):
+        entity = MagicMock(**{"ntr_id.return_value": "", "get_sites.return_value": []})
+        certificate = MagicMock(
             certificate_id="",
             certificate_type="SYSTEME_NATIONAL",
             certificate_issuer="",
@@ -26,7 +26,11 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
             valid_from=datetime(2026, 1, 31),
             valid_until=datetime(2027, 2, 17),
         )
-        self.entity_certificate = MagicMock(entity=self.entity, certificate=self.certificate)
+        entity_certificate = MagicMock(entity=entity, certificate=certificate)
+        return entity_certificate
+
+    def setUp(self):
+        super().setUp()
 
         module_to_patch = "edelivery.ebms.requests.add_update_certificate_request"
 
@@ -39,6 +43,10 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         self.patched_CertificateSite = patch(f"{module_to_patch}.CertificateSite").start()
         self.patched_CertificateSite.from_carbure_site.side_effect = lambda _: CertificateSite.from_xml("<SOME_TAG />")
         self.patched_CertificateSite.from_carbure_entity.side_effect = lambda _: CertificateSite.from_xml("<SOME_TAG />")
+
+        self.entity_certificate = self.create_mock_entity_certificate()
+        self.entity = self.entity_certificate.entity
+        self.certificate = self.entity_certificate.certificate
 
     def tearDown(self):
         patch.stopall()
@@ -91,6 +99,16 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         with self.assertRaises(NotImplementedError):
             AddUpdateCertificateRequest(self.entity_certificate)
 
+    def test_raises_an_error_if_certificate_scope_format_is_invalid(self):
+        self.certificate.certificate_id = "CERT_ID"
+        self.certificate.scope = "INVALID_FORMAT"
+        self.assertEqual(GenericCertificate.SYSTEME_NATIONAL, self.certificate.certificate_type)
+
+        with self.assertRaises(ValueError) as context:
+            AddUpdateCertificateRequest(self.entity_certificate)
+
+        self.assertEqual("Scope 'INVALID_FORMAT' for certificate 'CERT_ID' has invalid format", context.exception.args[0])
+
     def test_sets_validity_start_date(self):
         self.certificate.valid_from = datetime(2026, 6, 15, tzinfo=timezone.utc)
 
@@ -120,6 +138,12 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
         group_certification_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/GROUP_CERTIFICATION")
         self.assertEqual("NO", group_certification_element.text)
+
+    def test_sets_chain_of_custody_to_Mass_Balance(self):
+        root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
+        chain_of_custody_path = "./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CHAIN_OF_CUSTODIES/CHAIN_OF_CUSTODY"
+        chain_of_custody_elements = root_xml_element.findall(chain_of_custody_path)
+        self.assertEqual(["Mass Balance"], [e.text for e in chain_of_custody_elements])
 
     def test_sets_eo_scope(self):
         self.certificate.scope = "FSP"
@@ -158,3 +182,11 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
 
         sites = root_xml_element.findall("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/SOME_TAG")
         self.assertEqual(["Main site", "Site 1", "Site 2"], [s.text for s in sites])
+
+    def test_handles_several_certificates(self):
+        ec1 = self.create_mock_entity_certificate()
+        ec2 = self.create_mock_entity_certificate()
+        request = AddUpdateCertificateRequest(ec1, ec2)
+        root_xml_element = ET.fromstring(request.body)
+        certificates = root_xml_element.findall("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE")
+        self.assertEqual(2, len(certificates))

@@ -3,7 +3,6 @@ import {
   EntityType,
   UserRole,
   SiteType,
-  GESOption,
   Depot,
   User,
   UserRightRequest,
@@ -166,21 +165,8 @@ export const productionSite: ProductionSite = {
   name: "Test Production Site",
   country: country,
   id: 2,
-  producer: {
-    ...producer,
-    registered_country: 111,
-  },
   date_mise_en_service: "2000-01-31",
-  site_siret: "123456",
-  address: "",
-  postal_code: "64430",
-  manager_name: "Bob",
-  manager_phone: "012345678",
-  manager_email: "bob@bobby.bob",
-  ges_option: GESOption.Actual,
-  eligible_dc: true,
   dc_reference: "bobobobobob",
-  city: "Baigorri",
 }
 
 export const productionSiteCertificate: EntityDepot["site"] = {
