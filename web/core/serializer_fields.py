@@ -1,0 +1,54 @@
+from django.utils.encoding import force_str
+from rest_framework import serializers
+
+
+class LabelChoiceField(serializers.ChoiceField):
+    """ChoiceField that also accepts the (translated) display label of a Django choice."""
+
+    def __init__(self, choices=(), **kwargs):
+        super().__init__(choices=choices, **kwargs)
+        self.label_to_value = {force_str(label).lower(): value for value, label in choices}
+        self.label_to_value.update({value: value for value, label in choices})
+
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.lower() in self.label_to_value:
+            data = self.label_to_value[data.lower()]
+        return super().to_internal_value(data)
+
+    def validate_empty_values(self, data):
+        # Excel empty cells are parsed as None; blank CharFields store "".
+        if data is None and self.allow_blank:
+            data = ""
+        return super().validate_empty_values(data)
+
+
+class CachedPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+    """PrimaryKeyRelatedField resolving instances from a pre-fetched cache instead of one query per value.
+
+    The cache must be a `{pk: instance}` dict provided via the serializer context under `cache_key`.
+    This avoids N+1 queries when validating many rows at once (e.g. `many=True` on a large dataset).
+    Falls back to the regular per-value queryset lookup if no cache is found in the context, so the
+    field remains usable stand-alone (e.g. in isolated tests).
+    """
+
+    def __init__(self, *args, cache_key, **kwargs):
+        self.cache_key = cache_key
+        super().__init__(*args, **kwargs)
+
+    def to_internal_value(self, data):
+        cache = self.context.get(self.cache_key)
+        if cache is None:
+            return super().to_internal_value(data)
+
+        if isinstance(data, bool):
+            self.fail("incorrect_type", data_type=type(data).__name__)
+
+        try:
+            pk = int(data)
+        except (TypeError, ValueError):
+            self.fail("incorrect_type", data_type=type(data).__name__)
+
+        try:
+            return cache[pk]
+        except KeyError:
+            self.fail("does_not_exist", pk_value=data)

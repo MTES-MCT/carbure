@@ -180,6 +180,20 @@ class OperationSectorPropertyTest(TestCase):
         result = operation.sector
         self.assertEqual(result, Operation.GAZOLE)
 
+    def test_sector_returns_gpl_when_compatible_gpl(self):
+        """Should return GPL_C when biofuel is compatible with GPL."""
+        biofuel = Biocarburant.objects.create(
+            code="HCGPL",
+            name="HCGPL",
+            compatible_essence=False,
+            compatible_diesel=False,
+            compatible_gpl=True,
+        )
+        operation = Operation(biofuel=biofuel)
+
+        result = operation.sector
+        self.assertEqual(result, Operation.GPL_C)
+
     def test_sector_returns_carbureacteur_when_saf_biofuel(self):
         """Should return CARBUREACTEUR when biofuel code is in SAF_BIOFUEL_TYPES."""
         from saf.models.constants import SAF_BIOFUEL_TYPES

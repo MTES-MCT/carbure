@@ -10,20 +10,20 @@ import useEntity from "common/hooks/entity"
 
 import { getActionDetail } from "traceability/api"
 import type { DetailAction } from "traceability/components/actions-page"
-import { ActionField } from "traceability/hooks/use-action-fields"
 import { ActionForm } from "traceability/components/action-form"
+import { ActionFieldset } from "traceability/hooks/use-action-fields"
 import { ActionIndustry } from "traceability/types"
 
 export type ActionModalProps = {
   title: string
-  fields: ActionField[]
+  fieldsets: ActionFieldset[]
   industry: ActionIndustry
   detailActions?: DetailAction[]
 }
 
 export const ActionModal = ({
   title,
-  fields,
+  fieldsets,
   industry,
   detailActions,
 }: ActionModalProps) => {
@@ -46,7 +46,6 @@ export const ActionModal = ({
   return (
     <Portal onClose={closeDialog}>
       <Dialog
-        size="large"
         onClose={closeDialog}
         header={
           <Dialog.Title>
@@ -72,7 +71,7 @@ export const ActionModal = ({
           ) : undefined
         }
       >
-        <ActionForm action={action} fields={fields} />
+        <ActionForm action={action} fieldsets={fieldsets} />
 
         {actionResponse.loading && <LoaderOverlay />}
       </Dialog>

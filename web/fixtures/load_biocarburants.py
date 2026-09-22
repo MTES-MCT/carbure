@@ -10,36 +10,39 @@ from core.models import Biocarburant  # noqa: E402
 
 filename = "%s/web/fixtures/csv/biocarburants.csv" % (os.environ["CARBURE_HOME"])
 
-with open(filename) as csvfile:
-    reader = csv.reader(csvfile, quotechar='"')
+with open(filename, newline="", encoding="utf-8-sig") as csvfile:
+    reader = csv.DictReader(csvfile)
     for row in reader:
-        code = row[0]
-        if code == "code":
-            # header
-            continue
-        name = row[1]
-        pcikg = row[2]
-        pcil = row[3]
-        mv = row[4]
-        is_alcool = row[5]
-        is_graisse = row[6]
-        is_displayed = row[7]
-        compat_essence = row[8]
-        compat_diesel = row[9]
-        renewable_energy_share = row[10]
+        code = row["code"]
+        name = row["name"]
+        name_en = row["name_en"]
+        is_displayed = row["is_displayed"]
+        is_alcool = row["is_alcool"]
+        is_graisse = row["is_graisse"]
+        pci_kg = row["pci_kg"]
+        pci_litre = row["pci_litre"]
+        masse_volumique = row["masse_volumique"]
+        renewable_energy_share = row["renewable_energy_share"]
+        compatible_essence = row["compatible_essence"]
+        compatible_diesel = row["compatible_diesel"]
+        compatible_gpl = row["compatible_gpl"]
+        description = row["description"]
+
         obj, created = Biocarburant.objects.update_or_create(
             code=code,
             defaults={
                 "name": name,
-                "description": "",
-                "pci_kg": pcikg,
-                "pci_litre": pcil,
-                "masse_volumique": mv,
+                "name_en": name_en,
+                "is_displayed": is_displayed,
                 "is_alcool": is_alcool,
                 "is_graisse": is_graisse,
-                "is_displayed": is_displayed,
-                "compatible_essence": compat_essence,
-                "compatible_diesel": compat_diesel,
+                "pci_kg": pci_kg,
+                "pci_litre": pci_litre,
+                "masse_volumique": masse_volumique,
                 "renewable_energy_share": renewable_energy_share,
+                "compatible_essence": compatible_essence,
+                "compatible_diesel": compatible_diesel,
+                "compatible_gpl": compatible_gpl,
+                "description": description,
             },
         )

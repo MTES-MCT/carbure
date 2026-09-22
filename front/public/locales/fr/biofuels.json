@@ -24,5 +24,8 @@
   "HVP": "Huile végétale pure",
   "MT": "Méthanol",
   "MTBE": "MTBE",
-  "TAEE": "TAEE"
+  "TAEE": "TAEE",
+  "HCGPL": "Huiles co-traitées - GPL",
+  "HOGPL": "Autres Huiles Hydrotraitées - GPL",
+  "HVOGPL": "Huiles Végétales Hydrotraitées - GPL"
 }

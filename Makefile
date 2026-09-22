@@ -3,7 +3,8 @@
 	test-backend test-frontend \
 	makemigrations migrate seed ipython \
 	lint-fix translate translate-missing \
-	check-diff check-types generate-and-check-types
+	check-diff check-types generate-and-check-types \
+	flush
 
 -include .env
 export
@@ -17,6 +18,9 @@ django_cmd ?= uv run python web/manage.py
 npm_cmd ?= npm --prefix front
 
 # Docker
+build:
+	$(docker_cmd) build
+
 up:
 	$(docker_cmd) up -d
 
@@ -80,3 +84,6 @@ check-diff:
 
 check-types:
 	$(npm_cmd) run check-types
+
+flush:
+	$(django_cmd) flush

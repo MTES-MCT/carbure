@@ -6,11 +6,12 @@ from rest_framework import serializers
 
 from core.models import Pays
 from core.models.lot import CarbureLot
+from core.serializer_fields import CachedPrimaryKeyRelatedField
 from core.serializers import CountrySerializer
 from core.utils import check_file_size_and_extension
 from tiruert.models import Operation, OperationDetail
 from tiruert.serializers.balance import BalanceBiofuelSerializer
-from tiruert.serializers.fields import CachedPrimaryKeyRelatedField, TruncatedFloatField
+from tiruert.serializers.fields import TruncatedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
 from tiruert.services.operation import OperationService
 from tiruert.services.operation_excel_template import get_tiruert_operator_queryset
