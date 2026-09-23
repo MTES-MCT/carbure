@@ -3,8 +3,8 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
 import { EmptyStations } from "./components/empty-stations"
 import * as api from "./api"
-import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
+import { useH2Permissions } from "h2/hooks/use-h2-permissions"
 import { StationTable } from "./components/station-table"
 import { Button } from "common/components/button2"
 import { useCreateStationDialog } from "./components/create-station-dialog"
@@ -18,10 +18,8 @@ import { normalizeAccessType } from "h2/utils/normalizers"
 
 const StationsPage = () => {
   const { t } = useTranslation()
-  usePrivateNavigation(t("Mes stations"))
-
-  const entity = useEntity()
-  const canWrite = entity.canWrite()
+  const { canAccessAdmin, canWriteStations } = useH2Permissions()
+  usePrivateNavigation(canAccessAdmin ? t("Stations") : t("Mes stations"))
 
   const openCreateStationDialog = useCreateStationDialog()
 
@@ -46,7 +44,7 @@ const StationsPage = () => {
 
   return (
     <Main>
-      {canWrite && (
+      {canWriteStations && (
         <header>
           <Button
             asideX
@@ -59,7 +57,7 @@ const StationsPage = () => {
         </header>
       )}
 
-      <Content marginTop={canWrite}>
+      <Content marginTop={canWriteStations}>
         <ActionBar>
           <ActionBar.Grow>
             <SearchInput
