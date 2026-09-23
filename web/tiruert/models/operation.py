@@ -125,11 +125,13 @@ class Operation(models.Model):
     GAZOLE = "GAZOLE"
     CARBUREACTEUR = "CARBURÉACTEUR"
     GPL_C = "GPL_C"
+    MARITIME = "MARITIME"
     SECTOR_CODE_CHOICES = (
         (ESSENCE, ESSENCE),
         (GAZOLE, GAZOLE),
         (CARBUREACTEUR, CARBUREACTEUR),
         (GPL_C, GPL_C),
+        (MARITIME, MARITIME),
     )
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)

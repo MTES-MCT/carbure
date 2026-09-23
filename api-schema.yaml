@@ -11110,11 +11110,13 @@ paths:
                 - ESSENCE
                 - GAZOLE
                 - GPL_C
+                - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
             * `GPL_C` - GPL_C
+            * `MARITIME` - MARITIME
           explode: true
           style: form
         - in: query
@@ -11494,12 +11496,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: date_from
-          schema:
-            type: string
-            format: date
-          description: Date from where to calculate teneur and quantity
-        - in: query
           name: depot
           schema:
             type: array
@@ -11701,11 +11697,13 @@ paths:
                 - ESSENCE
                 - GAZOLE
                 - GPL_C
+                - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
             * `GPL_C` - GPL_C
+            * `MARITIME` - MARITIME
           explode: true
           style: form
         - in: query
@@ -11989,11 +11987,13 @@ paths:
                 - ESSENCE
                 - GAZOLE
                 - GPL_C
+                - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
             * `GPL_C` - GPL_C
+            * `MARITIME` - MARITIME
           explode: true
           style: form
         - in: query
@@ -12321,11 +12321,13 @@ paths:
                 - ESSENCE
                 - GAZOLE
                 - GPL_C
+                - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
             * `GPL_C` - GPL_C
+            * `MARITIME` - MARITIME
           explode: true
           style: form
         - in: query
@@ -13992,6 +13994,18 @@ components:
           type: integer
         code:
           type: string
+        compatible_essence:
+          type: boolean
+          default: false
+        compatible_diesel:
+          type: boolean
+          default: false
+        compatible_gpl:
+          type: boolean
+          default: false
+        compatible_maritime:
+          type: boolean
+          default: false
         renewable_energy_share:
           type: number
           format: double
@@ -18440,7 +18454,7 @@ components:
           maxLength: 256
         code:
           type: string
-          maxLength: 64
+          maxLength: 128
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
@@ -18462,7 +18476,7 @@ components:
           maxLength: 256
         code:
           type: string
-          maxLength: 64
+          maxLength: 128
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
@@ -18492,7 +18506,7 @@ components:
         code:
           type: string
           minLength: 1
-          maxLength: 64
+          maxLength: 128
         category:
           $ref: "#/components/schemas/MPCategoriesEnum"
         is_double_compte:
@@ -19378,12 +19392,14 @@ components:
         - GAZOLE
         - CARBURÉACTEUR
         - GPL_C
+        - MARITIME
       type: string
       description: |-
         * `ESSENCE` - ESSENCE
         * `GAZOLE` - GAZOLE
         * `CARBURÉACTEUR` - CARBURÉACTEUR
         * `GPL_C` - GPL_C
+        * `MARITIME` - MARITIME
     Operation:
       type: object
       properties:

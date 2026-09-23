@@ -366,6 +366,10 @@ class OperationExcelImportService:
 
     @staticmethod
     def execute(file, mode: str, debited_entity: Entity) -> dict:
+        declaration_year = DeclarationPeriodService.get_current_declaration_year()
+        if declaration_year is None:
+            raise serializers.ValidationError({"declaration_year": "Current declaration year is not set"})
+
         data = OperationExcelImportService._parse_rows(file)
 
         row_serializer = OperationExcelRowSerializer(
@@ -374,7 +378,7 @@ class OperationExcelImportService:
         ExcelImporter.validate_retrieved_data(row_serializer, EXCEL_IMPORT_CONFIG, len(data))
 
         groups = OperationExcelImportService._build_groups(row_serializer.validated_data, debited_entity)
-        declaration_year = DeclarationPeriodService.get_current_declaration_year()
+
         OperationExcelImportService._validate_groups(groups, len(data), declaration_year)
 
         operations = OperationExcelImportService._create_operations(groups, declaration_year) if mode == "create" else None

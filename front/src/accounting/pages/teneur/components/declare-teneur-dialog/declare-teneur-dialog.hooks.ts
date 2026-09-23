@@ -43,6 +43,10 @@ export const useDeclareTeneurDialog = ({
       biofuel: values.balance!.biofuel?.id ?? null,
       debited_entity: entity.id,
       lots: values.selected_lots!,
+      objective_sector:
+        values.objective_sector !== values.balance!.sector
+          ? values.objective_sector
+          : undefined,
     })
 
   const mutation = useMutation(onSubmit, {

@@ -3665,6 +3665,14 @@ export interface components {
         BalanceBiofuel: {
             id: number;
             code: string;
+            /** @default false */
+            compatible_essence: boolean;
+            /** @default false */
+            compatible_diesel: boolean;
+            /** @default false */
+            compatible_gpl: boolean;
+            /** @default false */
+            compatible_maritime: boolean;
             /** Format: double */
             renewable_energy_share: number;
             /** Format: double */
@@ -6102,6 +6110,7 @@ export interface components {
          *     * `GAZOLE` - GAZOLE
          *     * `CARBURÉACTEUR` - CARBURÉACTEUR
          *     * `GPL_C` - GPL_C
+         *     * `MARITIME` - MARITIME
          * @enum {string}
          */
         ObjectiveSectorCodeEnum: PathsApiTiruertOperationsGetParametersQuerySector;
@@ -14426,6 +14435,7 @@ export interface operations {
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  *     * `GPL_C` - GPL_C
+                 *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
                 selected_entity_id?: number;
@@ -14731,8 +14741,6 @@ export interface operations {
                  *     * `CAT3` - Graisses de catégorie 3
                  */
                 customs_category?: PathsApiTiruertOperationsGetParametersQueryCustoms_category[];
-                /** @description Date from where to calculate teneur and quantity */
-                date_from?: string;
                 depot?: string[];
                 durability_period?: string[];
                 /** @description Authorised entity ID. */
@@ -14806,6 +14814,7 @@ export interface operations {
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  *     * `GPL_C` - GPL_C
+                 *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
                 selected_entity_id?: number;
@@ -14924,6 +14933,7 @@ export interface operations {
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  *     * `GPL_C` - GPL_C
+                 *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
                 selected_entity_id?: number;
@@ -15065,6 +15075,7 @@ export interface operations {
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
                  *     * `GPL_C` - GPL_C
+                 *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
                 selected_entity_id?: number;
@@ -16087,7 +16098,8 @@ export enum PathsApiTiruertOperationsGetParametersQuerySector {
     CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
     ESSENCE = "ESSENCE",
     GAZOLE = "GAZOLE",
-    GPL_C = "GPL_C"
+    GPL_C = "GPL_C",
+    MARITIME = "MARITIME"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {
     ACCEPTED = "ACCEPTED",

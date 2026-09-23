@@ -154,10 +154,12 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 Value(0.0),
             ),
             "_sector": Case(
+                When(type=Operation.TENEUR, objective_sector__isnull=False, then=F("objective_sector")),
                 When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
                 When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
                 When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
                 When(biofuel__compatible_gpl=True, then=Value("GPL_C")),
+                When(biofuel__compatible_maritime=True, then=Value("MARITIME")),
                 default=Value(None),
                 output_field=CharField(),
             ),

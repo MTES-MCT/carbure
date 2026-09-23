@@ -1,4 +1,3 @@
-from datetime import date
 from unittest.mock import Mock, patch
 
 from django.http import QueryDict
@@ -551,20 +550,16 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Should not raise exception (no target = no check)
         OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id, declaration_year)
 
-    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_services_method_are_called_with_data(
         self,
         mock_calculate_target,
         mock_calculate_balance,
-        mock_get_period_by_year,
     ):
         """Should call ObjectiveService and BalanceService with correct parameters (MJ unit)."""
         mock_calculate_target.return_value = 100000  # Dummy target
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
-        period_start_date = date(2025, 1, 1)
-        mock_get_period_by_year.return_value = Mock(start_date=period_start_date)
 
         mock_request = Mock()
         mock_request.entity.id = 1
@@ -580,29 +575,24 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         # Verify ObjectiveService called with correct parameters
         mock_calculate_target.assert_called_once_with("CONV", 1)
-        mock_get_period_by_year.assert_called_once_with(declaration_year)
-
         # Verify BalanceService called with correct parameters
         mock_calculate_balance.assert_called_once()
         called_args = mock_calculate_balance.call_args[0]
         self.assertEqual(called_args[1], 1)  # entity_id
         self.assertEqual(called_args[2], "customs_category")  # group_by
         self.assertEqual(called_args[3], "mj")  # unit
-        self.assertEqual(called_args[4].date(), period_start_date)  # date_from converted to aware datetime
+        self.assertEqual(mock_calculate_balance.call_args.kwargs["declaration_year"], declaration_year)
 
-    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_objectives_compliance_passes_when_below_target(
         self,
         mock_calculate_target,
         mock_calculate_balance,
-        mock_get_period_by_year,
     ):
         """Should pass when future teneur is below target."""
         # Target = 100,000 MJ
         mock_calculate_target.return_value = 100000
-        mock_get_period_by_year.return_value = Mock(start_date=date(2025, 1, 1))
 
         # Current balance: 50,000 MJ pending + 20,000 MJ declared
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 50000, "declared_teneur": 20000}}
@@ -622,19 +612,16 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         # Should not raise exception
         OperationService.check_objectives_compliance(mock_request, selected_lots, data, entity_id, declaration_year)
 
-    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_objectives_compliance_raises_error_when_exceeds_target(
         self,
         mock_calculate_target,
         mock_calculate_balance,
-        mock_get_period_by_year,
     ):
         """Should raise ValidationError when future teneur exceeds target."""
         # Target = 100,000 MJ
         mock_calculate_target.return_value = 100000
-        mock_get_period_by_year.return_value = Mock(start_date=date(2025, 1, 1))
 
         # Current balance: 80,000 MJ pending + 15,000 MJ declared
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 80000, "declared_teneur": 15000}}
@@ -659,20 +646,17 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
         self.assertIn("20000", error_message)
         self.assertIn("100000", error_message)
 
-    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_objectives_compliance_applies_renewable_energy_share(
         self,
         mock_calculate_target,
         mock_calculate_balance,
-        mock_get_period_by_year,
     ):
         """Should include renewable_energy_share when converting selected lot volumes to MJ."""
         # With RES=0.5 and 1000L at PCI=10, teneur_to_add is 5000 MJ.
         # Without RES it would be 10000 MJ and this test would fail.
         mock_calculate_target.return_value = 7000
-        mock_get_period_by_year.return_value = Mock(start_date=date(2025, 1, 1))
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
 
         mock_request = Mock()
@@ -692,18 +676,15 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_calculate_target.assert_called_once_with("CONV", 1)
 
-    @patch("tiruert.services.operation.DeclarationPeriodService.get_period_by_year")
     @patch("tiruert.services.operation.BalanceService.calculate_balance")
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_objectives_compliance_truncates_teneur_to_add_after_total_sum(
         self,
         mock_calculate_target,
         mock_calculate_balance,
-        mock_get_period_by_year,
     ):
         """Should truncate teneur_to_add at MJ level after summing all lots."""
         mock_calculate_target.return_value = 117
-        mock_get_period_by_year.return_value = Mock(start_date=date(2025, 1, 1))
         mock_calculate_balance.return_value = {"balance_key": {"pending_teneur": 0, "declared_teneur": 0}}
 
         mock_request = Mock()
@@ -1067,9 +1048,29 @@ class OperationServiceDefineSectorTest(TestCase):
 
         self.assertEqual(result, Operation.CARBUREACTEUR)
 
+    def test_define_sector_returns_maritime_for_compatible_maritime_biofuel(self):
+        """Should return MARITIME when the biofuel is maritime-compatible."""
+        biofuel = Mock(
+            code="FOL_maritime",
+            compatible_essence=False,
+            compatible_diesel=False,
+            compatible_gpl=False,
+            compatible_maritime=True,
+        )
+
+        result = OperationService.define_sector(biofuel)
+
+        self.assertEqual(result, Operation.MARITIME)
+
     def test_define_sector_returns_none_when_no_sector_matches(self):
         """Should return None when the biofuel matches no sector."""
-        biofuel = Mock(code="UNKNOWN", compatible_essence=False, compatible_diesel=False, compatible_gpl=False)
+        biofuel = Mock(
+            code="UNKNOWN",
+            compatible_essence=False,
+            compatible_diesel=False,
+            compatible_gpl=False,
+            compatible_maritime=False,
+        )
 
         result = OperationService.define_sector(biofuel)
 

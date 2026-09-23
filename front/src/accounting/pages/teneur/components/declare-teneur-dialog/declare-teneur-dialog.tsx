@@ -90,12 +90,12 @@ const DeclareTeneurDialogContent = ({
   }, [form.value.quantity, form.value.balance?.biofuel?.pci_litre])
   // Get the current sector objective when the biofuel is selected
   const currentSectorObjective = useMemo(() => {
-    if (!form.value.balance?.sector) return undefined
+    if (!form.value.objective_sector) return undefined
 
     return sectorObjectives.find(
-      (sectorObjective) => sectorObjective.code === form.value.balance!.sector
+      (sectorObjective) => sectorObjective.code === form.value.objective_sector
     )
-  }, [sectorObjectives, form.value.balance])
+  }, [sectorObjectives, form.value.objective_sector])
 
   return (
     <Dialog
@@ -126,7 +126,10 @@ const DeclareTeneurDialogContent = ({
           <>
             <Box spacing="md">
               <RecapOperationGrid>
-                <RecapOperation balance={form.value.balance!} />
+                <RecapOperation
+                  balance={form.value.balance!}
+                  sector={form.value.objective_sector}
+                />
                 {currentStepIndex > 2 && (
                   <QuantitySummary values={form.value} />
                 )}

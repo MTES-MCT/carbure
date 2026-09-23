@@ -128,7 +128,7 @@ class BalanceService:
         )
 
     @staticmethod
-    def _calculate_balance_for_lot(operations, entity_id, group_by, date_from=None, detail_filters=None):
+    def _calculate_balance_for_lot(operations, entity_id, group_by, detail_filters=None):
         # Use a defaultdict with a factory function that creates an appropriate balance entry
         balance = defaultdict(partial(BalanceService._init_lot_balance_entry))
 
@@ -152,8 +152,7 @@ class BalanceService:
                     volume = detail.volume
                     BalanceService._update_available_balance(balance, key, operation, detail, credit_operation, volume)
 
-                    if date_from is None or operation.created_at >= date_from:
-                        BalanceService._update_volume(balance, key, credit_operation, volume)
+                    BalanceService._update_volume(balance, key, credit_operation, volume)
 
             if last_key is not None and operation.status in [Operation.PENDING, Operation.DRAFT]:
                 balance[last_key]["pending_operations"] += 1
@@ -161,7 +160,7 @@ class BalanceService:
         return balance
 
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by, unit, date_from=None, detail_filters=None):
+    def calculate_balance(operations, entity_id, group_by, unit, detail_filters=None, declaration_year=None):
         """
         Calculates balances based on the specified grouping
         'operations' is a queryset of already filtered operations
@@ -171,8 +170,8 @@ class BalanceService:
         - entity_id: ID of the entity for which the balance is being calculated
         - group_by: The grouping type for the balance calculation (e.g., sector, category, lot)
         - unit: The unit for the balance calculation
-        - date_from: (Optional) used to calculate teneur on a specific period
         - detail_filters: (Optional) dict with lot-level filters (ges_bound_min, ges_bound_max, feedstock, origin_country)
+        - declaration_year: (Optional) declaration year used to filter TENEUR contributions
 
         Returns:
         - A dictionary containing the calculated balances based on the specified grouping
@@ -186,15 +185,14 @@ class BalanceService:
                 entity_id,
                 group_by,
                 unit,
-                date_from,
                 detail_filters,
                 init_entry=BalanceService._init_balance_entry,
+                declaration_year=declaration_year,
             )
 
         return BalanceService._calculate_balance_for_lot(
             operations,
             entity_id,
             group_by,
-            date_from,
             detail_filters,
         )

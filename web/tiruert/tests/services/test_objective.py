@@ -790,7 +790,7 @@ class ObjectiveServiceBuildObjectivesResultTest(TestCase):
             Mock(),
             Mock(),
             entity_id=1,
-            date_from=date(2025, 1, 1),
+            period_start=date(2025, 1, 1),
             year=2025,
         )
 
@@ -926,7 +926,7 @@ class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):
         """Test get_balances_for_objectives_calculation returns both balances."""
         mock_balance.side_effect = [{"category": "data"}, {"sector": "data"}]
 
-        result = ObjectiveService.get_balances_for_objectives_calculation(Mock(), 1, "2025-01-01")
+        result = ObjectiveService.get_balances_for_objectives_calculation(Mock(), 1, 2025)
 
         self.assertEqual(len(result), 2)
         self.assertEqual(mock_balance.call_count, 2)
@@ -938,7 +938,7 @@ class ObjectiveServiceGetBalancesForObjectivesCalculationTest(TestCase):
         mock_operations = Mock()
         entity_id = 42
 
-        ObjectiveService.get_balances_for_objectives_calculation(mock_operations, entity_id, "2025-06-15")
+        ObjectiveService.get_balances_for_objectives_calculation(mock_operations, entity_id, 2025)
 
         # Should be called twice: once for category, once for sector
         self.assertEqual(mock_balance.call_count, 2)
@@ -1031,6 +1031,31 @@ class ObjectiveServiceCalculateEnergyBasisTest(TestCase):
 
         # 1000 L * 32 MJ/L * 0.9 = 28800 MJ
         self.assertEqual(result, 28800)
+
+    def test_calculate_energy_basis_for_maritime_fuel(self):
+        """Test maritime MACs use the Maritime category PCI in MJ/L."""
+        from tiruert.models import FossilFuel, FossilFuelCategory, MacFossilFuel
+
+        maritime_category = FossilFuelCategory.objects.create(name="Maritime", pci_litre=36.0)
+        maritime_fuel = FossilFuel.objects.create(
+            label="Fioul lourd Maritime",
+            nomenclature="FOL_maritime",
+            fuel_category=maritime_category,
+            pci_litre=36.0,
+        )
+        MacFossilFuel.objects.create(
+            fuel=maritime_fuel,
+            operator=self.entity,
+            volume=100,
+            period=1,
+            year=2025,
+            start_date="2025-01-01",
+            end_date="2025-01-31",
+        )
+
+        result = ObjectiveService.calculate_energy_basis(MacFossilFuel.objects.filter(year=2025), year=2025)
+
+        self.assertEqual(result, 3600)
 
     def test_calculate_energy_basis_with_empty_queryset(self):
         """Test calculate_energy_basis returns None for empty queryset."""
