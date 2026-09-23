@@ -4,7 +4,7 @@ BGS,Biogazole de synthèse (Hors HVO),Synthetic biodiesel (non HVO),0,0,0,0.773,
 EMHA,EMHA,AFME,1,0,1,0.892,37,33,1,1,0,0,Biogazole-ester méthylique d'acide gras - produit à partir d'une huile/graisse animale
 EMHU,EMHU,UCOME,1,0,1,0.892,37,33,1,1,0,0,Biogazole-ester méthylique d'acide gras - produit à partir d'une huile usagé
 EMHV,EMHV,VOME,1,0,1,0.892,37,33,1,1,0,0,Biogazole-ester - ester méthylique produit à partir d'une huile végétale
-ETBE,ETBE,ETBE,1,1,0,0.75,36,27,0.37,0,1,0,Éthyl-tertio-butyl-éther produit à partir d'éthanol
+ETBE,ETBE,ETBE,1,1,0,0.75,36,27,0.33,0,1,0,Éthyl-tertio-butyl-éther produit à partir d'éthanol
 MTBE,MTBE,MTBE,1,1,0,0.743,35,26,0.22,0,1,0,Méthyl-tertio-butyl-éther produit à partir de méthanol
 TAEE,TAEE,TAEE,1,0,0,0.763,38,29,0.29,0,0,0,Tertioamyléthyléther produit à partir d'éthanol)
 HVP,Huile végétale pure,Pure vegetable oil,0,0,1,0.919,37,34,1,0,0,0,Huile végétale pure
