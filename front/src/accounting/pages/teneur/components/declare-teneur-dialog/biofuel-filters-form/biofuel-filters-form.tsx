@@ -7,7 +7,7 @@ import useEntity from "common/hooks/entity"
 import { CategoryEnum } from "common/types"
 import i18next from "i18next"
 import { useTranslation } from "react-i18next"
-import { Balance, OperationSector } from "accounting/types"
+import { Balance } from "accounting/types"
 
 import { AdvancedFiltersBalanceCard } from "accounting/components/advanced-filters/advanced-filters"
 import { Box } from "common/components/scaffold"
@@ -18,6 +18,7 @@ import { useMemo } from "react"
 import { showNextStepAdvancedFilters } from "accounting/components/advanced-filters/advanced-filters.utils"
 import { floorNumber } from "common/utils/formatters"
 import { formatSector } from "accounting/utils/formatters"
+import { useCompatibleSectors } from "./biofuel-filters-form.hooks"
 
 export type BiofuelFiltersFormProps = AdvancedFiltersFormProps
 
@@ -77,21 +78,7 @@ export const BiofuelFiltersForm = ({
     resetFilters()
   }
 
-  const sectors = useMemo(() => {
-    const biofuel = value.balance?.biofuel
-    if (!biofuel) return []
-
-    return [
-      biofuel.compatible_essence && OperationSector.ESSENCE,
-      biofuel.compatible_diesel && OperationSector.GAZOLE,
-      biofuel.compatible_gpl && OperationSector.GPL_C,
-      biofuel.compatible_maritime && OperationSector.MARITIME,
-      value.balance?.sector,
-    ].filter(
-      (sector, index, sectors): sector is OperationSector =>
-        Boolean(sector) && sectors.indexOf(sector) === index
-    )
-  }, [value.balance?.biofuel, value.balance?.sector])
+  const sectors = useCompatibleSectors(value.balance)
 
   return (
     <>
