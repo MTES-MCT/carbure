@@ -1048,6 +1048,20 @@ class OperationServiceDefineSectorTest(TestCase):
 
         self.assertEqual(result, Operation.CARBUREACTEUR)
 
+    def test_define_sector_returns_maritime_for_compatible_maritime_biofuel(self):
+        """Should return MARITIME when the biofuel is maritime-compatible."""
+        biofuel = Mock(
+            code="FOL_maritime",
+            compatible_essence=False,
+            compatible_diesel=False,
+            compatible_gpl=False,
+            compatible_maritime=True,
+        )
+
+        result = OperationService.define_sector(biofuel)
+
+        self.assertEqual(result, Operation.MARITIME)
+
     def test_define_sector_returns_none_when_no_sector_matches(self):
         """Should return None when the biofuel matches no sector."""
         biofuel = Mock(
