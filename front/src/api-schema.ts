@@ -5682,10 +5682,6 @@ export interface components {
          */
         EtsStatusEnum: PathsApiSafTicketsGetParametersQueryEts_status;
         /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> cf17182b3 (chore(api): update schema)
          * @description * `DCA` - DCA
          *     * `AGRIMER` - AGRIMER
          *     * `TIRIB` - TIRIB
@@ -5697,34 +5693,8 @@ export interface components {
          *     * `ADEME` - ADEME
          *     * `DGDDI` - DGDDI
          *     * `DGDDI_NATIONAL` - DGDDI_NATIONAL
-<<<<<<< HEAD
          *     * `H2` - H2
          * @enum {string}
-=======
-         * @description Ordre
-         *
-         *     * `client` - Client
-         *     * `-client` - Client (décroissant)
-         *     * `volume` - Volume
-         *     * `-volume` - Volume (décroissant)
-         *     * `period` - Period
-         *     * `-period` - Period (décroissant)
-         *     * `feedstock` - Feedstock
-         *     * `-feedstock` - Feedstock (décroissant)
-         *     * `ghg_reduction` - Ghg reduction
-         *     * `-ghg_reduction` - Ghg reduction (décroissant)
-         *     * `created_at` - Created at
-         *     * `-created_at` - Created at (décroissant)
-         *     * `supplier` - Supplier
-         *     * `-supplier` - Supplier (décroissant)
-         *     * `consumption_type` - Consumption type
-         *     * `-consumption_type` - Consumption type (décroissant)
-         *     * `reception_airport` - Reception airport
-         *     * `-reception_airport` - Reception airport (décroissant)
->>>>>>> 1dbdd8c45 (fix(iricc): no longer use 'date_from' param and 'created_at' info in balance calculation, but use 'declaration_year')
-=======
-         * @enum {string}
->>>>>>> cf17182b3 (chore(api): update schema)
          */
         ExtAdminPagesEnum: ExtAdminPagesEnum;
         FeedStock: {
@@ -16359,10 +16329,6 @@ export enum EntityTypeEnum {
     HRS = "HRS"
 }
 export enum ExtAdminPagesEnum {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> cf17182b3 (chore(api): update schema)
     DCA = "DCA",
     AGRIMER = "AGRIMER",
     TIRIB = "TIRIB",
@@ -16373,25 +16339,8 @@ export enum ExtAdminPagesEnum {
     DREAL = "DREAL",
     ADEME = "ADEME",
     DGDDI = "DGDDI",
-<<<<<<< HEAD
     DGDDI_NATIONAL = "DGDDI_NATIONAL",
     H2 = "H2"
-=======
-  DCA = "DCA",
-  AGRIMER = "AGRIMER",
-  TIRIB = "TIRIB",
-  AIRLINE = "AIRLINE",
-  ELEC = "ELEC",
-  TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
-  BIOFUEL = "BIOFUEL",
-  DREAL = "DREAL",
-  ADEME = "ADEME",
-  DGDDI = "DGDDI",
-  DGDDI_NATIONAL = "DGDDI_NATIONAL",
->>>>>>> 1dbdd8c45 (fix(iricc): no longer use 'date_from' param and 'created_at' info in balance calculation, but use 'declaration_year')
-=======
-    DGDDI_NATIONAL = "DGDDI_NATIONAL"
->>>>>>> cf17182b3 (chore(api): update schema)
 }
 export enum FileTypeEnum {
     EXCEL = "EXCEL",
