@@ -5,7 +5,7 @@ from core.filters import FiltersActionFactory
 from core.pagination import TotalCountPagination
 from h2.filters.h2_station import H2StationFilter
 from h2.models import H2Station
-from h2.permissions import HasHRSRights, HasHRSWriteRights
+from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 from h2.serializers import H2StationInputSerializer, H2StationSerializer
 
 
@@ -23,7 +23,7 @@ from h2.serializers import H2StationInputSerializer, H2StationSerializer
 class H2StationViewSet(FiltersActionFactory(), ModelViewSet):
     queryset = H2Station.objects.all()
     serializer_class = H2StationSerializer
-    permission_classes = [HasHRSRights]
+    permission_classes = [HasHRSRights | HasH2AdminRights]
     filterset_class = H2StationFilter
     pagination_class = TotalCountPagination
     search_fields = ["name", "site_siret", "city"]
@@ -34,7 +34,10 @@ class H2StationViewSet(FiltersActionFactory(), ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        return self.queryset.filter(created_by=self.request.entity)
+        queryset = super().get_queryset()
+        if HasH2AdminRights().has_permission(self.request, self):
+            return queryset
+        return queryset.filter(created_by=self.request.entity)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

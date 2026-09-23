@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from core.tests_utils import PermissionTestMixin
-from h2.permissions import HasHRSRights, HasHRSWriteRights
+from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 from h2.views import H2StationViewSet
 
 
@@ -12,7 +12,7 @@ class H2StationPermissionTest(TestCase, PermissionTestMixin):
             [
                 (
                     ["list", "retrieve", "filters"],
-                    [HasHRSRights()],
+                    [(HasHRSRights | HasH2AdminRights)()],
                 ),
                 (
                     ["create", "update", "partial_update", "destroy"],
