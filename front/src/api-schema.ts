@@ -5802,6 +5802,7 @@ export interface components {
         H2Station: {
             readonly id: number;
             distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
+            readonly entity_name: string | null;
             name: string;
             /** SIRET */
             site_siret?: string;
@@ -12319,6 +12320,7 @@ export interface operations {
                  */
                 access_type?: PathsApiH2StationsGetParametersQueryAccess_type[];
                 commissioning_year?: number[];
+                entity?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /**
@@ -12512,6 +12514,7 @@ export interface operations {
                  */
                 access_type?: PathsApiH2StationsGetParametersQueryAccess_type[];
                 commissioning_year?: number[];
+                entity?: string[];
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 /** @description Filter string to apply */
@@ -15893,6 +15896,7 @@ export enum PathsApiH2StationsGetParametersQueryOrder_by {
 export enum PathsApiH2StationsFiltersGetParametersQueryFilter {
     access_type = "access_type",
     commissioning_year = "commissioning_year",
+    entity = "entity",
     has_personal_vehicle_connector = "has_personal_vehicle_connector",
     order_by = "order_by"
 }

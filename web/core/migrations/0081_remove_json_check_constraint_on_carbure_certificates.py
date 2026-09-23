@@ -14,8 +14,9 @@ def sql_result(request):
 def remove_check_clauses_validating_json_format(_apps, _schema_editor):
     q = (
         "select tc.table_name, cc.constraint_name from information_schema.check_constraints as cc "
-        "join information_schema.table_constraints as tc on tc.constraint_name=cc.constraint_name "
-        'where cc.check_clause like "json_valid%"'
+        "join information_schema.table_constraints as tc "
+        "on tc.constraint_schema = cc.constraint_schema and tc.constraint_name = cc.constraint_name "
+        "where cc.constraint_schema = database() and cc.check_clause like 'json_valid%'"
     )
     tables_and_constraints = sql_result(q)
     for t, c in tables_and_constraints:

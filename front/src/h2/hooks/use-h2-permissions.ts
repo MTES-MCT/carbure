@@ -7,5 +7,7 @@ export const useH2Permissions = () => {
   const canAccessAdmin =
     entity.isExternal && entity.hasAdminRight(ExternalAdminPages.H2)
 
-  return { canAccessAdmin }
+  const canWriteStations = entity.canWrite() && !canAccessAdmin
+
+  return { canAccessAdmin, canWriteStations }
 }

@@ -7287,6 +7287,14 @@ paths:
           explode: true
           style: form
         - in: query
+          name: entity
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7560,6 +7568,14 @@ paths:
           explode: true
           style: form
         - in: query
+          name: entity
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: entity_id
           schema:
             type: integer
@@ -7572,6 +7588,7 @@ paths:
             enum:
               - access_type
               - commissioning_year
+              - entity
               - has_personal_vehicle_connector
               - order_by
           description: Filter string to apply
@@ -7649,6 +7666,7 @@ paths:
                   value:
                     - access_type
                     - commissioning_year
+                    - entity
                     - has_personal_vehicle_connector
                     - order_by
                   summary: Example of filters response.
@@ -18734,6 +18752,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DistributedPressureEnum"
+        entity_name:
+          type: string
+          readOnly: true
+          nullable: true
         name:
           type: string
           maxLength: 128
@@ -18800,6 +18822,7 @@ components:
         - access_type
         - distributed_pressure
         - distribution_capacity
+        - entity_name
         - id
         - name
         - storage_capacity

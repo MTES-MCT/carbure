@@ -1,6 +1,6 @@
 import useEntity from "common/hooks/entity"
 import { lazy } from "react"
-import { Navigate, Route, Routes } from "react-router-dom"
+import { Navigate, Outlet, Route, Routes } from "react-router-dom"
 import { useH2Permissions } from "./hooks/use-h2-permissions"
 
 const currentYear = new Date().getFullYear()
@@ -14,19 +14,19 @@ const AdminCertificatesPage = lazy(() => import("h2/pages/admin/certificates"))
 const H2AdminRoutes = () => {
   return (
     <Routes>
-      <Route
-        path="admin/lots"
-        element={<Navigate replace to={`${currentYear}`} />}
-      />
-      <Route path="admin/lots/:year" element={<AdminLotsPage />} />
-      <Route
-        path="admin/certificates"
-        element={<Navigate replace to={`${currentYear}`} />}
-      />
-      <Route
-        path="admin/certificates/:year"
-        element={<AdminCertificatesPage />}
-      />
+      <Route path="admin" element={<Outlet />}>
+        <Route
+          path="lots"
+          element={<Navigate replace to={`${currentYear}`} />}
+        />
+        <Route path="lots/:year" element={<AdminLotsPage />} />
+        <Route path="stations" element={<StationsPage />} />
+        <Route
+          path="certificates"
+          element={<Navigate replace to={`${currentYear}`} />}
+        />
+        <Route path="certificates/:year" element={<AdminCertificatesPage />} />
+      </Route>
       <Route path="*" element={<Navigate replace to="admin/lots" />} />
     </Routes>
   )
