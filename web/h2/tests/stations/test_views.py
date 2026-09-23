@@ -145,6 +145,34 @@ class H2StationViewsTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
         self.assertCountEqual([station["name"] for station in response.data["results"]], ["Mine", "Other"])
+        self.assertCountEqual(
+            [station["entity_name"] for station in response.data["results"]],
+            [self.hrs_entity.name, self.other_hrs.name],
+        )
+
+    def test_admin_filters_stations_by_entity(self):
+        self._login_as_h2_admin()
+        H2StationFactory.create(name="Mine", created_by=self.hrs_entity, country=self.country)
+        H2StationFactory.create(name="Other", created_by=self.other_hrs, country=self.country)
+
+        response = self.client.get(
+            self.list_url,
+            {"entity_id": self.h2_admin.id, "entity": self.hrs_entity.name},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+        self.assertEqual(response.data["results"][0]["name"], "Mine")
+        self.assertEqual(response.data["results"][0]["entity_name"], self.hrs_entity.name)
+
+    def test_hrs_entity_filter_stays_scoped_to_own_stations(self):
+        H2StationFactory.create(name="Mine", created_by=self.hrs_entity, country=self.country)
+        H2StationFactory.create(name="Other", created_by=self.other_hrs, country=self.country)
+
+        response = self.client.get(self.list_url, {**self.base_params, "entity": self.other_hrs.name})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["results"], [])
 
     def test_admin_retrieves_any_hrs_station(self):
         self._login_as_h2_admin()

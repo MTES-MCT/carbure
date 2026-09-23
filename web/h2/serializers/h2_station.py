@@ -9,6 +9,7 @@ class H2StationSerializer(serializers.ModelSerializer):
     distributed_pressure = serializers.ListField(
         child=serializers.ChoiceField(choices=H2Station.DISTRIBUTION_PRESSURES),
     )
+    entity_name = serializers.CharField(source="created_by.name", read_only=True, allow_null=True)
 
     class Meta:
         model = H2Station

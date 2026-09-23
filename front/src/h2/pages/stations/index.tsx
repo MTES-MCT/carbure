@@ -70,6 +70,7 @@ const StationsPage = () => {
 
         <FilterMultiSelect2
           filterLabels={{
+            ...(canAccessAdmin ? { entity: t("Société") } : {}),
             access_type: t("Nature du site"),
             has_personal_vehicle_connector: t("Compatible VP"),
             commissioning_year: t("Mise en service"),
