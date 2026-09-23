@@ -116,6 +116,52 @@ class H2ActionExcelImportViewTest(APITestCase):
                 self.assertEqual(Action.objects.count(), 0)
                 self.assertTrue(any(field in row["errors"] for row in response.data["validation_errors"]))
 
+    def test_import_requires_shipping_fuel_type_when_road_transport(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.station.name,
+                certificate_id=self.certificate.certificate_id,
+                shipping_method="Transport routier",
+                shipping_fuel_type=None,
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertTrue(any("shipping_fuel_type" in row["errors"] for row in response.data["validation_errors"]))
+
+    def test_import_allows_blank_shipping_fuel_type_when_not_road(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.station.name,
+                certificate_id=self.certificate.certificate_id,
+                shipping_method="Pipeline",
+                shipping_fuel_type=None,
+            )
+        )
+
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(Action.objects.count(), 1)
+
+    def test_import_rejects_invalid_shipping_fuel_type(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.station.name,
+                certificate_id=self.certificate.certificate_id,
+                shipping_fuel_type="Kérosène",
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertTrue(any("shipping_fuel_type" in row["errors"] for row in response.data["validation_errors"]))
+
     def test_import_allows_blank_shipping_when_consumed_on_production_site(self):
         rows = parse_action_import_file(
             filled_h2_template(
@@ -124,9 +170,10 @@ class H2ActionExcelImportViewTest(APITestCase):
                 site_name=self.station.name,
                 certificate_id=self.certificate.certificate_id,
                 consumed_on_production_site="Oui",
-                shipping_method=None,
+                shipping_method="Transport routier",
                 shipping_distance=None,
                 shipping_date=None,
+                shipping_fuel_type=None,
                 etd1=None,
             ),
             H2ActionHandler(),

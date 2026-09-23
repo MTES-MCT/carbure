@@ -83,7 +83,7 @@ class ExampleIndustryExcelImportSerializer(ActionExcelImportSerializer):
 
 `required=True` par défaut sur `CharField` : cellule vide → erreur de ligne, même pipeline que le noyau.
 
-Champs noyau optionnels devenus obligatoires selon une autre cellule : `check_fields_required` (`core/serializers.py`) dans le serializer filière. H2 : `consumed_on_production_site == "Non"` → `shipping_method` / `shipping_distance` / `shipping_date` / `etd1`.
+Champs optionnels devenus obligatoires selon d'autres cellules : `check_fields_required_when` (`core/serializers.py`) dans le serializer filière. Chaque règle est un `(predicate, fields)` ; toutes les règles qui matchent sont évaluées ensemble. H2 : `consumed_on_production_site == "Non"` → `shipping_method` / `shipping_distance` / `shipping_date` / `etd1` ; et, dans ce cas, `shipping_method == ROAD` → `shipping_fuel_type`.
 
 Côté front, les erreurs utilisent le `key` (`external_ref`). Pour afficher le libellé Excel :
 
