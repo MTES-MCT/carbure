@@ -4,9 +4,9 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 ## Choix de conception
 
-- **Facteurs figés sur l’action, pas sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont copiés depuis le catalogue à la **création de la racine** (import Excel aujourd’hui, qui pose aussi `unit=kg`). Toute la chaîne de traçabilité convertit avec **ces** valeurs : un changement de PCI sur `Material` ne réécrit pas l’historique. À l’import Excel, une matière sans `lhv` **et** sans `density` lève une erreur interne (oubli catalogue, pas une erreur de cellule).
-- **Le certificat fige le MJ à la valorisation.** `valorize()` écrit l’énergie du parent dans le `VALORIZE` (`unit=MJ`) et recopie `lhv` / `density` pour que toute la chaîne garde les mêmes facteurs. C’est le seul moment où une quantité convertie est **stockée**. Sans facteur sur la racine → `ConversionError`.
-- **Le reste est calculé, pas persisté.** `mass` / `volume` / `energy` sont des annotations SQL (NULL si le facteur manque) :
+- **Les facteurs vivent sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont lus sur `Material` à chaque calcul. Un changement de PCI au catalogue s’applique aux actions déjà créées. À l’import Excel, une matière sans `lhv` **et** sans `density` lève une erreur interne (oubli catalogue, pas une erreur de cellule).
+- **Le certificat fige le MJ à la valorisation.** `valorize()` écrit l’énergie du parent dans le `VALORIZE` (`unit=MJ`) et reprend sa matière, pour que mass/volume du certificat se calculent avec les facteurs du catalogue. C’est le seul moment où une quantité convertie est **stockée**. Sans `lhv` sur la matière → `ConversionError`.
+- **Le reste est calculé, pas persisté.** `mass` / `volume` / `energy` sont des annotations SQL à partir de `material.lhv` / `material.density` (NULL si le facteur manque) :
 
 ```
 mass   = volume × density
@@ -17,7 +17,7 @@ energy = mass × lhv
 
 | Concept | Rôle |
 |---|---|
-| `Action` | POS, détenteur, matière, quantité + unité, snapshot `lhv` / `density`, site, logistique, GES |
+| `Action` | POS, détenteur, matière, quantité + unité, site, logistique, GES |
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
 | `Material` | Catalogue (`code`, `name`, `lhv`, `density`). Facteurs optionnels, ou strictement > 0 |
 
@@ -27,7 +27,7 @@ Import des matières :
 uv run python web/traceability/fixtures/load_materials.py
 ```
 
-Fichier : [`fixtures/materials.csv`](fixtures/materials.csv). Un changement de PCI au catalogue **ne réécrit pas** les snapshots déjà posés sur les actions. Chargé automatiquement au deploy (`bin/post_deploy.sh`).
+Fichier : [`fixtures/materials.csv`](fixtures/materials.csv). Un changement de PCI au catalogue s’applique aux actions liées à cette matière. Chargé automatiquement au deploy (`bin/post_deploy.sh`).
 
 ## Ce que la filière personnalise
 

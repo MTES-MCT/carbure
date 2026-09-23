@@ -45,7 +45,7 @@ class ActionInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         exclude = ["file"]
-        read_only_fields = ["id", "industry", "holder", "parent", "lhv", "density"]
+        read_only_fields = ["id", "industry", "holder", "parent"]
 
     def create(self, validated_data):
         validated_data["industry"] = self.context["handler"].industry
@@ -90,7 +90,6 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
         try:
             actions = []
             for attrs in validated_data:
-                material = attrs.get("material")
                 actions.append(
                     Action(
                         **{key: value for key, value in attrs.items() if key in _ACTION_MODEL_FIELDS},
@@ -98,8 +97,6 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
                         industry=industry,
                         type=Action.INIT,
                         unit=Action.KG,
-                        lhv=getattr(material, "lhv", None),
-                        density=getattr(material, "density", None),
                     )
                 )
 

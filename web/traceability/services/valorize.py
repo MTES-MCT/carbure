@@ -11,7 +11,8 @@ from traceability.models import Action, ActionStatus
 def valorize(actions: QuerySet[Action]) -> list[Action]:
     """Create a VALORIZE child in MJ for each INIT action currently PENDING, then accept the INIT.
 
-    Child quantity is the parent's energy. Ineligible rows in `actions` are skipped.
+    Child quantity is the parent's energy. The child keeps the parent's material so later
+    conversions read the catalog factors. Ineligible rows in `actions` are skipped.
     Raises NoEligibleActionError if none remain, ConversionError if energy cannot be derived.
     """
     pending_inits = list(actions.filter(type=Action.INIT, status=ActionStatus.PENDING))
@@ -33,8 +34,7 @@ def valorize(actions: QuerySet[Action]) -> list[Action]:
                 working_date=action.working_date,
                 quantity=action.energy,
                 parent=action,
-                lhv=action.lhv,
-                density=action.density,
+                material=action.material,
             )
             for action in pending_inits
         ]

@@ -9,15 +9,13 @@ from traceability.models import Action
 class AnnotateQuantitiesTest(TestCase):
     fixtures = ["json/countries.json"]
 
-    def test_manager_annotates_mass_volume_energy_from_action_factors(self):
-        material = MaterialFactory.create(lhv=Decimal("999"), density=Decimal("9"))
+    def test_manager_annotates_mass_volume_energy_from_material(self):
+        material = MaterialFactory.create(lhv=Decimal("120"), density=Decimal("0.8"))
         action = ActionFactory.create(
             type=Action.INIT,
             unit=Action.KG,
             quantity=Decimal("100.000"),
             material=material,
-            lhv=Decimal("120"),
-            density=Decimal("0.8"),
         )
 
         annotated = Action.objects.get(pk=action.pk)
@@ -26,11 +24,10 @@ class AnnotateQuantitiesTest(TestCase):
         self.assertEqual(annotated.energy, Decimal("12000.000"))
 
     def test_missing_factors_leave_derived_values_null(self):
-        kg = ActionFactory.create(type=Action.INIT, unit=Action.KG, quantity=Decimal("100.000"), lhv=None, density=None)
-        litre = ActionFactory.create(type=Action.INIT, unit=Action.L, quantity=Decimal("50.000"), lhv=None, density=None)
-        mj = ActionFactory.create(
-            type=Action.VALORIZE, unit=Action.MJ, quantity=Decimal("12000.000"), material=None, lhv=None, density=None
-        )
+        material = MaterialFactory.create(lhv=None, density=None)
+        kg = ActionFactory.create(type=Action.INIT, unit=Action.KG, quantity=Decimal("100.000"), material=material)
+        litre = ActionFactory.create(type=Action.INIT, unit=Action.L, quantity=Decimal("50.000"), material=material)
+        mj = ActionFactory.create(type=Action.VALORIZE, unit=Action.MJ, quantity=Decimal("12000.000"), material=None)
 
         annotated_kg = Action.objects.get(pk=kg.pk)
         self.assertEqual(annotated_kg.mass, Decimal("100.000"))
@@ -48,12 +45,12 @@ class AnnotateQuantitiesTest(TestCase):
         self.assertEqual(annotated_mj.energy, Decimal("12000.000"))
 
     def test_annotates_from_litre_with_factors(self):
+        material = MaterialFactory.create(lhv=Decimal("120"), density=Decimal("0.8"))
         action = ActionFactory.create(
             type=Action.INIT,
             unit=Action.L,
             quantity=Decimal("50.000"),
-            lhv=Decimal("120"),
-            density=Decimal("0.8"),
+            material=material,
         )
 
         annotated = Action.objects.get(pk=action.pk)
@@ -62,12 +59,12 @@ class AnnotateQuantitiesTest(TestCase):
         self.assertEqual(annotated.energy, Decimal("4800.000"))
 
     def test_annotates_from_mj_with_factors(self):
+        material = MaterialFactory.create(lhv=Decimal("120"), density=Decimal("0.8"))
         action = ActionFactory.create(
             type=Action.VALORIZE,
             unit=Action.MJ,
             quantity=Decimal("12000.000"),
-            lhv=Decimal("120"),
-            density=Decimal("0.8"),
+            material=material,
         )
 
         annotated = Action.objects.get(pk=action.pk)

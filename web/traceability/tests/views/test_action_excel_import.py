@@ -83,8 +83,6 @@ class ActionExcelImportViewTest(APITestCase):
                 "industry": Action.H2,
                 "type": Action.INIT,
                 "unit": Action.KG,
-                "lhv": Decimal("120"),
-                "density": Decimal("0.8"),
                 "material": self.material,
                 "certificate": self.certificate,
                 "site_id": self.site.id,
@@ -219,4 +217,4 @@ class ActionExcelImportViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(Action.objects.get(pos_id="ACT-001").lhv, Decimal("120"))
+        self.assertEqual(Action.objects.get(pos_id="ACT-001").material, material)

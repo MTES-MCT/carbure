@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from traceability.exceptions import ConversionError, NoEligibleActionError
-from traceability.factories import ActionFactory
+from traceability.factories import ActionFactory, MaterialFactory
 from traceability.models import Action, ActionStatus
 from traceability.services.valorize import valorize
 
@@ -17,8 +17,8 @@ class ValorizeTest(TestCase):
         return action
 
     def _with_lhv(self, action, lhv=Decimal("120")):
-        action.lhv = lhv
-        action.save(update_fields=["lhv"])
+        action.material.lhv = lhv
+        action.material.save(update_fields=["lhv"])
         return action
 
     def test_creates_valorize_child_and_accepts_pending_init(self):
@@ -33,8 +33,7 @@ class ValorizeTest(TestCase):
         self.assertEqual(child.holder_id, action.holder_id)
         self.assertEqual(child.unit, Action.MJ)
         self.assertEqual(child.quantity, Decimal("12000.000"))
-        self.assertEqual(child.lhv, action.lhv)
-        self.assertEqual(child.density, action.density)
+        self.assertEqual(child.material_id, action.material_id)
         self.assertEqual(Action.objects.get(pk=action.pk).status, ActionStatus.ACCEPTED)
 
     def test_skips_ineligible_actions(self):
@@ -53,7 +52,7 @@ class ValorizeTest(TestCase):
             valorize(Action.objects.all())
 
     def test_raises_when_energy_cannot_be_converted(self):
-        action = self._pending_init(unit=Action.KG, lhv=None)
+        action = self._pending_init(unit=Action.KG, material=MaterialFactory(lhv=None))
 
         with self.assertRaises(ConversionError) as ctx:
             valorize(Action.objects.filter(pk=action.pk))
@@ -64,7 +63,7 @@ class ValorizeTest(TestCase):
 
     def test_conversion_error_aborts_the_whole_batch(self):
         convertible = self._with_lhv(self._pending_init())
-        blocked = self._pending_init(unit=Action.KG, lhv=None)
+        blocked = self._pending_init(unit=Action.KG, material=MaterialFactory(lhv=None))
 
         with self.assertRaises(ConversionError) as ctx:
             valorize(Action.objects.filter(pk__in=[convertible.pk, blocked.pk]))
@@ -77,8 +76,7 @@ class ValorizeTest(TestCase):
         action = self._pending_init(
             quantity=Decimal("50.000"),
             unit=Action.L,
-            lhv=Decimal("120"),
-            density=Decimal("0.8"),
+            material=MaterialFactory(lhv=Decimal("120"), density=Decimal("0.8")),
         )
 
         created = valorize(Action.objects.filter(pk=action.pk))
@@ -94,8 +92,7 @@ class ValorizeTest(TestCase):
         action = self._pending_init(
             quantity=Decimal("12000.000"),
             unit=Action.MJ,
-            lhv=Decimal("120"),
-            density=Decimal("0.8"),
+            material=MaterialFactory(lhv=Decimal("120"), density=Decimal("0.8")),
         )
 
         created = valorize(Action.objects.filter(pk=action.pk))
