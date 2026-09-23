@@ -5,10 +5,10 @@ import { useCreateStationDialog } from "./create-station-dialog"
 
 export const EmptyStations = () => {
   const { t } = useTranslation()
-  const { canWriteStations } = useH2Permissions()
+  const { canAccessAdmin } = useH2Permissions()
   const openCreateStationDialog = useCreateStationDialog()
 
-  if (!canWriteStations) {
+  if (canAccessAdmin) {
     return (
       <EmptyState
         title={t("Aucune station d’hydrogène")}

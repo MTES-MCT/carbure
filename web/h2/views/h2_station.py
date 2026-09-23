@@ -34,7 +34,7 @@ class H2StationViewSet(FiltersActionFactory(), ModelViewSet):
         return super().get_permissions()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related("created_by")
         if HasH2AdminRights().has_permission(self.request, self):
             return queryset
         return queryset.filter(created_by=self.request.entity)
