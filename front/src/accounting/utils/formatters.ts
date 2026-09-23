@@ -37,7 +37,7 @@ export const formatSector = (sector: string) => {
       return i18next.t("Carburéacteur")
     case OperationSector.GPL_C:
       return i18next.t("GPL-c")
-    case "MARITIME":
+    case OperationSector.MARITIME:
       return i18next.t("Maritime")
     case ElecOperationSector.ELEC:
       return i18next.t("Électricité")
