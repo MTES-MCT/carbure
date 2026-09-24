@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from core.tests_utils import PermissionTestMixin
 from h2.handlers import H2ActionHandler
-from h2.permissions import HasHRSRights, HasHRSWriteRights
+from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 
 
 class H2ActionHandlerPermissionTest(TestCase, PermissionTestMixin):
@@ -11,7 +11,10 @@ class H2ActionHandlerPermissionTest(TestCase, PermissionTestMixin):
 
         for action in ["list", "retrieve", "filters", "get_years", "download_import_template"]:
             with self.subTest(action=action):
-                self.assertPermissionsEqual(handler.get_permissions(action), [HasHRSRights()])
+                self.assertPermissionsEqual(
+                    handler.get_permissions(action),
+                    [(HasHRSRights | HasH2AdminRights)()],
+                )
 
         for action in ["destroy", "import_actions"]:
             with self.subTest(action=action):
