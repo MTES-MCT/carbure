@@ -120,5 +120,4 @@ class StoredFileAdmin(admin.ModelAdmin):
     raw_id_fields = ("user", "entity")
     readonly_fields = ("created_at",)
     list_select_related = ("entity", "user")
-    date_hierarchy = "created_at"
     inlines = (StoredFileActionInline,)
