@@ -8,7 +8,7 @@ export const balanceBiofuel: Balance["biofuel"] = {
   compatible_diesel: false,
   compatible_gpl: false,
   compatible_maritime: false,
-  renewable_energy_share: 0,
+  renewable_energy_share: 1,
   pci_litre: 21.1,
   masse_volumique: 0.79,
 }
