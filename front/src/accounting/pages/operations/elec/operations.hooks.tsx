@@ -19,7 +19,7 @@ import {
   formatOperationStatus,
   formatOperationType,
 } from "accounting/utils/formatters"
-import styles from "../operations.module.css"
+import styles from "accounting/pages/operations/biofuels/components/operations-table/operations-table.module.css"
 import cl from "clsx"
 import { useUnit } from "common/hooks/unit"
 import { Unit } from "common/types"
