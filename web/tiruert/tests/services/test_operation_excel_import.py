@@ -10,11 +10,12 @@ from tiruert.services.operation_excel_import import OperationExcelImportService,
 
 
 class OperationExcelImportServiceHelpersTest(TestCase):
-    def _make_biofuel(self, biofuel_id=1, code="ETH", pci_litre=10):
+    def _make_biofuel(self, biofuel_id=1, code="ETH", pci_litre=10, renewable_energy_share=1):
         return SimpleNamespace(
             id=biofuel_id,
             code=code,
             pci_litre=pci_litre,
+            renewable_energy_share=renewable_energy_share,
             compatible_essence=True,
             compatible_diesel=False,
         )
@@ -238,7 +239,7 @@ class OperationExcelImportServiceHelpersTest(TestCase):
     def test_validate_group_calls_service_with_expected_arguments(self, mock_perform_checks):
         """Should pass normalized payload and request context to perform_checks_before_create."""
         debited = SimpleNamespace(id=42, name="Debited")
-        biofuel = self._make_biofuel(1, "ETH", 10)
+        biofuel = self._make_biofuel(1, "ETH", 10, renewable_energy_share=0.5)
         group = self._make_group(
             operation_type=Operation.TRANSFERT,
             customs_category="CONV",
@@ -258,6 +259,7 @@ class OperationExcelImportServiceHelpersTest(TestCase):
         self.assertEqual(call_kwargs["data"]["type"], Operation.TRANSFERT)
         self.assertEqual(call_kwargs["data"]["customs_category"], "CONV")
         self.assertEqual(call_kwargs["data"]["biofuel"], biofuel)
+        self.assertEqual(call_kwargs["data"]["renewable_energy_share"], 0.5)
         self.assertEqual(call_kwargs["data"]["debited_entity"], debited)
         self.assertEqual(call_kwargs["request"].entity, debited)
         self.assertEqual(call_kwargs["request"].GET, {})

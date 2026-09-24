@@ -45,13 +45,21 @@ const createValues = (
 
 const renderQuantityMax = (
   objective: CategoryObjective,
-  availableBalance: number
+  availableBalance: number,
+  renewableEnergyShare = 1
 ) => {
   const { result } = renderHook(() =>
     useCalculateQuantityMax(
       objective,
       createValues({
-        balance: { ...balance, available_balance: availableBalance },
+        balance: {
+          ...balance,
+          available_balance: availableBalance,
+          biofuel: {
+            ...balanceBiofuel,
+            renewable_energy_share: renewableEnergyShare,
+          },
+        },
       })
     )
   )
@@ -95,6 +103,16 @@ describe("useCalculateQuantityMax", () => {
 
     it("returns the cap in liters when the available balance is higher", () => {
       expect(renderQuantityMax(objective, 20_000)).toBe(maxLitersFromCap)
+    })
+
+    it("raises the cap in physical liters for a partially renewable biofuel", () => {
+      // 270_000 MJ / (21.1 MJ/L * 0.5) = 25_592.42 L (ceil to 2 decimals).
+      // With 30_000 L available, the energy cap determines the maximum.
+      expect(renderQuantityMax(objective, 30_000, 0.5)).toBe(25_592.42)
+    })
+
+    it("uses only the available balance when the renewable share is zero", () => {
+      expect(renderQuantityMax(objective, 30_000.009, 0)).toBe(30_000)
     })
 
     it("returns the cap in liters when it equals the available balance", () => {

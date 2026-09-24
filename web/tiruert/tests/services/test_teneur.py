@@ -218,20 +218,21 @@ class TeneurServiceConvertEmissionsTest(SimpleTestCase):
         """Test conversion from produced emissions rate to avoided emissions"""
         mock_biofuel = Mock()
         mock_biofuel.pci_litre = 35.5
+        mock_biofuel.renewable_energy_share = 0.5
         volume = 1000.0  # liters
         emissions_rate = 50.0  # gCO2/MJ
 
         result = TeneurService.convert_producted_emissions_to_avoided_emissions(volume, mock_biofuel, emissions_rate)
 
-        # volume_energy = 1000 * 35.5 = 35500 MJ
-        # avoided = (94 - 50) * 35500 / 1000000 = 1.562 tCO2
-        expected = (94 - 50) * 35500 / 1000000
+        # volume_energy = 1000 * 35.5 * 0.5 = 17750 MJ
+        expected = (94 - 50) * 17750 / 1000000
         self.assertEqual(result, expected)
 
     def test_convert_emissions_negative_for_high_emission_rate(self):
         """Test that avoided emissions can be negative if emissions exceed reference"""
         mock_biofuel = Mock()
         mock_biofuel.pci_litre = 35.5
+        mock_biofuel.renewable_energy_share = 1
         volume = 1000.0
         emissions_rate = 100.0  # Higher than reference (94)
 
@@ -249,6 +250,7 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
         """Test that prepare_data_and_optimize calls prepare_data with correct arguments"""
         mock_biofuel = Mock()
         mock_biofuel.pci_litre = 35.5
+        mock_biofuel.renewable_energy_share = 0.5
         data = {
             "biofuel": mock_biofuel,
             "target_volume": 1000.0,
@@ -274,6 +276,7 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
         """Test that optimize_biofuel_blending is called with correct parameters"""
         mock_biofuel = Mock()
         mock_biofuel.pci_litre = 35.5
+        mock_biofuel.renewable_energy_share = 0.5
         data = {
             "biofuel": mock_biofuel,
             "target_volume": 1000.0,
@@ -296,6 +299,7 @@ class TeneurServicePrepareDataAndOptimizeTest(SimpleTestCase):
         np.testing.assert_array_equal(call_args[0], volumes)
         np.testing.assert_array_equal(call_args[1], emissions)
         self.assertEqual(call_args[2], target_volume)
+        self.assertAlmostEqual(call_args[3], 94 - 1.5 * 1000000 / (1000 * 35.5 * 0.5))
 
     @patch("tiruert.services.teneur.log_warning")
     def test_logs_negative_volumes(self, patched_log_warning):

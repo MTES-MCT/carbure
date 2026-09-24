@@ -241,6 +241,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             entity_id = request.entity.id
             selected_lots = validated_data.pop("lots")
             declaration_year = self.context.get("declaration_year")
+            validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
 
             OperationService.perform_checks_before_create(
                 request, entity_id, selected_lots, validated_data, declaration_year
