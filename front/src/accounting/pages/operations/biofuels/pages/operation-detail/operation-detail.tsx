@@ -6,7 +6,7 @@ import * as api from "accounting/api/biofuels/operations"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
 import { OperationBadge } from "accounting/components/operation-badge/operation-badge"
-import css from "../../../operations.module.css"
+import css from "accounting/pages/operations/biofuels/components/operations-table/operations-table.module.css"
 import { Text } from "common/components/text"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"
 

@@ -3,12 +3,8 @@ import { OperationsFilter, OperationsQueryBuilder } from "accounting/types"
 import { useTranslation } from "react-i18next"
 
 import * as api from "accounting/api/biofuels/operations"
-import { Table } from "common/components/table2"
 import { useQuery } from "common/hooks/async"
-import {
-  useGetFilterOptions,
-  useOperationsBiofuelsColumns,
-} from "./operations.hooks"
+import { useGetFilterOptions } from "./operations.hooks"
 import { Pagination } from "common/components/pagination2/pagination"
 import HashRoute from "common/components/hash-route"
 import { OperationDetail } from "./pages/operation-detail"
@@ -27,6 +23,7 @@ import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { Button } from "common/components/button2"
 import { useLocation, useNavigate } from "react-router-dom"
 import { OperationsExcelImportDialog } from "./pages/operations-excel-import-dialog"
+import { OperationTable } from "./components/operations-table"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
@@ -53,15 +50,6 @@ const OperationsBiofuels = () => {
   const { result, loading } = useQuery(api.getOperations, {
     key: `operations`,
     params: [query, selectedEntityId],
-  })
-
-  const columns = useOperationsBiofuelsColumns({
-    onClickSector: (sector) => {
-      actions.setFilters({
-        ...state.filters,
-        sector: [sector],
-      })
-    },
   })
 
   const getFilterOptions = useGetFilterOptions(query, selectedEntityId)
@@ -111,9 +99,14 @@ const OperationsBiofuels = () => {
               }),
             })}
           />
-          <Table
-            columns={columns}
+          <OperationTable
             rows={result?.data?.results ?? []}
+            onClickSector={(sector) => {
+              actions.setFilters({
+                ...state.filters,
+                sector: [sector],
+              })
+            }}
             rowLink={(row) => ({
               pathname: location.pathname,
               search: location.search,
