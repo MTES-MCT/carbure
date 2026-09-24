@@ -19,7 +19,8 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `lookups` | Listes de choix `material` / `site` / `certificate` (API, Excel, validation) |
 | `excel_columns` | Colonnes du template et mapping à l’import — voir [`docs/excel.md`](docs/excel.md) |
 | `excel_import_serializer_class` | Validation d’import (surcharge filière) |
-| `get_permissions` | Droits lecture / écriture |
+| `read_permission`, `write_permission`, `admin_permission` | Droits. `admin_permission` ouvre la lecture et, via `scope_queryset`, toute la filière |
+| `scope_queryset` | Filtre `industry`, puis détenteur ou parent. Sans filtre détenteur si `admin_permission` passe |
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 

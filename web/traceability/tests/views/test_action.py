@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
-from core.models import Entity
+from core.models import Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory
 from traceability.models import Action
@@ -95,3 +95,62 @@ class ActionViewsetQuerysetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(seen_pks, [self.own_action.id])
+
+
+class ActionViewsetAdminQuerysetTest(TestCase):
+    fixtures = ["json/countries.json"]
+
+    def setUp(self):
+        self.hrs = Entity.objects.create(name="HRS", entity_type=Entity.HRS)
+        self.other_hrs = Entity.objects.create(name="Other HRS", entity_type=Entity.HRS)
+        self.h2_admin = Entity.objects.create(name="H2 Admin", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=self.h2_admin, right=ExternalAdminRights.H2)
+        self.elec_admin = Entity.objects.create(name="ELEC Admin", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=self.elec_admin, right=ExternalAdminRights.ELEC)
+
+        setup_current_user(self, "admin@carbure.local", "Admin", "password", [(self.h2_admin, "RW")])
+
+        self.list_url = reverse("traceability-action-list")
+        self.import_url = reverse("traceability-action-import-actions")
+        self.admin_params = {"entity_id": self.h2_admin.id, "industry": Action.H2}
+
+        self.hrs_action = ActionFactory.create(holder=self.hrs, industry=Action.H2)
+        self.other_hrs_action = ActionFactory.create(holder=self.other_hrs, industry=Action.H2)
+        self.other_industry_action = ActionFactory.create(holder=self.hrs, industry="BIOMASS")
+
+    def test_admin_lists_every_action_of_the_industry(self):
+        response = self.client.get(self.list_url, self.admin_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [item["id"] for item in response.data["results"]]
+        self.assertCountEqual(ids, [self.hrs_action.id, self.other_hrs_action.id])
+
+    def test_admin_retrieves_an_action_held_by_another_entity(self):
+        response = self.client.get(
+            reverse("traceability-action-detail", args=[self.other_hrs_action.id]),
+            self.admin_params,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], self.other_hrs_action.id)
+
+    def test_admin_cannot_destroy_or_import(self):
+        destroy_response = self.client.delete(
+            reverse("traceability-action-detail", args=[self.hrs_action.id]),
+            query_params=self.admin_params,
+        )
+        import_response = self.client.post(self.import_url, query_params=self.admin_params)
+
+        self.assertEqual(destroy_response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(import_response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Action.objects.filter(pk=self.hrs_action.id).exists())
+
+    def test_other_industry_admin_is_forbidden(self):
+        setup_current_user(self, "elec@carbure.local", "Elec", "password", [(self.elec_admin, "RW")])
+
+        response = self.client.get(
+            self.list_url,
+            {"entity_id": self.elec_admin.id, "industry": Action.H2},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

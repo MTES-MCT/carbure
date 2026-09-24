@@ -1,5 +1,5 @@
 import h2.handlers.lookups as lookups
-from h2.permissions import HasHRSRights, HasHRSWriteRights
+from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 from h2.serializers.action import SHIPPING_FUEL_TYPES, H2ActionExcelImportSerializer
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.excel import EXCEL_CONSUMPTION_COLOR, EXCEL_PRODUCTION_COLOR, EXCEL_TRANSPORT_COLOR, excel_column
@@ -9,6 +9,9 @@ from traceability.models import Action
 class H2ActionHandler(ActionIndustryHandler):
     industry = Action.H2
     lookups = lookups
+    read_permission = HasHRSRights
+    write_permission = HasHRSWriteRights
+    admin_permission = HasH2AdminRights
     excel_import_serializer_class = H2ActionExcelImportSerializer
     excel_columns = [
         {
@@ -74,9 +77,3 @@ class H2ActionHandler(ActionIndustryHandler):
         excel_column("eu"),
         excel_column("eccs"),
     ]
-
-    @classmethod
-    def get_permissions(cls, action: str):
-        if action in cls.write_actions:
-            return [HasHRSWriteRights()]
-        return [HasHRSRights()]

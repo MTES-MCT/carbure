@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.utils.decorators import decorator_from_middleware, method_decorator
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
@@ -56,10 +55,7 @@ class ActionViewset(
         return handler.get_permissions(self.action)
 
     def get_queryset(self):
-        queryset = self.queryset.filter(
-            Q(holder=self.request.entity) | Q(parent__holder=self.request.entity),
-            industry=self.request.handler.industry,
-        )
+        queryset = self.request.handler.scope_queryset(self.request, self.queryset)
         if self.action == "retrieve":
             queryset = annotate_total_emissions(queryset.filter(pk=self.kwargs["pk"]))
         return queryset
