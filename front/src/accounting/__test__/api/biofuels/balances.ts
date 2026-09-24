@@ -1,4 +1,4 @@
-import { balance } from "accounting/__test__/data/balances"
+import { balance, balanceBiofuel } from "accounting/__test__/data/balances"
 import { apiTypes } from "common/services/api-fetch.types"
 import { http, HttpResponse } from "msw"
 
@@ -20,6 +20,23 @@ export const okGetBalancesWithZeroAvailableBalance = http.get(
       results: [{ ...balance, available_balance: 0 }],
       count: 1,
       total_volume: 0,
+    })
+  }
+)
+
+export const okGetBalancesWithPartialRenewableShare = http.get(
+  "/api/tiruert/operations/balance/",
+  () => {
+    return HttpResponse.json<apiTypes["PaginatedBalanceResponseList"]>({
+      results: [
+        {
+          ...balance,
+          available_balance: 250000,
+          biofuel: { ...balanceBiofuel, renewable_energy_share: 0.5 },
+        },
+      ],
+      count: 1,
+      total_volume: 250000,
     })
   }
 )

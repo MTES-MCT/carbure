@@ -13,7 +13,10 @@ import {
   fillBiofuelFiltersStep,
   selectBiofuel,
 } from "./declare-teneur-dialog.stories.utils"
-import { okGetBalancesWithZeroAvailableBalance } from "accounting/__test__/api/biofuels/balances"
+import {
+  okGetBalancesWithPartialRenewableShare,
+  okGetBalancesWithZeroAvailableBalance,
+} from "accounting/__test__/api/biofuels/balances"
 import {
   defaultCategoryObjective,
   defaultMainObjective,
@@ -83,11 +86,19 @@ export const FirstStepBalanceZeroDisablesNext: Story = {
 }
 
 export const SecondStepQuantityMaxCappedByObjective: Story = {
+  parameters: {
+    msw: {
+      handlers: [
+        okGetBalancesWithPartialRenewableShare,
+        ...quantityBaseHandlers,
+      ],
+    },
+  },
   play: async ({ canvasElement }) => {
     await fillBiofuelFiltersStep(canvasElement)
     await clickNextStepButton(canvasElement)
 
-    await fillQuantityInput(canvasElement, "12797")
+    await fillQuantityInput(canvasElement, "25593")
     const validateButton = await waitFor(() =>
       within(canvasElement).getByRole("button", { name: "Valider la quantité" })
     )
