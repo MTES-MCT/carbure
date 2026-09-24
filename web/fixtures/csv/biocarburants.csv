@@ -33,3 +33,6 @@ EEAG,EEAG,FAEE,0,0,1,0.895,38,34,1,1,0,0,Biogazole-ester éthylique d'acide gras
 HOGPL,Autres Huiles Hydrotraitées - GPL,Hydrotreated oil - LPG,0,0,1,0.522,46,24,1,0,0,1,Huile provenant de la biomasse hydrotraitée (ayant subi un traitement thermochimique à l'hydrogène - gaz de pétrole liquéfié carburant (GPL)
 HVOGPL,Huiles Végétales Hydrotraitées - GPL,Hydrotreated vegetable oil - LPG,0,0,1,0.522,46,24,1,0,0,1,Huile végétale hydrotraitée  (ayant subi un traitement thermochimique à l'hydrogène - gaz de pétrole liquéfié carburant (GPL)
 HCGPL,Huiles co-traitées - GPL,Co-processed oils - LPG,0,0,1,0.500,46,23,1,0,0,1,Huile cotraitée (traitée dans une raffinerie en même temps que des combustibles ou carburants fossiles) provenant de la biomasse ou de la biomasse pyrolysée - gaz de pétrole liquéfié carburant (GPL)
+ETBE,ETBE,ETBE,1,1,0,0.75,36,27,0.33,0,1,0,Éthyl-tertio-butyl-éther produit à partir d'éthanol
+ETBE-63,ETBE 63%,ETBE 63%,1,1,0,0.75,36,27,0.63,0,1,0,Éthyl-tertio-butyl-éther produit à partir d'éthanol
+ETBE-100,ETBE 100%,ETBE 100%,1,1,0,0.75,36,27,1,0,1,0,Éthyl-tertio-butyl-éther produit à partir d'éthanol
