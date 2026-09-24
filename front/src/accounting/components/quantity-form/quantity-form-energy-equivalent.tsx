@@ -8,6 +8,7 @@ import { Trans, useTranslation } from "react-i18next"
 type EnergyEquivalentNoticeProps = {
   quantityLiters: number
   pciLitre: number
+  renewableEnergyShare: number
 }
 
 const scrollEnergyEquivalentIntoView = (
@@ -21,9 +22,14 @@ const scrollEnergyEquivalentIntoView = (
 export const EnergyEquivalentNotice = ({
   quantityLiters,
   pciLitre,
+  renewableEnergyShare,
 }: EnergyEquivalentNoticeProps) => {
   const { t } = useTranslation()
-  const energyGj = energyFromLiters(quantityLiters, pciLitre).gj
+  const energyGj = energyFromLiters(
+    quantityLiters,
+    pciLitre,
+    renewableEnergyShare
+  ).gj
   const rootRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

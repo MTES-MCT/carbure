@@ -181,6 +181,7 @@ class OperationExcelImportService:
             "biofuel": biofuel,
             "customs_category": group.customs_category,
             "type": group.operation_type,
+            "renewable_energy_share": biofuel.renewable_energy_share,
         }
         request = SimpleNamespace(entity=group.debited_entity, GET={})
 
@@ -256,6 +257,7 @@ class OperationExcelImportService:
                 {
                     "customs_category": group.customs_category,
                     "biofuel": group.biofuel,
+                    "renewable_energy_share": group.biofuel.renewable_energy_share,
                     "selected_lots": [{"id": lot_id, "volume": volume} for lot_id, volume in group.lot_volumes.items()],
                 }
             )
@@ -302,7 +304,7 @@ class OperationExcelImportService:
             "biofuel_id": group.biofuel_id,
             "credited_entity": group.credited_entity,
             "debited_entity": group.debited_entity,
-            "renewable_energy_share": 1,
+            "renewable_energy_share": group.biofuel.renewable_energy_share,
             "declaration_year": declaration_year,
         }
 

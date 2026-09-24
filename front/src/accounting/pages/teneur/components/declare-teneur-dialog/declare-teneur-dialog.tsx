@@ -81,13 +81,15 @@ const DeclareTeneurDialogContent = ({
   const quantityEnergyMj = useMemo(() => {
     const quantity = form.value.quantity ?? 0
     const pciLitre = form.value.balance?.biofuel?.pci_litre
+    const renewableEnergyShare =
+      form.value.balance?.biofuel?.renewable_energy_share
 
     if (!pciLitre) {
       return 0
     }
 
-    return energyFromLiters(quantity, pciLitre).mj
-  }, [form.value.quantity, form.value.balance?.biofuel?.pci_litre])
+    return energyFromLiters(quantity, pciLitre, renewableEnergyShare).mj
+  }, [form.value.quantity, form.value.balance?.biofuel])
   // Get the current sector objective when the biofuel is selected
   const currentSectorObjective = useMemo(() => {
     if (!form.value.objective_sector) return undefined

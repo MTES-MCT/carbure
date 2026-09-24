@@ -97,7 +97,7 @@ export const useRemainingCO2Objective = (
 /**
  * Max declarable quantity for the teneur form, in liters.
  * Balance is in L; category caps are in GJ — convert remaining cap to liters
- * (ceil to 2 decimals via pci_litre) before comparing with the available balance.
+ * (ceil to 2 decimals via pci_litre and renewable energy share) before comparing with the available balance.
  */
 export const useCalculateQuantityMax = (
   objective: CategoryObjective | BiofuelUnconstrainedCategoryObjective,
@@ -105,6 +105,7 @@ export const useCalculateQuantityMax = (
 ) => {
   const availableBalance = values.balance?.available_balance
   const pciLitre = values.balance?.biofuel?.pci_litre
+  const renewableEnergyShare = values.balance?.biofuel?.renewable_energy_share
 
   return useMemo(() => {
     if (availableBalance === undefined) {
@@ -116,16 +117,17 @@ export const useCalculateQuantityMax = (
       return floorNumber(availableBalance, FRACTION_DIGITS_LITERS)
     }
 
-    if (!pciLitre) {
+    if (!pciLitre || !renewableEnergyShare) {
       return floorNumber(availableBalance, FRACTION_DIGITS_LITERS)
     }
 
     const remainingObjectiveEnergyMj = objective.remaining_energy_mj
     const maxLitersFromObjective = maxLitersFromRemainingMj(
       remainingObjectiveEnergyMj,
-      pciLitre
+      pciLitre,
+      renewableEnergyShare
     )
 
     return Math.min(availableBalance, maxLitersFromObjective)
-  }, [objective, availableBalance, pciLitre])
+  }, [objective, availableBalance, pciLitre, renewableEnergyShare])
 }

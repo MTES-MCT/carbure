@@ -314,8 +314,8 @@ class TeneurService:
         volumes, emissions, lot_ids, enforced_volumes, target_volume = TeneurService.prepare_data(data)
 
         # Transform saved emissions (tCO2) into emissions per energy (gCO2/MJ)
-        pci = data["biofuel"].pci_litre
-        volume_energy = energy_mj(target_volume, pci)  # MJ
+        biofuel = data["biofuel"]
+        volume_energy = energy_mj(target_volume, biofuel.pci_litre, biofuel.renewable_energy_share)  # MJ
         target_emission = GHG_REFERENCE_RED_II - (data["target_emission"] * 1000000 / volume_energy)  # gCO2/MJ emis
 
         selected_lots, fun = TeneurService.optimize_biofuel_blending(
@@ -357,8 +357,7 @@ class TeneurService:
         """
         Convert producted emissions (gCO2/MJ) into avoided emissions (tCO2)
         """
-        pci = biofuel.pci_litre
-        volume_energy = energy_mj(volume, pci)  # MJ
+        volume_energy = energy_mj(volume, biofuel.pci_litre, biofuel.renewable_energy_share)  # MJ
         return avoided_emissions_tco2(volume_energy, emissions_rate, GHG_REFERENCE_RED_II)  # tCO2
 
     @staticmethod
