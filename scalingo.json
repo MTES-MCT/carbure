@@ -1,7 +1,4 @@
 {
-  "scripts": {
-    "first-deploy": "python web/manage.py create_sample_data"
-  },
   "env": {
     "BASE_URL": {
       "description": "URL of the application",
