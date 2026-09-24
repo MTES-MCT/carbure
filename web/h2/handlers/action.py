@@ -1,6 +1,6 @@
 import h2.handlers.lookups as lookups
 from h2.permissions import HasHRSRights, HasHRSWriteRights
-from h2.serializers.action import H2ActionExcelImportSerializer
+from h2.serializers.action import SHIPPING_FUEL_TYPES, H2ActionExcelImportSerializer
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.excel import EXCEL_CONSUMPTION_COLOR, EXCEL_PRODUCTION_COLOR, EXCEL_TRANSPORT_COLOR, excel_column
 from traceability.models import Action
@@ -35,14 +35,22 @@ class H2ActionHandler(ActionIndustryHandler):
         excel_column("ei"),
         excel_column("ep"),
         {
+            "key": "consumed_on_production_site",
             "header": "L'H2 est-il consommé sur le site de production",
             "comment": "Si oui, passer directement à la section consommation — Oui/Non",
+            "options": ["Oui", "Non"],
             "color": EXCEL_TRANSPORT_COLOR,
         },
         excel_column("shipping_method"),
         excel_column("shipping_distance", header="Distance de livraison (km)"),
         {"header": "Masse transportée (kg)", "color": EXCEL_TRANSPORT_COLOR},
-        {"header": "Type de carburant pour le transport", "color": EXCEL_TRANSPORT_COLOR},
+        {
+            "key": "shipping_fuel_type",
+            "header": "Type de carburant pour le transport",
+            "comment": "Obligatoire si l'H2 n'est pas consommé sur site et que le mode de transport est routier",
+            "color": EXCEL_TRANSPORT_COLOR,
+            "options": list(SHIPPING_FUEL_TYPES),
+        },
         excel_column("shipping_date"),
         {
             "key": "etd1",
