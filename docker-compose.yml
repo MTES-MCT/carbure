@@ -38,7 +38,7 @@ services:
 
   carbure-frontend:
     image: carbure_frontend:local
-    container_name: carbure_frontend
+    container_name: ${CARBURE_FRONTEND_CONTAINER:-carbure_frontend}
     <<: *common-settings
     environment:
       VITE_SENTRY_DSN: ${SENTRY_DSN}
@@ -60,7 +60,7 @@ services:
 
   carbure-django:
     image: carbure_app:local
-    container_name: carbure_app
+    container_name: ${CARBURE_APP_CONTAINER:-carbure_app}
     depends_on:
       - carbure-mysql
       - carbure-redis
@@ -69,8 +69,9 @@ services:
       dockerfile: ./web/Dockerfile
     <<: *common-settings
     environment:
-      DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mysql:3306/$MYSQL_DATABASE
-      REDIS_URL: redis://carbure-redis:6379
+      DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mysql:3306/${CARBURE_DATABASE:-${MYSQL_DATABASE}}
+      REDIS_URL: redis://carbure-redis:6379/${REDIS_DB:-0}
+      AWS_ENV_FOLDER_NAME: ${AWS_ENV_FOLDER_NAME:-carbure-local}
       CARBURE_HOME: /app
       PYTHONPATH: /app:/app/web
     volumes:
@@ -81,15 +82,18 @@ services:
 
   carbure-web-proxy:
     image: nginx:latest
-    container_name: carbure_web
+    container_name: ${CARBURE_PROXY_CONTAINER:-carbure_web}
     depends_on:
       - carbure-frontend
       - carbure-django
     <<: *common-settings
+    environment:
+      CARBURE_FRONTEND_HOST: ${CARBURE_FRONTEND_CONTAINER:-carbure_frontend}
+      CARBURE_BACKEND_HOST: ${CARBURE_APP_CONTAINER:-carbure_app}
     volumes:
-      - ./gateway:/etc/nginx/conf.d
+      - ./gateway/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     ports:
-      - 8090:80
+      - ${WEB_PORT:-8090}:80
 
 volumes:
   carburedb:
@@ -97,7 +101,7 @@ volumes:
   carbureredis:
     name: carbure_carbureredis
   uploadedfiles:
-    name: carbure_uploadedfiles
+    name: ${UPLOADED_FILES_VOLUME:-carbure_uploadedfiles}
 
 networks:
   carbure:

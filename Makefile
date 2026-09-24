@@ -1,5 +1,6 @@
 .PHONY: \
 	up down restart logs-django_cmd open restart-backend restart-frontend \
+	agent-up agent-down agent-logs \
 	test-backend test-frontend \
 	makemigrations migrate seed ipython \
 	lint-fix translate translate-missing \
@@ -38,6 +39,15 @@ restart-frontend:
 
 open:
 	open http://carbure.local:8090/
+
+agent-up:
+	./scripts/agent.sh up
+
+agent-down:
+	./scripts/agent.sh down
+
+agent-logs:
+	./scripts/agent.sh logs
 
 # Tests
 test-backend:

@@ -1,0 +1,11 @@
+# Loaded after docker-compose.yml. Attaches to the main network and does not
+# start MySQL, Redis or S3: those stay the ones already running.
+
+services:
+  carbure-django:
+    depends_on: !reset []
+
+networks:
+  carbure:
+    external: true
+    name: carbure_default
