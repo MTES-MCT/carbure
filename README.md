@@ -79,6 +79,8 @@ Dans le fichier `/etc/hosts` ajouter la ligne `127.0.0.1 carbure.local`
 
 Il est maintenant possible d'accéder à la version locale de CarbuRe à l'adresse `http://carbure.local:8090`.
 
+Un second environnement, pour un worktree git, se lance avec `make agent-up` (le tien doit déjà tourner). Il est décrit dans [scripts/agent.md](scripts/agent.md).
+
 # Authentification à Carbure
 
 Bien vérifier que la variable d'environnement `WITH_CSRF` est à `False` afin de désactiver la vérification de token CSRF.
