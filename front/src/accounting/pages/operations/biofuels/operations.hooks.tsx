@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { OperationBadge } from "accounting/components/operation-badge"
 import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { Text } from "common/components/text"
-import { formatValue, isSendingOperation } from "./operations.utils"
+import { isSendingOperation } from "./operations.utils"
 import * as api from "accounting/api/biofuels/operations"
 import {
   OperationDebitOrCredit,
@@ -142,7 +142,7 @@ export const useOperationsBiofuelsColumns = ({
         minWidth: "140px",
       },
       cell: (item) => {
-        const calculatedQuantity = Math.abs(formatValue(item, item.volume))
+        const calculatedQuantity = Math.abs(item.volume)
         const formattedQuantity = formatNumber(calculatedQuantity, {
           fractionDigits: FRACTION_DIGITS_LITERS,
         })
@@ -157,9 +157,7 @@ export const useOperationsBiofuelsColumns = ({
     {
       header: `${t("tCO2 évitées")}`,
       cell: (item) => {
-        const calculatedAvoidedEmissions = Math.abs(
-          formatValue(item, item.avoided_emissions)
-        )
+        const calculatedAvoidedEmissions = Math.abs(item.avoided_emissions)
         const formattedAvoidedEmissions = formatTCO2Number(
           calculatedAvoidedEmissions
         )
