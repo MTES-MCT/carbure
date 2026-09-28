@@ -45,9 +45,11 @@ fi
 
 "$script_dir/restore_local_backup.sh" "$backup_path" "$database_url"
 
-(
-  cd -- "$project_root"
-  DATABASE_URL="$database_url" python web/manage.py migrate
-)
+if [[ -f "$project_root/web/manage.py" ]]; then
+  (
+    cd -- "$project_root"
+    DATABASE_URL="$database_url" python web/manage.py migrate
+  )
+fi
 
 echo "> Database is ready"
