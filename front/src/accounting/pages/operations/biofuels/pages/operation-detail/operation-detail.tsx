@@ -42,8 +42,7 @@ export const OperationDetail = () => {
           operation && (
             <div className={css["operation-detail-header"]}>
               <Dialog.Title>
-                {formatOperationType(operation.type, operation.year)} n°
-                {operation.id}
+                {formatOperationType(operation.type)} n°{operation.id}
               </Dialog.Title>
               <OperationBadge status={operation.status} />
             </div>

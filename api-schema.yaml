@@ -10996,7 +10996,6 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
-                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11010,7 +11009,6 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
-            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11149,7 +11147,6 @@ paths:
               type: string
               enum:
                 - ACCEPTED
-                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -11166,7 +11163,6 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
-            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -11583,7 +11579,6 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
-                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11597,7 +11592,6 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
-            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11736,7 +11730,6 @@ paths:
               type: string
               enum:
                 - ACCEPTED
-                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -11753,7 +11746,6 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
-            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -11885,7 +11877,6 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
-                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -11899,7 +11890,6 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
-            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12026,7 +12016,6 @@ paths:
               type: string
               enum:
                 - ACCEPTED
-                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -12043,7 +12032,6 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
-            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -12219,7 +12207,6 @@ paths:
                 - REPORT
                 - TENEUR
                 - TRANSFERT
-                - YEARLY_BALANCE
           description: |-
             * `INCORPORATION` - INCORPORATION
             * `CESSION` - CESSION
@@ -12233,7 +12220,6 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
-            * `YEARLY_BALANCE` - YEARLY_BALANCE
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12360,7 +12346,6 @@ paths:
               type: string
               enum:
                 - ACCEPTED
-                - AUTO
                 - CANCELED
                 - CORRECTED
                 - DECLARED
@@ -12377,7 +12362,6 @@ paths:
             * `CORRECTED` - CORRECTED
             * `VALIDATED` - VALIDATED
             * `DRAFT` - DRAFT
-            * `AUTO` - AUTO
           explode: true
           style: form
         - in: query
@@ -19826,7 +19810,6 @@ components:
         - CORRECTED
         - VALIDATED
         - DRAFT
-        - AUTO
       type: string
       description: |-
         * `PENDING` - PENDING
@@ -19837,7 +19820,6 @@ components:
         * `CORRECTED` - CORRECTED
         * `VALIDATED` - VALIDATED
         * `DRAFT` - DRAFT
-        * `AUTO` - AUTO
     OperationTypeEnum:
       enum:
         - INCORPORATION
@@ -19852,7 +19834,6 @@ components:
         - TRANSFERT
         - EXPIRATION
         - REPORT
-        - YEARLY_BALANCE
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -19867,7 +19848,6 @@ components:
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT
-        * `YEARLY_BALANCE` - YEARLY_BALANCE
     OperationUpdate:
       type: object
       properties:

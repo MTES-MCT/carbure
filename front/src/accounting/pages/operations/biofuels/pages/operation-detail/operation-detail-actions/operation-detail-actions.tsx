@@ -58,7 +58,7 @@ export const OperationDetailActions = ({
     })
 
   const buttonsComponent = useMemo(() => {
-    if (!operation || operation.type === OperationType.YEARLY_BALANCE) return []
+    if (!operation) return []
 
     const buttons: React.ReactNode[] = [
       <Button

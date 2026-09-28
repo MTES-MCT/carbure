@@ -51,7 +51,7 @@ export const formatSector = (sector: string) => {
  * @param type the operation type sent by the API
  * @returns the i18n key for the operation type
  */
-export const formatOperationType = (type: string, year?: number) => {
+export const formatOperationType = (type: string) => {
   switch (type) {
     case OperationType.INCORPORATION:
       return i18next.t("Incorporation")
@@ -79,8 +79,6 @@ export const formatOperationType = (type: string, year?: number) => {
       return i18next.t("Expiration")
     case OperationType.REPORT:
       return i18next.t("Report Tiruert 2026")
-    case OperationType.YEARLY_BALANCE:
-      return year ? i18next.t("Reliquat " + (year! - 1)) : i18next.t("Reliquat")
     default:
       return i18next.t("Inconnu")
   }
@@ -124,8 +122,6 @@ export const formatOperationStatus = (
       return i18next.t("Validé")
     case OperationsStatus.DRAFT:
       return i18next.t("Brouillon")
-    case OperationsStatus.AUTO:
-      return i18next.t("Auto")
     default:
       return i18next.t("Inconnu")
   }
