@@ -50,7 +50,7 @@ class ActionViewset(
     serializer_class = ActionSerializer
     filterset_class = ActionFilter
     pagination_class = TotalCountPagination
-    search_fields = ["pos_id"]
+    search_fields = ["holder__name", "pos_id"]
 
     def get_permissions(self):
         # prevent DRF from raising an exception when generating the schema
