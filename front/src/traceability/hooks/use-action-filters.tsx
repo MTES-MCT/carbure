@@ -2,12 +2,13 @@ import { useTranslation } from "react-i18next"
 
 import { Normalizer } from "common/utils/normalize"
 import { EntityManager } from "common/hooks/entity"
-import { ActionFilter } from "traceability/types"
+import { ActionFilter, ActionStatus } from "traceability/types"
+import { getActionStatusLabel } from "traceability/utils"
 
 export type ActionFilterDisplay = {
   key: ActionFilter
   label: string
-  normalizer?: Normalizer<unknown, string>
+  normalizer?: Normalizer<string, string>
   condition?: (entity: EntityManager) => boolean
 }
 
@@ -43,6 +44,12 @@ export function useActionFilters() {
     status: {
       key: ActionFilter.status,
       label: t("Statut"),
+      normalizer: (status) => {
+        return {
+          value: status,
+          label: getActionStatusLabel(status as ActionStatus),
+        }
+      },
     },
 
     type: {
