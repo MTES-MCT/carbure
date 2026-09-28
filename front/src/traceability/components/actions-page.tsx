@@ -29,6 +29,7 @@ import { ActionFieldset } from "traceability/hooks/use-action-fields"
 import { Button, ButtonProps } from "common/components/button2"
 import { FrIconClassName } from "@codegouvfr/react-dsfr"
 import { SearchInput } from "common/components/inputs2"
+import { Pagination } from "common/components/pagination2"
 
 export const QUERY_KEY = "traceability-actions"
 
@@ -194,6 +195,12 @@ export const ActionsPage = ({
             search: location.search,
             hash: `action/${action.id}`,
           })}
+        />
+        <Pagination
+          defaultPage={query.page}
+          total={result?.data?.count ?? 0}
+          limit={state.limit}
+          onLimit={actions.setLimit}
         />
       </Content>
 
