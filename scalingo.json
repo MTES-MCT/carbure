@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "first-deploy": "python web/manage.py create_sample_data"
+    "first-deploy": "bash bin/post_deploy.sh && python3 web/manage.py create_sample_data"
   },
   "env": {
     "BASE_URL": {
