@@ -29,7 +29,7 @@ const CertificatesPage = () => {
       ]}
       columns={[
         { ...columns.pos_id, header: t("N˚ de certificat") },
-        columns.working_date,
+        columns.period,
         columns.quantity,
         columns.total_emissions,
       ]}
