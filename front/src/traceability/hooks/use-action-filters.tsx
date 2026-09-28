@@ -17,7 +17,7 @@ export function useActionFilters() {
   return {
     holder: {
       key: ActionFilter.holder,
-      label: t("Détenteur"),
+      label: t("Société"),
     },
 
     material: {

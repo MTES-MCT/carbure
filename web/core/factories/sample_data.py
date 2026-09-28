@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 
-from core.models import Entity, Pays, UserRights
+from core.models import Entity, ExternalAdminRights, Pays, UserRights
 
 User = get_user_model()
 
@@ -52,6 +52,20 @@ def set_user_access(user: User, entity: Entity, role: str):
         entity=entity,
         defaults={"role": role},
     )
+
+
+def setup_external_admin_entity(name: str, external_entity_type: str) -> Entity:
+    entity, _ = Entity.objects.get_or_create(
+        name=name,
+        entity_type=Entity.EXTERNAL_ADMIN,
+    )
+
+    ExternalAdminRights.objects.get_or_create(
+        entity=entity,
+        right=external_entity_type,
+    )
+
+    return entity
 
 
 def create_sample_data():

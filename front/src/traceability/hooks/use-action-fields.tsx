@@ -63,7 +63,7 @@ export function useActionFields() {
   return {
     holder: {
       key: "holder",
-      label: t("Détenteur"),
+      label: t("Société"),
       field: ({ form, props }) => {
         const bound = form.bind("holder")
 

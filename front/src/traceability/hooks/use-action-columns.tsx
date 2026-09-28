@@ -26,7 +26,7 @@ export function useActionColumns() {
     },
     holder: {
       key: "holder",
-      header: t("Détenteur"),
+      header: t("Société"),
       cell: (action) => (
         <Cell text={action.holder.name} sub={action.holder.entity_type} />
       ),
