@@ -191,7 +191,7 @@ def send_email_to_admin(entity, request):
     text_message = f"""
     Bonjour,
 
-    Une demande d'inscription de société {entity.name} a été déposée le {today} par l'utilisateur {request.user.email}.
+    Une demande d'inscription de société {entity.name} ({entity.entity_type}) a été déposée le {today} par l'utilisateur {request.user.email}.
     Veuillez traiter cette demande dans l'interface administrateur de CarbuRe :
 
     1 - Allez sur la page 'Sociétés'.
@@ -200,7 +200,7 @@ def send_email_to_admin(entity, request):
     4 - Cliquez sur le bouton "Autoriser la société".
 
     Bonne journée
-    """
+    """  # noqa: E501
 
     send_mail(
         request=request,
