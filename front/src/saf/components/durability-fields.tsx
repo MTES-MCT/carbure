@@ -6,6 +6,7 @@ import {
   formatNumber,
   formatPercentage,
 } from "common/utils/formatters"
+import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
 import { useTranslation } from "react-i18next"
 import { Dialog } from "common/components/dialog2"
 import { SafDurability } from "saf/types"
@@ -14,6 +15,7 @@ const formatNumberToText = (value: number | undefined) =>
   value ? formatNumber(value) : ""
 const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
   const { t } = useTranslation()
+  const emissionTitles = useGhgEmissionTitles()
 
   return (
     <Dialog.Section label={t("Émissions/Réductions")}>
@@ -22,14 +24,14 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
           <TextInput
             hasTooltip
             label="EEC"
-            title={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
+            title={emissionTitles.eec}
             value={durability.eec ? formatNumberToText(durability.eec) : "-"}
             readOnly
           />
           <TextInput
             hasTooltip
             label="EL"
-            title={t("Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols")} // prettier-ignore
+            title={emissionTitles.el}
             value={durability.el ? formatNumberToText(durability.el) : "-"}
             readOnly
           />
@@ -37,7 +39,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             required
             hasTooltip
             label="EP"
-            title={t("Émissions résultant dela transformation")}
+            title={emissionTitles.ep}
             value={durability.ep ? formatNumberToText(durability.ep) : "-"}
             readOnly
           />
@@ -45,7 +47,7 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
             required
             hasTooltip
             label="ETD"
-            title={t("Émissions résultant du transport et de la distribution")}
+            title={emissionTitles.etd}
             value={durability.etd ? formatNumberToText(durability.etd) : "-"}
             readOnly
           />
@@ -54,28 +56,28 @@ const DurabilityFields = ({ durability }: { durability: SafDurability }) => {
           <TextInput
             label="ESCA"
             hasTooltip
-            title={t("Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole")} // prettier-ignore
+            title={emissionTitles.esca}
             value={durability.esca ? formatNumberToText(durability.esca) : "-"}
             readOnly
           />
           <TextInput
             label="ECCS"
             hasTooltip
-            title={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
+            title={emissionTitles.eccs}
             value={durability.eccs ? formatNumberToText(durability.eccs) : "-"}
             readOnly
           />
           <TextInput
             label="ECCR"
             hasTooltip
-            title={t("Réductions d'émissions dues au piégeage et à la substitution du carbone")} // prettier-ignore
+            title={emissionTitles.eccr}
             value={durability.eccr ? formatNumberToText(durability.eccr) : "-"}
             readOnly
           />
           <TextInput
             label="EEE"
             hasTooltip
-            title={t("Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération")} // prettier-ignore
+            title={emissionTitles.eee}
             value={durability.eee ? formatNumberToText(durability.eee) : "-"}
             readOnly
           />

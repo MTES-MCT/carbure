@@ -28,7 +28,7 @@ const CertificatesPage = () => {
         filters.period, //
       ]}
       columns={[
-        { ...columns.pos_id, header: t("N˚ de certificat") },
+        { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
         columns.working_date,
         columns.quantity,
         columns.total_emissions,
@@ -37,7 +37,7 @@ const CertificatesPage = () => {
         {
           legend: t("Certificat"),
           fields: [
-            fields.pos_id,
+            fields.carbure_id,
             { ...fields.quantity, label: t("Quantité certifiée") },
             { ...fields.working_date, label: t("Date de création") },
           ],
