@@ -4,9 +4,9 @@ import { Dropdown } from "common/components/dropdown2"
 import { TextArea } from "common/components/inputs2"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import styles from "./user-ids-filter.module.css"
+import styles from "./entity-ids-filter.module.css"
 
-export function countUserIds(raw: string) {
+export function countEntityIds(raw: string) {
   const seen = new Set<string>()
   for (const token of raw.split(/[\s,;]+/)) {
     if (/^\d+$/.test(token)) seen.add(token)
@@ -14,18 +14,18 @@ export function countUserIds(raw: string) {
   return seen.size
 }
 
-type UserIdsFilterProps = {
+type EntityIdsFilterProps = {
   value: string
   onChange: (value: string) => void
 }
 
-export const UserIdsFilter = ({ value, onChange }: UserIdsFilterProps) => {
+export const EntityIdsFilter = ({ value, onChange }: EntityIdsFilterProps) => {
   const { t } = useTranslation()
   const triggerRef = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState(value)
-  const appliedCount = countUserIds(value)
-  const draftCount = countUserIds(draft)
+  const appliedCount = countEntityIds(value)
+  const draftCount = countEntityIds(draft)
 
   useEffect(() => {
     setDraft(value)

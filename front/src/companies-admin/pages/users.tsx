@@ -16,7 +16,7 @@ import { EntityType, UserRole } from "common/types"
 import { getEntityTypeLabel, getUserRoleLabel } from "common/utils/normalizers"
 import { ROUTE_URLS } from "common/utils/routes"
 import * as api from "../api"
-import { UserIdsFilter } from "../components/user-ids-filter"
+import { EntityIdsFilter } from "../components/entity-ids-filter"
 import { Button } from "common/components/button2"
 
 const AdminUsers = () => {
@@ -27,11 +27,11 @@ const AdminUsers = () => {
 
   const { state, actions, query } = useQueryBuilder()
   const listQuery = query as QueryParams<"/entities/admin-users/">
-  const [userIds, setUserIds] = useState("")
+  const [entityIds, setEntityIds] = useState("")
 
   const { result, loading } = useQuery(api.getAdminUsers, {
     key: "admin-users",
-    params: [listQuery, userIds],
+    params: [listQuery, entityIds],
   })
 
   const rows = result?.data?.results ?? []
@@ -71,10 +71,10 @@ const AdminUsers = () => {
             }),
           }}
         >
-          <UserIdsFilter
-            value={userIds}
-            onChange={(ids) => {
-              setUserIds(ids)
+          <EntityIdsFilter
+            value={entityIds}
+            onChange={(nextEntityIds) => {
+              setEntityIds(nextEntityIds)
               actions.setPage(1)
             }}
           />
@@ -89,17 +89,6 @@ const AdminUsers = () => {
               rowLink={(row) => entityUsersPath(row.entity_id)}
               columns={[
                 {
-                  small: true,
-                  key: "is_active",
-                  header: t("Actif"),
-                  cell: (row) => (row.is_active ? t("Oui") : t("Non")),
-                },
-                {
-                  key: "email",
-                  header: t("Adresse e-mail"),
-                  cell: (row) => <Cell text={row.email} />,
-                },
-                {
                   key: "entity",
                   header: t("Entité"),
                   cell: (row) => (
@@ -110,10 +99,27 @@ const AdminUsers = () => {
                   ),
                 },
                 {
+                  key: "entity",
+                  header: t("Entity id"),
+                  cell: (row) => <Cell text={row.entity_id} />,
+                },
+                {
+                  key: "id",
+                  header: t("Utilisateur"),
+                  cell: (row) => <Cell text={row.email} />,
+                },
+
+                {
                   small: true,
                   key: "role",
                   header: t("Rôle"),
                   cell: (row) => getUserRoleLabel(row.role),
+                },
+                {
+                  small: true,
+                  key: "is_active",
+                  header: t("Actif"),
+                  cell: (row) => (row.is_active ? t("Oui") : t("Non")),
                 },
                 {
                   small: true,
