@@ -211,7 +211,7 @@ export function useActionFields() {
           {...props}
           hasTooltip
           title={emissionTitles.ei}
-          {...form.bind("ei")}
+          {...form.bind("ei", { value: form.value.total_emissions?.ei })}
         />
       ),
     },
@@ -224,7 +224,7 @@ export function useActionFields() {
           {...props}
           hasTooltip
           title={emissionTitles.ep}
-          {...form.bind("ep")}
+          {...form.bind("ep", { value: form.value.total_emissions?.ep })}
         />
       ),
     },
@@ -237,7 +237,7 @@ export function useActionFields() {
           {...props}
           hasTooltip
           title={emissionTitles.etd}
-          {...form.bind("etd")}
+          {...form.bind("etd", { value: form.value.total_emissions?.etd })}
         />
       ),
     },
@@ -250,7 +250,7 @@ export function useActionFields() {
           {...props}
           hasTooltip
           title={emissionTitles.eu}
-          {...form.bind("eu")}
+          {...form.bind("eu", { value: form.value.total_emissions?.eu })}
         />
       ),
     },
@@ -263,7 +263,7 @@ export function useActionFields() {
           {...props}
           hasTooltip
           title={emissionTitles.eccs}
-          {...form.bind("eccs")}
+          {...form.bind("eccs", { value: form.value.total_emissions?.eccs })}
         />
       ),
     },
