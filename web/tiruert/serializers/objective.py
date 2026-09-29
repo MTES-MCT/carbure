@@ -55,3 +55,17 @@ class ObjectiveInputSerializer(serializers.Serializer):
     selected_entity_id = serializers.PrimaryKeyRelatedField(
         queryset=Entity.objects.filter(is_tiruert_liable=True), required=False, allow_null=True, default=None
     )
+
+
+class SnapshotBalanceEntrySerializer(serializers.Serializer):
+    sector = serializers.CharField()
+    biofuel = serializers.CharField(allow_null=True)
+    customs_category = serializers.CharField(allow_null=True)
+    volume = TruncatedFloatField()
+    energy = TruncatedFloatField(decimal_places=0)
+    saved_emissions = TruncatedFloatField()
+
+
+class SnapshotBalanceSerializer(serializers.Serializer):
+    year = serializers.IntegerField()
+    results = SnapshotBalanceEntrySerializer(many=True)
