@@ -5,7 +5,6 @@ from django.test import TestCase
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import Biocarburant, MatierePremiere
-from core.models.feedstock import GPL_BIOFUEL_TYPES
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from transactions.factories import CarbureLotFactory
 from transactions.models import ProductionSite
@@ -102,6 +101,18 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
+
+    def test_missing_ref_dbl_counting_gpl(self):
+        """GPL-compatible biofuels do not require a double-counting reference."""
+        gpl_biofuel = Biocarburant.objects.create(name="GPL test", code="TEST_GPL", compatible_gpl=True)
+        lot = self.create_lot(
+            feedstock=self.dc_feedstock,
+            biofuel=gpl_biofuel,
+            production_site_double_counting_certificate="",
+        )
+
+        errors = self.run_checks(lot)
+        assert not has_error(CarbureSanityCheckErrors.MISSING_REF_DBL_COUNTING, errors)
 
     def test_unknown_double_counting_certificate_unknown_production_site(self):
         error = CarbureCertificatesErrors.UNKNOWN_DOUBLE_COUNTING_CERTIFICATE
@@ -205,16 +216,3 @@ class DoubleCountingSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
 
         assert not has_error(CarbureCertificatesErrors.MISSING_REF_DBL_COUNTING, error_list)
-
-    def test_no_double_counting_requirement_on_gpl(self):
-        for code in GPL_BIOFUEL_TYPES:
-            gpl_biofuel = Biocarburant.objects.create(name=code, name_en=code, description="", code=code)
-            lot = self.create_lot(
-                feedstock=self.dc_feedstock,
-                biofuel=gpl_biofuel,
-                production_site_double_counting_certificate="",
-            )
-
-            error_list = self.run_checks(lot)
-
-            assert not has_error(CarbureCertificatesErrors.MISSING_REF_DBL_COUNTING, error_list)

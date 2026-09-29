@@ -86,6 +86,7 @@ class SafTicketSourceDetailsTest(TestCase):
         )
 
     def test_saf_ticket_sources(self):
+        """Return ticket source details with biofuel GPL compatibility."""
         query = {"entity_id": self.entity.id}
         response = self.client.get(reverse("saf-ticket-sources-detail", kwargs={"id": 1234}), query)
 
@@ -121,6 +122,7 @@ class SafTicketSourceDetailsTest(TestCase):
                 "name": "Huiles co-traitées - Kérosène",
                 "name_en": "",
                 "code": "HCC",
+                "compatible_gpl": False,
             },
             "country_of_origin": {
                 "name": "Espagne",

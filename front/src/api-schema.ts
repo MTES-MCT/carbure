@@ -3727,11 +3727,13 @@ export interface components {
             name: string;
             name_en: string;
             code: string;
+            compatible_gpl?: boolean;
         };
         BiofuelRequest: {
             name: string;
             name_en: string;
             code: string;
+            compatible_gpl?: boolean;
         };
         /** @description Serializer pour la liste admin des déclarations annuelles biométhane (DREAL). */
         BiomethaneAdminAnnualDeclaration: {

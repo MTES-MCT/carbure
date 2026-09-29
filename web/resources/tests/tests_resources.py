@@ -114,17 +114,18 @@ class ResourcesTest(TestCase):
 
         response = self.client.get(url)
         assert response.status_code == 200
-        biofuel_codes = [biofuel["code"] for biofuel in response.json()]
-        assert visible_gpl.code not in biofuel_codes
-        assert hidden_gpl.code not in biofuel_codes
+        biofuels = response.json()
+        assert visible_gpl.code not in [biofuel["code"] for biofuel in biofuels]
+        assert hidden_gpl.code not in [biofuel["code"] for biofuel in biofuels]
+        assert all(biofuel["compatible_gpl"] is False for biofuel in biofuels)
 
         producer.has_biogpl = True
         producer.save(update_fields=["has_biogpl"])
         response = self.client.get(url)
         assert response.status_code == 200
-        biofuel_codes = [biofuel["code"] for biofuel in response.json()]
-        assert visible_gpl.code in biofuel_codes
-        assert hidden_gpl.code not in biofuel_codes
+        biofuels = response.json()
+        assert next(biofuel for biofuel in biofuels if biofuel["code"] == visible_gpl.code)["compatible_gpl"] is True
+        assert hidden_gpl.code not in [biofuel["code"] for biofuel in biofuels]
 
     def test_get_materials(self):
         Material.objects.create(name="Bio-H2", code="H2-BIO")
