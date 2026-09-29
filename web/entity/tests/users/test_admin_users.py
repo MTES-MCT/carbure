@@ -93,7 +93,7 @@ class AdminUsersTest(TestCase):
     def test_filters_and_search(self):
         user = User.objects.create_user(email="filtre@carbure.local", name="Filtre", password="x")
         UserRights.objects.create(user=user, entity=self.producer, role=UserRights.RW)
-        other = User.objects.create_user(email="autre@carbure.local", name="Autre", password="x")
+        other = User.objects.create_user(email="autre@carbure.local", name="Autre", password="x", is_active=False)
         UserRights.objects.create(user=other, entity=self.operator, role=UserRights.RO)
 
         by_email = self.results(search="filtre@")
@@ -108,6 +108,12 @@ class AdminUsersTest(TestCase):
 
         by_role = self.results(role=UserRights.RW)
         self.assertTrue(all(row["role"] == UserRights.RW for row in by_role))
+
+        active_rows = self.results(is_active="true")
+        self.assertEqual([row["email"] for row in active_rows], ["filtre@carbure.local"])
+
+        inactive_rows = self.results(is_active="false")
+        self.assertEqual([row["email"] for row in inactive_rows], ["autre@carbure.local"])
 
         self.assertEqual(self.results(search=f"{self.producer.id}, {self.operator.id}"), [])
 
