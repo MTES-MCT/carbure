@@ -7,7 +7,7 @@ from core.models import UserRights
 from core.permissions import HasAdminRights
 from core.utils import CustomPageNumberPagination
 from entity.filters.admin_users import AdminUserFilter
-from entity.serializers.admin_users import AdminUserIdsSerializer, AdminUserRowSerializer
+from entity.serializers.admin_users import AdminEntityIdsSerializer, AdminUserRowSerializer
 
 
 @extend_schema(
@@ -34,7 +34,7 @@ class AdminUsersViewSet(ListModelMixin, GenericViewSet):
     pagination_class = CustomPageNumberPagination
 
     @extend_schema(
-        request=AdminUserIdsSerializer,
+        request=AdminEntityIdsSerializer,
         responses={200: AdminUserRowSerializer(many=True)},
         filters=True,
     )

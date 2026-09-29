@@ -4,11 +4,11 @@ import { UserRightStatus, EntityType, UserRole } from "common/types"
 
 export function getAdminUsers(
   query: QueryParams<"/entities/admin-users/">,
-  userIds: string
+  entityIds: string
 ) {
   return apiFetch.POST("/entities/admin-users/search/", {
     params: { query },
-    body: { user_ids: userIds },
+    body: { entity_ids: entityIds },
   })
 }
 

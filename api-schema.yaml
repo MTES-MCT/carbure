@@ -5560,7 +5560,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: user_ids
+          name: entity_ids
           schema:
             type: string
       tags:
@@ -5665,7 +5665,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: user_ids
+          name: entity_ids
           schema:
             type: string
       tags:
@@ -5674,13 +5674,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AdminUserIdsRequest"
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
           application/x-www-form-urlencoded:
             schema:
-              $ref: "#/components/schemas/AdminUserIdsRequest"
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/AdminUserIdsRequest"
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
       security:
         - basicAuth: []
       responses:
@@ -13792,10 +13792,10 @@ components:
       required:
         - delivery_site_id
         - ownership_type
-    AdminUserIdsRequest:
+    AdminEntityIdsRequest:
       type: object
       properties:
-        user_ids:
+        entity_ids:
           type: string
     AdminUserRow:
       type: object

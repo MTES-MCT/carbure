@@ -3623,8 +3623,8 @@ export interface components {
             blending_is_outsourced: boolean;
             blending_entity_id?: number;
         };
-        AdminUserIdsRequest: {
-            user_ids?: string;
+        AdminEntityIdsRequest: {
+            entity_ids?: string;
         };
         AdminUserRow: {
             readonly user_id: number;
@@ -11131,7 +11131,7 @@ export interface operations {
                 role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
                 /** @description A search term. */
                 search?: string;
-                user_ids?: string;
+                entity_ids?: string;
             };
             header?: never;
             path?: never;
@@ -11186,7 +11186,7 @@ export interface operations {
                 role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
                 /** @description A search term. */
                 search?: string;
-                user_ids?: string;
+                entity_ids?: string;
             };
             header?: never;
             path?: never;
@@ -11194,9 +11194,9 @@ export interface operations {
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["AdminUserIdsRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["AdminUserIdsRequest"];
-                "multipart/form-data": components["schemas"]["AdminUserIdsRequest"];
+                "application/json": components["schemas"]["AdminEntityIdsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AdminEntityIdsRequest"];
+                "multipart/form-data": components["schemas"]["AdminEntityIdsRequest"];
             };
         };
         responses: {

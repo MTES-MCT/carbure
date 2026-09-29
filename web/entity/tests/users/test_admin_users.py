@@ -109,24 +109,24 @@ class AdminUsersTest(TestCase):
         by_role = self.results(role=UserRights.RW)
         self.assertTrue(all(row["role"] == UserRights.RW for row in by_role))
 
-        self.assertEqual(self.results(search=f"{user.id}, {other.id}"), [])
+        self.assertEqual(self.results(search=f"{self.producer.id}, {self.operator.id}"), [])
 
-        by_ids = self.post_results(f"{user.id}, {other.id}")
+        by_entity_ids = self.post_results(f"{self.producer.id}, {self.operator.id}")
         self.assertEqual(
-            sorted(row["email"] for row in by_ids),
+            sorted(row["email"] for row in by_entity_ids),
             ["autre@carbure.local", "filtre@carbure.local"],
         )
 
-        by_lines = self.post_results(f"{user.id}\n{other.id}")
+        by_lines = self.post_results(f"{self.producer.id}\n{self.operator.id}")
         self.assertEqual(
             sorted(row["email"] for row in by_lines),
             ["autre@carbure.local", "filtre@carbure.local"],
         )
 
-    def post_results(self, user_ids, **params):
+    def post_results(self, entity_ids, **params):
         response = self.client.post(
             self.search_url,
-            {"user_ids": user_ids},
+            {"entity_ids": entity_ids},
             query_params={"entity_id": self.admin.id, **params},
         )
         self.assertEqual(response.status_code, 200, response.content)

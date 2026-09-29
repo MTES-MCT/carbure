@@ -3,8 +3,8 @@ from rest_framework import serializers
 from core.models import Entity, UserRights
 
 
-class AdminUserIdsSerializer(serializers.Serializer):
-    user_ids = serializers.CharField(required=False, allow_blank=True)
+class AdminEntityIdsSerializer(serializers.Serializer):
+    entity_ids = serializers.CharField(required=False, allow_blank=True)
 
 
 class AdminUserRowSerializer(serializers.ModelSerializer):
