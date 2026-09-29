@@ -3,7 +3,7 @@ import styles from "./filter-multiselect2.module.css"
 import { Normalizer } from "common/utils/normalize"
 import { QueryFilters } from "common/hooks/query-builder-2"
 import { useTranslation } from "react-i18next"
-import { useCallback } from "react"
+import { ReactNode, useCallback } from "react"
 import { Button } from "common/components/button2"
 
 const getEmptyFilters = <Key extends string>(filters: Key[]) => {
@@ -31,6 +31,7 @@ export interface FilterMultiSelectProps2<
   onSelect: (filters: QueryFilters) => void
   getFilterOptions: (filter: Key) => Promise<any[]>
   normalizers?: Partial<Record<Key, Normalizer<any, Value>>>
+  children?: ReactNode
 }
 
 export const FilterMultiSelect2 = <
@@ -42,6 +43,7 @@ export const FilterMultiSelect2 = <
   onSelect,
   getFilterOptions,
   normalizers,
+  children,
 }: FilterMultiSelectProps2<Key, Value>) => {
   const filters = Object.keys(filterLabels) as Key[]
   const emptyFilters = getEmptyFilters(filters)
@@ -68,6 +70,7 @@ export const FilterMultiSelect2 = <
           clear
         />
       ))}
+      {children}
       {hasFiltersValues() && (
         <Button
           onClick={() => onSelect(emptyFilters)}

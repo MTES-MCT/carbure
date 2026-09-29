@@ -17,6 +17,7 @@ export const ROUTE_URLS = {
         AGREEMENTS: `${baseUrl}/double-counting/agreements`,
       },
       COMPANIES: `${baseUrl}/entities`,
+      USERS: `${baseUrl}/users`,
     }
   },
   ACCOUNTING: (entity_id: number) => {

@@ -770,6 +770,8 @@
   "Sélectionner 1 ou plusieurs options": "Select one or more options",
   "{{count}} options sélectionnées_one": "{{count}} option selected",
   "{{count}} options sélectionnées_other": "{{count}} options selected",
+  "{{count}} identifiants reconnus_one": "{{count}} recognized id",
+  "{{count}} identifiants reconnus_other": "{{count}} recognized ids",
   "Sélectionner une option": "Select an option",
   "Revenir à la liste complète": "Back to full list",
   "Voir la liste": "See the list",
