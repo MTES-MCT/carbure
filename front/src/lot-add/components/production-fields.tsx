@@ -207,7 +207,7 @@ export const ProductionSiteDoubleCountingCertificateField = (
       icon={<CertificateIcon certificate={certificate} />}
       label={t("Certificat double-comptage")}
       {...dcProps}
-      required={!isSAF(value.biofuel)}
+      required={!isSAF(value.biofuel) && !value.biofuel?.compatible_gpl}
     />
   )
 }

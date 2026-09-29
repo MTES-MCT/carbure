@@ -15458,6 +15458,8 @@ components:
         code:
           type: string
           maxLength: 16
+        compatible_gpl:
+          type: boolean
       required:
         - code
         - name
@@ -15477,6 +15479,8 @@ components:
           type: string
           minLength: 1
           maxLength: 16
+        compatible_gpl:
+          type: boolean
       required:
         - code
         - name
