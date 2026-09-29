@@ -54,6 +54,7 @@ class SafTicketsTest(TestCase):
         self.second_ticket.save()
 
     def test_saf_tickets(self):
+        """List assigned tickets with biofuel GPL compatibility."""
         query = {
             "entity_id": self.entity.id,
             "year": 2022,
@@ -89,6 +90,7 @@ class SafTicketsTest(TestCase):
                 "name": "Huiles co-traitées - Kérosène",
                 "name_en": "",
                 "code": "HCC",
+                "compatible_gpl": False,
             },
             "country_of_origin": {
                 "name": "Espagne",

@@ -92,6 +92,7 @@ class SafTicketDetailsTest(TestCase):
         assert response.status_code == 404
 
     def test_saf_ticket_details_ok(self):
+        """Return the full ticket details, including biofuel GPL compatibility."""
         query = {"entity_id": self.entity.id}
         response = self.client.get(reverse("saf-tickets-detail", kwargs={"id": 4321}), query)
         assert response.status_code == 200
@@ -131,6 +132,7 @@ class SafTicketDetailsTest(TestCase):
                 "name": "Huiles co-traitées - Kérosène",
                 "name_en": "",
                 "code": "HCC",
+                "compatible_gpl": False,
             },
             "country_of_origin": {
                 "name": "Espagne",
