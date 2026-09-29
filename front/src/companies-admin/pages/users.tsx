@@ -13,7 +13,11 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { QueryParams } from "common/services/api-fetch.types"
 import { EntityType, UserRole } from "common/types"
-import { getEntityTypeLabel, getUserRoleLabel } from "common/utils/normalizers"
+import {
+  getEntityTypeLabel,
+  getUserRoleLabel,
+  normalizeBoolean,
+} from "common/utils/normalizers"
 import { ROUTE_URLS } from "common/utils/routes"
 import * as api from "../api"
 import { EntityIdsFilter } from "../components/entity-ids-filter"
@@ -52,10 +56,11 @@ const AdminUsers = () => {
           <Button>Exporter</Button>
         </ActionBar>
 
-        <FilterMultiSelect2<"entity_type" | "role", string>
+        <FilterMultiSelect2<"entity_type" | "role" | "is_active", string>
           filterLabels={{
             entity_type: t("Type d'entité"),
             role: t("Rôle"),
+            is_active: t("Utilisateur actif"),
           }}
           selected={state.filters}
           onSelect={actions.setFilters}
@@ -69,6 +74,7 @@ const AdminUsers = () => {
               value: role,
               label: getUserRoleLabel(role),
             }),
+            is_active: normalizeBoolean,
           }}
         >
           <EntityIdsFilter
@@ -143,9 +149,10 @@ const AdminUsers = () => {
   )
 }
 
-function getFilterOptions(filter: "entity_type" | "role") {
+function getFilterOptions(filter: "entity_type" | "role" | "is_active") {
   if (filter === "entity_type")
     return Promise.resolve(Object.values(EntityType))
+  if (filter === "is_active") return Promise.resolve(["true", "false"])
   return Promise.resolve(Object.values(UserRole))
 }
 

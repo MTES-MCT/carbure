@@ -11160,6 +11160,7 @@ export interface operations {
                  *     * `AUDITOR` - Auditeur
                  */
                 role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
+                is_active?: PathsApiEntitiesAdminUsersGetParametersQueryIs_active[];
                 /** @description A search term. */
                 search?: string;
                 entity_ids?: string;
@@ -11215,6 +11216,7 @@ export interface operations {
                  *     * `AUDITOR` - Auditeur
                  */
                 role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
+                is_active?: PathsApiEntitiesAdminUsersGetParametersQueryIs_active[];
                 /** @description A search term. */
                 search?: string;
                 entity_ids?: string;
@@ -16124,6 +16126,10 @@ export enum PathsApiEntitiesAdminUsersGetParametersQueryEntity_type {
     SAF_Trader = "SAF Trader",
     Trader = "Trader",
     Unknown = "Unknown"
+}
+export enum PathsApiEntitiesAdminUsersGetParametersQueryIs_active {
+    false = "false",
+    true = "true"
 }
 export enum PathsApiEntitiesAdminUsersGetParametersQueryRole {
     ADMIN = "ADMIN",

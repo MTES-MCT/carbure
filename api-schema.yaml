@@ -5553,6 +5553,20 @@ paths:
             * `AUDITOR` - Auditeur
           explode: true
           style: form
+        - in: query
+          name: is_active
+          schema:
+            type: array
+            items:
+              type: boolean
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
+          explode: true
+          style: form
         - name: search
           required: false
           in: query
@@ -5656,6 +5670,20 @@ paths:
             * `RW` - Lecture/Écriture
             * `ADMIN` - Administrateur
             * `AUDITOR` - Auditeur
+          explode: true
+          style: form
+        - in: query
+          name: is_active
+          schema:
+            type: array
+            items:
+              type: boolean
+              enum:
+                - "false"
+                - "true"
+          description: |-
+            * `true` - True
+            * `false` - False
           explode: true
           style: form
         - name: search
