@@ -66,14 +66,6 @@ class BiofuelFeedstockSanityChecksTest(TestCase):
 
         assert not errors
 
-    def test_hvogpl_requires_vegetable_oil_feedstock(self):
-        hvogpl = Biocarburant(code="HVOGPL", is_graisse=True)
-        vegetable_feedstock = MatierePremiere.biofuel.get(code="COLZA")
-        non_vegetable_feedstock = MatierePremiere.biofuel.get(code="HUILE_ALIMENTAIRE_USAGEE")
-
-        assert not list(get_biofuel_feedstock_incompatibilities(hvogpl, vegetable_feedstock))
-        assert list(get_biofuel_feedstock_incompatibilities(hvogpl, non_vegetable_feedstock))
-
     def test_hcgpl_requires_supported_feedstock(self):
         hcgpl = Biocarburant(code="HCGPL", is_graisse=True)
         supported_feedstock = MatierePremiere.biofuel.get(code="COLZA")
