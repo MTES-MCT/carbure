@@ -461,6 +461,7 @@ SPECTACULAR_SETTINGS = {
         "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
         "ElecQualichargeStatusEnum": "elec.models.ElecProvisionCertificateQualicharge.VALIDATION_CHOICES",
         "EntityTypeEnum": "core.models.Entity.ENTITY_TYPES",
+        "RoleEnum": "core.models.UserRights.ROLES",
         "ActionTypeEnum": "traceability.models.action.Action.TYPES",
         "ActionStatusEnum": "traceability.models.action_status.ActionStatus.STATUSES",
         "ActionShippingMethodEnum": "traceability.models.action.Action.SHIPPING_METHODS",
