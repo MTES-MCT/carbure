@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework_nested.routers import SimpleRouter
 
 from entity.views import (
+    AdminUsersViewSet,
     DepotViewSet,
     EntityCertificateViewSet,
     EntityViewSet,
@@ -14,6 +15,7 @@ from entity.views import (
 
 router = SimpleRouter()
 router.register("users", UserViewSet, basename="api-entity-users")
+router.register("admin-users", AdminUsersViewSet, basename="api-entity-admin-users")
 router.register("certificates", EntityCertificateViewSet, basename="api-entity-certificates")
 router.register("depots", DepotViewSet, basename="api-entity-depots")
 router.register("notifications", NotificationViewSet, basename="api-entity-notifications")

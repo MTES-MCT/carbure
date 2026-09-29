@@ -1,5 +1,5 @@
 from .entity import EntityViewSet
-from .users import UserViewSet
+from .users import AdminUsersViewSet, UserViewSet
 from .certificates import EntityCertificateViewSet
 from .depots import DepotViewSet
 from .notifications import NotificationViewSet
