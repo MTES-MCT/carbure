@@ -1,4 +1,3 @@
-import logging
 import os
 import traceback
 
@@ -32,8 +31,6 @@ def log_error(message, additional_infos=None):
 
 
 def log_exception(e):
-    logging.getLogger("django.request").error("Unhandled exception", exc_info=(type(e), e, e.__traceback__))
-
     if should_log_to_sentry():
         capture_exception(e)
 
