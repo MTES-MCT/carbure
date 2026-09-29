@@ -1,14 +1,25 @@
 import i18next from "i18next"
 
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, formatUnit } from "common/utils/formatters"
 
 import { ActionStatus, ActionTotalEmissions } from "traceability/types"
+import { ExtendedUnit, ExtendedUnitType } from "common/types"
 
-export const ACTION_EMISSIONS_UNIT = "gCO₂eq/MJ"
+export const ACTION_EMISSIONS_UNIT = ExtendedUnit.gCO2eqMJ
 
+// Format a decimal value
 export function formatActionDecimal(value: string | number | null | undefined) {
   if (value === null || value === undefined || value === "") return ""
   return formatNumber(Number(value), { fractionDigits: 3 })
+}
+
+// Format a decimal value with a unit
+export function formatUnitActionDecimal(
+  value: string | number | null | undefined,
+  unit: ExtendedUnitType
+) {
+  if (value === null || value === undefined || value === "") return ""
+  return formatUnit(Number(value), unit, { fractionDigits: 3 })
 }
 
 export function formatActionTotalEmissions(

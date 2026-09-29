@@ -26,9 +26,12 @@ import {
   normalizeActionSite,
 } from "traceability/normalizers"
 import { SiteTypeEnum } from "api-schema"
-import { formatUnit, getStepFromFractionDigits } from "common/utils/formatters"
+import { getStepFromFractionDigits } from "common/utils/formatters"
 import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
-import { ACTION_EMISSIONS_UNIT } from "traceability/utils"
+import {
+  ACTION_EMISSIONS_UNIT,
+  formatUnitActionDecimal,
+} from "traceability/utils"
 
 const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
 
@@ -112,10 +115,10 @@ export function useActionFields() {
       key: "quantity",
       label: t("Quantité"),
       field: ({ form, props }) => (
-        // <ActionDecimalInput {...props} {...form.bind("quantity")} />
-        <TextInput
+        <ActionDecimalInput
           {...props}
-          value={formatUnit(Number(form.value.quantity), Unit.kg)}
+          {...form.bind("quantity")}
+          readOnlyValue={formatUnitActionDecimal(form.value.quantity, Unit.kg)}
         />
       ),
     },
@@ -274,9 +277,12 @@ export function useActionFields() {
       field: ({ form, props }) => (
         <ActionDecimalInput
           {...props}
-          hintText={ACTION_EMISSIONS_UNIT}
           readOnly
           value={form.value.total_emissions?.total ?? ""}
+          readOnlyValue={formatUnitActionDecimal(
+            form.value.total_emissions?.total,
+            ACTION_EMISSIONS_UNIT
+          )}
         />
       ),
     },

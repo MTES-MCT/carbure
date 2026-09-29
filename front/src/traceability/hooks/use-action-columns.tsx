@@ -5,11 +5,7 @@ import { EntityManager } from "common/hooks/entity"
 import { formatDate } from "common/utils/formatters"
 import { ActionStatusBadge } from "traceability/components/action-status-badge"
 import { Action } from "traceability/types"
-import {
-  ACTION_EMISSIONS_UNIT,
-  formatActionDecimal,
-  formatActionTotalEmissions,
-} from "traceability/utils"
+import { ACTION_EMISSIONS_UNIT, formatActionDecimal } from "traceability/utils"
 
 export type ActionColumn = Column<Action> & {
   condition?: (entity: EntityManager) => boolean
@@ -92,7 +88,7 @@ export function useActionColumns() {
       header: t("Emissions"),
       cell: (action) => (
         <Cell
-          text={formatActionTotalEmissions(action.total_emissions)}
+          text={formatActionDecimal(action.total_emissions?.total)}
           sub={ACTION_EMISSIONS_UNIT}
         />
       ),

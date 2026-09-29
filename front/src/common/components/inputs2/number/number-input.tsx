@@ -1,5 +1,4 @@
 import { formatNumber } from "common/utils/formatters"
-import { ReadOnlyValue } from "../base-input"
 import { Input, InputProps } from "../input"
 
 export type NumberInputProps = InputProps & {
@@ -16,23 +15,20 @@ export const NumberInput = ({
   min,
   max,
   step,
+  readOnly,
+  readOnlyValue,
   ...props
 }: NumberInputProps) => {
-  if (props.readOnly) {
-    return (
-      <ReadOnlyValue
-        label={props.label}
-        hasTooltip={props.hasTooltip}
-        title={props.title}
-        readOnly={props.readOnly}
-        value={value !== undefined && value !== null ? formatNumber(value) : ""}
-      />
-    )
-  }
+  const formattedValue =
+    readOnly && value !== undefined && value !== null
+      ? formatNumber(value)
+      : undefined
   return (
     <Input
       {...props}
-      type={props.readOnly ? "text" : "number"}
+      readOnly={readOnly}
+      readOnlyValue={readOnlyValue ?? formattedValue}
+      type="number"
       nativeInputProps={{
         min,
         max,
