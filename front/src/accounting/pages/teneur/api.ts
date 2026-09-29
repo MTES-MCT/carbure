@@ -3,7 +3,7 @@ import { getElecBalances } from "accounting/api/elec/balances"
 import { PathsApiTiruertOperationsBalanceGetParametersQueryGroup_by } from "api-schema"
 import { CategoryEnum } from "common/types"
 import { Objectives } from "./types"
-import { api } from "common/services/api-fetch"
+import { api, HttpError } from "common/services/api-fetch"
 import { apiTypes } from "common/services/api-fetch.types"
 import { parseObjectivesResponse } from "./utils/parse-objectives-response"
 
@@ -21,6 +21,28 @@ export const getObjectives = async (
   return api
     .GET("/tiruert/objectives/", { params: { query: params } })
     .then((res) => parseObjectivesResponse(res?.data))
+}
+
+export const getSnapshotBalance = async (
+  entity_id: number,
+  year: number,
+  selected_entity_id?: number
+): Promise<apiTypes["SnapshotBalance"] | undefined> => {
+  try {
+    const response = await api.GET("/tiruert/objectives/snapshot-balance/", {
+      params: {
+        query: {
+          entity_id,
+          year: `${year}`,
+          ...(selected_entity_id !== undefined && { selected_entity_id }),
+        },
+      },
+    })
+    return response.data
+  } catch (error) {
+    if (error instanceof HttpError && error.status === 404) return undefined
+    throw error
+  }
 }
 
 /**

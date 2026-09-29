@@ -8,6 +8,7 @@ import { useQuery } from "common/hooks/async"
 import { getObjectives } from "accounting/pages/teneur/api"
 import { ObjectivesContent } from "accounting/pages/teneur/components/objectives-content"
 import { MacSectionAdmin } from "./components/mac-section-admin"
+import { SnapshotBalanceSection } from "accounting/components/snapshot-balance-section"
 
 export const Objectives = () => {
   const entity = useEntity()
@@ -44,6 +45,9 @@ export const Objectives = () => {
     <>
       {topNotice}
       {selectedEntityId && <MacSectionAdmin entityId={selectedEntityId} />}
+      {selectedEntityId && (
+        <SnapshotBalanceSection entityId={selectedEntityId} />
+      )}
       <ObjectivesContent objectivesData={objectivesData} readOnly />
     </>
   )
