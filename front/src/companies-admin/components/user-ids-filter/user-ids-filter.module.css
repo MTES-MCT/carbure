@@ -1,0 +1,17 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1w);
+  width: 22rem;
+  max-width: 80vw;
+  padding: var(--spacing-2w);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tag {
+  margin-right: var(--spacing-1v);
+}

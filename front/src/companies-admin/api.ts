@@ -1,5 +1,16 @@
 import { api as apiFetch } from "common/services/api-fetch"
+import { QueryParams } from "common/services/api-fetch.types"
 import { UserRightStatus, EntityType, UserRole } from "common/types"
+
+export function getAdminUsers(
+  query: QueryParams<"/entities/admin-users/">,
+  userIds: string
+) {
+  return apiFetch.POST("/entities/admin-users/search/", {
+    params: { query },
+    body: { user_ids: userIds },
+  })
+}
 
 export function getCompanies(entity_id: number) {
   return apiFetch.GET("/entities/", {
