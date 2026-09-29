@@ -76,14 +76,14 @@ def get_biofuel_feedstock_incompatibilities(biofuel: Biocarburant, feedstock: Ma
     fat_biofuels = ("EMHA", "HOE", "HOG", "HOC", "HCC", "HCG", "HCE", "HOGPL", "HCGPL", "B100")
     fat_feedstocks = ("HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2", "HUILES_OU_GRAISSES_ANIMALES_CAT3")
     if feedstock.code in fat_feedstocks and biofuel.code not in fat_biofuels:
-        yield "Des huiles ou graisses animales ne peuvent donner que des EMHA, B100 ou HOG/HOE/HOC"
+        yield "Des huiles ou graisses animales ne peuvent donner que des EMHA, B100 ou HOG/HOE/HOC/HCC/HCG/HCE/HOGPL/HCGPL"
 
     sugar_feedstocks = ("MAIS", "BLE", "BETTERAVE", "CANNE_A_SUCRE", "RESIDUS_VINIQUES", "LIES_DE_VIN", "MARC_DE_RAISIN")
     sugar_biofuels = ("ETH", "ETBE", "ED95", "MTBE", "BES")
     if feedstock.code in sugar_feedstocks and biofuel.code not in sugar_biofuels:
         yield "Maïs, Blé, Betterave, Canne à Sucre ou Résidus Viniques ne peuvent créer que de l'Éthanol, ETBE, BES ou MTBE."
 
-    hvo_biofuels = ("HVOE", "HVOG", "HVOC", "HVOGPL")
+    hvo_biofuels = ("HVOE", "HVOG", "HVOC")
     if biofuel.code in hvo_biofuels and not feedstock.is_huile_vegetale:
         yield "Un HVO doit provenir d'huiles végétales uniquement. Pour les autres huiles hydrotraitées, voir la nomenclature HOE/HOG/HOC"  # noqa: E501
 
