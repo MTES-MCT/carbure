@@ -74,7 +74,6 @@ def check_mac_bc_wrong(lot: CarbureLot):
         "HOG",
         "HOC",
         "HOGPL",
-        "HVOGPL",
         "HCGPL",
     )
     if lot.delivery_type == CarbureLot.RFC and lot.biofuel and lot.biofuel.code not in mac_biofuels:
