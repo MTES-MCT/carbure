@@ -2,10 +2,12 @@ import { Operation, OperationType } from "accounting/types"
 import { formatSector, formatTCO2Number } from "accounting/utils/formatters"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { formatQuantityDisplay } from "./operation-detail-fields.utils"
+import {
+  formatEnergyDisplay,
+  formatQuantityDisplay,
+} from "./operation-detail-fields.utils"
 import { formatDate, formatPeriod } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
-import { formatValue } from "../../../operations.utils"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const { t } = useTranslation()
@@ -19,6 +21,8 @@ export const useOperationDetailFields = (operation?: Operation) => {
     const isReceiver = (operation?.volume ?? 0) > 0
     const isSender = (operation?.volume ?? 0) < 0
 
+    const applyRenewableShare = operation.renewable_energy_share !== 1
+
     // Define all possible conditional fields
     const fields = compact([
       { label: t("Filière"), value: formatSector(operation.sector) },
@@ -30,18 +34,15 @@ export const useOperationDetailFields = (operation?: Operation) => {
       { label: t("Biocarburant"), value: operation.biofuel?.code },
       {
         label: t("Quantité"),
-        value: formatQuantityDisplay(operation, false),
+        value: formatQuantityDisplay(operation, applyRenewableShare),
       },
-      operation.type === OperationType.INCORPORATION &&
-        operation.renewable_energy_share !== 1 && {
-          label: t("Quantité renouvelable"),
-          value: formatQuantityDisplay(operation, true),
-        },
+      applyRenewableShare && {
+        label: t("Energie renouvelable"),
+        value: formatEnergyDisplay(operation),
+      },
       {
         label: t("Tonnes CO2 eq évitées"),
-        value: formatTCO2Number(
-          formatValue(operation, operation.avoided_emissions)
-        ),
+        value: formatTCO2Number(operation.avoided_emissions),
       },
       operation.type === OperationType.TRANSFERT &&
         isReceiver && {

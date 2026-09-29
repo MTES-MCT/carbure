@@ -12,7 +12,7 @@ import {
   isSendingOperation,
 } from "../../operations.utils"
 import { OperationBadge } from "accounting/components/operation-badge"
-import css from "../../../operations.module.css"
+import css from "accounting/pages/operations/biofuels/components/operations-table/operations-table.module.css"
 import { Text } from "common/components/text"
 import { Trans, useTranslation } from "react-i18next"
 import { Grid, LoaderOverlay, Main } from "common/components/scaffold"

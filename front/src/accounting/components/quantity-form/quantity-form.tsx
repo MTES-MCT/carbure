@@ -240,6 +240,7 @@ const QuantitySection = ({
         <EnergyEquivalentNotice
           quantityLiters={value.quantity!}
           pciLitre={pciLitre!}
+          renewableEnergyShare={balance.biofuel?.renewable_energy_share ?? 1}
         />
       )}
       {quantityDeclared && (
