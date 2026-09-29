@@ -1,10 +1,90 @@
+from datetime import date
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.core.cache import cache
 from django.test import TestCase
 
 from core.models import Entity
+from tiruert.models import ObjectiveSnapshot
 from tiruert.services.objective_snapshot import ObjectiveSnapshotService
+
+
+class CreateSnapshotBalanceTest(TestCase):
+    def test_persists_balances_by_sector_biofuel_and_category(self):
+        """Persist detailed balances in liters and MJ with a single calculation."""
+        entity = Entity.objects.create(name="Operator", entity_type=Entity.OPERATOR)
+        period = SimpleNamespace(start_date=date(2025, 1, 1), end_date=date(2026, 3, 31))
+        key = ("ESSENCE", "EP2AM", "ETH")
+        entry = {
+            "sector": "ESSENCE",
+            "customs_category": "EP2AM",
+            "biofuel": SimpleNamespace(code="ETH"),
+            "available_balance": 123,
+            "energy_mj": 2500,
+            "saved_emissions": 4.5,
+        }
+
+        with (
+            patch("tiruert.services.declaration_period.DeclarationPeriodService.get_period_by_year", return_value=period),
+            patch.object(ObjectiveSnapshotService, "compute", return_value={"main": {}}),
+            patch(
+                "tiruert.services.objective_snapshot.BalanceService.calculate_balance", return_value={key: entry}
+            ) as calculate,
+        ):
+            snapshot = ObjectiveSnapshotService.create_snapshot(entity.id, 2025)
+
+        self.assertEqual(
+            snapshot.data_balance,
+            [
+                {
+                    "sector": "ESSENCE",
+                    "customs_category": "EP2AM",
+                    "biofuel": "ETH",
+                    "volume": 123,
+                    "energy": 2500,
+                    "saved_emissions": 4.5,
+                }
+            ],
+        )
+        self.assertEqual(ObjectiveSnapshot.objects.get(entity=entity, year=2025).data_balance, snapshot.data_balance)
+        calculate.assert_called_once()
+        self.assertEqual(calculate.call_args.args[2:4], (None, "l"))
+        self.assertTrue(calculate.call_args.kwargs["include_energy"])
+
+    def test_compute_balance_uses_one_detailed_aggregation(self):
+        """Keep energy in MJ from one balance aggregation for the closed year."""
+        entity = Entity.objects.create(name="Operator", entity_type=Entity.OPERATOR)
+        entry = {
+            "sector": "ESSENCE",
+            "customs_category": "EP2AM",
+            "biofuel": SimpleNamespace(code="ETH"),
+            "available_balance": 123,
+            "energy_mj": 2500,
+            "saved_emissions": 4.5,
+        }
+        with patch(
+            "tiruert.services.objective_snapshot.BalanceService.calculate_balance",
+            return_value={("ESSENCE", "EP2AM", "ETH"): entry},
+        ) as calculate:
+            result = ObjectiveSnapshotService.compute_balance(entity.id, 2025, date(2026, 3, 31))
+
+        self.assertEqual(
+            result,
+            [
+                {
+                    "sector": "ESSENCE",
+                    "customs_category": "EP2AM",
+                    "biofuel": "ETH",
+                    "volume": 123,
+                    "energy": 2500,
+                    "saved_emissions": 4.5,
+                }
+            ],
+        )
+        calculate.assert_called_once()
+        self.assertEqual(calculate.call_args.args[2:4], (None, "l"))
+        self.assertEqual(calculate.call_args.kwargs, {"declaration_year": 2025, "include_energy": True})
 
 
 class GetCachedAggregatedTest(TestCase):

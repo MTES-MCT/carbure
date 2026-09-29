@@ -648,6 +648,35 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
         # Should have non-zero quantity (conversion applied successfully)
         self.assertGreater(result_mj[sector_key]["quantity"]["debit"], 0)
 
+    def test_default_balance_can_include_energy_with_different_renewable_shares(self):
+        """Sum energy per operation when a group contains different renewable shares."""
+        from core.models import Biocarburant
+
+        biofuel = Biocarburant.objects.filter(compatible_essence=True, pci_litre__gt=0).first()
+        self.assertIsNotNone(biofuel)
+        operations = []
+        for share in (1.0, 0.5):
+            operation = self._create_operation_with_details(
+                credited_entity=self.entity,
+                type=Operation.INCORPORATION,
+                status=Operation.VALIDATED,
+                biofuel=biofuel,
+                renewable_energy_share=share,
+            )
+            operation.details.update(volume=100)
+            operations.append(operation)
+
+        balance = BalanceService.calculate_balance(
+            Operation.objects.filter(id__in=[operation.id for operation in operations]),
+            self.entity.id,
+            None,
+            "l",
+            include_energy=True,
+        )
+        entry = balance[(Operation.ESSENCE, operations[0].customs_category, biofuel.code)]
+        self.assertEqual(entry["available_balance"], 200)
+        self.assertAlmostEqual(entry["energy_mj"], 150 * biofuel.pci_litre)
+
     def test_calculate_balance_truncates_teneur_after_sum_per_operation(self):
         """Teneur in MJ must apply int() after summing details per operation, then sum operation totals."""
         from core.models import Biocarburant
