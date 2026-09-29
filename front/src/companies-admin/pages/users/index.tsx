@@ -1,10 +1,11 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { Button } from "common/components/button2"
 import { SearchInput } from "common/components/inputs2"
 import { NoResult } from "common/components/no-result2"
 import { Pagination } from "common/components/pagination2/pagination"
 import { ActionBar, Content, Main } from "common/components/scaffold"
-import { Cell, Table } from "common/components/table2"
+import { Table } from "common/components/table2"
 import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
@@ -12,16 +13,15 @@ import useTitle from "common/hooks/title"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { QueryParams } from "common/services/api-fetch.types"
-import { EntityType, UserRole } from "common/types"
-import {
-  getEntityTypeLabel,
-  getUserRoleLabel,
-  normalizeBoolean,
-} from "common/utils/normalizers"
 import { ROUTE_URLS } from "common/utils/routes"
-import * as api from "../api"
-import { EntityIdsFilter } from "../components/entity-ids-filter"
-import { Button } from "common/components/button2"
+import * as api from "../../api"
+import { EntityIdsFilter } from "../../components/entity-ids-filter"
+import {
+  adminUserFilterNormalizers,
+  getAdminUserFilterOptions,
+  useAdminUserColumns,
+  useAdminUserFilters,
+} from "./hooks"
 
 const AdminUsers = () => {
   const { t } = useTranslation()
@@ -32,6 +32,8 @@ const AdminUsers = () => {
   const { state, actions, query } = useQueryBuilder()
   const listQuery = query as QueryParams<"/entities/admin-users/">
   const [entityIds, setEntityIds] = useState("")
+  const filterLabels = useAdminUserFilters()
+  const columns = useAdminUserColumns()
 
   const { result, loading } = useQuery(api.getAdminUsers, {
     key: "admin-users",
@@ -56,26 +58,12 @@ const AdminUsers = () => {
           <Button>Exporter</Button>
         </ActionBar>
 
-        <FilterMultiSelect2<"entity_type" | "role" | "is_active", string>
-          filterLabels={{
-            entity_type: t("Type d'entité"),
-            role: t("Rôle"),
-            is_active: t("Utilisateur actif"),
-          }}
+        <FilterMultiSelect2
+          filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={getFilterOptions}
-          normalizers={{
-            entity_type: (type: EntityType) => ({
-              value: type,
-              label: getEntityTypeLabel(type),
-            }),
-            role: (role: UserRole) => ({
-              value: role,
-              label: getUserRoleLabel(role),
-            }),
-            is_active: normalizeBoolean,
-          }}
+          getFilterOptions={getAdminUserFilterOptions}
+          normalizers={adminUserFilterNormalizers}
         >
           <EntityIdsFilter
             value={entityIds}
@@ -93,47 +81,7 @@ const AdminUsers = () => {
               loading={loading}
               rows={rows}
               rowLink={(row) => entityUsersPath(row.entity_id)}
-              columns={[
-                {
-                  key: "entity",
-                  header: t("Entité"),
-                  cell: (row) => (
-                    <Cell
-                      text={row.entity_name}
-                      sub={getEntityTypeLabel(row.entity_type)}
-                    />
-                  ),
-                },
-                {
-                  key: "entity",
-                  header: t("Entity id"),
-                  cell: (row) => <Cell text={row.entity_id} />,
-                },
-                {
-                  key: "id",
-                  header: t("Utilisateur"),
-                  cell: (row) => <Cell text={row.email} />,
-                },
-
-                {
-                  small: true,
-                  key: "role",
-                  header: t("Rôle"),
-                  cell: (row) => getUserRoleLabel(row.role),
-                },
-                {
-                  small: true,
-                  key: "is_active",
-                  header: t("Actif"),
-                  cell: (row) => (row.is_active ? t("Oui") : t("Non")),
-                },
-                {
-                  small: true,
-                  key: "actions",
-                  header: t("Actions"),
-                  cell: () => t("Consulter"),
-                },
-              ]}
+              columns={columns}
             />
             <Pagination
               defaultPage={query.page}
@@ -147,13 +95,6 @@ const AdminUsers = () => {
       </Content>
     </Main>
   )
-}
-
-function getFilterOptions(filter: "entity_type" | "role" | "is_active") {
-  if (filter === "entity_type")
-    return Promise.resolve(Object.values(EntityType))
-  if (filter === "is_active") return Promise.resolve(["true", "false"])
-  return Promise.resolve(Object.values(UserRole))
 }
 
 export default AdminUsers
