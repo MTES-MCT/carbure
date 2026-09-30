@@ -1,13 +1,93 @@
-from datetime import date
+from datetime import date, datetime
 from types import SimpleNamespace
 from unittest.mock import patch
 
 from django.core.cache import cache
 from django.test import TestCase
+from django.utils.timezone import make_aware
 
 from core.models import Entity
-from tiruert.models import ObjectiveSnapshot
+from tiruert.models import ObjectiveSnapshot, Operation
+from tiruert.services.objective import ObjectiveService
 from tiruert.services.objective_snapshot import ObjectiveSnapshotService
+
+
+class HistoricalSnapshotBalanceTest(TestCase):
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/depots.json",
+        "json/entities.json",
+        "json/entities_sites.json",
+    ]
+
+    def setUp(self):
+        from core.models import Biocarburant
+        from tiruert.factories import OperationDetailFactory, OperationFactory
+        from transactions.factories import CarbureLotFactory
+
+        self.entity = Entity.objects.create(name="Historical snapshot operator", entity_type=Entity.OPERATOR)
+        self.biofuel = Biocarburant.objects.get(code="ETH")
+        self.operation_ids = []
+        scenarios = [
+            (Operation.INCORPORATION, "202401", None, 40, datetime(2026, 2, 1)),
+            (Operation.INCORPORATION, "202501", None, 60, datetime(2026, 2, 1)),
+            (Operation.INCORPORATION, "202601", None, 200, datetime(2026, 2, 1)),
+            (Operation.TENEUR, None, 2026, 30, datetime(2026, 2, 1)),
+            (Operation.INCORPORATION, "202501", None, 400, datetime(2026, 4, 1)),
+        ]
+        for operation_type, durability_period, declaration_year, volume, created_at in scenarios:
+            operation = OperationFactory(
+                type=operation_type,
+                status=Operation.VALIDATED,
+                credited_entity=self.entity if operation_type == Operation.INCORPORATION else None,
+                debited_entity=self.entity if operation_type == Operation.TENEUR else None,
+                biofuel=self.biofuel,
+                durability_period=durability_period,
+                declaration_year=declaration_year,
+            )
+            lot = CarbureLotFactory(
+                biofuel=self.biofuel,
+                added_by=self.entity,
+                carbure_supplier=self.entity,
+                carbure_client=self.entity,
+                carbure_producer=self.entity,
+            )
+            OperationDetailFactory(operation=operation, lot=lot, volume=volume, emission_rate_per_mj=10)
+            Operation.objects.filter(id=operation.id).update(created_at=make_aware(created_at))
+            self.operation_ids.append(operation.id)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2026)
+    def test_snapshot_balance_is_bounded_to_closed_year_and_date(self, mock_current_year):
+        """Test that the snapshot balance is bounded to the closed year and date."""
+        entries = ObjectiveSnapshotService.compute_balance(self.entity.id, 2025, date(2026, 3, 31))
+
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0]["volume"], 100)
+        self.assertAlmostEqual(entries[0]["energy"], 100 * self.biofuel.pci_litre)
+        mock_current_year.assert_not_called()
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2026)
+    def test_objective_balances_use_requested_year(self, mock_current_year):
+        """Test that the objective balances use the requested declaration year."""
+        operations = Operation.objects.filter(
+            id__in=self.operation_ids,
+            created_at__lte=make_aware(datetime(2026, 3, 31, 23, 59, 59)),
+        )
+
+        for year in (2025, "2025"):
+            with self.subTest(year=year):
+                category_balances, sector_balances = ObjectiveService.get_balances_for_objectives_calculation(
+                    operations, self.entity.id, declaration_year=year
+                )
+
+                for balances in (category_balances, sector_balances):
+                    self.assertAlmostEqual(
+                        sum(entry["available_balance"] for entry in balances.values()),
+                        100 * self.biofuel.pci_litre,
+                    )
+        mock_current_year.assert_not_called()
 
 
 class CreateSnapshotBalanceTest(TestCase):
@@ -26,8 +106,10 @@ class CreateSnapshotBalanceTest(TestCase):
         }
 
         with (
-            patch("tiruert.services.declaration_period.DeclarationPeriodService.get_period_by_year", return_value=period),
-            patch.object(ObjectiveSnapshotService, "compute", return_value={"main": {}}),
+            patch(
+                "tiruert.services.declaration_period.DeclarationPeriodService.get_period_by_year", return_value=period
+            ) as get_period,
+            patch.object(ObjectiveSnapshotService, "compute", return_value={"main": {}}) as compute,
             patch(
                 "tiruert.services.objective_snapshot.BalanceService.calculate_balance", return_value={key: entry}
             ) as calculate,
@@ -48,6 +130,8 @@ class CreateSnapshotBalanceTest(TestCase):
             ],
         )
         self.assertEqual(ObjectiveSnapshot.objects.get(entity=entity, year=2025).data_balance, snapshot.data_balance)
+        get_period.assert_called_once_with(2025)
+        compute.assert_called_once_with(entity.id, 2025, period=period)
         calculate.assert_called_once()
         self.assertEqual(calculate.call_args.args[2:4], (None, "l"))
         self.assertTrue(calculate.call_args.kwargs["include_energy"])
@@ -85,6 +169,25 @@ class CreateSnapshotBalanceTest(TestCase):
         calculate.assert_called_once()
         self.assertEqual(calculate.call_args.args[2:4], (None, "l"))
         self.assertEqual(calculate.call_args.kwargs, {"declaration_year": 2025, "include_energy": True})
+
+
+class ComputeDeclarationPeriodTest(TestCase):
+    def test_reuses_preloaded_period(self):
+        period = SimpleNamespace(start_date=date(2025, 1, 1), end_date=date(2026, 3, 31))
+        with patch("tiruert.services.declaration_period.DeclarationPeriodService.get_period_by_year") as get_period:
+            result = ObjectiveSnapshotService.compute(1, 2025, period=period)
+
+        get_period.assert_not_called()
+        self.assertIsNone(result)
+
+    def test_loads_period_when_not_provided(self):
+        with patch(
+            "tiruert.services.declaration_period.DeclarationPeriodService.get_period_by_year", return_value=None
+        ) as get_period:
+            result = ObjectiveSnapshotService.compute(1, 2025)
+
+        get_period.assert_called_once_with(2025)
+        self.assertIsNone(result)
 
 
 class GetCachedAggregatedTest(TestCase):
