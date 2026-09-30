@@ -171,6 +171,33 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         self.assertEqual(errors, {})
         self.assertIsNone(data["culture_details"])
 
+    def test_collection_type_required_for_iaa_residue_feedstocks(self):
+        """Collection type is required for the IAA residue feedstocks added to the rule."""
+        codes = (
+            "AUTRE-GLYCERINE",
+            "HUILE-DE-PALME",
+            "PLATS-CUISINES-SANS-PRODUITS-ANIMAUX",
+            "SOUPES-DE-BIODECHETS-ISSUS-DU-DECONDITIONNEMENT",
+        )
+        for code in codes:
+            with self.subTest(code=code):
+                feedstock = MatierePremiere.objects.create(
+                    name=code,
+                    name_en=code,
+                    code=code,
+                    is_methanogenic=True,
+                )
+                data = {
+                    "feedstock": feedstock,
+                    "material_unit": BiomethaneSupplyInput.WET,
+                    "type_cive": None,
+                    "culture_details": None,
+                    "collection_type": None,
+                    "volume": 100.0,
+                }
+                errors = apply_feedstock_field_rules(data)
+                self.assertIn("collection_type", errors)
+
     def test_collection_type_required_when_name_in_rule(self):
         """When input name is in collection_type list, field is required."""
         data = {
