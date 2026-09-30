@@ -69,7 +69,7 @@ export const SnapshotBalanceDialog = ({
             {t("Aucun solde disponible pour cette année.")}
           </Notice>
         )}
-        <div style={{ maxHeight: 470, overflow: "auto" }}>
+        <div className={css.tableContainer}>
           {entries.length > 0 && (
             <Table
               className={css.table}
