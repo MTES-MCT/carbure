@@ -455,9 +455,17 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
 
     // dispatch
     carbure_dispatch_site_id:
-      lot.dispatch_site instanceof Object ? lot.dispatch_site.id : undefined,
+      lot.dispatch_site instanceof Object
+        ? lot.dispatch_site.id
+        : lot.lot?.carbure_dispatch_site
+          ? ""
+          : undefined,
     unknown_dispatch_site:
-      typeof lot.dispatch_site === "string" ? lot.dispatch_site : undefined,
+      typeof lot.dispatch_site === "string"
+        ? lot.dispatch_site
+        : lot.lot?.unknown_dispatch_site
+          ? ""
+          : undefined,
     dispatch_site_country_code: lot.dispatch_site_country?.code_pays,
     dispatch_date: lot.dispatch_date,
 
@@ -479,6 +487,11 @@ export function lotFormToPayload(lot: Partial<LotFormValue> | undefined) {
 }
 
 export function isFrenchDelivery(value: LotFormValue) {
+  const country =
+    value.delivery_site instanceof Object
+      ? value.delivery_site.country
+      : value.delivery_site_country
+
   return (
     [
       DeliveryType.Blending,
@@ -487,7 +500,7 @@ export function isFrenchDelivery(value: LotFormValue) {
       DeliveryType.Direct,
       DeliveryType.Unknown,
     ].includes(value.delivery_type ?? DeliveryType.Unknown) &&
-    value.delivery_site_country?.code_pays === "FR"
+    country?.code_pays === "FR"
   )
 }
 
