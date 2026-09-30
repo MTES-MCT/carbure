@@ -85,6 +85,30 @@ export function download<Path extends PathsWithGetMethod>(
   return window.open(getDownloadUrl(endpoint, params))
 }
 
+/**
+ * Save a file returned by an endpoint.
+ * The filename comes from the Content-Disposition header when the backend sends one.
+ */
+export function downloadFile(
+  file: Blob,
+  response: Response,
+  fallbackName = "download"
+) {
+  const url = URL.createObjectURL(file)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = fileName(response) ?? fallbackName
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function fileName(response: Response) {
+  const header = response.headers.get("Content-Disposition") ?? ""
+  const quoted = /filename="([^"]+)"/i.exec(header)?.[1]
+  if (quoted) return quoted
+  return /filename=([^;]+)/i.exec(header)?.[1]?.trim()
+}
+
 export function toSearchParams(params: any) {
   const urlParams = new URLSearchParams()
   for (const key in params) {

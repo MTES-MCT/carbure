@@ -1,8 +1,13 @@
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+import os
+import tempfile
+from datetime import datetime
+
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
+from core.excel import ExcelResponse, export_to_excel
 from core.filters import FiltersActionFactory
 from core.models import UserRights
 from core.permissions import HasAdminRights
@@ -42,3 +47,32 @@ class AdminUsersViewSet(FiltersActionFactory(), ListModelMixin, GenericViewSet):
     @action(detail=False, methods=["post"], url_path="search")
     def search(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+    @extend_schema(
+        request=AdminEntityIdsSerializer,
+        filters=True,
+        responses={(200, "application/vnd.ms-excel"): OpenApiTypes.BINARY},
+    )
+    @action(detail=False, methods=["post"], url_path="export")
+    def export(self, request, *args, **kwargs):
+        rows = self.filter_queryset(self.get_queryset())
+        filename = f"carbure_utilisateurs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        excel_file = export_to_excel(
+            os.path.join(tempfile.gettempdir(), filename),
+            [
+                {
+                    "label": "Utilisateurs",
+                    "rows": rows,
+                    "columns": [
+                        {"label": "Entité", "value": "entity.name"},
+                        {"label": "Type d'entité", "value": lambda row: row.entity.get_entity_type_display()},
+                        {"label": "Entity id", "value": "entity_id"},
+                        {"label": "Utilisateur", "value": "user.email"},
+                        {"label": "Rôle", "value": lambda row: row.get_role_display()},
+                        {"label": "Actif", "value": lambda row: "Oui" if row.user.is_active else "Non"},
+                    ],
+                }
+            ],
+            column_width=28,
+        )
+        return ExcelResponse(excel_file)

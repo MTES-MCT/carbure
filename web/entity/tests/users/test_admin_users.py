@@ -1,7 +1,10 @@
+from io import BytesIO
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from openpyxl import load_workbook
 
 from core.models import Entity, UserRights, UserRightsRequests
 from core.tests_utils import FiltersActionTestMixin, setup_current_user
@@ -31,6 +34,7 @@ class AdminUsersTest(FiltersActionTestMixin, TestCase):
         )
         self.list_url = reverse("api-entity-admin-users-list")
         self.search_url = reverse("api-entity-admin-users-search")
+        self.export_url = reverse("api-entity-admin-users-export")
 
     def results(self, **params):
         response = self.client.get(self.list_url, {"entity_id": self.admin.id, **params})
@@ -143,6 +147,37 @@ class AdminUsersTest(FiltersActionTestMixin, TestCase):
                 "is_active": [False, True],
                 "role": [UserRights.RO, UserRights.RW],
             },
+        )
+
+    def test_export_returns_every_filtered_row(self):
+        active = User.objects.create_user(email="actif@carbure.local", name="Actif", password="x")
+        UserRights.objects.create(user=active, entity=self.producer, role=UserRights.RW)
+        inactive = User.objects.create_user(email="inactif@carbure.local", name="Inactif", password="x", is_active=False)
+        UserRights.objects.create(user=inactive, entity=self.operator, role=UserRights.RO)
+        outsider = Entity.objects.create(name="Hors filtre", entity_type=Entity.TRADER)
+        other = User.objects.create_user(email="autre@carbure.local", name="Autre", password="x")
+        UserRights.objects.create(user=other, entity=outsider, role=UserRights.RW)
+
+        response = self.client.post(
+            self.export_url,
+            {"entity_ids": f"{self.producer.id}\n{self.operator.id}"},
+            query_params={"entity_id": self.admin.id, "page": 99, "page_size": 1},
+        )
+
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response["Content-Type"], "application/vnd.ms-excel")
+        self.assertIn("carbure_utilisateurs_", response["Content-Disposition"])
+
+        workbook = load_workbook(BytesIO(response.content))
+        self.addCleanup(workbook.close)
+        rows = list(workbook.active.iter_rows(values_only=True))
+        self.assertEqual(
+            rows,
+            [
+                ("Entité", "Type d'entité", "Entity id", "Utilisateur", "Rôle", "Actif"),
+                ("Producteur Alpha", "Producteur", self.producer.id, "actif@carbure.local", "Lecture/Écriture", "Oui"),
+                ("Operateur Beta", "Opérateur", self.operator.id, "inactif@carbure.local", "Lecture Seule", "Non"),
+            ],
         )
 
     def post_results(self, entity_ids, **params):

@@ -1678,6 +1678,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/entities/admin-users/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["entities_admin_users_export_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/entities/admin-users/filters/": {
         parameters: {
             query?: never;
@@ -11168,6 +11184,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaginatedAdminUserRowList"];
+                };
+            };
+        };
+    };
+    entities_admin_users_export_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                entity_ids?: string;
+                /**
+                 * @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
+                 */
+                entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
+                /**
+                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 *
+                 *     * `true` - True
+                 *     * `false` - False
+                 */
+                is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /**
+                 * @description * `RO` - Lecture Seule
+                 *     * `RW` - Lecture/Écriture
+                 *     * `ADMIN` - Administrateur
+                 *     * `AUDITOR` - Auditeur
+                 */
+                role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AdminEntityIdsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AdminEntityIdsRequest"];
+                "multipart/form-data": components["schemas"]["AdminEntityIdsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.ms-excel": File;
                 };
             };
         };
