@@ -1,6 +1,7 @@
 # Gateway config to access both frontend and backend dev server under a same host.
-# Hostnames are injected by the nginx image (envsubst) from CARBURE_FRONTEND_HOST
-# and CARBURE_BACKEND_HOST, so the main stack and the agent stack share this file.
+# The nginx image runs envsubst on this file. It only replaces variables that
+# exist in the container (CARBURE_FRONTEND_HOST, CARBURE_BACKEND_HOST).
+# $host and $remote_addr are nginx variables and stay as written.
 server {
     listen 80;
     server_name carbure_gateway;

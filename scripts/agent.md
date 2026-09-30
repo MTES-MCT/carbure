@@ -1,10 +1,22 @@
 # Environnement local pour un agent
 
-Deux checkouts du repo peuvent tourner en même temps : le tien sur `http://carbure.local:8090`, celui d'un agent (autre worktree git) sur `http://carbure.local:8190`.
+Deux checkouts du repo peuvent tourner en même temps : le tien sur `http://carbure.local:8090`, celui d'un agent (autre worktree git) sur `http://carbure-agent.local:8190`.
 
 MySQL, Redis et le mock S3 ne sont pas dupliqués. L'agent a son propre Django, son propre Vite et son propre nginx. Sa base s'appelle `carbure_agent`, sur le même serveur MySQL que la tienne.
 
 Ton environnement doit déjà tourner (`make up`) avant `make agent-up`.
+
+## Hôte
+
+L'agent s'ouvre sur `carbure-agent.local`, pas sur `carbure.local`. Le navigateur range les cookies par hôte, pas par port : les deux ports du même nom partageraient `sessionid`, et une connexion sur l'agent déconnecterait l'environnement du port 8090.
+
+Dans `/etc/hosts`, à côté de `carbure.local` :
+
+```
+127.0.0.1 carbure-agent.local
+```
+
+Dans le `.env`, ajouter `carbure-agent.local` à `ALLOWED_HOSTS`. Django et Vite lisent cette variable.
 
 ## Fichiers
 
@@ -27,14 +39,14 @@ Ton environnement doit déjà tourner (`make up`) avant `make agent-up`.
 | `CARBURE_APP_CONTAINER` | `carbure_app` | `carbure_agent_app` |
 | `CARBURE_PROXY_CONTAINER` | `carbure_web` | `carbure_agent_web` |
 | `WEB_PORT` | `8090` | `8190` |
-| `CARBURE_DATABASE` | la base de ton `.env` | `carbure_agent` |
+| `MYSQL_DATABASE` | la base du `.env` | `carbure_agent` |
 | `REDIS_DB` | `0` | `1` |
 | `AWS_ENV_FOLDER_NAME` | `carbure-local` | `carbure-agent` |
 | `UPLOADED_FILES_VOLUME` | `carbure_uploadedfiles` | `carbure_agent_uploadedfiles` |
 
 Les noms de conteneurs doivent différer : Docker n'autorise qu'un conteneur de chaque nom sur la machine. Le port aussi, sinon les deux nginx voudraient `8090`.
 
-Redis `1` est un index logique du même Redis, pour que les clés de session de l'agent ne mélangent pas les tiennes. Le dossier S3 et le volume de fichiers suivent la même idée.
+Redis `1` est un index logique du même Redis : il sépare le cache Django. Les sessions restent dans la table `django_session` de chaque base. Le dossier S3 et le volume de fichiers suivent la même idée de séparation.
 
 Dans `docker-compose.yml`, une écriture comme `${WEB_PORT:-8090}` veut dire : prendre `WEB_PORT` s'il est défini, sinon `8090`. `make up` ne définit pas ces variables, donc ton environnement ne change pas.
 

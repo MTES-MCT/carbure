@@ -69,8 +69,11 @@ services:
       dockerfile: ./web/Dockerfile
     <<: *common-settings
     environment:
-      DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mysql:3306/${CARBURE_DATABASE:-${MYSQL_DATABASE}}
+      # make agent-up overrides MYSQL_DATABASE from docker-compose.agent.env. make up keeps the .env value.
+      DATABASE_URL: mysql://root:$MYSQL_ROOT_PASSWORD@carbure-mysql:3306/${MYSQL_DATABASE}
+      # REDIS_DB picks the cache database. Sessions stay in MySQL.
       REDIS_URL: redis://carbure-redis:6379/${REDIS_DB:-0}
+      # Overrides env_file. The Makefile exports .env first, so a local value still applies on make up.
       AWS_ENV_FOLDER_NAME: ${AWS_ENV_FOLDER_NAME:-carbure-local}
       CARBURE_HOME: /app
       PYTHONPATH: /app:/app/web
@@ -88,9 +91,13 @@ services:
       - carbure-django
     <<: *common-settings
     environment:
+      # Derived from the container names above. The nginx image substitutes
+      # them into default.conf.template; they are not set in docker-compose.agent.env.
       CARBURE_FRONTEND_HOST: ${CARBURE_FRONTEND_CONTAINER:-carbure_frontend}
       CARBURE_BACKEND_HOST: ${CARBURE_APP_CONTAINER:-carbure_app}
     volumes:
+      # /etc/nginx/templates/*.template is run through envsubst at container start.
+      # Only variables present in this container are replaced, so $host stays an nginx variable.
       - ./gateway/default.conf.template:/etc/nginx/templates/default.conf.template:ro
     ports:
       - ${WEB_PORT:-8090}:80
@@ -101,6 +108,7 @@ volumes:
   carbureredis:
     name: carbure_carbureredis
   uploadedfiles:
+    # The default is the volume name from before this parameter, so existing files stay in place.
     name: ${UPLOADED_FILES_VOLUME:-carbure_uploadedfiles}
 
 networks:
