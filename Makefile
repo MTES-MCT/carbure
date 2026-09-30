@@ -3,8 +3,7 @@
 	test-backend test-frontend \
 	makemigrations migrate flush seed ipython \
 	lint-fix translate translate-missing \
-	check-diff check-types generate-and-check-types \
-	flush
+	check-diff check-types generate-and-check-types
 
 -include .env
 export
@@ -87,6 +86,3 @@ check-diff:
 
 check-types:
 	$(npm_cmd) run check-types
-
-flush:
-	$(django_cmd) flush
