@@ -3,7 +3,7 @@ import random
 import factory
 
 from biomethane.models import BiomethaneDigestateStorage, BiomethaneProductionUnit
-from core.models import Entity, Pays
+from core.models import Department, Entity, Pays
 from entity.factories.entity import EntityFactory
 
 
@@ -40,7 +40,16 @@ class BiomethaneDigestateStorageFactory(factory.django.DjangoModelFactory):
 
 
 def create_production_unit(producer: Entity, **kwargs):
-    BiomethaneProductionUnitFactory.create(producer=producer, **kwargs)
+    department, _ = Department.objects.get_or_create(code_dept="75", defaults={"name": "Paris"})
+    defaults = {
+        "department": department,
+        "insee_code": "75101",
+        "icpe_number": "75-0001",
+        "spreading_management_methods": [BiomethaneProductionUnit.DIRECT_SPREADING],
+        "digestate_sale_types": [BiomethaneProductionUnit.SPREADING_PLAN_ICPE],
+    }
+    defaults.update(kwargs)
+    BiomethaneProductionUnitFactory.create(producer=producer, **defaults)
 
     BiomethaneDigestateStorage.objects.update_or_create(
         producer=producer,
