@@ -3,9 +3,11 @@
 
 services:
   carbure-django:
+    # !reset needs Docker Compose 2.24+. Without it, up would recreate carbure_mysql.
     depends_on: !reset []
 
 networks:
   carbure:
+    # Created by the main project. Django resolves the host carbure-mysql on it.
     external: true
     name: carbure_default
