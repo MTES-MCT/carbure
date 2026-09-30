@@ -1678,6 +1678,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/entities/admin-users/filters/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["entities_admin_users_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/entities/admin-users/search/": {
         parameters: {
             query?: never;
@@ -11099,6 +11115,7 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                entity_ids?: string;
                 /**
                  * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
@@ -11116,6 +11133,13 @@ export interface operations {
                  *     * `HRS` - Distributeur d'hydrogène pour la mobilité
                  */
                 entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
+                /**
+                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 *
+                 *     * `true` - True
+                 *     * `false` - False
+                 */
+                is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -11129,10 +11153,8 @@ export interface operations {
                  *     * `AUDITOR` - Auditeur
                  */
                 role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
-                is_active?: PathsApiEntitiesAdminUsersGetParametersQueryIs_active[];
                 /** @description A search term. */
                 search?: string;
-                entity_ids?: string;
             };
             header?: never;
             path?: never;
@@ -11150,11 +11172,12 @@ export interface operations {
             };
         };
     };
-    entities_admin_users_search_create: {
+    entities_admin_users_filters_retrieve: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
+                entity_ids?: string;
                 /**
                  * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
@@ -11172,6 +11195,73 @@ export interface operations {
                  *     * `HRS` - Distributeur d'hydrogène pour la mobilité
                  */
                 entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
+                /** @description Filter string to apply */
+                filter: PathsApiEntitiesAdminUsersFiltersGetParametersQueryFilter;
+                /**
+                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 *
+                 *     * `true` - True
+                 *     * `false` - False
+                 */
+                is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /**
+                 * @description * `RO` - Lecture Seule
+                 *     * `RW` - Lecture/Écriture
+                 *     * `ADMIN` - Administrateur
+                 *     * `AUDITOR` - Auditeur
+                 */
+                role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
+    entities_admin_users_search_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                entity_ids?: string;
+                /**
+                 * @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
+                 */
+                entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
+                /**
+                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 *
+                 *     * `true` - True
+                 *     * `false` - False
+                 */
+                is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -11185,10 +11275,8 @@ export interface operations {
                  *     * `AUDITOR` - Auditeur
                  */
                 role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
-                is_active?: PathsApiEntitiesAdminUsersGetParametersQueryIs_active[];
                 /** @description A search term. */
                 search?: string;
-                entity_ids?: string;
             };
             header?: never;
             path?: never;
@@ -16063,15 +16151,16 @@ export enum PathsApiEntitiesAdminUsersGetParametersQueryEntity_type {
     Trader = "Trader",
     Unknown = "Unknown"
 }
-export enum PathsApiEntitiesAdminUsersGetParametersQueryIs_active {
-    false = "false",
-    true = "true"
-}
 export enum PathsApiEntitiesAdminUsersGetParametersQueryRole {
     ADMIN = "ADMIN",
     AUDITOR = "AUDITOR",
     RO = "RO",
     RW = "RW"
+}
+export enum PathsApiEntitiesAdminUsersFiltersGetParametersQueryFilter {
+    entity_type = "entity_type",
+    is_active = "is_active",
+    role = "role"
 }
 export enum PathsApiH2StationsGetParametersQueryAccess_type {
     PRIVATE = "PRIVATE",

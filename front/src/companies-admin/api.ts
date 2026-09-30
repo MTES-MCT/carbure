@@ -1,6 +1,7 @@
 import { api as apiFetch } from "common/services/api-fetch"
 import { QueryParams } from "common/services/api-fetch.types"
 import { UserRightStatus, EntityType, UserRole } from "common/types"
+import { AdminUserQuery, AdminUserQueryFilter } from "./types"
 
 export function getAdminUsers(
   query: QueryParams<"/entities/admin-users/">,
@@ -10,6 +11,17 @@ export function getAdminUsers(
     params: { query },
     body: { entity_ids: entityIds },
   })
+}
+
+export function getAdminUsersFilters(
+  filter: AdminUserQueryFilter,
+  query: AdminUserQuery
+) {
+  return apiFetch
+    .GET("/entities/admin-users/filters/", {
+      params: { query: { ...query, filter } },
+    })
+    .then((res) => res.data ?? [])
 }
 
 export function getCompanies(entity_id: number) {

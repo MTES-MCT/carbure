@@ -12,7 +12,6 @@ import { useQueryBuilder } from "common/hooks/query-builder-2"
 import useTitle from "common/hooks/title"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
-import { QueryParams } from "common/services/api-fetch.types"
 import { ROUTE_URLS } from "common/utils/routes"
 import * as api from "../../api"
 import { EntityIdsFilter } from "../../components/entity-ids-filter"
@@ -22,6 +21,10 @@ import {
   useAdminUserColumns,
   useAdminUserFilters,
 } from "./hooks"
+import {
+  AdminUserQueryBuilder,
+  AdminUserQueryFilter,
+} from "companies-admin/types"
 
 const AdminUsers = () => {
   const { t } = useTranslation()
@@ -29,15 +32,15 @@ const AdminUsers = () => {
   usePrivateNavigation(t("Utilisateurs"))
   const entity = useEntity()
 
-  const { state, actions, query } = useQueryBuilder()
-  const listQuery = query as QueryParams<"/entities/admin-users/">
+  const { state, actions, query } =
+    useQueryBuilder<AdminUserQueryBuilder["config"]>()
   const [entityIds, setEntityIds] = useState("")
   const filterLabels = useAdminUserFilters()
   const columns = useAdminUserColumns()
 
   const { result, loading } = useQuery(api.getAdminUsers, {
     key: "admin-users",
-    params: [listQuery, entityIds],
+    params: [query, entityIds],
   })
 
   const rows = result?.data?.results ?? []
@@ -62,7 +65,9 @@ const AdminUsers = () => {
           filterLabels={filterLabels}
           selected={state.filters}
           onSelect={actions.setFilters}
-          getFilterOptions={getAdminUserFilterOptions}
+          getFilterOptions={(filter) =>
+            getAdminUserFilterOptions(filter as AdminUserQueryFilter, query)
+          }
           normalizers={adminUserFilterNormalizers}
         >
           <EntityIdsFilter
