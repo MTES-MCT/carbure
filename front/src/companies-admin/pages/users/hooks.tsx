@@ -2,11 +2,13 @@ import { useTranslation } from "react-i18next"
 import { Cell, Column } from "common/components/table2"
 import { apiTypes } from "common/services/api-fetch.types"
 import { EntityType, UserRole } from "common/types"
+import * as api from "../../api"
 import {
   getEntityTypeLabel,
   getUserRoleLabel,
   normalizeBoolean,
 } from "common/utils/normalizers"
+import { AdminUserQuery, AdminUserQueryFilter } from "companies-admin/types"
 
 export type AdminUserRow = apiTypes["AdminUserRow"]
 export type AdminUserFilter = "entity_type" | "role" | "is_active"
@@ -21,11 +23,11 @@ export function useAdminUserFilters() {
   }
 }
 
-export function getAdminUserFilterOptions(filter: AdminUserFilter) {
-  if (filter === "entity_type")
-    return Promise.resolve(Object.values(EntityType))
-  if (filter === "is_active") return Promise.resolve(["true", "false"])
-  return Promise.resolve(Object.values(UserRole))
+export function getAdminUserFilterOptions(
+  filter: AdminUserQueryFilter,
+  query: AdminUserQuery
+) {
+  return api.getAdminUsersFilters(filter, query)
 }
 
 export const adminUserFilterNormalizers = {
@@ -55,7 +57,7 @@ export function useAdminUserColumns(): Column<AdminUserRow>[] {
       ),
     },
     {
-      key: "entity",
+      key: "entity_id",
       header: t("Entity id"),
       cell: (row) => <Cell text={row.entity_id} />,
     },

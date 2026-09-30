@@ -4,7 +4,8 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core.models import Entity, UserRights, UserRightsRequests
-from core.tests_utils import setup_current_user
+from core.tests_utils import FiltersActionTestMixin, setup_current_user
+from entity.views.users.admin_users import AdminUsersViewSet
 
 User = get_user_model()
 
@@ -15,7 +16,7 @@ def row_by_email(results, email, entity_name):
     return matches[0]
 
 
-class AdminUsersTest(TestCase):
+class AdminUsersTest(FiltersActionTestMixin, TestCase):
     def setUp(self):
         self.admin = Entity.objects.create(name="Admin Carbure", entity_type=Entity.ADMIN)
         self.producer = Entity.objects.create(name="Producteur Alpha", entity_type=Entity.PRODUCER)
@@ -127,6 +128,21 @@ class AdminUsersTest(TestCase):
         self.assertEqual(
             sorted(row["email"] for row in by_lines),
             ["autre@carbure.local", "filtre@carbure.local"],
+        )
+
+    def test_filter_options(self):
+        active = User.objects.create_user(email="actif@carbure.local", name="Actif", password="x")
+        UserRights.objects.create(user=active, entity=self.producer, role=UserRights.RW)
+        inactive = User.objects.create_user(email="inactif@carbure.local", name="Inactif", password="x", is_active=False)
+        UserRights.objects.create(user=inactive, entity=self.operator, role=UserRights.RO)
+
+        self.assertFilters(
+            AdminUsersViewSet,
+            {
+                "entity_type": [Entity.OPERATOR, Entity.PRODUCER],
+                "is_active": [False, True],
+                "role": [UserRights.RO, UserRights.RW],
+            },
         )
 
     def post_results(self, entity_ids, **params):

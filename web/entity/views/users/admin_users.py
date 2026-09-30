@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
+from core.filters import FiltersActionFactory
 from core.models import UserRights
 from core.permissions import HasAdminRights
 from core.utils import CustomPageNumberPagination
@@ -21,7 +22,7 @@ from entity.serializers.admin_users import AdminEntityIdsSerializer, AdminUserRo
         ),
     ]
 )
-class AdminUsersViewSet(ListModelMixin, GenericViewSet):
+class AdminUsersViewSet(FiltersActionFactory(), ListModelMixin, GenericViewSet):
     queryset = (
         UserRights.objects.filter(user__is_staff=False, user__is_superuser=False)
         .select_related("user", "entity")
