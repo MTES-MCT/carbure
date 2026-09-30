@@ -12,7 +12,7 @@ import {
 } from "common/components/inputs2"
 import { Select } from "common/components/selects2"
 import { EntityManager } from "common/hooks/entity"
-import { EntityPreview } from "common/types"
+import { EntityPreview, Unit } from "common/types"
 import { normalizeEntityPreview } from "common/utils/normalizers"
 import {
   Action,
@@ -27,7 +27,11 @@ import {
 } from "traceability/normalizers"
 import { SiteTypeEnum } from "api-schema"
 import { getStepFromFractionDigits } from "common/utils/formatters"
-import { ACTION_EMISSIONS_UNIT } from "traceability/utils"
+import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
+import {
+  ACTION_EMISSIONS_UNIT,
+  formatUnitActionDecimal,
+} from "traceability/utils"
 
 const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
 
@@ -60,6 +64,16 @@ export type ActionSiteFieldOptions = {
 
 export function useActionFields() {
   const { t } = useTranslation()
+  const emissionTitles = useGhgEmissionTitles()
+
+  const pos_id: ActionField = {
+    key: "pos_id",
+    label: t("N° de POS"),
+    field: ({ form, props }: ActionFieldConfig) => (
+      <TextInput {...props} {...form.bind("pos_id")} />
+    ),
+  }
+
   return {
     holder: {
       key: "holder",
@@ -101,7 +115,11 @@ export function useActionFields() {
       key: "quantity",
       label: t("Quantité"),
       field: ({ form, props }) => (
-        <ActionDecimalInput {...props} {...form.bind("quantity")} />
+        <ActionDecimalInput
+          {...props}
+          {...form.bind("quantity")}
+          readOnlyValue={formatUnitActionDecimal(form.value.quantity, Unit.kg)}
+        />
       ),
     },
 
@@ -124,12 +142,11 @@ export function useActionFields() {
       },
     },
 
-    pos_id: {
-      key: "pos_id",
-      label: t("N° de POS"),
-      field: ({ form, props }) => (
-        <TextInput {...props} {...form.bind("pos_id")} />
-      ),
+    pos_id,
+
+    carbure_id: {
+      ...pos_id,
+      label: t("N° d'identifiant Carbure"),
     },
 
     certificate: {
@@ -193,7 +210,12 @@ export function useActionFields() {
       key: "ei",
       label: t("EI"),
       field: ({ form, props }) => (
-        <ActionDecimalInput {...props} {...form.bind("ei")} />
+        <ActionDecimalInput
+          {...props}
+          hasTooltip
+          title={emissionTitles.ei}
+          {...form.bind("ei", { value: form.value.total_emissions?.ei })}
+        />
       ),
     },
 
@@ -201,7 +223,12 @@ export function useActionFields() {
       key: "ep",
       label: t("EP"),
       field: ({ form, props }) => (
-        <ActionDecimalInput {...props} {...form.bind("ep")} />
+        <ActionDecimalInput
+          {...props}
+          hasTooltip
+          title={emissionTitles.ep}
+          {...form.bind("ep", { value: form.value.total_emissions?.ep })}
+        />
       ),
     },
 
@@ -209,7 +236,12 @@ export function useActionFields() {
       key: "etd",
       label: t("ETD"),
       field: ({ form, props }) => (
-        <ActionDecimalInput {...props} {...form.bind("etd")} />
+        <ActionDecimalInput
+          {...props}
+          hasTooltip
+          title={emissionTitles.etd}
+          {...form.bind("etd", { value: form.value.total_emissions?.etd })}
+        />
       ),
     },
 
@@ -217,7 +249,12 @@ export function useActionFields() {
       key: "eu",
       label: t("EU"),
       field: ({ form, props }) => (
-        <ActionDecimalInput {...props} {...form.bind("eu")} />
+        <ActionDecimalInput
+          {...props}
+          hasTooltip
+          title={emissionTitles.eu}
+          {...form.bind("eu", { value: form.value.total_emissions?.eu })}
+        />
       ),
     },
 
@@ -225,7 +262,12 @@ export function useActionFields() {
       key: "eccs",
       label: t("ECCS"),
       field: ({ form, props }) => (
-        <ActionDecimalInput {...props} {...form.bind("eccs")} />
+        <ActionDecimalInput
+          {...props}
+          hasTooltip
+          title={emissionTitles.eccs}
+          {...form.bind("eccs", { value: form.value.total_emissions?.eccs })}
+        />
       ),
     },
 
@@ -235,9 +277,12 @@ export function useActionFields() {
       field: ({ form, props }) => (
         <ActionDecimalInput
           {...props}
-          hintText={ACTION_EMISSIONS_UNIT}
           readOnly
           value={form.value.total_emissions?.total ?? ""}
+          readOnlyValue={formatUnitActionDecimal(
+            form.value.total_emissions?.total,
+            ACTION_EMISSIONS_UNIT
+          )}
         />
       ),
     },

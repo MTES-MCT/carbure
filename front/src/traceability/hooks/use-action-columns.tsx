@@ -5,11 +5,7 @@ import { EntityManager } from "common/hooks/entity"
 import { formatDate } from "common/utils/formatters"
 import { ActionStatusBadge } from "traceability/components/action-status-badge"
 import { Action } from "traceability/types"
-import {
-  ACTION_EMISSIONS_UNIT,
-  formatActionDecimal,
-  formatActionTotalEmissions,
-} from "traceability/utils"
+import { ACTION_EMISSIONS_UNIT, formatActionDecimal } from "traceability/utils"
 
 export type ActionColumn = Column<Action> & {
   condition?: (entity: EntityManager) => boolean
@@ -17,6 +13,12 @@ export type ActionColumn = Column<Action> & {
 
 export function useActionColumns() {
   const { t } = useTranslation()
+
+  const pos_id: ActionColumn = {
+    key: "pos_id",
+    header: t("N° de POS"),
+    cell: (action) => <Cell text={action.pos_id} />,
+  }
 
   return {
     status: {
@@ -50,7 +52,7 @@ export function useActionColumns() {
       key: "quantity",
       header: t("Quantité"),
       cell: (action) => (
-        <Cell text={formatActionDecimal(action.quantity)} sub="MJ" />
+        <Cell text={formatActionDecimal(action.quantity)} sub="kg" />
       ),
     },
 
@@ -60,10 +62,11 @@ export function useActionColumns() {
       cell: (action) => <Cell text={action.site?.name} />,
     },
 
-    pos_id: {
-      key: "pos_id",
-      header: t("N° de POS"),
-      cell: (action) => <Cell text={action.pos_id} />,
+    pos_id,
+
+    carbure_id: {
+      ...pos_id,
+      header: t("Identifiant Carbure"),
     },
 
     period: {
@@ -85,7 +88,7 @@ export function useActionColumns() {
       header: t("Emissions"),
       cell: (action) => (
         <Cell
-          text={formatActionTotalEmissions(action.total_emissions)}
+          text={formatActionDecimal(action.total_emissions?.total)}
           sub={ACTION_EMISSIONS_UNIT}
         />
       ),

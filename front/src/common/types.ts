@@ -80,6 +80,7 @@ export enum ExtendedUnit {
   GJ = "gj",
   MWh = "MWh",
   tCO2ev = "tCO2ev",
+  gCO2eqMJ = "gCO₂eq/MJ",
 }
 export type ExtendedUnitType = Unit | ExtendedUnit
 

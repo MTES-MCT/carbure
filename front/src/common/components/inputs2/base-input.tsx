@@ -15,6 +15,8 @@ export type ExtendedInputProps = {
   // Content of the tooltip
   title?: ReactNode
   readOnly?: boolean
+  // Replaces the field value when read-only (formatted text, unit, link, …)
+  readOnlyValue?: ReactNode
   autoFocus?: boolean
   name?: string
   pattern?: string
@@ -40,19 +42,21 @@ export const BaseInput = ({
   domRef,
   marginBottom,
   readOnly,
+  readOnlyValue,
   ...props
 }: BaseInputProps) => {
   // Set a custom style for read only inputs
   if (readOnly) {
-    const value =
+    const nativeValue =
       props.nativeInputProps?.value ?? props.nativeTextAreaProps?.value
+
     return (
       <ReadOnlyValue
         label={label}
         hasTooltip={hasTooltip}
         title={title}
         readOnly={readOnly}
-        value={`${value}`}
+        value={readOnlyValue ?? `${nativeValue}`}
       />
     )
   }
@@ -127,7 +131,7 @@ export const ReadOnlyValue = ({
   title,
   readOnly,
   value,
-}: LabelProps & { value: string }) => {
+}: LabelProps & { value: ReactNode }) => {
   return (
     <div>
       <Label
@@ -136,7 +140,9 @@ export const ReadOnlyValue = ({
         title={title}
         readOnly={readOnly}
       />
-      <Text size="sm">{value !== undefined && value !== "" ? value : "-"}</Text>
+      <Text size="sm">
+        {value !== undefined && value !== null && value !== "" ? value : "-"}
+      </Text>
     </div>
   )
 }
