@@ -17,7 +17,7 @@
       "size": "M"
     },
     {
-      "command": "45 0 * * * bash database/restore.sh scalingo carbure-prod \"$STAGING_DATABASE_URL\"",
+      "command": "45 1 * * * bash database/restore.sh scalingo carbure-prod \"$STAGING_DATABASE_URL\" && scalingo --region osc-secnum-fr1 --app carbure-staging run python web/manage.py migrate",
       "size": "M"
     }
   ]

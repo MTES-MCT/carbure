@@ -14,13 +14,13 @@
 
 set -euo pipefail
 
-backup_path=$1
-DATABASE_URL=${2:-${DATABASE_URL:-}}
-
-if [[ -z "$backup_path" ]]; then
-  echo "backup_path must be provided as the first argument" >&2
+if (( $# < 1 )) || [[ -z "$1" ]]; then
+  echo "Usage: $0 <dir|file> [database-url]" >&2
   exit 1
 fi
+
+backup_path=$1
+DATABASE_URL=${2:-${DATABASE_URL:-}}
 
 if [[ -z "$DATABASE_URL" ]]; then
   echo "DATABASE_URL is not defined" >&2
@@ -66,7 +66,7 @@ echo "> Restoring '$MYSQL_DATABASE' from '$backup_file'..."
 
 # Remove CREATE DATABASE and USE statements near the top of the Scalingo dumps,
 # then stream the resulting SQL directly into MySQL.
-tar -xOzf "$backup_file" "*.sql" |
+tar -xOzf "$backup_file" |
   sed -E '1,50 {
     /^[[:space:]]*CREATE[[:space:]]+DATABASE([[:space:]]|$)/d
     /^[[:space:]]*USE([[:space:]]|$)/d
