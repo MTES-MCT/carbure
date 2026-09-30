@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { Button } from "common/components/button2"
+import { ExportButton } from "common/components/export"
 import { SearchInput } from "common/components/inputs2"
 import { NoResult } from "common/components/no-result2"
 import { Pagination } from "common/components/pagination2/pagination"
@@ -58,7 +58,12 @@ const AdminUsers = () => {
               onChange={actions.setSearch}
             />
           </ActionBar.Grow>
-          <Button>Exporter</Button>
+          <ExportButton
+            query={query}
+            download={(currentQuery) =>
+              api.exportAdminUsers(currentQuery, entityIds)
+            }
+          />
         </ActionBar>
 
         <FilterMultiSelect2

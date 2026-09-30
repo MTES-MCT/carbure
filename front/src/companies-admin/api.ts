@@ -1,16 +1,24 @@
-import { api as apiFetch } from "common/services/api-fetch"
-import { QueryParams } from "common/services/api-fetch.types"
+import { api as apiFetch, downloadFile } from "common/services/api-fetch"
 import { UserRightStatus, EntityType, UserRole } from "common/types"
 import { AdminUserQuery, AdminUserQueryFilter } from "./types"
 
-export function getAdminUsers(
-  query: QueryParams<"/entities/admin-users/">,
-  entityIds: string
-) {
+export function getAdminUsers(query: AdminUserQuery, entityIds: string) {
   return apiFetch.POST("/entities/admin-users/search/", {
     params: { query },
     body: { entity_ids: entityIds },
   })
+}
+
+export function exportAdminUsers(query: AdminUserQuery, entityIds: string) {
+  return apiFetch
+    .POST("/entities/admin-users/export/", {
+      params: { query },
+      body: { entity_ids: entityIds },
+      parseAs: "blob",
+    })
+    .then(({ data, response }) => {
+      if (data) downloadFile(data, response, "carbure_utilisateurs.xlsx")
+    })
 }
 
 export function getAdminUsersFilters(
