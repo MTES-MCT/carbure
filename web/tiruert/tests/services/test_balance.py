@@ -925,7 +925,7 @@ class BalanceServiceObjectiveSectorTest(TestCase):
 
         self.assertGreater(result[Operation.ESSENCE]["pending_teneur"], 0)
 
-    def test_future_teneur_is_excluded_from_stock(self, mock_current_year):
+    def test_future_teneur_is_excluded_from_stock(self):
         """A future TENEUR is excluded from both stock and teneur contributions."""
         operation = self._create_teneur_with_details(self.biofuel_essence, declaration_year=2027)
 
