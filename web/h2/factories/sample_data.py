@@ -178,8 +178,8 @@ def setup_h2_certificates() -> tuple[Action, Action]:
         eccs=Decimal("5"),
     )
 
-    ActionStatus.objects.create(action=h2_lot_03, status=ActionStatus.ACCEPTED)
-    ActionStatus.objects.create(action=h2_lot_04, status=ActionStatus.ACCEPTED)
+    ActionStatus.objects.update_or_create(action=h2_lot_03, status=ActionStatus.ACCEPTED)
+    ActionStatus.objects.update_or_create(action=h2_lot_04, status=ActionStatus.ACCEPTED)
 
     return valorize_child(h2_lot_03), valorize_child(h2_lot_04)
 
