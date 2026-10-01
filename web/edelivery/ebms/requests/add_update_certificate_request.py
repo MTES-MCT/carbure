@@ -51,7 +51,7 @@ class AddUpdateCertificateRequest(BaseRequest):
   {self.eo_scope_xml_elements(scopes)}
   {self.site_xml_elements(main_site, other_sites)}
   <CHAIN_OF_CUSTODIES>
-    <CHAIN_OF_CUSTODY>Mass Balance</CHAIN_OF_CUSTODY>
+    <CHAIN_OF_CUSTODY>Mass balance</CHAIN_OF_CUSTODY>
   </CHAIN_OF_CUSTODIES>
 </EO_CERTIFICATE>"""
 
