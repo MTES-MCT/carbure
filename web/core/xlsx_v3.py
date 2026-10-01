@@ -554,7 +554,7 @@ def make_dispatchsites_sheet(workbook):
     worksheet_sites = workbook.add_worksheet("SitesDExpedition")
     dispatch_sites = Site.objects.filter(site_type__in=DISPATCH_SITE_TYPES).order_by("country", "id")
     bold = workbook.add_format({"bold": True})
-    columns = ["id", "name", "city", "country", "site_type"]
+    columns = ["name", "city", "country", "site_type"]
 
     for column, name in enumerate(columns):
         worksheet_sites.write(0, column, name, bold)
@@ -564,7 +564,6 @@ def make_dispatchsites_sheet(workbook):
             row,
             0,
             [
-                site.id,
                 site.name,
                 site.city,
                 site.country.code_pays if site.country else "",
