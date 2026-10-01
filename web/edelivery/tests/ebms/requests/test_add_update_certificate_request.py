@@ -139,11 +139,11 @@ class AddUpdateCertificateRequestTest(BaseRequestTest):
         group_certification_element = root_xml_element.find("./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/GROUP_CERTIFICATION")
         self.assertEqual("NO", group_certification_element.text)
 
-    def test_sets_chain_of_custody_to_Mass_Balance(self):
+    def test_sets_chain_of_custody_to_Mass_balance(self):
         root_xml_element = self.add_update_certificate_request_payload(self.entity_certificate)
         chain_of_custody_path = "./EO_CERTIFICATE_HEADER/EO_CERTIFICATE/CHAIN_OF_CUSTODIES/CHAIN_OF_CUSTODY"
         chain_of_custody_elements = root_xml_element.findall(chain_of_custody_path)
-        self.assertEqual(["Mass Balance"], [e.text for e in chain_of_custody_elements])
+        self.assertEqual(["Mass balance"], [e.text for e in chain_of_custody_elements])
 
     def test_sets_eo_scope(self):
         self.certificate.scope = "FSP"
