@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.services import BiomethaneAnnualDeclarationService
+from biomethane.services.annual_declaration.notification import notify_declaration_reopened
 
 
 class BiomethaneAnnualDeclarationStatusSerializer(serializers.ModelSerializer):
@@ -105,6 +106,7 @@ class BiomethaneAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStatusSer
 
         # Filter validated_data to only include allowed fields
         validated_data = {k: v for k, v in validated_data.items() if k in allowed_fields}
+        reopening = is_dreal and validated_data.get("is_open") is True and not instance.is_open
 
         # Validate status changes
         status = validated_data.get("status")
@@ -129,5 +131,8 @@ class BiomethaneAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStatusSer
 
         if validated_data:
             instance.save()
+
+        if reopening:
+            notify_declaration_reopened(instance, request=self.context.get("request"))
 
         return instance

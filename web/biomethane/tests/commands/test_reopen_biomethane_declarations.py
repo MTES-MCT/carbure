@@ -25,7 +25,7 @@ class ReopenBiomethaneDeclarationsTests(TestCase):
         setup_current_user(self, "writer@example.com", "Writer", "pass", [(self.producer, UserRights.RW)])
         setup_current_user(self, "reader@example.com", "Reader", "pass", [(self.producer, UserRights.RO)])
 
-    @patch("biomethane.management.commands.reopen_biomethane_declarations.send_mail")
+    @patch("biomethane.services.annual_declaration.notification.send_mail")
     def test_reopens_declaration_and_emails_admin_and_writer(self, send_mail):
         call_command(
             "reopen_biomethane_declarations",
@@ -45,7 +45,7 @@ class ReopenBiomethaneDeclarationsTests(TestCase):
         self.assertIn(str(self.year), send_mail.call_args.kwargs["subject"])
         self.assertIn(str(self.year), send_mail.call_args.kwargs["message"])
 
-    @patch("biomethane.management.commands.reopen_biomethane_declarations.send_mail")
+    @patch("biomethane.services.annual_declaration.notification.send_mail")
     def test_skips_entity_without_declaration(self, send_mail):
         call_command(
             "reopen_biomethane_declarations",

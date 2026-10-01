@@ -1,19 +1,13 @@
 import argparse
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from biomethane.models import BiomethaneAnnualDeclaration
-from core.helpers import send_mail
-from core.models import Entity, UserRights
-
-EMAIL_SUBJECT = "Carbure - Réouverture de votre déclaration {year}"
-EMAIL_BODY = """Bonjour,
-Nous vous informons que votre déclaration {year} dans CarbuRe a été réouverte.
-Nous vous invitons à vous connecter via le lien ci-dessous afin de la finaliser.
-https://carbure.beta.gouv.fr/
-L'équipe CarbuRe
-"""
+from biomethane.services.annual_declaration.notification import (
+    get_reopen_notification_recipients,
+    reopen_declaration,
+)
+from core.models import Entity
 
 
 def parse_entity_ids(value):
@@ -54,7 +48,8 @@ class Command(BaseCommand):
         year = options["year"]
         dry_run = options["dry_run"] == "true"
         entity_ids = options["entity_ids"]
-        entity_ids = parse_entity_ids(entity_ids)
+        if isinstance(entity_ids, str):
+            entity_ids = parse_entity_ids(entity_ids)
 
         for entity_id in entity_ids:
             self._reopen_declaration(entity_id, year, dry_run)
@@ -66,30 +61,21 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(f"Entity {entity_id} does not exist. Skipping."))
             return
 
-        declaration = BiomethaneAnnualDeclaration.objects.filter(producer=entity, year=year)
-        if not declaration.exists():
+        declaration = BiomethaneAnnualDeclaration.objects.filter(producer=entity, year=year).first()
+        if declaration is None:
             self.stdout.write(self.style.WARNING(f"No declaration for entity {entity_id} in {year}. Skipping."))
             return
 
-        recipients = list(
-            entity.get_users_emails(role__in=[UserRights.ADMIN, UserRights.RW]).order_by("user__email").distinct()
-        )
         if dry_run:
+            recipients = get_reopen_notification_recipients(entity)
             self.stdout.write(
                 f"[dry-run] Would reopen declaration {year} for entity {entity_id} and email {recipients or 'nobody'}."
             )
             return
 
-        declaration.update(is_open=True, status=BiomethaneAnnualDeclaration.IN_PROGRESS)
+        recipients = reopen_declaration(declaration)
         if not recipients:
             self.stdout.write(self.style.WARNING(f"Declaration {year} reopened for entity {entity_id}, no recipients."))
             return
 
-        send_mail(
-            request=None,
-            subject=EMAIL_SUBJECT.format(year=year),
-            message=EMAIL_BODY.format(year=year),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=recipients,
-        )
         self.stdout.write(self.style.SUCCESS(f"Declaration {year} reopened for entity {entity_id}, email sent."))
