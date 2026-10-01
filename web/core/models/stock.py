@@ -94,6 +94,10 @@ class CarbureStock(models.Model):
         verbose_name = "CarbureStock"
         verbose_name_plural = "CarbureStocks"
 
+    @property
+    def depot_country_id(self):
+        return self.depot.country_id if self.depot else None
+
     def get_weight(self):
         return self.remaining_volume * self.biofuel.masse_volumique
 
