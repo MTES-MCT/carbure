@@ -121,7 +121,7 @@ class BiomethaneAnnualDeclarationViewSet(
                 declaration,
                 data=request.data,
                 partial=True,
-                context={"is_dreal": is_dreal},
+                context={**self.get_serializer_context(), "is_dreal": is_dreal},
             )
             serializer.is_valid(raise_exception=True)
             declaration = self.get_queryset().get(pk=serializer.save().pk)

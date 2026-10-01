@@ -46,7 +46,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         """Test that retrieve creates a new declaration if it doesn't exist"""
         # Mock date to ensure we're within the declaration period
         with (
-            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("biomethane.services.annual_declaration.declaration.date") as mock_date_service,
             patch("core.models.declaration_period.date") as mock_date_model,
         ):
             mock_date_service.today.return_value = date(self.current_year, 2, 15)
@@ -80,7 +80,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         )
 
         # Mock date to be within the declaration period (before March 31)
-        with patch("biomethane.services.annual_declaration.date") as mock_date_service:
+        with patch("biomethane.services.annual_declaration.declaration.date") as mock_date_service:
             mock_date_service.today.return_value = date(self.current_year, 2, 15)
             response = self.client.get(self.annual_declaration_url, self.base_params)
 
@@ -103,7 +103,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         update_data = {"status": BiomethaneAnnualDeclaration.IN_PROGRESS}
 
         # Mock date to be within the declaration period (before March 31)
-        with patch("biomethane.services.annual_declaration.date") as mock_date_service:
+        with patch("biomethane.services.annual_declaration.declaration.date") as mock_date_service:
             mock_date_service.today.return_value = date(self.current_year, 2, 15)
             response = self.client.patch(
                 self.annual_declaration_url,
@@ -129,7 +129,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         update_data = {"status": BiomethaneAnnualDeclaration.IN_PROGRESS}
 
         # Mock date to be within the declaration period (before March 31)
-        with patch("biomethane.services.annual_declaration.date") as mock_date_service:
+        with patch("biomethane.services.annual_declaration.declaration.date") as mock_date_service:
             mock_date_service.today.return_value = date(self.current_year, 2, 15)
             response = self.client.patch(
                 self.annual_declaration_url,
@@ -309,7 +309,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         setup_current_user(self, "dreal2@carbure.local", "DREAL 2", "gogogo", [(dreal, "ADMIN")])
 
         with (
-            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("biomethane.services.annual_declaration.declaration.date") as mock_date_service,
             patch("core.models.declaration_period.date") as mock_date_model,
         ):
             mock_date_service.today.return_value = date(self.current_year, 2, 15)
@@ -360,3 +360,62 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    @patch("biomethane.services.annual_declaration.notification.send_mail")
+    def test_dreal_reopen_sets_in_progress_and_emails_producer_users(self, send_mail):
+        department = Department.objects.create(code_dept="31", name="Haute-Garonne")
+        BiomethaneProductionUnitFactory.create(producer=self.producer_entity, department=department)
+        declaration = BiomethaneAnnualDeclaration.objects.create(
+            producer=self.producer_entity,
+            year=self.current_declaration_year,
+            status=BiomethaneAnnualDeclaration.DECLARED,
+            is_open=False,
+        )
+        setup_current_user(
+            self,
+            "producer-admin@carbure.local",
+            "Producer admin",
+            "gogogo",
+            [(self.producer_entity, "ADMIN")],
+        )
+        setup_current_user(
+            self,
+            "producer-reader@carbure.local",
+            "Producer reader",
+            "gogogo",
+            [(self.producer_entity, "RO")],
+        )
+
+        dreal = Entity.objects.create(name="Test DREAL Reopen", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=dreal, right=ExternalAdminRights.DREAL)
+        EntityScope.objects.create(
+            entity=dreal,
+            content_type=ContentType.objects.get_for_model(Department),
+            object_id=department.id,
+        )
+        setup_current_user(self, "dreal-reopen@carbure.local", "DREAL Reopen", "gogogo", [(dreal, "ADMIN")])
+
+        with patch("biomethane.services.annual_declaration.declaration.date") as mock_date_service:
+            mock_date_service.today.return_value = date(self.current_year, 2, 15)
+            response = self.client.patch(
+                self.annual_declaration_url,
+                {"is_open": True, "status": BiomethaneAnnualDeclaration.IN_PROGRESS},
+                content_type="application/json",
+                query_params={
+                    "entity_id": dreal.id,
+                    "producer_id": self.producer_entity.id,
+                    "year": self.current_declaration_year,
+                },
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        declaration.refresh_from_db()
+        self.assertTrue(declaration.is_open)
+        self.assertEqual(declaration.status, BiomethaneAnnualDeclaration.IN_PROGRESS)
+        send_mail.assert_called_once()
+        self.assertEqual(
+            send_mail.call_args.kwargs["recipient_list"],
+            ["producer-admin@carbure.local", "tester@carbure.local"],
+        )
+        self.assertIn(str(self.current_declaration_year), send_mail.call_args.kwargs["subject"])
+        self.assertIn(str(self.current_declaration_year), send_mail.call_args.kwargs["message"])

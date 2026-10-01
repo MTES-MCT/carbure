@@ -33,7 +33,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
             .get()
         )
 
-    @patch("biomethane.services.annual_declaration.date")
+    @patch("biomethane.services.annual_declaration.declaration.date")
     def test_get_declaration_period(self, mock_date):
         """Test get_current_declaration_year returns previous year based on current date"""
         # Test that get_current_declaration_year always returns previous year
@@ -58,7 +58,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         # Test when we're in the period - need to mock date in both service and model
         with (
-            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("biomethane.services.annual_declaration.declaration.date") as mock_date_service,
             patch("core.models.declaration_period.date") as mock_date_model,
         ):
             mock_date_service.today.return_value = date(2026, 2, 15)
@@ -68,7 +68,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
 
         # Test when we're after the period
         with (
-            patch("biomethane.services.annual_declaration.date") as mock_date_service,
+            patch("biomethane.services.annual_declaration.declaration.date") as mock_date_service,
             patch("core.models.declaration_period.date") as mock_date_model,
         ):
             mock_date_service.today.return_value = date(2026, 5, 15)
@@ -418,7 +418,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         )
         self.assertEqual(status, BiomethaneAnnualDeclaration.NOT_STARTED)
 
-    @patch("biomethane.services.annual_declaration.date")
+    @patch("biomethane.services.annual_declaration.declaration.date")
     def test_get_declaration_status_in_progress_before_deadline(self, mock_date):
         """Test get_declaration_status returns IN_PROGRESS before 31st March of the declaration year"""
         mock_date.today.return_value = date(2025, 3, 30)
@@ -432,7 +432,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         status = self._get_computed_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.IN_PROGRESS)
 
-    @patch("biomethane.services.annual_declaration.date")
+    @patch("biomethane.services.annual_declaration.declaration.date")
     def test_get_declaration_status_overdue_after_declaration_year_march_31(self, mock_date):
         """Test get_declaration_status returns OVERDUE after 31st March of the declaration year"""
         mock_date.today.return_value = date(2026, 4, 1)
@@ -446,7 +446,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         status = self._get_computed_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.OVERDUE)
 
-    @patch("biomethane.services.annual_declaration.date")
+    @patch("biomethane.services.annual_declaration.declaration.date")
     def test_get_declaration_status_declared(self, mock_date):
         """Test get_declaration_status returns DECLARED for declared declaration"""
         mock_date.today.return_value = date(2026, 4, 1)  # After 31st March
@@ -460,7 +460,7 @@ class BiomethaneAnnualDeclarationServiceTests(TestCase):
         status = self._get_computed_status(declaration)
         self.assertEqual(status, BiomethaneAnnualDeclaration.DECLARED)
 
-    @patch("biomethane.services.annual_declaration.date")
+    @patch("biomethane.services.annual_declaration.declaration.date")
     def test_get_declaration_status_overdue_previous_year(self, mock_date):
         """Test get_declaration_status returns OVERDUE for old year IN_PROGRESS declaration"""
         mock_date.today.return_value = date(2026, 2, 1)
