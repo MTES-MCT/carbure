@@ -399,7 +399,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
             mock_date_service.today.return_value = date(self.current_year, 2, 15)
             response = self.client.patch(
                 self.annual_declaration_url,
-                {"is_open": True, "status": BiomethaneAnnualDeclaration.IN_PROGRESS},
+                {"is_open": True},
                 content_type="application/json",
                 query_params={
                     "entity_id": dreal.id,
@@ -419,3 +419,7 @@ class BiomethaneAnnualDeclarationViewSetTests(TestCase):
         )
         self.assertIn(str(self.current_declaration_year), send_mail.call_args.kwargs["subject"])
         self.assertIn(str(self.current_declaration_year), send_mail.call_args.kwargs["message"])
+        self.assertIn(
+            f"/org/{self.producer_entity.id}/biomethane/{self.current_declaration_year}/supply-plan",
+            send_mail.call_args.kwargs["message"],
+        )

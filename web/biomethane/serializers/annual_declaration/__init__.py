@@ -1,1 +1,4 @@
-from .annual_declaration import BiomethaneAnnualDeclarationSerializer
+from .annual_declaration import (
+    BiomethaneAnnualDeclarationDrealSerializer,
+    BiomethaneAnnualDeclarationSerializer,
+)

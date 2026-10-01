@@ -44,6 +44,10 @@ class ReopenBiomethaneDeclarationsTests(TestCase):
         )
         self.assertIn(str(self.year), send_mail.call_args.kwargs["subject"])
         self.assertIn(str(self.year), send_mail.call_args.kwargs["message"])
+        self.assertIn(
+            f"/org/{self.producer.id}/biomethane/{self.year}/supply-plan",
+            send_mail.call_args.kwargs["message"],
+        )
 
     @patch("biomethane.services.annual_declaration.notification.send_mail")
     def test_skips_entity_without_declaration(self, send_mail):
