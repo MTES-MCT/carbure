@@ -175,7 +175,7 @@ class ApplyFeedstockFieldRulesTests(TestCase):
         """Collection type is required for the IAA residue feedstocks added to the rule."""
         codes = (
             "AUTRE-GLYCERINE",
-            "HUILE-DE-PALME",
+            "HUILE_PALME",
             "PLATS-CUISINES-SANS-PRODUITS-ANIMAUX",
             "SOUPES-DE-BIODECHETS-ISSUS-DU-DECONDITIONNEMENT",
         )

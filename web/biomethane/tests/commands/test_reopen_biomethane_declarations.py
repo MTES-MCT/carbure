@@ -62,3 +62,18 @@ class ReopenBiomethaneDeclarationsTests(TestCase):
         self.assertFalse(self.declaration.is_open)
         self.assertEqual(self.declaration.status, BiomethaneAnnualDeclaration.DECLARED)
         send_mail.assert_not_called()
+
+    @patch("biomethane.services.annual_declaration.notification.send_mail", side_effect=OSError("smtp down"))
+    def test_reopen_rolls_back_when_email_fails(self, send_mail):
+        with self.assertRaises(OSError):
+            call_command(
+                "reopen_biomethane_declarations",
+                year=self.year,
+                entity_ids=str(self.producer.id),
+                dry_run="false",
+            )
+
+        self.declaration.refresh_from_db()
+        self.assertFalse(self.declaration.is_open)
+        self.assertEqual(self.declaration.status, BiomethaneAnnualDeclaration.DECLARED)
+        send_mail.assert_called_once()
