@@ -7,7 +7,6 @@ from django.db.models.query import QuerySet
 
 from core.carburetypes import CarbureStockErrors, CarbureUnit
 from core.models import CarbureLot, CarbureStock, Entity, GenericError
-from transactions.forms.lot_form import DISPATCH_SITE_TYPES
 from transactions.models import YearConfig
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
 
@@ -38,7 +37,6 @@ VOLUME_FORMAT_INCORRECT = "VOLUME_FORMAT_INCORRECT"
 WRONG_FLOAT_FORMAT = "WRONG_FLOAT_FORMAT"
 UNKNOWN_DELIVERY_SITE = "UNKNOWN_DELIVERY_SITE"
 UNKNOWN_DELIVERY_COUNTRY = "UNKNOWN_DELIVERY_COUNTRY"
-INVALID_DISPATCH_SITE = "INVALID_DISPATCH_SITE"
 UNKNOWN_CLIENT = "UNKNOWN_CLIENT"
 
 
@@ -544,6 +542,7 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
 
 
 def fill_dispatch_data(lot, data, prefetched_data):
+    dispatch_site = None
     dispatch_site_id = data.get("carbure_dispatch_site_id", None)
     if dispatch_site_id:
         try:
@@ -551,18 +550,7 @@ def fill_dispatch_data(lot, data, prefetched_data):
         except (TypeError, ValueError):
             dispatch_site = None
 
-        if dispatch_site is None or dispatch_site.site_type not in DISPATCH_SITE_TYPES:
-            return [
-                GenericError(
-                    lot=lot,
-                    field="dispatch_site",
-                    error=INVALID_DISPATCH_SITE,
-                    display_to_creator=True,
-                    is_blocking=True,
-                    value=str(dispatch_site_id),
-                )
-            ]
-
+    if dispatch_site is not None:
         lot.carbure_dispatch_site = dispatch_site
         lot.unknown_dispatch_site = None
         lot.dispatch_site_country = dispatch_site.country
