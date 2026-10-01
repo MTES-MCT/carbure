@@ -3,7 +3,6 @@ import {
   useAnnualDeclaration,
   useAnnualDeclarationYear,
 } from "biomethane/providers/annual-declaration"
-import { AnnualDeclarationStatus } from "biomethane/types"
 import { useMutation } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
@@ -19,12 +18,7 @@ export const useToggleDeclaration = () => {
       patchAnnualDeclaration(
         entity.id,
         selectedYear!,
-        is_open
-          ? { is_open: false }
-          : {
-              is_open: true,
-              status: AnnualDeclarationStatus.IN_PROGRESS,
-            },
+        { is_open: !is_open },
         selectedEntityId
       ),
     {

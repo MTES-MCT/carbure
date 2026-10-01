@@ -12,6 +12,7 @@ from biomethane.permissions import (
     is_entity_related_to_biomethane_external_admin,
 )
 from biomethane.serializers import BiomethaneAnnualDeclarationSerializer
+from biomethane.serializers.annual_declaration import BiomethaneAnnualDeclarationDrealSerializer
 from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
 from biomethane.views.mixins import YearsActionMixin
 from biomethane.views.mixins.retrieve import GetObjectMixin
@@ -67,6 +68,11 @@ class BiomethaneAnnualDeclarationViewSet(
         setattr(request, "year", int(year))
         return request
 
+    def get_serializer_class(self):
+        if self.action == "partial_update" and HasDrealRights().has_permission(self.request, self):
+            return BiomethaneAnnualDeclarationDrealSerializer
+        return super().get_serializer_class()
+
     def get_queryset(self):
         if self.action == "get_years":
             return BiomethaneAnnualDeclaration.objects.all()
@@ -112,19 +118,13 @@ class BiomethaneAnnualDeclarationViewSet(
 
     def partial_update(self, request, *args, **kwargs):
         """Partial update of the declaration for a producer and year"""
-        permission = HasDrealRights()
-        is_dreal = permission.has_permission(request, self)
-
         try:
             declaration = self.get_object()
-            serializer = self.get_serializer(
-                declaration,
-                data=request.data,
-                partial=True,
-                context={**self.get_serializer_context(), "is_dreal": is_dreal},
-            )
-            serializer.is_valid(raise_exception=True)
-            declaration = self.get_queryset().get(pk=serializer.save().pk)
-            return Response(self.get_serializer(declaration).data)
         except BiomethaneAnnualDeclaration.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(declaration, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        serializer.instance = self.get_queryset().get(pk=declaration.pk)
+        return Response(serializer.data)

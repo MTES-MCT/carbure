@@ -1,3 +1,5 @@
+import os
+
 from django.conf import settings
 
 from biomethane.models import BiomethaneAnnualDeclaration
@@ -8,7 +10,7 @@ REOPEN_EMAIL_SUBJECT = "Carbure - Réouverture de votre déclaration {year}"
 REOPEN_EMAIL_BODY = """Bonjour,
 Nous vous informons que votre déclaration {year} dans CarbuRe a été réouverte.
 Nous vous invitons à vous connecter via le lien ci-dessous afin de la finaliser.
-https://carbure.beta.gouv.fr/
+{base_url}/org/{entity_id}/biomethane/{year}/supply-plan
 L'équipe CarbuRe
 """
 
@@ -25,7 +27,11 @@ def notify_declaration_reopened(declaration, request=None):
     send_mail(
         request=request,
         subject=REOPEN_EMAIL_SUBJECT.format(year=declaration.year),
-        message=REOPEN_EMAIL_BODY.format(year=declaration.year),
+        message=REOPEN_EMAIL_BODY.format(
+            year=declaration.year,
+            entity_id=declaration.producer_id,
+            base_url=os.environ.get("BASE_URL", "").rstrip("/"),
+        ),
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=recipients,
     )

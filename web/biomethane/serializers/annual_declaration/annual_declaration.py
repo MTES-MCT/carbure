@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from biomethane.models import BiomethaneAnnualDeclaration
 from biomethane.services import BiomethaneAnnualDeclarationService
-from biomethane.services.annual_declaration.notification import notify_declaration_reopened
+from biomethane.services.annual_declaration.notification import reopen_declaration
 
 
 class BiomethaneAnnualDeclarationStatusSerializer(serializers.ModelSerializer):
@@ -92,47 +92,50 @@ class BiomethaneAnnualDeclarationSerializer(BiomethaneAnnualDeclarationStatusSer
         return BiomethaneAnnualDeclarationService.is_declaration_complete(instance, missing_fields)
 
     def update(self, instance, validated_data):
-        is_dreal = self.context.get("is_dreal", False)
+        """
+        Producer correction: an open declaration can only be set back to IN_PROGRESS.
+        DECLARED is set by the validate action. A closed declaration cannot be edited.
+        """
+        if not instance.is_open:
+            raise serializers.ValidationError(
+                {"status": "La déclaration annuelle n'est pas modifiable dans son état actuel."}
+            )
 
-        if is_dreal:
-            allowed_fields = ["is_open", "status"]
-        else:
-            allowed_fields = ["status"]
+        validated_data = {key: value for key, value in validated_data.items() if key == "status"}
 
-            if not instance.is_open:
-                raise serializers.ValidationError(
-                    {"status": "La déclaration annuelle n'est pas modifiable dans son état actuel."}
-                )
-
-        # Filter validated_data to only include allowed fields
-        validated_data = {k: v for k, v in validated_data.items() if k in allowed_fields}
-        reopening = is_dreal and validated_data.get("is_open") is True and not instance.is_open
-
-        # Validate status changes
         status = validated_data.get("status")
         if status is not None:
             if (
                 instance.status == BiomethaneAnnualDeclaration.IN_PROGRESS
                 and status == BiomethaneAnnualDeclaration.IN_PROGRESS
             ):
-                # No change needed
                 validated_data.pop("status")
-            elif status == BiomethaneAnnualDeclaration.IN_PROGRESS:
-                # Allow changing to IN_PROGRESS
-                pass
-            else:
+            elif status != BiomethaneAnnualDeclaration.IN_PROGRESS:
                 raise serializers.ValidationError(
                     {"status": f"Seul le statut {BiomethaneAnnualDeclaration.IN_PROGRESS} est autorisé."}
                 )
 
-        # Update all allowed fields
         for field, value in validated_data.items():
             setattr(instance, field, value)
 
         if validated_data:
             instance.save()
 
-        if reopening:
-            notify_declaration_reopened(instance, request=self.context.get("request"))
+        return instance
+
+
+class BiomethaneAnnualDeclarationDrealSerializer(BiomethaneAnnualDeclarationSerializer):
+    def update(self, instance, validated_data):
+        if "is_open" not in validated_data:
+            return instance
+
+        is_open = validated_data["is_open"]
+        if is_open and not instance.is_open:
+            reopen_declaration(instance, request=self.context.get("request"))
+            return instance
+
+        if instance.is_open != is_open:
+            instance.is_open = is_open
+            instance.save(update_fields=["is_open"])
 
         return instance
