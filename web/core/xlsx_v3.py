@@ -1407,9 +1407,11 @@ def make_template_carbure_stocks_sheet(workbook, entity):
         "dae",
         "vendor_certificate",
         "client",
+        "dispatch_date",
         "delivery_date",
         "delivery_site",
         "delivery_site_country",
+        "delivery_type",
     ]
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
@@ -1436,6 +1438,7 @@ def make_template_carbure_stocks_sheet(workbook, entity):
             "",
             random.choice(clients).name,
             today,
+            today,
             random.choice(delivery_sites).name,
             "",
         ]
@@ -1448,6 +1451,7 @@ def make_template_carbure_stocks_sheet(workbook, entity):
             get_random_dae(),
             "",
             "Unknown Client GmbH",
+            today,
             today,
             "",
             "DE",
