@@ -19,9 +19,6 @@ class LotNode(Node):
         "production_site_certificate": True,
         "production_site_certificate_type": True,
         "production_site_double_counting_certificate": True,
-        "carbure_dispatch_site": True,
-        "unknown_dispatch_site": True,
-        "dispatch_site_country": True,
         "ghg_total": True,
         "ghg_reference": True,
         "ghg_reduction": True,
@@ -39,6 +36,9 @@ class LotNode(Node):
         "lhv_amount": True,
         "transport_document_type": True,
         "transport_document_reference": True,
+        "carbure_dispatch_site": True,
+        "unknown_dispatch_site": True,
+        "dispatch_site_country": True,
         "carbure_delivery_site": True,
         "unknown_delivery_site": True,
         "delivery_site_country": True,
@@ -77,7 +77,8 @@ class LotNode(Node):
     # data to copy only from a direct parent stock
     FROM_PARENT_STOCK = {
         "carbure_client": "carbure_supplier",
-        "depot": "carbure_dispatch_site",
+        "depot_id": "carbure_dispatch_site_id",
+        "depot_country_id": "dispatch_site_country_id",
         **FROM_STOCK,
     }
 
@@ -323,10 +324,19 @@ class LotNode(Node):
             if field == "carbure_production_site" and value:
                 derived_fields["production_country"] = value.country
                 derived_fields["production_site_commissioning_date"] = value.date_mise_en_service
+                derived_fields["unknown_production_site"] = None
             if field == "carbure_delivery_site" and value:
                 derived_fields["delivery_site_country"] = value.country
+                derived_fields["unknown_delivery_site"] = None
             if field == "carbure_dispatch_site" and value:
                 derived_fields["dispatch_site_country"] = value.country
+                derived_fields["unknown_dispatch_site"] = None
+            if field == "carbure_producer" and value:
+                derived_fields["unknown_producer"] = None
+            if field == "carbure_supplier" and value:
+                derived_fields["unknown_supplier"] = None
+            if field == "carbure_client" and value:
+                derived_fields["unknown_client"] = None
         return derived_fields
 
 
