@@ -3,6 +3,7 @@ import datetime
 from core.carburetypes import CarbureSanityCheckErrors
 from core.common import find_normalized
 from core.models import CarbureLot
+from transactions.forms.lot_form import DISPATCH_SITE_TYPES
 
 from .helpers import generic_error
 
@@ -70,6 +71,20 @@ def check_delivery_date_before_dispatch_date(lot: CarbureLot):
             lot=lot,
             field="delivery_date",
             is_blocking=True,
+        )
+
+
+def check_invalid_dispatch_site(lot: CarbureLot):
+    dispatch_site = lot.carbure_dispatch_site
+    if dispatch_site is not None and dispatch_site.site_type not in DISPATCH_SITE_TYPES:
+        return generic_error(
+            error=CarbureSanityCheckErrors.INVALID_DISPATCH_SITE,
+            lot=lot,
+            field="dispatch_site",
+            display_to_admin=False,
+            display_to_auditor=False,
+            is_blocking=True,
+            value=str(dispatch_site.pk),
         )
 
 

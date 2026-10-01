@@ -7,7 +7,7 @@ from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Susta
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
 from transactions.factories import CarbureLotFactory
-from transactions.models import Depot, EntitySite, YearConfig
+from transactions.models import Depot, EntitySite, Site, YearConfig
 from transactions.sanity_checks.general import check_missing_delivery_type
 
 from ..helpers import enrich_lot, get_prefetched_data, has_blocking_errors, has_error
@@ -96,6 +96,26 @@ class GeneralSanityChecksTest(TestCase):
 
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
+
+    def test_invalid_dispatch_site_type_is_blocking(self):
+        dispatch_site = Site.objects.create(name="Invalid Dispatch Site", site_type=Site.POWER_PLANT)
+        lot = self.create_lot(carbure_dispatch_site=dispatch_site)
+
+        errors = self.run_checks(lot)
+        dispatch_errors = [error for error in errors if error.error == CarbureSanityCheckErrors.INVALID_DISPATCH_SITE]
+
+        assert len(dispatch_errors) == 1
+        assert dispatch_errors[0].field == "dispatch_site"
+        assert dispatch_errors[0].value == str(dispatch_site.pk)
+        assert dispatch_errors[0].display_to_creator is True
+        assert dispatch_errors[0].is_blocking is True
+
+        lot.carbure_dispatch_site = Depot.objects.filter(site_type=Depot.EFPE).first()
+        assert not has_error(CarbureSanityCheckErrors.INVALID_DISPATCH_SITE, self.run_checks(lot))
+
+        lot.carbure_dispatch_site = None
+        lot.unknown_dispatch_site = "Unknown Dispatch Site"
+        assert not has_error(CarbureSanityCheckErrors.INVALID_DISPATCH_SITE, self.run_checks(lot))
 
     def test_mac_not_efpe_only_for_rfc(self):
         error = CarbureSanityCheckErrors.MAC_NOT_EFPE
