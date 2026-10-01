@@ -134,8 +134,4 @@ class BiomethaneAnnualDeclarationDrealSerializer(BiomethaneAnnualDeclarationSeri
             reopen_declaration(instance, request=self.context.get("request"))
             return instance
 
-        if instance.is_open != is_open:
-            instance.is_open = is_open
-            instance.save(update_fields=["is_open"])
-
         return instance
