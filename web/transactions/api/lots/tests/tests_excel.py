@@ -162,10 +162,10 @@ class LotsExcelImportTest(TestCase):
 
         assert headers[10:13] == ("dispatch_site", "dispatch_site_country", "dispatch_date")
         assert dispatch_headers == ("name", "city", "country", "site_type")
-        dispatch_ids = {row[0] for row in dispatch_rows}
-        assert self.owner_production_site.id in dispatch_ids
-        assert self.owner_depot.id in dispatch_ids
-        assert invalid_dispatch_site.id not in dispatch_ids
+        dispatch_names = {row[0] for row in dispatch_rows}
+        assert self.owner_production_site.name in dispatch_names
+        assert self.owner_depot.name in dispatch_names
+        assert invalid_dispatch_site.name not in dispatch_names
 
     def test_lot_export_contains_dispatch_fields(self):
         lot = CarbureLot(
