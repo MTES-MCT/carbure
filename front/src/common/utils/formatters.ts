@@ -28,6 +28,8 @@ export type FormatNumberOptions = {
 >
 
 export function formatNumber(num: number, options: FormatNumberOptions = {}) {
+  num = Object.is(num, -0) ? 0 : num
+
   const defaultOptions: FormatNumberOptions = {
     fractionDigits: 2,
     appendZeros: false,
