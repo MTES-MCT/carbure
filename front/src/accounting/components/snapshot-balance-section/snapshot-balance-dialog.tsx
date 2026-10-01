@@ -7,9 +7,10 @@ import { Portal } from "common/components/portal"
 import { Row } from "common/components/scaffold"
 import { Table } from "common/components/table2"
 import { apiTypes } from "common/services/api-fetch.types"
-import { formatNumber } from "common/utils/formatters"
+import { formatNumber, formatUnit } from "common/utils/formatters"
 import { formatSector } from "accounting/utils/formatters"
 import css from "./snapshot-balance-section.module.css"
+import { ExtendedUnit } from "common/types"
 
 type BalanceEntry = apiTypes["SnapshotBalanceEntry"]
 
@@ -46,7 +47,7 @@ export const SnapshotBalanceDialog = ({
           {formatNumber(row.volume)} L
           <br />
           <span style={{ color: "var(--text-mention-grey)" }}>
-            {formatNumber(row.energy / 1000)} GJ
+            {formatUnit(row.energy / 1000, ExtendedUnit.GJ)}
           </span>
         </>
       ),
