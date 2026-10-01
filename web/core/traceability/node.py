@@ -382,7 +382,7 @@ def serialize_integrity_errors(integrity_errors):
 def is_similar(a, b):
     if isinstance(a, Number) and isinstance(b, Number):
         return round(a, 2) == round(b, 2)
-    if isinstance(a, str) and isinstance(b, str):
+    elif isinstance(a, str) and isinstance(b, str):
         return a.strip() == b.strip()
     else:
         return a == b
