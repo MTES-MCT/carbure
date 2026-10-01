@@ -1,8 +1,9 @@
 from datetime import date
 from unittest import TestCase
 
-from core.models import Entity
-from transactions.helpers import INCORRECT_FORMAT_DISPATCH_DATE, construct_carbure_lot
+from core.models import CarbureLot, Entity
+from transactions.helpers import INCORRECT_FORMAT_DISPATCH_DATE, construct_carbure_lot, fill_dispatch_data
+from transactions.models import Site
 
 
 class ConstructCarbureLotTest(TestCase):
@@ -27,3 +28,18 @@ class ConstructCarbureLotTest(TestCase):
         self.assertEqual(1, len(dispatch_errors))
         self.assertEqual(INCORRECT_FORMAT_DISPATCH_DATE, dispatch_errors[0].error)
         self.assertTrue(dispatch_errors[0].is_blocking)
+
+    def test_allows_missing_or_unknown_dispatch_site_id(self):
+        for site_id in (None, "", 999, "not-an-id"):
+            with self.subTest(site_id=site_id):
+                lot = CarbureLot(carbure_dispatch_site=Site(pk=1, site_type=Site.EFPE))
+                errors = fill_dispatch_data(
+                    lot,
+                    {"carbure_dispatch_site_id": site_id, "unknown_dispatch_site": "Unknown Dispatch Site"},
+                    self.prefetched_data,
+                )
+
+                self.assertEqual([], errors)
+                self.assertIsNone(lot.carbure_dispatch_site)
+                self.assertIsNone(lot.dispatch_site_country)
+                self.assertEqual("Unknown Dispatch Site", lot.unknown_dispatch_site)
