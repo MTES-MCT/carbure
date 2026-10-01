@@ -5,7 +5,7 @@ import { Box, Row } from "common/components/scaffold"
 import { Title } from "common/components/title"
 import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
-import { getSnapshotBalance } from "accounting/pages/teneur/api"
+import { getSnapshotBalance } from "accounting/api/api"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 import { SnapshotBalanceDialog } from "./snapshot-balance-dialog"
 
