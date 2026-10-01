@@ -161,7 +161,7 @@ class LotsExcelImportTest(TestCase):
         workbook.close()
 
         assert headers[10:13] == ("dispatch_site", "dispatch_site_country", "dispatch_date")
-        assert dispatch_headers == ("id", "name", "city", "country", "site_type")
+        assert dispatch_headers == ("name", "city", "country", "site_type")
         dispatch_ids = {row[0] for row in dispatch_rows}
         assert self.owner_production_site.id in dispatch_ids
         assert self.owner_depot.id in dispatch_ids
