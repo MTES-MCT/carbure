@@ -1,3 +1,4 @@
+import math
 from datetime import datetime, timezone
 
 from django.test import SimpleTestCase, override_settings
@@ -55,3 +56,9 @@ class TruncateTests(SimpleTestCase):
 
     def test_truncate_with_zero_decimal_places(self):
         self.assertEqual(truncate(12.99, 0), 12)
+
+    def test_truncate_returns_positive_zero_for_all_decimal_places(self):
+        for decimal_places in range(4):
+            result = truncate(-0.0001, decimal_places)
+            self.assertEqual(result, 0)
+            self.assertEqual(math.copysign(1, result), 1)

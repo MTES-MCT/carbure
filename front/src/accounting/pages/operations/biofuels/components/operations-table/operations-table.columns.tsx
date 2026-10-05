@@ -7,7 +7,6 @@ import {
   OperationList,
   OperationOrder,
   OperationsStatus,
-  OperationType,
 } from "accounting/types"
 import {
   formatOperationType,
@@ -30,8 +29,7 @@ export type UseOperationsColumnsProps = {
 const displayValueDebitOrCredit = (
   value: number | string,
   isOperationDebit: boolean,
-  isOperationRejected: boolean,
-  isOperationYearlyBalance: boolean
+  isOperationRejected: boolean
 ) => {
   const operator = isOperationDebit ? "-" : "+"
 
@@ -41,8 +39,7 @@ const displayValueDebitOrCredit = (
       fontWeight="semibold"
       className={cl(
         styles["operation-debit"],
-        isOperationRejected && styles["operation--rejected"],
-        isOperationYearlyBalance && styles["field-label"]
+        isOperationRejected && styles["operation--rejected"]
       )}
     >
       {operator}
@@ -54,8 +51,7 @@ const displayValueDebitOrCredit = (
       fontWeight="semibold"
       className={cl(
         styles["operation-credit"],
-        isOperationRejected && styles["operation--rejected"],
-        isOperationYearlyBalance && styles["field-label"]
+        isOperationRejected && styles["operation--rejected"]
       )}
     >
       {operator}
@@ -120,7 +116,7 @@ export const useOperationsBiofuelsColumns = ({
     },
     {
       header: t("Opération"),
-      cell: (item) => <Cell text={formatOperationType(item.type, item.year)} />,
+      cell: (item) => <Cell text={formatOperationType(item.type)} />,
       key: OperationOrder.type,
     },
     {
@@ -144,8 +140,7 @@ export const useOperationsBiofuelsColumns = ({
         return displayValueDebitOrCredit(
           formattedQuantity,
           isSendingOperation(item.volume),
-          item.status === OperationsStatus.REJECTED,
-          item.type === OperationType.YEARLY_BALANCE
+          item.status === OperationsStatus.REJECTED
         )
       },
     },
@@ -159,8 +154,7 @@ export const useOperationsBiofuelsColumns = ({
         return displayValueDebitOrCredit(
           formattedAvoidedEmissions,
           isSendingOperation(item.volume),
-          item.status === OperationsStatus.REJECTED,
-          item.type === OperationType.YEARLY_BALANCE
+          item.status === OperationsStatus.REJECTED
         )
       },
       style: {

@@ -10,10 +10,11 @@ from rest_framework.viewsets import GenericViewSet
 from core.models import Entity
 from tiruert.filters import MacFilter, ObjectiveFilter, OperationFilterForBalance
 from tiruert.filters.elec_operation import ElecOperationFilterForBalance
-from tiruert.models import MacFossilFuel, Objective, Operation
+from tiruert.models import MacFossilFuel, Objective, ObjectiveSnapshot, Operation
 from tiruert.models.elec_operation import ElecOperation
 from tiruert.permissions import HasTiruertRightsObjectives
 from tiruert.serializers import ObjectiveInputSerializer, ObjectiveOutputSerializer
+from tiruert.serializers.objective import SnapshotBalanceSerializer
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.objective_snapshot import ObjectiveSnapshotService
@@ -90,6 +91,28 @@ class ObjectiveViewSet(UnitMixin, GenericViewSet):
         else:
             # Operator view: own entity
             return self._get_objectives_response(request, entity.id)
+
+    @extend_schema(responses={200: SnapshotBalanceSerializer, 404: None})
+    def get_snapshot_balance(self, request):
+        """Get snapshot balance for a specific entity and year."""
+        data = ObjectiveInputSerializer(data=request.GET)
+        data.is_valid(raise_exception=True)
+
+        entity = request.entity
+        selected_entity = data.validated_data.get("selected_entity_id")
+        if entity.entity_type in (Entity.ADMIN, Entity.EXTERNAL_ADMIN):
+            if selected_entity is None:
+                raise Http404
+            target_entity_id = selected_entity.id
+        else:
+            target_entity_id = entity.id
+
+        year = data.validated_data["year"]
+        snapshot = ObjectiveSnapshot.objects.filter(entity_id=target_entity_id, year=year).first()
+        if snapshot is None or snapshot.data_balance is None:
+            raise Http404
+
+        return Response(SnapshotBalanceSerializer({"year": year, "results": snapshot.data_balance}).data)
 
     def _get_objectives_response(self, request, target_entity_id):
         """Build and return objectives response for a single entity."""

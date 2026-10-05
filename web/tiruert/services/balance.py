@@ -117,14 +117,21 @@ class BalanceService:
         return operations.prefetch_related(Prefetch("details", queryset=details_qs, to_attr="prefetched_details"))
 
     @staticmethod
-    def _filter_operations_for_current_year(operations):
-        current_year = DeclarationPeriodService.get_current_declaration_year()
-        if current_year is None:
+    def _filter_operations_for_year(operations, declaration_year=None):
+        """
+        Bound operations to the requested declaration year, or the current year when omitted.
+        """
+        year = (
+            int(declaration_year)
+            if declaration_year is not None
+            else DeclarationPeriodService.get_current_declaration_year()
+        )
+        if year is None:
             return operations
 
         return operations.filter(
-            (Q(durability_period__isnull=True) | Q(durability_period__lt=str(current_year + 1)))
-            & (Q(declaration_year__isnull=True) | Q(declaration_year__lte=current_year))
+            (Q(durability_period__isnull=True) | Q(durability_period__lt=str(year + 1)))
+            & (Q(declaration_year__isnull=True) | Q(declaration_year__lte=year))
         )
 
     @staticmethod
@@ -160,7 +167,9 @@ class BalanceService:
         return balance
 
     @staticmethod
-    def calculate_balance(operations, entity_id, group_by, unit, detail_filters=None, declaration_year=None):
+    def calculate_balance(
+        operations, entity_id, group_by, unit, detail_filters=None, declaration_year=None, include_energy=False
+    ):
         """
         Calculates balances based on the specified grouping
         'operations' is a queryset of already filtered operations
@@ -171,12 +180,13 @@ class BalanceService:
         - group_by: The grouping type for the balance calculation (e.g., sector, category, lot)
         - unit: The unit for the balance calculation
         - detail_filters: (Optional) dict with lot-level filters (ges_bound_min, ges_bound_max, feedstock, origin_country)
-        - declaration_year: (Optional) declaration year used to filter TENEUR contributions
+        - declaration_year: (Optional) year bounding stock and filtering TENEUR contributions
+        - include_energy: Include the signed energy balance in MJ for the default grouping
 
         Returns:
         - A dictionary containing the calculated balances based on the specified grouping
         """
-        operations = BalanceService._filter_operations_for_current_year(operations)
+        operations = BalanceService._filter_operations_for_year(operations, declaration_year=declaration_year)
 
         if group_by in [None, BalanceService.GROUP_BY_SECTOR, BalanceService.GROUP_BY_CATEGORY]:
             return calculate_balance_with_annotations(
@@ -187,6 +197,7 @@ class BalanceService:
                 detail_filters,
                 init_entry=BalanceService._init_balance_entry,
                 declaration_year=declaration_year,
+                include_energy=include_energy,
             )
 
         return BalanceService._calculate_balance_for_lot(
