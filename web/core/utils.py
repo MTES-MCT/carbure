@@ -308,12 +308,14 @@ def truncate(value: float, decimal_places: int = 2) -> float:
     value = float(value)
 
     if decimal_places == 0:
-        return int(value)
+        truncated_value = int(value)
+    else:
+        rounded_value = round(value, decimal_places)
+        if abs(value - rounded_value) <= 1e-6:
+            truncated_value = rounded_value
+        else:
+            factor = 10**decimal_places
+            epsilon = 1e-9 if value >= 0 else -1e-9
+            truncated_value = int((value + epsilon) * factor) / factor
 
-    rounded_value = round(value, decimal_places)
-    if abs(value - rounded_value) <= 1e-6:
-        return rounded_value
-
-    factor = 10**decimal_places
-    epsilon = 1e-9 if value >= 0 else -1e-9
-    return int((value + epsilon) * factor) / factor
+    return 0 if truncated_value == 0 else truncated_value
