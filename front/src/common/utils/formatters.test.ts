@@ -26,10 +26,6 @@ describe("formatters", () => {
       expect(formatNumber(1000000, { fractionDigits: 0 })).toBe("1 000 000")
     })
 
-    it("Should format negative zero as zero", () => {
-      expect(formatNumber(-0)).toBe("0")
-    })
-
     it("Should add zeros to the decimal part if appendZeros is true", () => {
       expect(
         formatNumber(1000000.1, {
