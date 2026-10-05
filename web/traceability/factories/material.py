@@ -10,5 +10,6 @@ class MaterialFactory(factory.django.DjangoModelFactory):
 
     code = factory.Faker("lexify", text="MAT-????")
     name = factory.LazyAttribute(lambda obj: f"Matière {obj.code}")
+    unit = Material.KG
     lhv = fuzzy.FuzzyInteger(2, 100)
     density = fuzzy.FuzzyInteger(2, 100)
