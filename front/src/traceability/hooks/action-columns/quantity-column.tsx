@@ -22,7 +22,7 @@ export function quantityColumn(
       return (
         <Cell
           text={text || "-"}
-          sub={text ? formatUnitOnly(unit) : undefined}
+          sub={text && unit ? formatUnitOnly(unit) : undefined}
         />
       )
     },
