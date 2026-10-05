@@ -1,7 +1,7 @@
 .PHONY: \
 	up down restart logs-django_cmd open restart-backend restart-frontend \
 	test-backend test-frontend \
-	makemigrations merge-migrations migrate seed ipython \
+	makemigrations merge-migrations migrate seed ipython db-tunnel \
 	lint lint-fix translate translate-missing \
 	check-diff check-types generate-and-check-types \
 	flush reset-db fallback
@@ -64,6 +64,9 @@ reset-db:
 
 ipython:
 	$(django_cmd) shell --interface ipython
+
+db-tunnel:
+	scalingo --region osc-secnum-fr1 --app $(app) db-tunnel DATABASE_URL
 
 # Lint
 lint:
