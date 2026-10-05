@@ -10,13 +10,13 @@ export const ACTION_CONVERTED_QUANTITY = {
 export type ActionConvertedQuantity = keyof typeof ACTION_CONVERTED_QUANTITY
 export type ActionQuantityKey = "quantity" | ActionConvertedQuantity
 
-/** Resolve the displayed quantity: stored `quantity` + native unit, or a converted annotation (kg / l / MJ). Missing factors yield a null value. */
+/** Resolve the displayed quantity: stored `quantity` + the material unit, or a converted annotation (kg / l / MJ). A missing material or conversion factor yields a null unit or value. */
 export function getActionQuantity(
-  action: Pick<Action, ActionQuantityKey | "unit">,
+  action: Pick<Action, ActionQuantityKey | "material">,
   key: ActionQuantityKey
 ) {
   if (key === "quantity") {
-    return { value: action.quantity, unit: action.unit }
+    return { value: action.quantity, unit: action.material?.unit }
   }
 
   return { value: action[key], unit: ACTION_CONVERTED_QUANTITY[key] }

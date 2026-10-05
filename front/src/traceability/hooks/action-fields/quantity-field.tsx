@@ -28,7 +28,11 @@ export function quantityField(
           <DecimalInput
             step={ACTION_DECIMAL_STEP}
             fractionDigits={ACTION_DECIMAL_FRACTION_DIGITS}
-            unit={form.value.unit ? formatUnitOnly(form.value.unit) : undefined}
+            unit={
+              form.value.material?.unit
+                ? formatUnitOnly(form.value.material.unit)
+                : undefined
+            }
             {...props}
             {...form.bind("quantity")}
           />
