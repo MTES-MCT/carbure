@@ -1,6 +1,8 @@
 import { Cell, Column, Order, Table } from "common/components/table2"
 import { YesNoIndicator } from "common/components/yes-no-indicator"
+import { compact } from "common/utils/collection"
 import { formatDate, formatNumber } from "common/utils/formatters"
+import { useH2Permissions } from "h2/hooks/use-h2-permissions"
 import { H2Station } from "h2/types"
 import { formatAccessType } from "h2/utils/formatters"
 import { useTranslation } from "react-i18next"
@@ -20,10 +22,15 @@ export const StationTable = ({
   onOrder,
 }: StationTableProps) => {
   const { t } = useTranslation()
+  const { canAccessAdmin } = useH2Permissions()
 
   const showStation = useEditStationDialog()
 
-  const columns: Column<H2Station>[] = [
+  const columns: Column<H2Station>[] = compact([
+    canAccessAdmin && {
+      header: t("Société"),
+      cell: (station) => <Cell text={station.entity_name ?? ""} />,
+    },
     {
       key: "name",
       header: t("Nom de la station"),
@@ -64,7 +71,7 @@ export const StationTable = ({
         <Cell text={formatDate(station.commissioning_date ?? null)} />
       ),
     },
-  ]
+  ])
 
   return (
     <Table

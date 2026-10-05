@@ -10,11 +10,12 @@ from tiruert.services.operation_excel_import import OperationExcelImportService,
 
 
 class OperationExcelImportServiceHelpersTest(TestCase):
-    def _make_biofuel(self, biofuel_id=1, code="ETH", pci_litre=10):
+    def _make_biofuel(self, biofuel_id=1, code="ETH", pci_litre=10, renewable_energy_share=1):
         return SimpleNamespace(
             id=biofuel_id,
             code=code,
             pci_litre=pci_litre,
+            renewable_energy_share=renewable_energy_share,
             compatible_essence=True,
             compatible_diesel=False,
         )
@@ -238,7 +239,7 @@ class OperationExcelImportServiceHelpersTest(TestCase):
     def test_validate_group_calls_service_with_expected_arguments(self, mock_perform_checks):
         """Should pass normalized payload and request context to perform_checks_before_create."""
         debited = SimpleNamespace(id=42, name="Debited")
-        biofuel = self._make_biofuel(1, "ETH", 10)
+        biofuel = self._make_biofuel(1, "ETH", 10, renewable_energy_share=0.5)
         group = self._make_group(
             operation_type=Operation.TRANSFERT,
             customs_category="CONV",
@@ -258,6 +259,7 @@ class OperationExcelImportServiceHelpersTest(TestCase):
         self.assertEqual(call_kwargs["data"]["type"], Operation.TRANSFERT)
         self.assertEqual(call_kwargs["data"]["customs_category"], "CONV")
         self.assertEqual(call_kwargs["data"]["biofuel"], biofuel)
+        self.assertEqual(call_kwargs["data"]["renewable_energy_share"], 0.5)
         self.assertEqual(call_kwargs["data"]["debited_entity"], debited)
         self.assertEqual(call_kwargs["request"].entity, debited)
         self.assertEqual(call_kwargs["request"].GET, {})
@@ -411,6 +413,52 @@ class OperationExcelImportServiceExecuteTest(TestCase):
 
 
 class OperationExcelImportServiceCreateOperationsTest(TestCase):
+    @patch("tiruert.services.operation_excel_import.OperationService.create_operation_with_details")
+    @patch("tiruert.services.operation_excel_import.OperationService.build_details_data")
+    def test_create_operation_for_group_passes_renewable_share_to_operation_payload(
+        self, mock_build_details_data, mock_create_operation_with_details
+    ):
+        """Should propagate biofuel renewable_energy_share into operation creation payload."""
+        debited = SimpleNamespace(id=1, name="Debited")
+        credited = SimpleNamespace(id=2, name="Credited")
+        biofuel = SimpleNamespace(
+            id=1,
+            code="ETH",
+            pci_litre=10,
+            renewable_energy_share=0.63,
+            compatible_essence=True,
+            compatible_diesel=False,
+        )
+        group = OperationGroup(
+            operation_type=Operation.TRANSFERT,
+            customs_category="CONV",
+            biofuel_id=1,
+            biofuel_code="ETH",
+            biofuel=biofuel,
+            sector=Operation.ESSENCE,
+            credited_entity=credited,
+            debited_entity=debited,
+            row_numbers=[3],
+            lot_volumes={10: 20.0},
+        )
+
+        mock_build_details_data.return_value = [{"lot_id": 10, "volume": 20.0}]
+        mock_created_operation = Mock(id=101)
+        mock_create_operation_with_details.return_value = mock_created_operation
+
+        result = OperationExcelImportService._create_operation_for_group(
+            group,
+            declaration_year=2026,
+            emissions_by_lot={10: 1.1},
+        )
+
+        self.assertEqual(result, mock_created_operation)
+        mock_build_details_data.assert_called_once_with({10: 20.0}, {10: 1.1})
+        mock_create_operation_with_details.assert_called_once()
+        operation_data, details_data = mock_create_operation_with_details.call_args.args
+        self.assertEqual(operation_data["renewable_energy_share"], 0.63)
+        self.assertEqual(details_data, [{"lot_id": 10, "volume": 20.0}])
+
     @patch("tiruert.services.operation_excel_import.OperationExcelImportService._create_operation_for_group")
     @patch("tiruert.services.operation_excel_import.OperationService.get_emission_rates_by_lot")
     def test_create_operations_aggregates_all_lot_ids_for_emissions_lookup(

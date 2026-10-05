@@ -33,6 +33,7 @@ def _get_sector_expression():
         When(operation__biofuel__compatible_diesel=True, then=Value(Operation.GAZOLE)),
         When(operation__biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value(Operation.CARBUREACTEUR)),
         When(operation__biofuel__compatible_gpl=True, then=Value(Operation.GPL_C)),
+        When(operation__biofuel__compatible_maritime=True, then=Value(Operation.MARITIME)),
         default=Value(None),
         output_field=CharField(),
     )
@@ -78,7 +79,7 @@ def _get_avoided_emissions_expression():
     )
 
 
-def _build_common_context(entity_id, unit, date_from):
+def _build_common_context(entity_id, unit, declaration_year=None):
     quantity_expr = _get_quantity_expression(unit)
     teneur_energy_expr = _get_quantity_expression("mj")
     avoided_emissions_expr = _get_avoided_emissions_expression()
@@ -87,7 +88,9 @@ def _build_common_context(entity_id, unit, date_from):
     debit_cond = Q(operation__debited_entity_id=entity_id)
     pending_or_draft_cond = Q(operation__status__in=[Operation.PENDING, Operation.DRAFT])
     process_cond = ~Q(operation__credited_entity_id=entity_id, operation__status__in=[Operation.PENDING, Operation.DRAFT])
-    date_cond = Q() if date_from is None else Q(operation__created_at__gte=date_from)
+    teneur_date_cond = Q()
+    if declaration_year is not None:
+        teneur_date_cond = Q(operation__declaration_year=declaration_year)
 
     return {
         "unit": unit,
@@ -98,11 +101,11 @@ def _build_common_context(entity_id, unit, date_from):
         "debit_cond": debit_cond,
         "pending_or_draft_cond": pending_or_draft_cond,
         "process_cond": process_cond,
-        "date_cond": date_cond,
+        "teneur_date_cond": teneur_date_cond,
     }
 
 
-def _build_base_aggregations(context, include_ghg=False):
+def _build_base_aggregations(context, include_ghg=False, include_energy=False):
     aggregations = {
         "available_balance": Sum(
             Case(
@@ -123,7 +126,7 @@ def _build_base_aggregations(context, include_ghg=False):
         "quantity_credit": Sum(
             Case(
                 When(
-                    context["process_cond"] & context["date_cond"] & context["credit_cond"],
+                    context["process_cond"] & context["credit_cond"],
                     then=context["quantity_expr"],
                 ),
                 default=Value(0.0),
@@ -133,7 +136,7 @@ def _build_base_aggregations(context, include_ghg=False):
         "quantity_debit": Sum(
             Case(
                 When(
-                    context["process_cond"] & context["date_cond"] & context["debit_cond"],
+                    context["process_cond"] & context["debit_cond"],
                     then=context["quantity_expr"],
                 ),
                 default=Value(0.0),
@@ -151,6 +154,16 @@ def _build_base_aggregations(context, include_ghg=False):
         aggregations["ghg_reduction_min"] = Min("lot__ghg_reduction_red_ii")
         aggregations["ghg_reduction_max"] = Max("lot__ghg_reduction_red_ii")
 
+    if include_energy:
+        aggregations["energy_mj"] = Sum(
+            Case(
+                When(context["process_cond"] & context["credit_cond"], then=_get_quantity_expression("mj")),
+                When(context["process_cond"] & context["debit_cond"], then=-_get_quantity_expression("mj")),
+                default=Value(0.0),
+                output_field=FloatField(),
+            )
+        )
+
     return aggregations
 
 
@@ -159,7 +172,7 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
         details_qs.annotate(**group_annotations)
         .filter(
             context["process_cond"]
-            & context["date_cond"]
+            & context["teneur_date_cond"]
             & Q(operation__type=Operation.TENEUR)
             & Q(operation__status__in=[Operation.PENDING, Operation.DECLARED])
         )
@@ -195,7 +208,7 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
     return grouped_contributions
 
 
-def _calculate_default_grouping(balance, details_qs, context):
+def _calculate_default_grouping(balance, details_qs, context, include_energy=False):
     sector_expr = _get_sector_expression()
     group_fields = ("group_sector", "group_customs_category", "group_biofuel_id")
     group_annotations = {
@@ -208,7 +221,7 @@ def _calculate_default_grouping(balance, details_qs, context):
     base_groups = list(
         details_qs.annotate(**group_annotations)
         .values(*group_fields)
-        .annotate(**_build_base_aggregations(context, include_ghg=True))
+        .annotate(**_build_base_aggregations(context, include_ghg=True, include_energy=include_energy))
     )
 
     # Aggregate teneur metrics by operation first, then sum operation-level contributions by output group.
@@ -235,6 +248,8 @@ def _calculate_default_grouping(balance, details_qs, context):
         entry["quantity"]["credit"] = group["quantity_credit"] or 0.0
         entry["quantity"]["debit"] = group["quantity_debit"] or 0.0
         entry["available_balance"] = group["available_balance"] or 0.0
+        if include_energy:
+            entry["energy_mj"] = group["energy_mj"] or 0.0
         entry["saved_emissions"] = group["saved_emissions"] or 0.0
         entry["pending_operations"] = group["pending_operations"] or 0
         entry["ghg_reduction_min"] = group["ghg_reduction_min"]
@@ -322,7 +337,9 @@ def _calculate_sector_grouping(balance, details_qs, context):
         entry["declared_saved_emissions"] = group["declared_saved_emissions"] or 0.0
 
 
-def calculate_balance_with_annotations(operations, entity_id, group_by, unit, date_from, detail_filters, init_entry):
+def calculate_balance_with_annotations(
+    operations, entity_id, group_by, unit, detail_filters, init_entry, declaration_year=None, include_energy=False
+):
     balance = defaultdict(partial(init_entry, unit))
 
     details_qs = OperationDetail.objects.filter(
@@ -331,7 +348,7 @@ def calculate_balance_with_annotations(operations, entity_id, group_by, unit, da
     )
     details_qs = apply_operation_detail_filters(details_qs, detail_filters)
 
-    context = _build_common_context(entity_id, unit, date_from)
+    context = _build_common_context(entity_id, unit, declaration_year)
 
     if group_by == "sector":
         _calculate_sector_grouping(balance, details_qs, context)
@@ -341,5 +358,5 @@ def calculate_balance_with_annotations(operations, entity_id, group_by, unit, da
         _calculate_category_grouping(balance, details_qs, context)
         return balance
 
-    _calculate_default_grouping(balance, details_qs, context)
+    _calculate_default_grouping(balance, details_qs, context, include_energy=include_energy)
     return balance

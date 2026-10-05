@@ -43,7 +43,9 @@ class ExcelImportActionMixin:
             )
 
         serializer = request.handler.excel_import_serializer_class(
-            data=rows, many=True, context=self.get_serializer_context()
+            data=rows,
+            many=True,
+            context={**self.get_serializer_context(), "import_file": file_serializer.validated_data["file"]},
         )
         try:
             serializer = ExcelImporter.validate_retrieved_data(

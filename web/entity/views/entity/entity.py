@@ -33,6 +33,7 @@ class EntityViewSet(ViewSet, EntityActionMixin):
                         ExternalAdminRights.TRANSFERRED_ELEC,
                         ExternalAdminRights.DREAL,
                         ExternalAdminRights.ADEME,
+                        ExternalAdminRights.H2,
                     ]
                 )
             ]
@@ -46,6 +47,7 @@ class EntityViewSet(ViewSet, EntityActionMixin):
                         ExternalAdminRights.ELEC,
                         ExternalAdminRights.DOUBLE_COUNTING,
                         ExternalAdminRights.DREAL,
+                        ExternalAdminRights.H2,
                     ],
                 )
             ]
@@ -53,7 +55,7 @@ class EntityViewSet(ViewSet, EntityActionMixin):
         if self.action == "enable_entity":
             return [
                 HasAdminRights(
-                    allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC],
+                    allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC, ExternalAdminRights.H2],
                     allow_role=[UserRights.ADMIN, UserRights.RW],
                 )
             ]

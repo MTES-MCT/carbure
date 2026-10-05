@@ -11,6 +11,7 @@ from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField,
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
 from traceability.serializers.total_emissions import ActionTotalEmissionsSerializer
+from traceability.services.action_import_file import store_action_import_file
 
 
 class ActionParentSerializer(serializers.ModelSerializer):
@@ -33,13 +34,13 @@ class ActionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = "__all__"
+        exclude = ["file"]
 
 
 class ActionInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = "__all__"
+        exclude = ["file"]
         read_only_fields = ["id", "industry", "holder", "parent"]
 
     def create(self, validated_data):
@@ -65,17 +66,29 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
     def create(self, validated_data):
         holder = self.context["entity"]
         industry = self.context["handler"].industry
-        actions = [
-            Action(
-                **{key: value for key, value in attrs.items() if key in _ACTION_MODEL_FIELDS},
-                holder=holder,
-                industry=industry,
-                type=Action.INIT,
-            )
-            for attrs in validated_data
-        ]
+        stored_file = store_action_import_file(
+            self.context["import_file"],
+            entity=holder,
+            user=self.context["request"].user,
+        )
+        for action_data in validated_data:
+            action_data["file"] = stored_file
 
-        return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
+        try:
+            actions = [
+                Action(
+                    **{key: value for key, value in action_data.items() if key in _ACTION_MODEL_FIELDS},
+                    holder=holder,
+                    industry=industry,
+                    type=Action.INIT,
+                )
+                for action_data in validated_data
+            ]
+
+            return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
+        except Exception:
+            stored_file.url.delete(save=False)
+            raise
 
 
 class ActionExcelImportSerializer(serializers.ModelSerializer):

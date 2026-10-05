@@ -6,7 +6,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 | Concept | Rôle |
 |---|---|
-| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité (MJ), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`) |
+| `Action` | Unité de traçabilité : POS, détenteur, matière, quantité (MJ), site, logistique, GES (`ei`/`ep`/`etd`/`eu`/`eccs`). Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
 | `Material` | Catalogue matières (`code`, `name`) |
 

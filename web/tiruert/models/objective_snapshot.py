@@ -15,6 +15,7 @@ class ObjectiveSnapshot(models.Model):
     date_from = models.DateField()
     date_to = models.DateField()
     data = models.JSONField()
+    data_balance = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

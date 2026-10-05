@@ -86,6 +86,15 @@ class Action(models.Model):
         verbose_name="Mode de transport", choices=SHIPPING_METHODS, max_length=16, null=True, blank=True
     )
 
+    file = models.ForeignKey(
+        "core.StoredFile",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="actions",
+        verbose_name="Fichier",
+    )
+
     working_date = models.DateField(verbose_name="Date de référence")
 
     eec = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)

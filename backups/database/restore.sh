@@ -11,25 +11,22 @@
 #   ./restore.sh local /tmp/backups
 #   ./restore.sh local /tmp/backups/backup.tar.gz
 #   ./restore.sh scalingo carbure-prod
+#   SCALINGO_TOKEN=my-token ./restore.sh scalingo carbure-prod
 #
 # The database URL must be passed as an argument or set in $DATABASE_URL. If it has no password,
 # the restore script asks for one interactively. Avoid putting the password in a command-line URL.
+# When downloading from scalingo, set the SCALINGO_TOKEN variable in order to control which account to use.
 
 set -euo pipefail
+
+if (( $# < 2 )) || [[ -z "$1" || -z "$2" ]]; then
+  echo "Usage: $0 <local|scalingo> <backup-location> [database-url]" >&2
+  exit 1
+fi
 
 backup_source=$1
 backup_location=$2
 database_url=${3:-${DATABASE_URL:-}}
-
-if [[ -z "$backup_source" ]]; then
-  echo "backup_source must be provided as the first argument" >&2
-  exit 1
-fi
-
-if [[ -z "$backup_location" ]]; then
-  echo "backup_location must be provided as the second argument" >&2
-  exit 1
-fi
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 project_root=$(cd -- "$script_dir/../.." && pwd)
@@ -48,9 +45,11 @@ fi
 
 "$script_dir/restore_local_backup.sh" "$backup_path" "$database_url"
 
-(
-  cd -- "$project_root"
-  DATABASE_URL="$database_url" python web/manage.py migrate
-)
+if [[ -f "$project_root/web/manage.py" ]]; then
+  (
+    cd -- "$project_root"
+    DATABASE_URL="$database_url" python web/manage.py migrate
+  )
+fi
 
 echo "> Database is ready"

@@ -13,6 +13,7 @@ import { useCacheBuster } from "./hooks/cache-buster"
 import { ExternalAdminPages } from "./types"
 import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
 import { useAccountingPermissions } from "accounting/hooks/use-accounting-permissions"
+import { useH2Permissions } from "h2/hooks/use-h2-permissions"
 
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
@@ -120,6 +121,7 @@ const Org = () => {
     useBiomethanePermissions()
   const { canAccessModule: canAccessAccountingModule } =
     useAccountingPermissions()
+  const { canAccessAdmin: canAccessH2Admin } = useH2Permissions()
   useMissingCompanyInfoModal() //TO DELETE WHEN ALL COMPANIES ARE REGISTRED // TO UNCOMMENT TO
 
   const {
@@ -262,11 +264,14 @@ const Org = () => {
         </>
       )}
 
+      {(isHRS || canAccessH2Admin) && (
+        <Route path="h2/*" element={<H2Routes />} />
+      )}
       {isHRS && (
-        <>
-          <Route path="h2/*" element={<H2Routes />} />
-          <Route path="*" element={<Navigate replace to="h2/stations" />} />
-        </>
+        <Route path="*" element={<Navigate replace to="h2/stations" />} />
+      )}
+      {canAccessH2Admin && (
+        <Route path="*" element={<Navigate replace to="h2/admin/lots" />} />
       )}
 
       {(isAdmin || isExternal) && (

@@ -166,6 +166,27 @@ class OperationViewSetIntegrationTest(TestCase):
         result = next(item for item in response.json()["results"] if item["id"] == operation.id)
         self.assertEqual(result["sector"], Operation.GPL_C)
 
+    def test_list_operations_filters_teneur_by_objective_sector(self):
+        """The sector filter should use objective_sector for TENEUR operations."""
+        operation = Operation.objects.create(
+            type=Operation.TENEUR,
+            status=Operation.VALIDATED,
+            customs_category=MatierePremiere.CONV,
+            biofuel=self.biofuel_eth,
+            debited_entity=self.entity,
+            objective_sector=Operation.ESSENCE,
+            renewable_energy_share=1.0,
+        )
+
+        response = self.client.get(
+            self.url,
+            {"entity_id": self.entity.id, "sector": Operation.ESSENCE},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        result = next(item for item in response.json()["results"] if item["id"] == operation.id)
+        self.assertEqual(result["sector"], Operation.ESSENCE)
+
     def test_list_queryset_clears_details_prefetch_when_details_not_requested(self):
         """List queryset should not keep the default details prefetch unless details are requested."""
         django_request = self.factory.get(self.url, {"entity_id": self.entity.id})

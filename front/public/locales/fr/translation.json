@@ -236,6 +236,12 @@
   "Veuillez choisir dans le menu ci-dessous les carburants que vous souhaitez inclure dans vos déclarations de mises à consommation. Ils s'afficheront ensuite dans le tableau, où vous pourrez en préciser les volumes.": "Veuillez choisir dans le menu ci-dessous les carburants que vous souhaitez inclure dans vos déclarations de mises à consommation. Ils s'afficheront ensuite dans le tableau, où vous pourrez en préciser les volumes.",
   "Choisissez des carburants": "Choisissez des carburants",
   "Mises à consommation": "Mises à consommation",
+  "Reliquats {{year}}": "Reliquats {{year}}",
+  "Soldes reportés en {{year}}": "Soldes reportés en {{year}}",
+  "Voir les reliquats": "Voir les reliquats",
+  "Voir les soldes reportés": "Voir les soldes reportés",
+  "Quantité (L/GJ)": "Quantité (L/GJ)",
+  "Aucun solde disponible pour cette année.": "Aucun solde disponible pour cette année.",
   "Voir mes MàC": "Voir mes MàC",
   "Renseigner mes MàC": "Renseigner mes MàC",
   "L'assiette de vos objectifs sera calculée sur la base des mises à consommation de carburants fossiles que vous aurez renseignées, ainsi que d'un PCI théorique.": "L'assiette de vos objectifs sera calculée sur la base des mises à consommation de carburants fossiles que vous aurez renseignées, ainsi que d'un PCI théorique.",
@@ -1728,6 +1734,7 @@
   "Émissions": "Émissions",
   "Émissions résultant de l'extraction ou de la culture des matières premières": "Émissions résultant de l'extraction ou de la culture des matières premières",
   "Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols": "Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols",
+  "Émissions liées aux intrants": "Émissions liées aux intrants",
   "Émissions résultant de la transformation": "Émissions résultant de la transformation",
   "Émissions résultant du transport et de la distribution": "Émissions résultant du transport et de la distribution",
   "Émissions résultant du carburant à l'usage": "Émissions résultant du carburant à l'usage",
@@ -1814,7 +1821,6 @@
   "Volume ({{volume}} litres disponibles)_other": "Volume ({{volume}} litres disponibles)",
   "Maximum": "Maximum",
   "Émissions/Réductions": "Émissions/Réductions",
-  "Émissions résultant dela transformation": "Émissions résultant dela transformation",
   "Réduction": "Réduction",
   "Périodes": "Périodes",
   "Matières Premières": "Matières Premières",
@@ -2354,5 +2360,6 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_one": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_many": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
-  "Report 2026": "Report 2026"
+  "Report 2026": "Report 2026",
+  "Energie renouvelable": "Energie renouvelable"
 }

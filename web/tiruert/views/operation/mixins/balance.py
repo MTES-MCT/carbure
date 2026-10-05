@@ -1,7 +1,4 @@
-from datetime import datetime
-
-from django.utils.timezone import make_aware
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, PolymorphicProxySerializer, extend_schema
+from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 
@@ -42,13 +39,6 @@ class BalanceActionMixin:
                 description="Group by sector, lot.",
                 default="",
             ),
-            OpenApiParameter(
-                name="date_from",
-                type=OpenApiTypes.DATE,
-                location=OpenApiParameter.QUERY,
-                description="Date from where to calculate teneur and quantity",
-                default=None,
-            ),
         ],
         responses={
             status.HTTP_200_OK: PolymorphicProxySerializer(
@@ -73,8 +63,6 @@ class BalanceActionMixin:
         entity_id = request.entity.id
         unit = "l"
         group_by = request.query_params.get("group_by", None)
-        date_from_str = request.query_params.get("date_from")
-        date_from = make_aware(datetime.strptime(date_from_str, "%Y-%m-%d")) if date_from_str else None
         durability_period = request.query_params.getlist("durability_period") or None
         detail_filters = {
             "ges_bound_min": request.query_params.get("ges_bound_min"),
@@ -97,8 +85,7 @@ class BalanceActionMixin:
             entity_id,
             group_by,
             unit,
-            date_from,
-            detail_filters,
+            detail_filters=detail_filters,
         )
 
         # Convert balance to a list of dictionaries for serialization

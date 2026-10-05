@@ -8,6 +8,7 @@ import {
   validateStationData,
 } from "../station-form"
 import useEntity from "common/hooks/entity"
+import { useH2Permissions } from "h2/hooks/use-h2-permissions"
 import { useDeleteStation, useUpdateStation } from "./edit-station-dialog.hooks"
 import { H2Station } from "h2/types"
 
@@ -23,7 +24,7 @@ export const EditStationDialog = ({
   const { t } = useTranslation()
 
   const entity = useEntity()
-  const canWrite = entity.canWrite()
+  const { canWriteStations } = useH2Permissions()
 
   const updateStation = useUpdateStation({ onClose })
   const deleteStation = useDeleteStation({ station, onClose })
@@ -47,13 +48,13 @@ export const EditStationDialog = ({
         }
         footer={
           <>
-            {canWrite && (
+            {canWriteStations && (
               <Button customPriority="danger" onClick={deleteStation}>
                 {t("Supprimer")}
               </Button>
             )}
 
-            {canWrite && (
+            {canWriteStations && (
               <Button
                 type="submit"
                 loading={updateStation.loading}
@@ -66,7 +67,7 @@ export const EditStationDialog = ({
         }
       >
         <StationForm
-          readOnly={!canWrite}
+          readOnly={!canWriteStations}
           station={station}
           onSubmit={onSubmit}
         />

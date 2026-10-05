@@ -1,6 +1,7 @@
 import { Fieldset, useFormContext } from "common/components/form"
 import { BlankField, NumberInput, TextInput } from "common/components/input"
 import { formatGHG, formatPercentage } from "common/utils/formatters"
+import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
 import { isAfter } from "date-fns"
 import { useTranslation } from "react-i18next"
 import { LotFormValue } from "./lot-form"
@@ -13,6 +14,7 @@ interface GHGFieldsProps {
 
 export const EmissionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
+  const emissionTitles = useGhgEmissionTitles()
   const entity = useEntity()
   const { bind, value } = useFormContext<LotFormValue>()
 
@@ -22,14 +24,14 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         required={value.feedstock?.category === "CONV"}
         label="EEC"
         hasTooltip
-        title={t("Émissions résultant de l'extraction ou de la culture des matières premières")} // prettier-ignore
+        title={emissionTitles.eec}
         {...bind("eec")}
         {...props}
       />
       <NumberInput
         label="EL"
         hasTooltip
-        title={t("Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols")} // prettier-ignore
+        title={emissionTitles.el}
         {...bind("el")}
         {...props}
       />
@@ -37,7 +39,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         required
         label="EP"
         hasTooltip
-        title={t("Émissions résultant de la transformation")}
+        title={emissionTitles.ep}
         {...bind("ep")}
         {...props}
       />
@@ -45,14 +47,14 @@ export const EmissionFields = (props: GHGFieldsProps) => {
         required
         label="ETD"
         hasTooltip
-        title={t("Émissions résultant du transport et de la distribution")}
+        title={emissionTitles.etd}
         {...bind("etd")}
         {...props}
       />
       <NumberInput
         label="EU"
         hasTooltip
-        title={t("Émissions résultant du carburant à l'usage")}
+        title={emissionTitles.eu}
         {...bind("eu")}
         {...props}
       />
@@ -68,9 +70,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
           readOnly
           label="ECEL"
           hasTooltip
-          title={t(
-            "Émissions résultant de la combustion de biomasse pour la production d'électricité"
-          )}
+          title={emissionTitles.ecel}
           {...bind("emission_electricity")}
           {...props}
         />
@@ -81,9 +81,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
           readOnly
           label="ECH"
           hasTooltip
-          title={t(
-            "Émissions résultant de la combustion de biomasse pour la production de chaleur"
-          )}
+          title={emissionTitles.ech}
           {...bind("emission_heat")}
           {...props}
         />
@@ -94,6 +92,7 @@ export const EmissionFields = (props: GHGFieldsProps) => {
 
 export const ReductionFields = (props: GHGFieldsProps) => {
   const { t } = useTranslation()
+  const emissionTitles = useGhgEmissionTitles()
   const entity = useEntity()
   const { bind, value } = useFormContext<LotFormValue>()
 
@@ -102,28 +101,28 @@ export const ReductionFields = (props: GHGFieldsProps) => {
       <NumberInput
         label="ESCA"
         hasTooltip
-        title={t("Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole")} // prettier-ignore
+        title={emissionTitles.esca}
         {...bind("esca")}
         {...props}
       />
       <NumberInput
         label="ECCS"
         hasTooltip
-        title={t("Réductions d'émissions dues au piégeage et au stockage géologique du carbone")} // prettier-ignore
+        title={emissionTitles.eccs}
         {...bind("eccs")}
         {...props}
       />
       <NumberInput
         label="ECCR"
         hasTooltip
-        title={t("Réductions d'émissions dues au piégeage et à la substitution du carbone")} // prettier-ignore
+        title={emissionTitles.eccr}
         {...bind("eccr")}
         {...props}
       />
       <NumberInput
         label="EEE"
         hasTooltip
-        title={t("Réductions d'émissions dues à la production excédentaire d'électricité dans le cadre de la cogénération")} // prettier-ignore
+        title={emissionTitles.eee}
         {...bind("eee")}
         {...props}
       />

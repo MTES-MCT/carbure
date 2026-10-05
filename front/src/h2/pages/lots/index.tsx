@@ -45,6 +45,10 @@ const LotsPage = () => {
           lot_id: t("ID_LOT/Batch ID"),
           lot_quantity: t("Quantite (kg)"),
           producer: t("Producteur"),
+          consumed_on_production_site: t(
+            "L'H2 est-il consommé sur le site de production"
+          ),
+          shipping_fuel_type: t("Type de carburant pour le transport"),
           certificate: t("N° du certificat du producteur"),
           etd1: t("Etd1"),
           etd2: t("Etd2"),

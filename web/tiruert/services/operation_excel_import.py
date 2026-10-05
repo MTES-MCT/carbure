@@ -181,6 +181,7 @@ class OperationExcelImportService:
             "biofuel": biofuel,
             "customs_category": group.customs_category,
             "type": group.operation_type,
+            "renewable_energy_share": biofuel.renewable_energy_share,
         }
         request = SimpleNamespace(entity=group.debited_entity, GET={})
 
@@ -256,6 +257,7 @@ class OperationExcelImportService:
                 {
                     "customs_category": group.customs_category,
                     "biofuel": group.biofuel,
+                    "renewable_energy_share": group.biofuel.renewable_energy_share,
                     "selected_lots": [{"id": lot_id, "volume": volume} for lot_id, volume in group.lot_volumes.items()],
                 }
             )
@@ -302,7 +304,7 @@ class OperationExcelImportService:
             "biofuel_id": group.biofuel_id,
             "credited_entity": group.credited_entity,
             "debited_entity": group.debited_entity,
-            "renewable_energy_share": 1,
+            "renewable_energy_share": group.biofuel.renewable_energy_share,
             "declaration_year": declaration_year,
         }
 
@@ -366,6 +368,10 @@ class OperationExcelImportService:
 
     @staticmethod
     def execute(file, mode: str, debited_entity: Entity) -> dict:
+        declaration_year = DeclarationPeriodService.get_current_declaration_year()
+        if declaration_year is None:
+            raise serializers.ValidationError({"declaration_year": "Current declaration year is not set"})
+
         data = OperationExcelImportService._parse_rows(file)
 
         row_serializer = OperationExcelRowSerializer(
@@ -374,7 +380,7 @@ class OperationExcelImportService:
         ExcelImporter.validate_retrieved_data(row_serializer, EXCEL_IMPORT_CONFIG, len(data))
 
         groups = OperationExcelImportService._build_groups(row_serializer.validated_data, debited_entity)
-        declaration_year = DeclarationPeriodService.get_current_declaration_year()
+
         OperationExcelImportService._validate_groups(groups, len(data), declaration_year)
 
         operations = OperationExcelImportService._create_operations(groups, declaration_year) if mode == "create" else None

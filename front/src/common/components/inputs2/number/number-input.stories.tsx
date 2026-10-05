@@ -56,3 +56,19 @@ export const ReadOnly: Story = {
     value: 1458,
   },
 }
+
+export const ReadOnlyWithUnit: Story = {
+  args: {
+    readOnly: true,
+    value: 1458,
+    readOnlyValue: "1 458 kg",
+  },
+}
+
+export const ReadOnlyWithStyle: Story = {
+  args: {
+    readOnly: true,
+    value: 1458,
+    readOnlyValue: <span style={{ color: "red" }}>1 458 kg</span>,
+  },
+}

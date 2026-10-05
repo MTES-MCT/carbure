@@ -12,10 +12,18 @@ import { energyFromLiters } from "../../utils/liters"
 const formatElecBalanceGj = (valueMj: number) =>
   formatObjectiveGJFromMj(valueMj)
 
-const formatBiofuelBalanceGj = (liters: number, pciLitre?: number) => {
+// available_balance is in liters (converted via pci_litre), pending_teneur/declared_teneur
+// are always in MJ, so they must be summed in MJ before converting the total to GJ.
+const formatBiofuelBalanceGj = (
+  liters: number,
+  pciLitre?: number,
+  additionalMj = 0
+) => {
   if (!pciLitre) return "-"
 
-  return formatObjectiveGJ(energyFromLiters(liters, pciLitre).gj)
+  return formatObjectiveGJFromMj(
+    energyFromLiters(liters, pciLitre).mj + additionalMj
+  )
 }
 
 export const useBiofuelTeneurColumns = () => {
@@ -34,8 +42,9 @@ export const useBiofuelTeneurColumns = () => {
       cell: (item) => (
         <Cell
           text={formatBiofuelBalanceGj(
-            item.available_balance + item.pending_teneur,
-            item.biofuel?.pci_litre
+            item.available_balance,
+            item.biofuel?.pci_litre,
+            item.pending_teneur
           )}
         />
       ),
@@ -43,12 +52,7 @@ export const useBiofuelTeneurColumns = () => {
     {
       header: `${t("Teneur à valider")} (GJ)`,
       cell: (item) => (
-        <Cell
-          text={formatBiofuelBalanceGj(
-            item.pending_teneur,
-            item.biofuel?.pci_litre
-          )}
-        />
+        <Cell text={formatObjectiveGJFromMj(item.pending_teneur)} />
       ),
     },
     {

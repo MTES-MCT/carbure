@@ -821,3 +821,17 @@ def check_fields_required(attrs, fields, _error_message=None):
             errors[field] = error_message
     if errors:
         raise serializers.ValidationError(errors)
+
+
+def check_fields_required_when(attrs, rules, _error_message=None):
+    """Require fields for every matching rule, in a single validation error.
+
+    ``rules`` is an iterable of ``(predicate, fields)``. A predicate receives
+    ``attrs`` and returns whether its fields are required. Every matching rule
+    is applied, so one error lists all missing fields.
+    """
+    required = []
+    for predicate, fields in rules:
+        if predicate(attrs):
+            required.extend(fields)
+    check_fields_required(attrs, required, _error_message)

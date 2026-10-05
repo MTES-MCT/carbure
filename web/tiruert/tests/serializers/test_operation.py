@@ -243,6 +243,7 @@ class OperationInputSerializerCreateTest(TestCase):
             volume=1000,
             ghg_total=9.8,
         )
+        self.biofuel_eth.renewable_energy_share = 0.5
 
         serializer = OperationInputSerializer(context={"request": self.mock_request})
         validated_data = {
@@ -266,6 +267,8 @@ class OperationInputSerializerCreateTest(TestCase):
         self.assertIsNotNone(operation.id)
         self.assertEqual(operation.type, Operation.CESSION)
         self.assertEqual(operation.biofuel, self.biofuel_eth)
+        self.assertEqual(operation.renewable_energy_share, 0.5)
+        self.assertEqual(operation.volume, 800)
 
         # Verify details created
         self.assertEqual(operation.details.count(), 2)

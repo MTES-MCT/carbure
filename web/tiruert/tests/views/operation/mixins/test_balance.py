@@ -201,23 +201,6 @@ class BalanceActionMixinTest(TestCase):
                 self.assertEqual(selected, expected_serializer)
 
     @patch("tiruert.services.balance.BalanceService.calculate_balance")
-    def test_balance_action_with_date_from_parameter(self, mock_calculate_balance):
-        """Test that balance action parses and passes date_from parameter correctly"""
-        mock_calculate_balance.return_value = {}
-
-        request = self._create_request({"unit": "l", "date_from": "2025-01-15"})
-
-        self.view.balance(request)
-
-        mock_calculate_balance.assert_called_once()
-        call_args = mock_calculate_balance.call_args[0]
-        date_from = call_args[4]
-        self.assertIsNotNone(date_from)
-        self.assertEqual(date_from.year, 2025)
-        self.assertEqual(date_from.month, 1)
-        self.assertEqual(date_from.day, 15)
-
-    @patch("tiruert.services.balance.BalanceService.calculate_balance")
     def test_balance_action_with_ges_bounds(self, mock_calculate_balance):
         """Test that balance action passes ges_bound_min and ges_bound_max parameters"""
         mock_calculate_balance.return_value = {}
@@ -227,8 +210,7 @@ class BalanceActionMixinTest(TestCase):
         self.view.balance(request)
 
         mock_calculate_balance.assert_called_once()
-        call_args = mock_calculate_balance.call_args[0]
-        detail_filters = call_args[5]
+        detail_filters = mock_calculate_balance.call_args.kwargs["detail_filters"]
         self.assertEqual(detail_filters["ges_bound_min"], "50.0")
         self.assertEqual(detail_filters["ges_bound_max"], "80.0")
 
