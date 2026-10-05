@@ -14227,10 +14227,6 @@ components:
           allOf:
             - $ref: "#/components/schemas/ActionTypeEnum"
           title: Type d'action
-        unit:
-          allOf:
-            - $ref: "#/components/schemas/PreferredUnitEnum"
-          title: Unité
         quantity:
           type: string
           format: decimal
@@ -14307,7 +14303,6 @@ components:
         - status
         - total_emissions
         - type
-        - unit
         - volume
         - working_date
     ActionCertificate:
@@ -19894,10 +19889,15 @@ components:
           pattern: ^-?\d{0,6}(?:\.\d{0,6})?$
           nullable: true
           title: Masse volumique (kg/l)
+        unit:
+          allOf:
+            - $ref: "#/components/schemas/PreferredUnitEnum"
+          title: Unité
       required:
         - code
         - id
         - name
+        - unit
     MaterialUnitEnum:
       enum:
         - DRY
