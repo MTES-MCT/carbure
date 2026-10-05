@@ -52,13 +52,6 @@ class Action(models.Model):
     TYPES = [(INIT, "INIT"), (VALORIZE, "VALORIZE")]
     type = models.CharField(verbose_name="Type d'action", choices=TYPES, max_length=16)
 
-    # Duplicated from Entity.UNIT_CHOICE: sharing is impractical (different contexts).
-    L = "l"
-    KG = "kg"
-    MJ = "MJ"
-    ACTION_UNIT_CHOICE = ((L, "litres"), (KG, "kg"), (MJ, "MJ"))
-    unit = models.CharField(verbose_name="Unité", choices=ACTION_UNIT_CHOICE, max_length=8)
-
     parent = models.ForeignKey(
         "self", verbose_name="Action parente", null=True, blank=True, on_delete=models.PROTECT, related_name="children"
     )

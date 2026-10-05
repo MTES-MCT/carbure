@@ -48,7 +48,7 @@ class LatestStatusFilter(admin.SimpleListFilter):
 
 @admin.register(Material)
 class MaterialAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "name", "lhv", "density")
+    list_display = ("id", "code", "name", "unit", "lhv", "density")
     search_fields = ("code", "name")
 
 
@@ -86,7 +86,7 @@ class ActionAdmin(admin.ModelAdmin):
         "holder",
         "material__name",
         "quantity",
-        "unit",
+        "material__unit",
         "material__lhv",
         "material__density",
         "site",
@@ -96,7 +96,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_filter = (
         "industry",
         "type",
-        "unit",
+        "material__unit",
         LatestStatusFilter,
         "material__name",
         "shipping_method",

@@ -20,6 +20,13 @@ class Material(models.Model):
         blank=True,
     )
 
+    # Duplicated from Entity.UNIT_CHOICE: sharing is impractical (different contexts).
+    L = "l"
+    KG = "kg"
+    MJ = "MJ"
+    MATERIAL_UNIT_CHOICE = ((L, "litres"), (KG, "kg"), (MJ, "MJ"))
+    unit = models.CharField(verbose_name="Unité", choices=MATERIAL_UNIT_CHOICE, max_length=8)
+
     class Meta:
         db_table = "material"
         verbose_name = "Matière"
