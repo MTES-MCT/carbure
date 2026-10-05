@@ -96,7 +96,6 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
                         holder=holder,
                         industry=industry,
                         type=Action.INIT,
-                        unit=Action.KG,
                     )
                 )
 

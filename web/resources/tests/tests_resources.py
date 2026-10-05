@@ -104,8 +104,8 @@ class ResourcesTest(TestCase):
         assert len(data) == 1
 
     def test_get_materials(self):
-        Material.objects.get_or_create(code="H2-BIO", defaults={"name": "Bio-H2"})
-        Material.objects.get_or_create(code="H2-RFNBO", defaults={"name": "RFNBO-H2"})
+        Material.objects.get_or_create(code="H2-BIO", defaults={"name": "Bio-H2", "unit": Material.KG})
+        Material.objects.get_or_create(code="H2-RFNBO", defaults={"name": "RFNBO-H2", "unit": Material.KG})
 
         response = self.client.get(reverse("resources-materials"))
         assert response.status_code == 200

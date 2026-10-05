@@ -24,7 +24,7 @@ from traceability.serializers import MaterialSerializer
 def get_materials(request, *args, **kwargs):
     query = request.query_params.get("query")
 
-    materials = Material.objects.all().order_by("name")
+    materials = Material.objects.exclude(code=Material.VALORIZED_ENERGY_CODE).order_by("name")
     if query:
         materials = materials.filter(Q(name__icontains=query) | Q(code__icontains=query))
 
