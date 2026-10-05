@@ -126,6 +126,8 @@ export function List<T, V>({
     }
 
     return items.map(({ value, label, children, disabled, data }, index) => {
+      const key = `${label}-${index}`
+
       const config: ItemConfig<T, V> = {
         value,
         label,
@@ -145,7 +147,7 @@ export function List<T, V>({
       // render group header
       if (children) {
         return (
-          <div key={label}>
+          <div key={key}>
             <li
               data-group
               data-key={label}
@@ -169,7 +171,7 @@ export function List<T, V>({
           onClick={() => selection.select(value)}
           onFocus={() => selection.focus(value)}
           borderBottom={border && index < items.length - 1}
-          key={label}
+          key={key}
         >
           {render(config)}
         </ListItem>
