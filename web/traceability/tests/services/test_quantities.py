@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from traceability.factories import ActionFactory, MaterialFactory
-from traceability.models import Action
+from traceability.models import Action, Material
 
 
 class AnnotateQuantitiesTest(TestCase):
@@ -13,7 +13,6 @@ class AnnotateQuantitiesTest(TestCase):
         material = MaterialFactory.create(lhv=Decimal("120"), density=Decimal("0.8"))
         action = ActionFactory.create(
             type=Action.INIT,
-            unit=Action.KG,
             quantity=Decimal("100.000"),
             material=material,
         )
@@ -24,10 +23,21 @@ class AnnotateQuantitiesTest(TestCase):
         self.assertEqual(annotated.energy, Decimal("12000.000"))
 
     def test_missing_factors_leave_derived_values_null(self):
-        material = MaterialFactory.create(lhv=None, density=None)
-        kg = ActionFactory.create(type=Action.INIT, unit=Action.KG, quantity=Decimal("100.000"), material=material)
-        litre = ActionFactory.create(type=Action.INIT, unit=Action.L, quantity=Decimal("50.000"), material=material)
-        mj = ActionFactory.create(type=Action.VALORIZE, unit=Action.MJ, quantity=Decimal("12000.000"), material=None)
+        kg = ActionFactory.create(
+            type=Action.INIT,
+            quantity=Decimal("100.000"),
+            material=MaterialFactory.create(unit=Material.KG, lhv=None, density=None),
+        )
+        litre = ActionFactory.create(
+            type=Action.INIT,
+            quantity=Decimal("50.000"),
+            material=MaterialFactory.create(unit=Material.L, lhv=None, density=None),
+        )
+        mj = ActionFactory.create(
+            type=Action.VALORIZE,
+            quantity=Decimal("12000.000"),
+            material=MaterialFactory.create(unit=Material.MJ, lhv=None, density=None),
+        )
 
         annotated_kg = Action.objects.get(pk=kg.pk)
         self.assertEqual(annotated_kg.mass, Decimal("100.000"))
@@ -45,10 +55,9 @@ class AnnotateQuantitiesTest(TestCase):
         self.assertEqual(annotated_mj.energy, Decimal("12000.000"))
 
     def test_annotates_from_litre_with_factors(self):
-        material = MaterialFactory.create(lhv=Decimal("120"), density=Decimal("0.8"))
+        material = MaterialFactory.create(unit=Material.L, lhv=Decimal("120"), density=Decimal("0.8"))
         action = ActionFactory.create(
             type=Action.INIT,
-            unit=Action.L,
             quantity=Decimal("50.000"),
             material=material,
         )
@@ -59,10 +68,9 @@ class AnnotateQuantitiesTest(TestCase):
         self.assertEqual(annotated.energy, Decimal("4800.000"))
 
     def test_annotates_from_mj_with_factors(self):
-        material = MaterialFactory.create(lhv=Decimal("120"), density=Decimal("0.8"))
+        material = MaterialFactory.create(unit=Material.MJ, lhv=Decimal("120"), density=Decimal("0.8"))
         action = ActionFactory.create(
             type=Action.VALORIZE,
-            unit=Action.MJ,
             quantity=Decimal("12000.000"),
             material=material,
         )

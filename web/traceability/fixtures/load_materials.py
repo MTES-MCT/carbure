@@ -36,3 +36,13 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
                 "unit": unit,
             },
         )
+
+Material.objects.update_or_create(
+    code=Material.VALORIZED_ENERGY_CODE,
+    defaults={
+        "name": Material.VALORIZED_ENERGY_NAME,
+        "unit": Material.MJ,
+        "lhv": None,
+        "density": None,
+    },
+)

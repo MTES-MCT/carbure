@@ -6,7 +6,7 @@ from traceability.models import Material
 
 class MaterialConstraintsTest(TestCase):
     def test_allows_null_lhv_and_density(self):
-        material = Material.objects.create(code="MAT-NULL", name="Sans facteur")
+        material = Material.objects.create(code="MAT-NULL", name="Sans facteur", unit=Material.KG)
         self.assertIsNone(material.lhv)
         self.assertIsNone(material.density)
 
@@ -14,4 +14,4 @@ class MaterialConstraintsTest(TestCase):
         cases = (("lhv", 0), ("lhv", -1), ("density", 0), ("density", -1))
         for index, (field, value) in enumerate(cases):
             with self.subTest(field=field, value=value), self.assertRaises(IntegrityError), transaction.atomic():
-                Material.objects.create(code=f"X{index}", name=f"{field} {value}", **{field: value})
+                Material.objects.create(code=f"X{index}", name=f"{field} {value}", unit=Material.KG, **{field: value})
