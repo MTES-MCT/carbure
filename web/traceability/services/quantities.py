@@ -16,7 +16,7 @@ def quantities_db_annotation() -> dict:
 
     Reads `material.lhv` / `material.density`. Missing factors yield NULL.
     """
-    from traceability.models.action import Action
+    from traceability.models.material import Material
 
     quantity = F("quantity")
     lhv = F("material__lhv")
@@ -25,9 +25,9 @@ def quantities_db_annotation() -> dict:
 
     mass = Round(
         Case(
-            When(unit=Action.KG, then=quantity),
-            When(unit=Action.L, then=_expression_wrapper(quantity * density)),
-            When(unit=Action.MJ, then=_expression_wrapper(quantity / lhv)),
+            When(material__unit=Material.KG, then=quantity),
+            When(material__unit=Material.L, then=_expression_wrapper(quantity * density)),
+            When(material__unit=Material.MJ, then=_expression_wrapper(quantity / lhv)),
             default=empty,
             output_field=QUANTITY_FIELD,
         ),
@@ -35,9 +35,9 @@ def quantities_db_annotation() -> dict:
     )
     volume = Round(
         Case(
-            When(unit=Action.L, then=quantity),
-            When(unit=Action.KG, then=_expression_wrapper(quantity / density)),
-            When(unit=Action.MJ, then=_expression_wrapper(quantity / lhv / density)),
+            When(material__unit=Material.L, then=quantity),
+            When(material__unit=Material.KG, then=_expression_wrapper(quantity / density)),
+            When(material__unit=Material.MJ, then=_expression_wrapper(quantity / lhv / density)),
             default=empty,
             output_field=QUANTITY_FIELD,
         ),
@@ -45,9 +45,9 @@ def quantities_db_annotation() -> dict:
     )
     energy = Round(
         Case(
-            When(unit=Action.MJ, then=quantity),
-            When(unit=Action.KG, then=_expression_wrapper(quantity * lhv)),
-            When(unit=Action.L, then=_expression_wrapper(quantity * density * lhv)),
+            When(material__unit=Material.MJ, then=quantity),
+            When(material__unit=Material.KG, then=_expression_wrapper(quantity * lhv)),
+            When(material__unit=Material.L, then=_expression_wrapper(quantity * density * lhv)),
             default=empty,
             output_field=QUANTITY_FIELD,
         ),
