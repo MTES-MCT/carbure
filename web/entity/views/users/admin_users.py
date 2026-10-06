@@ -39,6 +39,18 @@ class AdminUsersViewSet(FiltersActionFactory(), ListModelMixin, GenericViewSet):
     search_fields = ["user__email", "entity__name"]
     pagination_class = CustomPageNumberPagination
 
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        if self.request.method != "POST":
+            return queryset
+
+        serializer = AdminEntityIdsSerializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        entity_ids = serializer.validated_data.get("entity_ids")
+        if entity_ids is not None:
+            queryset = queryset.filter(entity_id__in=entity_ids)
+        return queryset
+
     @extend_schema(
         request=AdminEntityIdsSerializer,
         responses={200: AdminUserRowSerializer(many=True)},

@@ -1,3 +1,5 @@
+import re
+
 from rest_framework import serializers
 
 from core.models import Entity, UserRights
@@ -5,6 +7,11 @@ from core.models import Entity, UserRights
 
 class AdminEntityIdsSerializer(serializers.Serializer):
     entity_ids = serializers.CharField(required=False, allow_blank=True)
+
+    def validate_entity_ids(self, value):
+        if not value:
+            return None
+        return [int(token) for token in re.findall(r"\d+", value)]
 
 
 class AdminUserRowSerializer(serializers.ModelSerializer):
