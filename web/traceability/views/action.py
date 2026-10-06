@@ -1,16 +1,19 @@
 from django.db.models import Q
 from django.utils.decorators import decorator_from_middleware, method_decorator
 from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
 
 from core.filters import FiltersActionFactory
 from core.pagination import TotalCountPagination
+from traceability.exceptions import ActionNotDeletableError
 from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.middlewares import ActionHandlerMiddleware
 from traceability.models import Action
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
+from traceability.services.delete import delete_action
 from traceability.services.total_emissions import annotate_total_emissions
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
@@ -79,3 +82,9 @@ class ActionViewset(
         context["entity"] = getattr(self.request, "entity", None)
         context["handler"] = getattr(self.request, "handler", None)
         return context
+
+    def perform_destroy(self, instance):
+        try:
+            delete_action(instance)
+        except ActionNotDeletableError as exc:
+            raise ValidationError() from exc

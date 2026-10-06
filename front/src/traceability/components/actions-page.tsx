@@ -26,7 +26,7 @@ import { useCombinedQuery } from "traceability/hooks/use-combined-query"
 import { ActionModal } from "traceability/components/action-modal"
 import { ActionExcelImportDialog } from "traceability/components/action-excel-import-dialog"
 import { ActionFieldset } from "traceability/hooks/use-action-fields"
-import { Button, ButtonProps } from "common/components/button2"
+import { Button } from "common/components/button2"
 import { FrIconClassName } from "@codegouvfr/react-dsfr"
 import { SearchInput } from "common/components/inputs2"
 import { Pagination } from "common/components/pagination2"
@@ -37,14 +37,6 @@ export type MainAction = {
   icon: FrIconClassName
   label: string
   onAction: () => void
-}
-
-export type DetailAction = {
-  icon: FrIconClassName
-  label: string
-  priority?: ButtonProps["priority"]
-  variant?: ButtonProps["customPriority"]
-  onAction: (action: Action) => void
 }
 
 export type ExcelImportConfig = {
@@ -61,7 +53,7 @@ export type ActionsPageProps = {
   subpath: string
   fixedQuery: Partial<ActionQuery>
   mainAction?: MainAction
-  detailActions?: DetailAction[]
+  renderDetailActions?: (action: Action) => ReactNode
   excelImport?: ExcelImportConfig
   filters: ActionFilterDisplay[]
   columns: ActionColumn[]
@@ -75,7 +67,7 @@ export const ActionsPage = ({
   subpath,
   fixedQuery,
   mainAction,
-  detailActions,
+  renderDetailActions,
   excelImport,
   filters,
   columns,
@@ -224,7 +216,7 @@ export const ActionsPage = ({
             <ActionModal
               title={detailTitle}
               fieldsets={fieldsets}
-              detailActions={detailActions}
+              renderDetailActions={renderDetailActions}
               industry={industry}
             />
           }
