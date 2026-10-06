@@ -3002,6 +3002,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Get snapshot balance for a specific entity and year. */
         get: operations["tiruert_objectives_snapshot_balance_retrieve"];
         put?: never;
         post?: never;
@@ -3590,7 +3591,6 @@ export interface components {
         ActivateAccountRequest: {
             uidb64: string;
             token: string;
-            invite?: number;
         };
         ActivateResponse: {
             message: string;
