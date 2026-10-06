@@ -161,6 +161,19 @@ class MandatorySanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
 
+    def test_direct_delivery_allows_missing_client_and_delivery_site(self):
+        lot = self.create_lot(
+            delivery_type=CarbureLot.DIRECT,
+            carbure_client=None,
+            carbure_delivery_site=None,
+            delivery_site_country=Pays.objects.get(code_pays="FR"),
+        )
+
+        error_list = self.run_checks(lot)
+
+        assert not has_error(CarbureSanityCheckErrors.MISSING_CARBURE_CLIENT, error_list)
+        assert not has_error(CarbureSanityCheckErrors.MISSING_CARBURE_DELIVERY_SITE, error_list)
+
     def test_missing_delivery_date(self):
         pass
 
