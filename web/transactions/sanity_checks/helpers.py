@@ -57,7 +57,6 @@ def is_french_delivery(lot: CarbureLot):
             CarbureLot.BLENDING,
             CarbureLot.TRADING,
             CarbureLot.STOCK,
-            CarbureLot.DIRECT,
             CarbureLot.UNKNOWN,
         ]
         and lot.delivery_site_country
