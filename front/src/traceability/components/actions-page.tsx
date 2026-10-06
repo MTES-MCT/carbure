@@ -1,5 +1,6 @@
 import { ReactNode, useCallback } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
+import { isEmpty } from "ramda"
 
 import HashRoute from "common/components/hash-route"
 import { ActionBar, Content, Main } from "common/components/scaffold"
@@ -59,6 +60,7 @@ export type ActionsPageProps = {
   columns: ActionColumn[]
   fieldsets?: ActionFieldset[]
   industry: ActionIndustry
+  emptyState?: ReactNode
 }
 
 export const ActionsPage = ({
@@ -73,6 +75,7 @@ export const ActionsPage = ({
   columns,
   fieldsets,
   industry,
+  emptyState,
 }: ActionsPageProps) => {
   usePrivateNavigation(listTitle)
 
@@ -126,6 +129,17 @@ export const ActionsPage = ({
     (filter: ActionFilter) => getActionFilters(filter, industry, combinedQuery),
     [industry, combinedQuery]
   )
+
+  const showEmptyState =
+    Boolean(emptyState) &&
+    !loading &&
+    !state.search &&
+    isEmpty(state.filters) &&
+    (result?.data?.count ?? 0) === 0
+
+  if (showEmptyState) {
+    return emptyState
+  }
 
   return (
     <Main>
