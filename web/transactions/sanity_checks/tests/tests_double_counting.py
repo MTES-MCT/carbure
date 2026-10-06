@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 
 from django.test import TestCase
 
@@ -49,6 +50,7 @@ class DoubleCountingSanityChecksTest(TestCase):
             valid_until=datetime.date(2024, 12, 31),
         )
 
+        # "future" relative to the lots delivery_date (2023-07-01) used in the tests, not to today
         self.future_dc_cert = DoubleCountingRegistration.objects.create(
             certificate_id="FR_00999_2025",
             production_site=self.production_site,
@@ -194,6 +196,67 @@ class DoubleCountingSanityChecksTest(TestCase):
         lot.production_site_double_counting_certificate = self.dc_cert.certificate_id
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
+
+    def test_inactive_double_counting_certificate(self):
+        """Test that inactive double counting certificates are correctly identified."""
+        error = CarbureCertificatesErrors.INACTIVE_DOUBLE_COUNTING_CERTIFICATE
+
+        lot = self.create_lot(
+            feedstock=self.dc_feedstock,
+            biofuel=self.dc_biofuel,
+            carbure_producer=self.producer,
+            carbure_production_site=self.production_site,
+            delivery_date=datetime.date(2023, 7, 1),
+            production_site_double_counting_certificate=self.dc_cert.certificate_id,
+        )
+
+        # case 1: certificate is VALID => ok
+        error_list = self.run_checks(lot)
+        assert not has_error(error, error_list)
+
+        # case 2: certificate suspended, withdrawn or terminated => blocking error
+        for status in [
+            DoubleCountingRegistration.SUSPENDED,
+            DoubleCountingRegistration.WITHDRAWN,
+            DoubleCountingRegistration.TERMINATED,
+        ]:
+            self.dc_cert.status = status
+            self.dc_cert.save()
+
+            error_list = self.run_checks(lot, get_prefetched_data())
+            assert has_error(error, error_list), status
+            assert next(e for e in error_list if e.error == error).is_blocking
+
+    @patch("certificates.models.timezone.localdate", new=lambda: datetime.date(2026, 10, 6))
+    def test_computed_status(self):
+        self.assertEqual(self.old_dc_cert.computed_status, DoubleCountingRegistration.EXPIRED)
+
+        active_certificate = DoubleCountingRegistration.objects.create(
+            certificate_id="FR_00999_ACTIVE",
+            production_site=self.production_site,
+            valid_from=datetime.date(2025, 1, 1),
+            valid_until=datetime.date(2026, 12, 31),
+        )
+        active_certificate.refresh_from_db()
+        self.assertEqual(active_certificate.computed_status, DoubleCountingRegistration.ACTIVE)
+
+        incoming_certificate = DoubleCountingRegistration.objects.create(
+            certificate_id="FR_00999_2027",
+            production_site=self.production_site,
+            valid_from=datetime.date(2027, 1, 1),
+            valid_until=datetime.date(2028, 12, 31),
+        )
+        incoming_certificate.refresh_from_db()
+        self.assertEqual(incoming_certificate.computed_status, DoubleCountingRegistration.INCOMING)
+
+        expiring_certificate = DoubleCountingRegistration.objects.create(
+            certificate_id="FR_00999_2026_EXPIRING",
+            production_site=None,
+            valid_from=datetime.date(2025, 1, 1),
+            valid_until=datetime.date(2027, 1, 1),
+        )
+        expiring_certificate.refresh_from_db()
+        self.assertEqual(expiring_certificate.computed_status, DoubleCountingRegistration.EXPIRES_SOON)
 
     def test_no_double_counting_requirement_on_saf(self):
         lot = self.create_lot(

@@ -1,3 +1,4 @@
+from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import CarbureLot
 from core.models.feedstock import GPL_BIOFUEL_TYPES
@@ -76,6 +77,21 @@ def check_invalid_double_counting_certificate(lot: CarbureLot, prefetched_data):
             display_to_recipient=True,
             is_blocking=True,
             lot=lot,
+        )
+
+
+def check_inactive_double_counting_certificate(lot: CarbureLot, prefetched_data):
+    is_dc, certificate = get_dc(lot, prefetched_data)
+    if not is_dc or certificate is None:
+        return
+
+    if certificate.status != DoubleCountingRegistration.VALID:
+        return generic_error(
+            error=CarbureCertificatesErrors.INACTIVE_DOUBLE_COUNTING_CERTIFICATE,
+            display_to_recipient=True,
+            is_blocking=True,
+            lot=lot,
+            field="production_site_double_counting_certificate",
         )
 
 

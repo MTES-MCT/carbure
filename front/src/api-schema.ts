@@ -5210,7 +5210,8 @@ export interface components {
             readonly production_site: string;
             /** Format: date */
             valid_until: string;
-            readonly status: components["schemas"]["DoubleCountingAgreementStatus"];
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+            readonly computed_status: components["schemas"]["DoubleCountingAgreementStatus"];
             /** Format: double */
             readonly quotas_progression: number;
         };
@@ -5221,7 +5222,8 @@ export interface components {
             valid_from: string;
             /** Format: date */
             valid_until: string;
-            readonly status: components["schemas"]["DoubleCountingAgreementStatus"];
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+            readonly computed_status: components["schemas"]["DoubleCountingAgreementStatus"];
             readonly producer: string;
             readonly production_site: string;
             application: components["schemas"]["DoubleCountingApplication"];
@@ -5236,6 +5238,14 @@ export interface components {
             valid_until: string;
             readonly biofuel_list: string;
         };
+        /**
+         * @description * `VALID` - Valide
+         *     * `SUSPENDED` - Suspendu
+         *     * `WITHDRAWN` - Retiré
+         *     * `TERMINATED` - Interrompu
+         * @enum {string}
+         */
+        DoubleCountingRegistrationStatusEnum: DoubleCountingRegistrationStatusEnum;
         DoubleCountingSourcing: {
             readonly id: number;
             readonly year: number;
@@ -16340,6 +16350,12 @@ export enum DoubleCountingAgreementStatus {
     EXPIRED = "EXPIRED",
     EXPIRES_SOON = "EXPIRES_SOON",
     INCOMING = "INCOMING"
+}
+export enum DoubleCountingRegistrationStatusEnum {
+    VALID = "VALID",
+    SUSPENDED = "SUSPENDED",
+    WITHDRAWN = "WITHDRAWN",
+    TERMINATED = "TERMINATED"
 }
 export enum DoubleCountingStatus {
     PENDING = "PENDING",
