@@ -497,7 +497,6 @@ export function isFrenchDelivery(value: LotFormValue) {
       DeliveryType.Blending,
       DeliveryType.Trading,
       DeliveryType.Stock,
-      DeliveryType.Direct,
       DeliveryType.Unknown,
     ].includes(value.delivery_type ?? DeliveryType.Unknown) &&
     country?.code_pays === "FR"
