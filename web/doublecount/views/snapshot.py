@@ -17,6 +17,7 @@ class ApplicationSnapshotSerializer(serializers.Serializer):
     agreements_incoming = serializers.IntegerField()
     agreements_active = serializers.IntegerField()
     agreements_expired = serializers.IntegerField()
+    agreements_inactive = serializers.IntegerField()
 
 
 class SafSnapshotError:
@@ -55,9 +56,11 @@ def get_snapshot(request, *args, **kwargs):
 
     agreements_incoming = DoubleCountingRegistration.objects.filter(Q(valid_from__year__gt=current_year))
     agreements_active = DoubleCountingRegistration.objects.filter(
-        Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year)
+        Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year),
+        status=DoubleCountingRegistration.VALID,
     )
     agreements_expired = DoubleCountingRegistration.objects.filter(Q(valid_until__year__lt=current_year))
+    agreements_inactive = DoubleCountingRegistration.objects.exclude(status=DoubleCountingRegistration.VALID)
 
     return Response(
         {
@@ -66,5 +69,6 @@ def get_snapshot(request, *args, **kwargs):
             "agreements_incoming": agreements_incoming.count(),
             "agreements_active": agreements_active.count(),
             "agreements_expired": agreements_expired.count(),
+            "agreements_inactive": agreements_inactive.count(),
         }
     )

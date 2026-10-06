@@ -13903,9 +13903,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DoubleCountingRegistration"
+        inactive:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingRegistration"
       required:
         - active
         - expired
+        - inactive
         - incoming
     Airport:
       type: object
@@ -14011,9 +14016,12 @@ components:
           type: integer
         agreements_expired:
           type: integer
+        agreements_inactive:
+          type: integer
       required:
         - agreements_active
         - agreements_expired
+        - agreements_inactive
         - agreements_incoming
         - applications_pending
         - applications_rejected

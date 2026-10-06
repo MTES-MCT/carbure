@@ -6,6 +6,7 @@ from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationSerializer
 
 from .utils import add_quotas_to_agreements
@@ -15,6 +16,7 @@ class AgreementListsSerializer(serializers.Serializer):
     active = DoubleCountingRegistrationSerializer(many=True)
     incoming = DoubleCountingRegistrationSerializer(many=True)
     expired = DoubleCountingRegistrationSerializer(many=True)
+    inactive = DoubleCountingRegistrationSerializer(many=True)
 
 
 class AgreementAdminListActionMixin:
@@ -44,10 +46,14 @@ class AgreementAdminListActionMixin:
 
         year = self.request.query_params.get("year", datetime.now().year)
 
-        agreements_active = queryset.filter(Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year))
+        agreements_active = queryset.filter(
+            Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year),
+            status=DoubleCountingRegistration.VALID,
+        )
 
         agreements_incoming = queryset.filter(Q(valid_from__year__gt=year))
         agreements_expired = queryset.filter(Q(valid_until__year__lt=year))
+        agreements_inactive = queryset.exclude(status=DoubleCountingRegistration.VALID)
 
         active_agreements = DoubleCountingRegistrationSerializer(agreements_active, many=True).data
         active_agreements_with_quotas = add_quotas_to_agreements(year, active_agreements)
@@ -56,5 +62,6 @@ class AgreementAdminListActionMixin:
             "active": active_agreements_with_quotas,
             "incoming": DoubleCountingRegistrationSerializer(agreements_incoming, many=True).data,
             "expired": DoubleCountingRegistrationSerializer(agreements_expired, many=True).data,
+            "inactive": DoubleCountingRegistrationSerializer(agreements_inactive, many=True).data,
         }
         return Response(data)

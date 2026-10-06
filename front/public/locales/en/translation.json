@@ -1131,6 +1131,8 @@
   "Expirés ({{ count }})_other": "Expired ({{ count }})",
   "À venir ({{ count }})_one": "Coming soon ({{ count }})",
   "À venir ({{ count }})_other": "Coming soon ({{ count }})",
+  "Non actifs ({{ count }})_one": "Inactive ({{ count }})",
+  "Non actifs ({{ count }})_other": "Inactive ({{ count }})",
   "Aucun agrément trouvé": "No agreements found",
   "Exporter les agréments": "Export agreements",
   "En cours": "Active",

@@ -16,7 +16,9 @@ import {
   DoubleCountingAgreementsSnapshot,
 } from "../../../double-counting/types"
 import { AgreementDetailsDialog } from "./agreement-details-dialog"
-import AgreementStatusTag from "./agreement-status"
+import AgreementStatusTag, {
+  AgreementRegistrationStatusTag,
+} from "./agreement-status"
 import { compact } from "common/utils/collection"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { AgreementFilters } from "../../filters"
@@ -52,7 +54,12 @@ const AgreementList = ({
   const columns: Column<DoubleCountingAgreementOverview>[] = compact([
     {
       header: t("Statut"),
-      cell: (a) => <AgreementStatusTag status={a.computed_status} />,
+      cell: (a) =>
+        tab === "inactive" ? (
+          <AgreementRegistrationStatusTag status={a.status} />
+        ) : (
+          <AgreementStatusTag status={a.computed_status} />
+        ),
     },
     {
       header: t("N° d'agrément"),
@@ -96,6 +103,7 @@ const AgreementList = ({
   }
 
   const agreements = agreementsResponse.result?.data
+  const rows = agreements?.[tab as keyof typeof agreements]
 
   const getAgrementFilter = (filter: AgreementFilter) => {
     return api.getAgrementFilters(filter, query)
@@ -128,6 +136,12 @@ const AgreementList = ({
               count: snapshot?.agreements_incoming,
             }),
           },
+          {
+            key: "inactive",
+            label: t("Non actifs ({{ count }})", {
+              count: snapshot?.agreements_inactive,
+            }),
+          },
         ]}
       />
       <Content>
@@ -137,10 +151,7 @@ const AgreementList = ({
           onSelect={actions.setFilters}
           getFilterOptions={getAgrementFilter}
         />
-        {!agreements ||
-        (tab === "active" && agreements["active"].length === 0) ||
-        (tab === "expired" && agreements.expired.length === 0) ||
-        (tab === "incoming" && agreements.incoming.length === 0) ? (
+        {!rows || rows.length === 0 ? (
           <NoResult
             label={t("Aucun agrément trouvé")}
             loading={agreementsResponse.loading}
@@ -150,13 +161,7 @@ const AgreementList = ({
             <Table
               loading={agreementsResponse.loading}
               columns={columns}
-              rows={
-                tab === "active"
-                  ? agreements.active
-                  : tab === "expired"
-                    ? agreements.expired
-                    : agreements.incoming
-              }
+              rows={rows}
               onAction={showApplicationDialog}
               order={state.order}
               onOrder={actions.setOrder}
@@ -181,6 +186,7 @@ const defaultCount = {
   agreements_active: 0,
   agreements_expired: 0,
   agreements_incoming: 0,
+  agreements_inactive: 0,
 }
 
 export const ExportAgreementsButton = () => {

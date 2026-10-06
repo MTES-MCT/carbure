@@ -3611,6 +3611,7 @@ export interface components {
             active: components["schemas"]["DoubleCountingRegistration"][];
             incoming: components["schemas"]["DoubleCountingRegistration"][];
             expired: components["schemas"]["DoubleCountingRegistration"][];
+            inactive: components["schemas"]["DoubleCountingRegistration"][];
         };
         Airport: {
             readonly id: number;
@@ -3653,6 +3654,7 @@ export interface components {
             agreements_incoming: number;
             agreements_active: number;
             agreements_expired: number;
+            agreements_inactive: number;
         };
         ApproveDoubleCountingRequest: {
             dca_id: number;

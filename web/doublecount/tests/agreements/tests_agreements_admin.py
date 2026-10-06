@@ -4,6 +4,7 @@ from datetime import date
 from django.test import TestCase
 from django.urls import reverse
 
+from certificates.models import DoubleCountingRegistration
 from core.models import CarbureLot, Entity, Pays, UserRights
 from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
@@ -129,6 +130,24 @@ class AdminDoubleCountAgreementsTest(TestCase):
         # quotas
         total_progression = (prod3_progression + prod1_progression) / 2
         assert active_agreement1["quotas_progression"] == round(total_progression, 2)
+
+    def test_get_agreements_inactive(self):
+        """Test retrieving inactive agreements."""
+        valid_agreement, *_ = self.create_agreement()
+        suspended_agreement, *_ = self.create_agreement()
+        suspended_agreement.status = DoubleCountingRegistration.SUSPENDED
+        suspended_agreement.save()
+
+        response = self.client.get(
+            reverse("double-counting-agreements-agreement-admin"),
+            {"entity_id": self.admin.id, "year": 2023, "order_by": "production_site"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        assert [a["id"] for a in data["active"]] == [valid_agreement.id]
+        assert [a["id"] for a in data["inactive"]] == [suspended_agreement.id]
+        assert data["inactive"][0]["status"] == DoubleCountingRegistration.SUSPENDED
 
     def test_get_agreements_excel(self):
         self.create_agreement()
