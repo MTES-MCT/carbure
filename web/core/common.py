@@ -85,7 +85,7 @@ def try_get_double_counting_certificate(cert, production_site):
     d["holder"] = match.certificate_holder
     d["valid_from"] = match.valid_from
     d["valid_until"] = match.valid_until
-    d["status"] = match.status
+    d["status"] = match.computed_status
     return d
 
 

@@ -449,6 +449,7 @@ SPECTACULAR_SETTINGS = {
         "saf.filters.TicketFilter.status": "saf.models.SafTicket.ticket_statuses",
         "DoubleCountingStatus": "doublecount.models.DoubleCountingApplication.DCA_STATUS_CHOICES",
         "DoubleCountingAgreementStatus": "certificates.models.DoubleCountingRegistration.AGREEMENT_STATUS",
+        "DoubleCountingRegistrationStatusEnum": "certificates.models.DoubleCountingRegistration.STATUS_CHOICES",
         "UserRightsRequestsStatusEnum": "core.models.UserRightsRequests.STATUS_TYPES",
         "PreferredUnitEnum": "core.models.Entity.UNIT_CHOICE",
         "MPCategoriesEnum": "core.models.MatierePremiere.MP_CATEGORIES",
