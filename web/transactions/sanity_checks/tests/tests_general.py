@@ -57,6 +57,33 @@ class GeneralSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
 
+    def test_direct_delivery_country_is_blocking(self):
+        lot = self.create_lot(delivery_type=CarbureLot.DIRECT)
+        error_code = CarbureSanityCheckErrors.INVALID_DIRECT_DELIVERY_COUNTRY
+
+        for country in (self.prefetched_data["countries"]["DE"], None):
+            with self.subTest(country=country):
+                lot.delivery_site_country = country
+                errors = [error for error in self.run_checks(lot) if error.error == error_code]
+                assert len(errors) == 1
+                assert errors[0].field == "delivery_site_country"
+                assert errors[0].is_blocking is True
+                assert errors[0].display_to_creator is True
+
+        lot.delivery_site_country = self.prefetched_data["countries"]["FR"]
+        assert not has_error(error_code, self.run_checks(lot))
+
+    def test_direct_delivery_country_only_applies_to_direct(self):
+        error_code = CarbureSanityCheckErrors.INVALID_DIRECT_DELIVERY_COUNTRY
+        lot = self.create_lot(delivery_site_country=self.prefetched_data["countries"]["DE"])
+
+        for delivery_type, _ in CarbureLot.DELIVERY_TYPES:
+            if delivery_type == CarbureLot.DIRECT:
+                continue
+            with self.subTest(delivery_type=delivery_type):
+                lot.delivery_type = delivery_type
+                assert not has_error(error_code, self.run_checks(lot))
+
     def test_delivery_date_before_dispatch_date(self):
         error = CarbureSanityCheckErrors.DELIVERY_DATE_BEFORE_DISPATCH_DATE
         dispatch_date = datetime.date(2025, 1, 2)

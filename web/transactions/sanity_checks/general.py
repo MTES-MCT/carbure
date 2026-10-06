@@ -114,6 +114,18 @@ def check_mac_bc_wrong(lot: CarbureLot):
         )
 
 
+def check_direct_delivery_country(lot: CarbureLot):
+    if lot.delivery_type == CarbureLot.DIRECT and (
+        not lot.delivery_site_country or lot.delivery_site_country.code_pays != "FR"
+    ):
+        return generic_error(
+            error=CarbureSanityCheckErrors.INVALID_DIRECT_DELIVERY_COUNTRY,
+            lot=lot,
+            field="delivery_site_country",
+            is_blocking=True,
+        )
+
+
 def check_mac_not_efpe(lot: CarbureLot):
     if lot.delivery_type == CarbureLot.RFC and lot.carbure_delivery_site and lot.carbure_delivery_site.site_type != "EFPE":
         return generic_error(
