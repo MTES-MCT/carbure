@@ -52,7 +52,7 @@ const AgreementList = ({
   const columns: Column<DoubleCountingAgreementOverview>[] = compact([
     {
       header: t("Statut"),
-      cell: (a) => <AgreementStatusTag status={a.status} />,
+      cell: (a) => <AgreementStatusTag status={a.computed_status} />,
     },
     {
       header: t("N° d'agrément"),

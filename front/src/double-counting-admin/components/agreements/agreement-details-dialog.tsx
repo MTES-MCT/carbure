@@ -68,7 +68,7 @@ export const AgreementDetailsDialog = () => {
         header={
           <>
             <Dialog.Title>
-              <AgreementStatusTag status={agreement?.status} />
+              <AgreementStatusTag status={agreement?.computed_status} />
               {t("Agrément double comptage n°{{dcNumber}}", {
                 dcNumber: agreement?.certificate_id || "FR_XXX_XXXX",
               })}
