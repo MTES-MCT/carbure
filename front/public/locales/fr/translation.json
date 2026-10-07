@@ -1655,6 +1655,8 @@
   "En attente - Déclarant": "En attente - Déclarant",
   "En attente - DGEC": "En attente - DGEC",
   "Valider toutes les données": "Valider toutes les données",
+  "{{count}} agréments sélectionnés_one": "{{count}} agrément sélectionné",
+  "Appliquer": "Appliquer",
   "{{count}} volumes sélectionnés_one": "{{count}} volume sélectionné",
   "{{count}} volumes sélectionnés_many": "{{count}} volumes sélectionnés",
   "{{count}} volumes sélectionnés_other": "{{count}} volumes sélectionnés",

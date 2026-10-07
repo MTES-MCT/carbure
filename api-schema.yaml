@@ -3039,6 +3039,80 @@ paths:
               schema:
                 $ref: "#/components/schemas/AgreementLists"
           description: ""
+  /api/double-counting/agreements/{id}/update-status/:
+    patch:
+      operationId: double_counting_agreements_update_status_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusUpdateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusUpdateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementStatusUpdateRequest"
+          description: ""
+  /api/double-counting/agreements/bulk-update-status/:
+    post:
+      operationId: double_counting_agreements_bulk_update_status_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementStatusBulkUpdateResponse"
+          description: ""
   /api/double-counting/agreements/agreement-public/:
     get:
       operationId: double_counting_agreements_agreement_public_list
@@ -13912,6 +13986,38 @@ components:
         - expired
         - inactive
         - incoming
+    AgreementStatusUpdateRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
+      required:
+        - status
+    AgreementStatusBulkUpdateRequest:
+      type: object
+      properties:
+        agreement_ids:
+          type: array
+          items:
+            type: integer
+        status:
+          $ref: "#/components/schemas/AgreementStatusBulkUpdateRequestStatus"
+      required:
+        - agreement_ids
+        - status
+    AgreementStatusBulkUpdateResponse:
+      type: object
+      properties:
+        updated_count:
+          type: integer
+      required:
+        - updated_count
+    AgreementStatusBulkUpdateRequestStatus:
+      type: string
+      enum:
+        - SUSPENDED
+        - WITHDRAWN
+        - TERMINATED
     Airport:
       type: object
       properties:

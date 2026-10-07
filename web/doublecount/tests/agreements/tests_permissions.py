@@ -15,7 +15,7 @@ class DoubleCountingApplicationPermissionTest(TestCase, PermissionTestMixin):
                     [(HasProducerRights | HasDoubleCountingAdminRights)()],
                 ),
                 (
-                    ["export", "agreement_admin"],
+                    ["export", "agreement_admin", "update_status", "bulk_update_status"],
                     [HasDoubleCountingAdminRights()],
                 ),
                 (

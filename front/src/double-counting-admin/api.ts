@@ -8,7 +8,11 @@ import {
   ApplicationListQuery,
   ApplicationFilter,
 } from "./types"
-import { DoubleCountingStatus } from "api-schema"
+import {
+  AgreementStatusBulkUpdateRequestStatus,
+  DoubleCountingStatus,
+} from "api-schema"
+import { AgreementRegistrationStatus } from "../double-counting/types"
 // GLOBAL
 
 export function getSnapshot(entity_id: number) {
@@ -152,6 +156,28 @@ export function getDoubleCountingAgreementList(query: AgreementListQuery) {
     params: {
       query,
     },
+  })
+}
+
+export function updateDoubleCountingAgreementStatus(
+  entity_id: number,
+  agreement_id: number,
+  status: AgreementRegistrationStatus
+) {
+  return apiFetch.PATCH("/double-counting/agreements/{id}/update-status/", {
+    params: { query: { entity_id }, path: { id: agreement_id } },
+    body: { status },
+  })
+}
+
+export function updateDoubleCountingAgreementsStatus(
+  entity_id: number,
+  agreement_ids: number[],
+  status: AgreementStatusBulkUpdateRequestStatus
+) {
+  return apiFetch.POST("/double-counting/agreements/bulk-update-status/", {
+    params: { query: { entity_id } },
+    body: { agreement_ids, status },
   })
 }
 

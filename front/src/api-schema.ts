@@ -921,6 +921,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/double-counting/agreements/{id}/update-status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["double_counting_agreements_update_status_update"];
+        trace?: never;
+    };
+    "/api/double-counting/agreements/bulk-update-status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["double_counting_agreements_bulk_update_status_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/double-counting/agreements/agreement-public/": {
         parameters: {
             query?: never;
@@ -3613,6 +3645,18 @@ export interface components {
             expired: components["schemas"]["DoubleCountingRegistration"][];
             inactive: components["schemas"]["DoubleCountingRegistration"][];
         };
+        AgreementStatusUpdateRequest: {
+            status: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+        };
+        AgreementStatusBulkUpdateRequest: {
+            agreement_ids: number[];
+            status: components["schemas"]["AgreementStatusBulkUpdateRequestStatus"];
+        };
+        AgreementStatusBulkUpdateResponse: {
+            updated_count: number;
+        };
+        /** @enum {string} */
+        AgreementStatusBulkUpdateRequestStatus: AgreementStatusBulkUpdateRequestStatus;
         Airport: {
             readonly id: number;
             name: string;
@@ -9451,6 +9495,65 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AgreementLists"];
+                };
+            };
+        };
+    };
+    double_counting_agreements_update_status_update: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Certificat Double Compte. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgreementStatusUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AgreementStatusUpdateRequest"];
+                "multipart/form-data": components["schemas"]["AgreementStatusUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementStatusUpdateRequest"];
+                };
+            };
+        };
+    };
+    double_counting_agreements_bulk_update_status_create: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgreementStatusBulkUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AgreementStatusBulkUpdateRequest"];
+                "multipart/form-data": components["schemas"]["AgreementStatusBulkUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementStatusBulkUpdateResponse"];
                 };
             };
         };
@@ -16252,6 +16355,11 @@ export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     status = "status",
     type = "type",
     year = "year"
+}
+export enum AgreementStatusBulkUpdateRequestStatus {
+    SUSPENDED = "SUSPENDED",
+    WITHDRAWN = "WITHDRAWN",
+    TERMINATED = "TERMINATED"
 }
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",

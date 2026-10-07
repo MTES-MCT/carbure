@@ -1,7 +1,8 @@
 from datetime import datetime
 
+from django.db import transaction
 from django.db.models.query_utils import Q
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -19,7 +20,82 @@ class AgreementListsSerializer(serializers.Serializer):
     inactive = DoubleCountingRegistrationSerializer(many=True)
 
 
+class AgreementStatusUpdateSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=DoubleCountingRegistration.STATUS_CHOICES)
+
+
+class AgreementStatusBulkUpdateSerializer(AgreementStatusUpdateSerializer):
+    agreement_ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
+    status = serializers.ChoiceField(
+        choices=[
+            DoubleCountingRegistration.SUSPENDED,
+            DoubleCountingRegistration.WITHDRAWN,
+            DoubleCountingRegistration.TERMINATED,
+        ]
+    )
+
+
 class AgreementAdminListActionMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            ),
+        ],
+        request=AgreementStatusBulkUpdateSerializer,
+        responses={
+            200: inline_serializer(
+                name="AgreementStatusBulkUpdateResponse",
+                fields={"updated_count": serializers.IntegerField()},
+            ),
+        },
+    )
+    @action(methods=["post"], detail=False, url_path="bulk-update-status")
+    def bulk_update_status(self, request, *args, **kwargs):
+        serializer = AgreementStatusBulkUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        agreement_ids = set(serializer.validated_data["agreement_ids"])
+        with transaction.atomic():
+            agreements = list(
+                self.get_queryset().filter(id__in=agreement_ids, status=DoubleCountingRegistration.VALID).select_for_update()
+            )
+            if {agreement.id for agreement in agreements} != agreement_ids:
+                return Response({"detail": "One or more agreements are not active."}, status=400)
+
+            for agreement in agreements:
+                agreement.status = serializer.validated_data["status"]
+            DoubleCountingRegistration.objects.bulk_update(agreements, ["status"])
+
+        return Response({"updated_count": len(agreement_ids)})
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            ),
+        ],
+        request=AgreementStatusUpdateSerializer,
+        responses={200: AgreementStatusUpdateSerializer},
+    )
+    @action(methods=["patch"], detail=True, url_path="update-status")
+    def update_status(self, request, *args, **kwargs):
+        serializer = AgreementStatusUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        agreement = self.get_object()
+        agreement.status = serializer.validated_data["status"]
+        agreement.save(update_fields=["status"])
+        return Response({"status": agreement.status})
+
     @extend_schema(
         filters=True,
         parameters=[
@@ -51,8 +127,8 @@ class AgreementAdminListActionMixin:
             status=DoubleCountingRegistration.VALID,
         )
 
-        agreements_incoming = queryset.filter(Q(valid_from__year__gt=year))
-        agreements_expired = queryset.filter(Q(valid_until__year__lt=year))
+        agreements_incoming = queryset.filter(Q(valid_from__year__gt=year), status=DoubleCountingRegistration.VALID)
+        agreements_expired = queryset.filter(Q(valid_until__year__lt=year), status=DoubleCountingRegistration.VALID)
         agreements_inactive = queryset.exclude(status=DoubleCountingRegistration.VALID)
 
         active_agreements = DoubleCountingRegistrationSerializer(agreements_active, many=True).data

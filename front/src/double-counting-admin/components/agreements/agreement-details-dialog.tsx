@@ -24,6 +24,7 @@ import { ProductionSiteDetails } from "common/types"
 import GenerateDecisionDialog from "../generate-decision-dialog/generate-decision-dialog"
 import { ProductionSiteRecap } from "double-counting/components/applications/application-tabs/production-site-recap"
 import { FilesManager } from "double-counting/components/files-manager"
+import { AgreementDetailsDialogChangeStatus } from "./agreement-details-dialog-change-status"
 
 export const AgreementDetailsDialog = () => {
   const { t } = useTranslation()
@@ -57,6 +58,21 @@ export const AgreementDetailsDialog = () => {
 
     portal((close) => (
       <GenerateDecisionDialog application={application} onClose={close} />
+    ))
+  }
+
+  const openChangeStatusDialog = () => {
+    if (!agreement) {
+      return
+    }
+
+    portal((close) => (
+      <AgreementDetailsDialogChangeStatus
+        agreementIds={[agreement.id]}
+        initialStatus={agreement.status}
+        onClose={close}
+        onSuccess={() => navigate({ pathname: location.pathname })}
+      />
     ))
   }
 
@@ -97,14 +113,27 @@ export const AgreementDetailsDialog = () => {
           </>
         }
         footer={
-          application &&
-          canWrite && (
-            <Button
-              onClick={() => openGenerateDecisionDialog()}
-              iconId="ri-download-line"
-            >
-              <Trans>Générer la décision</Trans>
-            </Button>
+          canWrite &&
+          !applicationResponse.loading && (
+            <>
+              {agreement && (
+                <Button
+                  customPriority="warning"
+                  iconId="ri-loop-right-line"
+                  onClick={openChangeStatusDialog}
+                >
+                  <Trans>Changer le statut</Trans>
+                </Button>
+              )}
+              {application && (
+                <Button
+                  onClick={openGenerateDecisionDialog}
+                  iconId="ri-download-line"
+                >
+                  <Trans>Générer la décision</Trans>
+                </Button>
+              )}
+            </>
           )
         }
       >

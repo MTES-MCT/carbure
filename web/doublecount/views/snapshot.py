@@ -54,12 +54,18 @@ def get_snapshot(request, *args, **kwargs):
     )
     applications_rejected = applications.filter(Q(status=DoubleCountingApplication.REJECTED))
 
-    agreements_incoming = DoubleCountingRegistration.objects.filter(Q(valid_from__year__gt=current_year))
+    agreements_incoming = DoubleCountingRegistration.objects.filter(
+        Q(valid_from__year__gt=current_year),
+        status=DoubleCountingRegistration.VALID,
+    )
     agreements_active = DoubleCountingRegistration.objects.filter(
         Q(valid_from__year__lte=current_year) & Q(valid_until__year__gte=current_year),
         status=DoubleCountingRegistration.VALID,
     )
-    agreements_expired = DoubleCountingRegistration.objects.filter(Q(valid_until__year__lt=current_year))
+    agreements_expired = DoubleCountingRegistration.objects.filter(
+        Q(valid_until__year__lt=current_year),
+        status=DoubleCountingRegistration.VALID,
+    )
     agreements_inactive = DoubleCountingRegistration.objects.exclude(status=DoubleCountingRegistration.VALID)
 
     return Response(

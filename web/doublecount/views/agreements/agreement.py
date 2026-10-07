@@ -21,7 +21,7 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
     def get_permissions(self):
         if self.action == "agreements_public_list":
             return []
-        elif self.action in ["agreement_admin", "export"]:
+        elif self.action in ["agreement_admin", "update_status", "bulk_update_status", "export"]:
             return [HasDoubleCountingAdminRights()]
 
         return super().get_permissions()

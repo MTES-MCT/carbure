@@ -28,6 +28,8 @@ import {
   AgreementOrder,
 } from "double-counting-admin/types"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
+import { usePortal } from "common/components/portal"
+import { AgreementDetailsDialogChangeStatus } from "./agreement-details-dialog-change-status"
 
 const AgreementList = ({
   snapshot = defaultCount,
@@ -35,8 +37,10 @@ const AgreementList = ({
   snapshot: DoubleCountingAgreementsSnapshot | undefined
 }) => {
   const { t } = useTranslation()
+  const portal = usePortal()
   usePrivateNavigation(t("Agréments actifs"))
   const [tab, setTab] = useState("active")
+  const [selection, setSelection] = useState<number[]>([])
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -50,7 +54,6 @@ const AgreementList = ({
     key: "dc-agreements",
     params: [query],
   })
-
   const columns: Column<DoubleCountingAgreementOverview>[] = compact([
     {
       header: t("Statut"),
@@ -116,7 +119,10 @@ const AgreementList = ({
       )}
       <Tabs
         focus={tab}
-        onFocus={setTab}
+        onFocus={(nextTab) => {
+          setTab(nextTab)
+          setSelection([])
+        }}
         tabs={[
           {
             key: "active",
@@ -162,6 +168,32 @@ const AgreementList = ({
               loading={agreementsResponse.loading}
               columns={columns}
               rows={rows}
+              hasSelectionColumn={tab === "active"}
+              selected={selection}
+              onSelect={setSelection}
+              identify={(agreement) => agreement.id}
+              selectionText={t("{{count}} agréments sélectionnés", {
+                count: selection.length,
+              })}
+              topActions={[
+                <Table.TopActionsButton
+                  priority="tertiary no outline"
+                  iconId="ri-loop-right-line"
+                  colorVariant="success"
+                  onClick={() =>
+                    portal((close) => (
+                      <AgreementDetailsDialogChangeStatus
+                        agreementIds={selection}
+                        bulk
+                        onClose={close}
+                        onSuccess={() => setSelection([])}
+                      />
+                    ))
+                  }
+                >
+                  {t("Changer le statut")}
+                </Table.TopActionsButton>,
+              ]}
               onAction={showApplicationDialog}
               order={state.order}
               onOrder={actions.setOrder}

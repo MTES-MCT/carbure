@@ -1589,6 +1589,7 @@
   "En attente - Déclarant": "Pending - Declarant",
   "En attente - DGEC": "Pending - DGEC",
   "Valider toutes les données": "Validate all data",
+  "Appliquer": "Apply",
   "{{count}} volumes sélectionnés_one": "{{count}} selected volume",
   "{{count}} volumes sélectionnés_other": "{{count}} selected volumes",
   "Validation en cours...": "Validation in progress...",
