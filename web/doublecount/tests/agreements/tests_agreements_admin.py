@@ -5,8 +5,9 @@ from django.test import TestCase
 from django.urls import reverse
 
 from certificates.models import DoubleCountingRegistration
-from core.models import CarbureLot, Entity, Pays, UserRights
+from core.models import CarbureLot, Entity, MatierePremiere, Pays, UserRights
 from core.tests_utils import setup_current_user
+from doublecount.errors import DoubleCountingError
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.factories.production import DoubleCountingProductionFactory
@@ -273,6 +274,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         )
 
         assert response.status_code == 400
+        assert response.json() == {"message": DoubleCountingError.AGREEMENTS_NOT_UPDATABLE}
         valid_agreement.refresh_from_db()
         assert valid_agreement.status == DoubleCountingRegistration.VALID
 
@@ -289,6 +291,13 @@ class AdminDoubleCountAgreementsTest(TestCase):
     def test_get_agreement_details(self):
         agreement, app, production1, production2, production3 = self.create_agreement()
         agreement_id = agreement.id
+        non_industrial_feedstocks = list(
+            MatierePremiere.biofuel.filter(is_double_compte=True, is_industrial_waste=False).order_by("id")[:3]
+        )
+        self.assertEqual(len(non_industrial_feedstocks), 3)
+        for production, feedstock in zip((production1, production2, production3), non_industrial_feedstocks, strict=True):
+            production.feedstock = feedstock
+            production.save(update_fields=["feedstock"])
 
         start_year = agreement.valid_from.year
 
@@ -304,8 +313,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         data = response.json()
         application = data["application"]
         quotas = data["quotas"]
-        expected_has_industrial_waste = app.production.filter(feedstock__is_industrial_waste=True).exists()
-        assert data["has_dechets_industriels"] == expected_has_industrial_waste
+        assert data["has_dechets_industriels"] is False
 
         assert application["id"] == app.id
         assert len(quotas) == 2  # production 1 +production 3

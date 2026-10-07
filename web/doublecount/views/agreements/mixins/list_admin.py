@@ -5,10 +5,12 @@ from django.db.models.query_utils import Q
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationSerializer
+from doublecount.errors import DoubleCountingError
 
 from .utils import add_quotas_to_agreements
 
@@ -25,7 +27,7 @@ class AgreementStatusUpdateSerializer(serializers.Serializer):
 
 
 class AgreementStatusBulkUpdateSerializer(AgreementStatusUpdateSerializer):
-    agreement_ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
+    agreement_ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False, max_length=100)
     status = serializers.ChoiceField(
         choices=[
             DoubleCountingRegistration.SUSPENDED,
@@ -52,6 +54,10 @@ class AgreementAdminListActionMixin:
                 name="AgreementStatusBulkUpdateResponse",
                 fields={"updated_count": serializers.IntegerField()},
             ),
+            400: inline_serializer(
+                name="AgreementStatusBulkUpdateErrorResponse",
+                fields={"message": serializers.CharField()},
+            ),
         },
     )
     @action(methods=["post"], detail=False, url_path="bulk-update-status")
@@ -62,10 +68,13 @@ class AgreementAdminListActionMixin:
         agreement_ids = set(serializer.validated_data["agreement_ids"])
         with transaction.atomic():
             agreements = list(
-                self.get_queryset().filter(id__in=agreement_ids, status=DoubleCountingRegistration.VALID).select_for_update()
+                self.get_queryset()
+                .select_related(None)
+                .filter(id__in=agreement_ids, status=DoubleCountingRegistration.VALID)
+                .select_for_update()
             )
             if {agreement.id for agreement in agreements} != agreement_ids:
-                return Response({"detail": "One or more agreements are not active."}, status=400)
+                raise ValidationError({"message": DoubleCountingError.AGREEMENTS_NOT_UPDATABLE})
 
             for agreement in agreements:
                 agreement.status = serializer.validated_data["status"]
