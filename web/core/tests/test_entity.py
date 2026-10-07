@@ -138,3 +138,14 @@ class EntityTest(TestCase):
 
         self.assertIn(producer_with_ademe_contract, allowed_entities)
         self.assertNotIn(producer_without_ademe_contract, allowed_entities)
+
+    def test_get_allowed_entities_for_h2_admin_filters_to_hrs(self):
+        h2_admin = EntityFactory.create(entity_type=Entity.EXTERNAL_ADMIN, name="H2 Admin")
+        ExternalAdminRights.objects.create(entity=h2_admin, right=ExternalAdminRights.H2)
+        hrs = EntityFactory.create(entity_type=Entity.HRS, name="HRS 1")
+        other = EntityFactory.create(entity_type=Entity.OPERATOR, name="Operator")
+
+        allowed_entities = h2_admin.get_allowed_entities()
+
+        self.assertIn(hrs, allowed_entities)
+        self.assertNotIn(other, allowed_entities)

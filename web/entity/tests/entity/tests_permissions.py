@@ -22,6 +22,7 @@ class EntityPermissionTest(TestCase, PermissionTestMixin):
                                 ExternalAdminRights.TRANSFERRED_ELEC,
                                 ExternalAdminRights.DREAL,
                                 ExternalAdminRights.ADEME,
+                                ExternalAdminRights.H2,
                             ]
                         )
                     ],
@@ -36,6 +37,7 @@ class EntityPermissionTest(TestCase, PermissionTestMixin):
                                 ExternalAdminRights.ELEC,
                                 ExternalAdminRights.DOUBLE_COUNTING,
                                 ExternalAdminRights.DREAL,
+                                ExternalAdminRights.H2,
                             ],
                         )
                     ],
@@ -44,7 +46,7 @@ class EntityPermissionTest(TestCase, PermissionTestMixin):
                     ["enable_entity"],
                     [
                         HasAdminRights(
-                            allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC],
+                            allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC, ExternalAdminRights.H2],
                             allow_role=[UserRights.RW, UserRights.ADMIN],
                         )
                     ],

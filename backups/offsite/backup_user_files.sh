@@ -66,6 +66,7 @@ rclone sync \
   --stats 30s \
   --retries 3 \
   --low-level-retries 10 \
+  --exclude "/certificates/**" \
   "$source_path" \
   "$destination_path"
 

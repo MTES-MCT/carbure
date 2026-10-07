@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.test import TestCase
 
 from core.models import MatierePremiere
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
 
 
@@ -77,15 +77,16 @@ class BalanceServiceLotVolumeRuleTest(TestCase):
 
 
 class BalanceServiceFilterOperationsTest(TestCase):
-    """Unit tests for filtering operations by the current declaration year."""
+    """Unit tests for filtering operations by the requested or current declaration year."""
 
     @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
     def test_filter_operations_for_current_year_excludes_next_year(self, mock_current_year):
+        """Test the current-year fallback builds and applies the expected Q filter."""
         operations = Mock()
         filtered_operations = Mock()
         operations.filter.return_value = filtered_operations
 
-        result = BalanceService._filter_operations_for_current_year(operations)
+        result = BalanceService._filter_operations_for_year(operations)
 
         self.assertIs(result, filtered_operations)
         operations.filter.assert_called_once_with(
@@ -93,6 +94,127 @@ class BalanceServiceFilterOperationsTest(TestCase):
             & (Q(declaration_year__isnull=True) | Q(declaration_year__lte=2025))
         )
         mock_current_year.assert_called_once_with()
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2026)
+    def test_explicit_year_takes_precedence_over_current_year(self, mock_current_year):
+        """Test that an explicit declaration year takes precedence over the current year."""
+        for year in (2025, "2025"):
+            with self.subTest(year=year):
+                operations = Mock()
+
+                result = BalanceService._filter_operations_for_year(operations, declaration_year=year)
+
+                self.assertIs(result, operations.filter.return_value)
+                operations.filter.assert_called_once_with(
+                    (Q(durability_period__isnull=True) | Q(durability_period__lt="2026"))
+                    & (Q(declaration_year__isnull=True) | Q(declaration_year__lte=2025))
+                )
+        mock_current_year.assert_not_called()
+
+
+class BalanceServiceFilterOperationsForCurrentYearBehaviorTest(TestCase):
+    """Behavioral tests verifying which operations the current-year fallback keeps."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/depots.json",
+        "json/entities.json",
+        "json/entities_sites.json",
+    ]
+
+    def setUp(self):
+        from tiruert.factories import OperationFactory
+
+        self.OperationFactory = OperationFactory
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_keeps_operation_with_durability_period_in_current_year(self, mock_current_year):
+        """An operation whose durability_period is within the current year is kept."""
+        op = self.OperationFactory(durability_period="202501")
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertIn(op, result)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_keeps_operation_with_durability_period_before_current_year(self, mock_current_year):
+        """An operation whose durability_period is before the current year is kept."""
+        op = self.OperationFactory(durability_period="202401")
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertIn(op, result)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_excludes_operation_with_durability_period_in_next_year(self, mock_current_year):
+        """An operation whose durability_period falls in the next year is excluded."""
+        op = self.OperationFactory(durability_period="202601")
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertNotIn(op, result)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_keeps_operation_with_declaration_year_at_or_before_current(self, mock_current_year):
+        """An operation whose declaration_year is at or before the current year is kept."""
+        op = self.OperationFactory(declaration_year=2025)
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertIn(op, result)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_keeps_operation_with_declaration_year_before_current(self, mock_current_year):
+        """An operation whose declaration_year is before the current year is kept."""
+        op = self.OperationFactory(declaration_year=2024)
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertIn(op, result)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_excludes_operation_with_declaration_year_after_current(self, mock_current_year):
+        """An operation whose declaration_year is after the current year is excluded."""
+        op = self.OperationFactory(declaration_year=2026)
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertNotIn(op, result)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=None)
+    def test_keeps_all_operations_when_no_current_declaration_period(self, mock_current_year):
+        """When there is no current declaration period, no filtering is applied."""
+        op = self.OperationFactory(durability_period="203001", declaration_year=2099)
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertIn(op, result)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_created_at_does_not_affect_kept_operation(self, mock_current_year):
+        """created_at must not be used as a filtering criterion: an old created_at must not exclude an operation."""
+        from datetime import datetime, timezone
+
+        op = self.OperationFactory(durability_period=None, declaration_year=2025)
+        Operation.objects.filter(id=op.id).update(created_at=datetime(2020, 1, 1, tzinfo=timezone.utc))
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertIn(op, result)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2025)
+    def test_created_at_does_not_prevent_exclusion(self, mock_current_year):
+        """created_at must not be used as a filtering criterion: a created_at value must not prevent exclusion."""
+        from datetime import datetime, timezone
+
+        op = self.OperationFactory(durability_period=None, declaration_year=2026)
+        Operation.objects.filter(id=op.id).update(created_at=datetime(2025, 6, 1, tzinfo=timezone.utc))
+
+        result = BalanceService._filter_operations_for_year(Operation.objects.filter(id=op.id))
+
+        self.assertNotIn(op, result)
 
 
 class OperationDetailAvoidedEmissionsTest(TestCase):
@@ -355,37 +477,6 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
                                 entry["quantity"]["credit"], 0, f"Status {status_code} should not contribute to credit"
                             )
 
-    def test_calculate_balance_excludes_informative_operations(self):
-        """YEARLY_BALANCE operations must not contribute to balance calculations."""
-        from core.models import Biocarburant
-
-        biofuel = Biocarburant.objects.filter(compatible_essence=True).first()
-
-        if not biofuel:
-            self.skipTest("Missing compatible_essence biofuel in fixtures")
-
-        credit_operation = self.OperationFactory.create_incorporation(
-            entity=self.entity,
-            biofuel=biofuel,
-        )
-        self.OperationDetailFactory.create_for_operation(credit_operation, volume=1000.0)
-
-        yearly_balance = self.OperationFactory(
-            type=Operation.YEARLY_BALANCE,
-            status=Operation.ACCEPTED,
-            customs_category=MatierePremiere.CONV,
-            biofuel=biofuel,
-            credited_entity=self.entity,
-        )
-        OperationDetail.objects.create(operation=yearly_balance, lot=None, volume=500.0)
-
-        operations = Operation.objects.filter(id__in=[credit_operation.id, yearly_balance.id])
-
-        result = BalanceService.calculate_balance(operations, self.entity.id, None, "l")
-        total = sum(entry["available_balance"] for entry in result.values())
-
-        self.assertEqual(total, 1000.0)  # 500 from YEARLY_BALANCE should be excluded
-
     def test_calculate_balance_applies_credit_and_debit_logic(self):
         """Test calculate_balance correctly applies credit/debit based on entity relationship."""
 
@@ -487,34 +578,24 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
             self.assertEqual(entry["quantity"]["debit"], 0)
             self.assertEqual(entry["quantity"]["credit"], 0)
 
-    def test_calculate_balance_respects_date_from_filter(self):
-        """Test calculate_balance filters quantity updates by date_from."""
-        from datetime import datetime, timezone
-
-        # Create operation with specific date
+    def test_calculate_balance_includes_all_operations(self):
+        """Test calculate_balance computes the complete balance without a date filter."""
         op = self._create_operation_with_details(
             debited_entity=self.entity,
             type=Operation.CESSION,
             status=Operation.VALIDATED,
         )
-        # Set created_at to past date
-        op.created_at = datetime(2024, 1, 1, tzinfo=timezone.utc)
-        op.save()
-
         operations = Operation.objects.filter(id=op.id)
 
-        # Request balance with date_from after operation date
         result = BalanceService.calculate_balance(
             operations,
             self.entity.id,
             BalanceService.GROUP_BY_SECTOR,
             "liters",
-            date_from=datetime(2024, 6, 1, tzinfo=timezone.utc),
         )
 
-        # Quantity should not be updated (date_from filter)
         for entry in result.values():
-            self.assertEqual(entry["quantity"]["debit"], 0)
+            self.assertGreater(entry["quantity"]["debit"], 0)
 
     def test_calculate_balance_groups_by_category(self):
         """Test calculate_balance groups by customs_category correctly."""
@@ -582,6 +663,35 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
 
         # Should have non-zero quantity (conversion applied successfully)
         self.assertGreater(result_mj[sector_key]["quantity"]["debit"], 0)
+
+    def test_default_balance_can_include_energy_with_different_renewable_shares(self):
+        """Sum energy per operation when a group contains different renewable shares."""
+        from core.models import Biocarburant
+
+        biofuel = Biocarburant.objects.filter(compatible_essence=True, pci_litre__gt=0).first()
+        self.assertIsNotNone(biofuel)
+        operations = []
+        for share in (1.0, 0.5):
+            operation = self._create_operation_with_details(
+                credited_entity=self.entity,
+                type=Operation.INCORPORATION,
+                status=Operation.VALIDATED,
+                biofuel=biofuel,
+                renewable_energy_share=share,
+            )
+            operation.details.update(volume=100)
+            operations.append(operation)
+
+        balance = BalanceService.calculate_balance(
+            Operation.objects.filter(id__in=[operation.id for operation in operations]),
+            self.entity.id,
+            None,
+            "l",
+            include_energy=True,
+        )
+        entry = balance[(Operation.ESSENCE, operations[0].customs_category, biofuel.code)]
+        self.assertEqual(entry["available_balance"], 200)
+        self.assertAlmostEqual(entry["energy_mj"], 150 * biofuel.pci_litre)
 
     def test_calculate_balance_truncates_teneur_after_sum_per_operation(self):
         """Teneur in MJ must apply int() after summing details per operation, then sum operation totals."""
@@ -728,13 +838,14 @@ class BalanceServiceObjectiveSectorTest(TestCase):
         self.biofuel_diesel = Biocarburant.objects.filter(compatible_diesel=True).first()
         self.biofuel_essence = Biocarburant.objects.filter(compatible_essence=True).first()
 
-    def _create_teneur_with_details(self, biofuel, objective_sector=None, status=Operation.PENDING):
+    def _create_teneur_with_details(self, biofuel, objective_sector=None, status=Operation.PENDING, declaration_year=None):
         op = self.OperationFactory(
             type=Operation.TENEUR,
             status=status,
             debited_entity=self.entity,
             biofuel=biofuel,
             objective_sector=objective_sector,
+            declaration_year=declaration_year,
         )
         lot = self.CarbureLotFactory.create(
             added_by=self.entity,
@@ -798,6 +909,52 @@ class BalanceServiceObjectiveSectorTest(TestCase):
 
         if Operation.ESSENCE in result:
             self.assertEqual(result[Operation.ESSENCE]["pending_teneur"], 0)
+
+    @patch("tiruert.services.balance.DeclarationPeriodService.get_current_declaration_year", return_value=2026)
+    def test_teneur_in_declaration_period_is_counted(self, mock_current_year):
+        """A TENEUR assigned to the requested declaration year is counted."""
+        operation = self._create_teneur_with_details(self.biofuel_essence, declaration_year=2026)
+
+        result = BalanceService.calculate_balance(
+            Operation.objects.filter(id=operation.id),
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "mj",
+            declaration_year=2026,
+        )
+
+        self.assertGreater(result[Operation.ESSENCE]["pending_teneur"], 0)
+
+    def test_future_teneur_is_excluded_from_stock(self):
+        """A future TENEUR is excluded from both stock and teneur contributions."""
+        operation = self._create_teneur_with_details(self.biofuel_essence, declaration_year=2027)
+
+        result = BalanceService.calculate_balance(
+            Operation.objects.filter(id=operation.id),
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "mj",
+            declaration_year=2026,
+        )
+
+        self.assertEqual(len(result), 0)
+
+    def test_previous_teneur_debits_stock_without_contributing_to_requested_year(self):
+        """A previous TENEUR still debits stock but does not contribute to the requested year."""
+        operation = self._create_teneur_with_details(self.biofuel_essence, declaration_year=2025)
+
+        result = BalanceService.calculate_balance(
+            Operation.objects.filter(id=operation.id),
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "mj",
+            declaration_year=2026,
+        )
+
+        self.assertIn(Operation.ESSENCE, result)
+        self.assertLess(result[Operation.ESSENCE]["available_balance"], 0)  # Previous TENEUR debits stock
+        self.assertEqual(result[Operation.ESSENCE]["pending_teneur"], 0)
+        self.assertEqual(result[Operation.ESSENCE]["declared_teneur"], 0)
 
     def test_default_grouping_keeps_teneur_in_natural_sector(self):
         """Default grouping must keep teneur in the biofuel natural sector even when objective_sector differs."""

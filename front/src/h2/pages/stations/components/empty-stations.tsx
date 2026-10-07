@@ -1,10 +1,21 @@
 import { EmptyState } from "common/molecules/empty-state"
+import { useH2Permissions } from "h2/hooks/use-h2-permissions"
 import { useTranslation } from "react-i18next"
 import { useCreateStationDialog } from "./create-station-dialog"
 
 export const EmptyStations = () => {
   const { t } = useTranslation()
+  const { canAccessAdmin, canWriteStations } = useH2Permissions()
   const openCreateStationDialog = useCreateStationDialog()
+
+  if (canAccessAdmin) {
+    return (
+      <EmptyState
+        title={t("Aucune station d’hydrogène")}
+        description={t("Les sociétés HRS n’ont pas encore déclaré de station.")}
+      />
+    )
+  }
 
   return (
     <EmptyState
@@ -15,6 +26,7 @@ export const EmptyStations = () => {
       buttonProps={{
         children: t("Inscrire une station"),
         iconId: "ri-add-line",
+        disabled: !canWriteStations,
         onClick: openCreateStationDialog,
       }}
     />

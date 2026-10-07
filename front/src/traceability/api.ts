@@ -38,6 +38,19 @@ export function getActions(industry: ActionIndustry, query: ActionQuery) {
   })
 }
 
+export function deleteAction(
+  entity_id: number,
+  id: number,
+  industry: ActionIndustry
+) {
+  return api.DELETE("/traceability/actions/{id}/", {
+    params: {
+      path: { id },
+      query: { entity_id, industry },
+    },
+  })
+}
+
 export function getActionDetail(
   entity_id: number,
   id: number,

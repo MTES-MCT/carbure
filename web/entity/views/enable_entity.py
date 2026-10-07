@@ -36,7 +36,9 @@ class EntityViewSet(ViewSet):
         request=EmptyResponseSerializer,
         responses=EmptyResponseSerializer,
     )
-    @permission_classes([HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC])])
+    @permission_classes(
+        [HasAdminRights(allow_external=[ExternalAdminRights.AIRLINE, ExternalAdminRights.ELEC, ExternalAdminRights.H2])]
+    )
     @action(
         methods=["post"],
         detail=True,

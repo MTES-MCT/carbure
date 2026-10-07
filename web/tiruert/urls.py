@@ -16,9 +16,11 @@ router.register("elec-operations", ElecOperationViewSet, basename="elec-operatio
 router.register("mac-fossil-fuel", MacFossilFuelViewSet, basename="mac-fossil-fuel")
 
 objectives = ObjectiveViewSet.as_view({"get": "get_objectives"})
+snapshot_balance = ObjectiveViewSet.as_view({"get": "get_snapshot_balance"})
 
 urlpatterns = router.urls + [
     path("objectives/", objectives, name="get-objectives"),
+    path("objectives/snapshot-balance/", snapshot_balance, name="get-snapshot-balance"),
     path("declaration-period/", curent_declaration_period, name="declaration-period-is-open"),
     path("declaration-period/years/", declaration_period_years, name="declaration-period-years"),
 ]

@@ -7,6 +7,7 @@ from h2.models import H2Station
 
 
 class H2StationFilter(django_filters.FilterSet):
+    entity = django_filters.AllValuesMultipleFilter(field_name="created_by__name")
     access_type = django_filters.AllValuesMultipleFilter(field_name="access_type")
     has_personal_vehicle_connector = MultipleBooleanFilter(field_name="has_personal_vehicle_connector")
 

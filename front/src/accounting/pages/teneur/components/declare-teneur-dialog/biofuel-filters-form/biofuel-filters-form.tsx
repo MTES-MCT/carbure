@@ -17,6 +17,8 @@ import { useBuildFilters } from "accounting/components/advanced-filters/advanced
 import { useMemo } from "react"
 import { showNextStepAdvancedFilters } from "accounting/components/advanced-filters/advanced-filters.utils"
 import { floorNumber } from "common/utils/formatters"
+import { formatSector } from "accounting/utils/formatters"
+import { useCompatibleSectors } from "./biofuel-filters-form.hooks"
 
 export type BiofuelFiltersFormProps = AdvancedFiltersFormProps
 
@@ -72,8 +74,11 @@ export const BiofuelFiltersForm = ({
 
     // Used to know which balance is currently selected
     setField("balance", balance)
+    setField("objective_sector", balance.sector)
     resetFilters()
   }
+
+  const sectors = useCompatibleSectors(value.balance)
 
   return (
     <>
@@ -92,6 +97,19 @@ export const BiofuelFiltersForm = ({
           value={selectedBalance}
           onChange={onBalanceChange}
         />
+        {value.balance && (
+          <Autocomplete
+            label={t("Filière")}
+            options={sectors.map((sector) => ({
+              value: sector,
+              label: formatSector(sector),
+            }))}
+            value={value.objective_sector}
+            onChange={(option) => setField("objective_sector", option)}
+            readOnly={sectors.length === 1}
+            required
+          />
+        )}
       </Box>
       {value.balance && <AdvancedFiltersBalanceCard />}
     </>

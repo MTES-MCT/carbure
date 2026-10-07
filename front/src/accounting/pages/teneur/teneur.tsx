@@ -20,6 +20,7 @@ import { ValidatePendingTeneurDialog } from "./components/validate-pending-teneu
 import { ObjectivesContent } from "./components/objectives-content"
 import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declaration-tiruert.provider"
 import { MacSectionTeneur } from "./components/mac-section-teneur"
+import { SnapshotBalanceSection } from "accounting/components/snapshot-balance-section"
 
 const Teneur = () => {
   const entity = useEntity()
@@ -95,6 +96,7 @@ const Teneur = () => {
       )}
 
       <MacSectionTeneur />
+      <SnapshotBalanceSection />
 
       <ObjectivesContent
         objectivesData={objectivesData}

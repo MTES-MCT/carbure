@@ -66,7 +66,7 @@ export const FormMultiSelect = <T, V = T>({
         hasTooltip={hasTooltip}
         title={title}
         readOnly={props.readOnly}
-        value={displayLabel}
+        value={props.readOnlyValue ?? displayLabel}
       />
     )
   }

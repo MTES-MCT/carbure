@@ -81,7 +81,7 @@ Il est maintenant possible d'accéder à la version locale de CarbuRe à l'adres
 
 # Authentification à Carbure
 
-Bien vérifier que la variable d'environnement `IMAGE_TAG` est à `local` afin de désactiver la vérification de token CSRF.
+Bien vérifier que la variable d'environnement `WITH_CSRF` est à `False` afin de désactiver la vérification de token CSRF.
 
 Ajouter un nouveau super utilisateur CarbuRe dans la db locale :
 

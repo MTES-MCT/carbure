@@ -8,6 +8,10 @@ from tiruert.serializers.fields import RoundedFloatField, TruncatedFloatField
 class BalanceBiofuelSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     code = serializers.CharField()
+    compatible_essence = serializers.BooleanField(default=False)
+    compatible_diesel = serializers.BooleanField(default=False)
+    compatible_gpl = serializers.BooleanField(default=False)
+    compatible_maritime = serializers.BooleanField(default=False)
     renewable_energy_share = RoundedFloatField()
     pci_litre = RoundedFloatField()
     masse_volumique = RoundedFloatField()
