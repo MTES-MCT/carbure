@@ -114,6 +114,18 @@ def check_mac_bc_wrong(lot: CarbureLot):
         )
 
 
+def check_direct_delivery_supplier(lot: CarbureLot):
+    if lot.delivery_type == CarbureLot.DIRECT and (
+        not lot.carbure_supplier_id or lot.carbure_supplier_id != lot.added_by_id or (lot.unknown_supplier or "").strip()
+    ):
+        return generic_error(
+            error=CarbureSanityCheckErrors.INVALID_DIRECT_DELIVERY_SUPPLIER,
+            lot=lot,
+            field="supplier",
+            is_blocking=True,
+        )
+
+
 def check_direct_delivery_country(lot: CarbureLot):
     if lot.delivery_type == CarbureLot.DIRECT and (
         not lot.delivery_site_country or lot.delivery_site_country.code_pays != "FR"
