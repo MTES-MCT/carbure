@@ -392,6 +392,12 @@ def fill_supplier_info(lot, data, entity):
     lot.unknown_supplier = data.get("unknown_supplier", None)
     lot.supplier_certificate = str(data.get("supplier_certificate", "")).strip()
 
+    if lot.delivery_type == CarbureLot.DIRECT:
+        lot.carbure_supplier = entity
+        lot.unknown_supplier = None
+        lot.supplier_certificate = str(data.get("supplier_certificate") or "").strip() or entity.default_certificate
+        return errors
+
     # I AM THE SUPPLIER
     if str(data.get("carbure_supplier_id")) == str(entity.id):
         lot.carbure_supplier = entity
