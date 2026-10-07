@@ -126,7 +126,7 @@ export function useLotForm(
     const isClientEntity = knownClient?.id === entity.id
     const isClientUnknown = knownClient === undefined
 
-    if (!isClientEntity && !isClientUnknown) {
+    if (!isClientEntity && !isClientUnknown && !isLotSupplier(entity, value)) {
       value.delivery_type = undefined
     }
 

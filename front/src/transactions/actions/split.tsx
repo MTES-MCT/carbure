@@ -87,7 +87,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
     }
   )
 
-  const deliveryTypes = getDeliveryTypes(entity, value.client)
+  const deliveryTypes = getDeliveryTypes(entity, value.client, entity)
   const isDirect = value.delivery_type === DeliveryType.Direct
   const showUsageField = value.delivery_type === DeliveryType.RFC
   const showUsagePrecisionField =
