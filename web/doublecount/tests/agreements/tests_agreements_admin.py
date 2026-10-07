@@ -215,6 +215,28 @@ class AdminDoubleCountAgreementsTest(TestCase):
         agreement.refresh_from_db()
         assert agreement.status == DoubleCountingRegistration.VALID
 
+    def test_read_only_admin_cannot_update_agreement_status(self):
+        agreement, *_ = self.create_agreement()
+        setup_current_user(self, "readonly@carbure.local", "Read Only", "gogogo", [(self.admin, UserRights.RO)], True)
+
+        update_response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.SUSPENDED},
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.admin.id}",
+        )
+        bulk_response = self.client.post(
+            reverse("double-counting-agreements-bulk-update-status"),
+            {"agreement_ids": [agreement.id], "status": DoubleCountingRegistration.SUSPENDED},
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.admin.id}",
+        )
+
+        assert update_response.status_code == 403
+        assert bulk_response.status_code == 403
+        agreement.refresh_from_db()
+        assert agreement.status == DoubleCountingRegistration.VALID
+
     def test_bulk_update_agreement_status(self):
         agreements = [self.create_agreement()[0] for _ in range(2)]
 

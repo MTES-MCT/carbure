@@ -6,7 +6,11 @@ from certificates.serializers import DoubleCountingRegistrationDetailsSerializer
 from core.models import Entity
 from doublecount.filters import AgreementFilter
 from doublecount.models import DoubleCountingProduction, DoubleCountingSourcing
-from doublecount.permissions import HasDoubleCountingAdminRights, HasProducerRights
+from doublecount.permissions import (
+    HasDoubleCountingAdminRights,
+    HasDoubleCountingAdminWriteRights,
+    HasProducerRights,
+)
 from doublecount.views.agreements.mixins import ActionMixin
 
 
@@ -21,7 +25,9 @@ class AgreementViewSet(ActionMixin, GenericViewSet):
     def get_permissions(self):
         if self.action == "agreements_public_list":
             return []
-        elif self.action in ["agreement_admin", "update_status", "bulk_update_status", "export"]:
+        elif self.action in ["update_status", "bulk_update_status"]:
+            return [HasDoubleCountingAdminWriteRights()]
+        elif self.action in ["agreement_admin", "export"]:
             return [HasDoubleCountingAdminRights()]
 
         return super().get_permissions()
