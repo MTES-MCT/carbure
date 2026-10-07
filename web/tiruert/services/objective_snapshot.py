@@ -7,12 +7,13 @@ from django.utils.timezone import make_aware
 from adapters.logger import log_info, log_warning
 from tiruert.models import MacFossilFuel, Objective, ObjectiveSnapshot, Operation
 from tiruert.models.elec_operation import ElecOperation
+from tiruert.services.balance import BalanceService
 from tiruert.services.objective import ObjectiveService
 
 
 class ObjectiveSnapshotService:
     @staticmethod
-    def compute(entity_id, year):
+    def compute(entity_id, year, period=None):
         """
         Compute objectives for an entity/year without needing a ViewSet or request.
         Dates are derived from the TiruertDeclarationPeriod for the given year.
@@ -20,13 +21,15 @@ class ObjectiveSnapshotService:
         Args:
             entity_id: ID of the entity
             year: Declaration year (int)
+            period: Optional preloaded declaration period
 
         Returns:
             dict with keys 'main', 'sectors', 'categories', or None if data is missing.
         """
         from tiruert.services.declaration_period import DeclarationPeriodService
 
-        period = DeclarationPeriodService.get_period_by_year(year)
+        if period is None:
+            period = DeclarationPeriodService.get_period_by_year(year)
         if period is None:
             log_info(f"No declaration period found for year {year}, skipping snapshot for entity {entity_id}.")
             return None
@@ -85,18 +88,47 @@ class ObjectiveSnapshotService:
             log_info(f"No declaration period found for year {year}, cannot create snapshot.")
             return None
 
-        data = ObjectiveSnapshotService.compute(entity_id, year)
+        data = ObjectiveSnapshotService.compute(entity_id, year, period=period)
         if data is None:
             return None
+
+        data_balance = ObjectiveSnapshotService.compute_balance(entity_id, year, period.end_date)
 
         snapshot, created = ObjectiveSnapshot.objects.update_or_create(
             entity_id=entity_id,
             year=year,
-            defaults={"data": data, "date_from": period.start_date, "date_to": period.end_date},
+            defaults={
+                "data": data,
+                "data_balance": data_balance,
+                "date_from": period.start_date,
+                "date_to": period.end_date,
+            },
         )
         action = "Created" if created else "Updated"
         log_info(f"{action} objective snapshot for entity {entity_id} / year {year}.")
         return snapshot
+
+    @staticmethod
+    def compute_balance(entity_id, year, end_date):
+        date_to = make_aware(datetime.combine(end_date, time.max))
+        operations = Operation.objects.filter(
+            Q(credited_entity_id=entity_id) | Q(debited_entity_id=entity_id),
+            created_at__lte=date_to,
+        ).distinct()
+        balance = BalanceService.calculate_balance(
+            operations, entity_id, None, "l", declaration_year=year, include_energy=True
+        )
+        return [
+            {
+                "sector": entry["sector"],
+                "biofuel": entry["biofuel"].code if entry["biofuel"] else None,
+                "customs_category": entry["customs_category"],
+                "volume": entry["available_balance"],
+                "energy": entry.get("energy_mj", 0),
+                "saved_emissions": entry["saved_emissions"],
+            }
+            for entry in balance.values()
+        ]
 
     @staticmethod
     def get_snapshot(entity_id, year):

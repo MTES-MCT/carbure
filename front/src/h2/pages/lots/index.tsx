@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 
 import { ActionsPage } from "traceability/components/actions-page"
-import { useActionColumns } from "traceability/hooks/action-columns"
+import { DeleteActionButton } from "traceability/components/delete-action-button"
 import { useActionFilters } from "traceability/hooks/use-action-filters"
 import {
   ActionSiteFieldOptions,
@@ -10,7 +10,7 @@ import {
 import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 import { SiteTypeEnum } from "api-schema"
 import { Text } from "common/components/text"
-
+import { useActionColumns } from "traceability/hooks/action-columns"
 const H2_LOT_QUERY: Partial<ActionQuery> = {
   type: [ActionType.INIT],
 }
@@ -56,14 +56,7 @@ const LotsPage = () => {
           working_date: t("Mois d'utilisation / consommation"),
         },
       }}
-      detailActions={[
-        {
-          icon: "fr-icon-close-line",
-          label: "Supprimer",
-          variant: "danger",
-          onAction: () => {},
-        },
-      ]}
+      renderDetailActions={(action) => <DeleteActionButton action={action} />}
       filters={[
         { ...filters.material, label: t("Nature d'H2") },
         filters.period,
@@ -72,7 +65,7 @@ const LotsPage = () => {
       ]}
       columns={[
         columns.status,
-        columns.working_date,
+        columns.period,
         columns.pos_id,
         { ...columns.site, header: t("Station") },
         { ...columns.material, header: t("Nature d'H2") },

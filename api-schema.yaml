@@ -10907,6 +10907,44 @@ paths:
               schema:
                 $ref: "#/components/schemas/ObjectiveOutput"
           description: ""
+  /api/tiruert/objectives/snapshot-balance/:
+    get:
+      operationId: tiruert_objectives_snapshot_balance_retrieve
+      description: Get snapshot balance for a specific entity and year.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: selected_entity_id
+          schema:
+            type: integer
+          description: Target entity ID (admin only). If provided, returns objectives for
+            this entity. If omitted for admin, returns aggregated objectives for
+            all tiruert-liable entities.
+        - in: query
+          name: year
+          schema:
+            type: string
+          description: Year of the objectives
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SnapshotBalance"
+          description: ""
+        "404":
+          description: No response body
   /api/tiruert/operations/:
     get:
       operationId: tiruert_operations_list
@@ -13784,8 +13822,6 @@ components:
         token:
           type: string
           minLength: 1
-        invite:
-          type: integer
       required:
         - token
         - uidb64
@@ -21753,6 +21789,45 @@ components:
         * `EFCA` - EFCA
         * `AIRPORT` - AIRPORT
         * `H2 REFUELING STATION` - H2 REFUELING STATION
+    SnapshotBalance:
+      type: object
+      properties:
+        year:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SnapshotBalanceEntry"
+      required:
+        - results
+        - year
+    SnapshotBalanceEntry:
+      type: object
+      properties:
+        sector:
+          type: string
+        biofuel:
+          type: string
+          nullable: true
+        customs_category:
+          type: string
+          nullable: true
+        volume:
+          type: number
+          format: double
+        energy:
+          type: number
+          format: double
+        saved_emissions:
+          type: number
+          format: double
+      required:
+        - biofuel
+        - customs_category
+        - energy
+        - saved_emissions
+        - sector
+        - volume
     SpreadingManagementMethodsEnum:
       enum:
         - DIRECT_SPREADING

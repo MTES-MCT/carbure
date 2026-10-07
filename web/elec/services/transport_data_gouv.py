@@ -127,9 +127,10 @@ class TransportDataGouv:
 
         # cache the csv to the filesystem to avoid refetching it every time
         if not os.path.exists(file_path):
-            csv_response = requests.get(dataset_url)
-            with open(file_path, "wb") as file:
-                file.write(csv_response.content)
+            with requests.get(dataset_url, stream=True) as csv_response:
+                with open(file_path, "wb") as file:
+                    for chunk in csv_response.iter_content(chunk_size=1024 * 1024):
+                        file.write(chunk)
 
         return file_path
 

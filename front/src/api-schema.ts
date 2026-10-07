@@ -2995,6 +2995,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/objectives/snapshot-balance/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Get snapshot balance for a specific entity and year. */
+        get: operations["tiruert_objectives_snapshot_balance_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/operations/": {
         parameters: {
             query?: never;
@@ -3580,7 +3597,6 @@ export interface components {
         ActivateAccountRequest: {
             uidb64: string;
             token: string;
-            invite?: number;
         };
         ActivateResponse: {
             message: string;
@@ -7141,6 +7157,21 @@ export interface components {
          * @enum {string}
          */
         SiteTypeEnum: SiteTypeEnum;
+        SnapshotBalance: {
+            year: number;
+            results: components["schemas"]["SnapshotBalanceEntry"][];
+        };
+        SnapshotBalanceEntry: {
+            sector: string;
+            biofuel: string | null;
+            customs_category: string | null;
+            /** Format: double */
+            volume: number;
+            /** Format: double */
+            energy: number;
+            /** Format: double */
+            saved_emissions: number;
+        };
         /**
          * @description * `DIRECT_SPREADING` - Épandage direct
          *     * `SPREADING_VIA_PROVIDER` - Épandage via un prestataire
@@ -14368,6 +14399,39 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ObjectiveOutput"];
                 };
+            };
+        };
+    };
+    tiruert_objectives_snapshot_balance_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description Target entity ID (admin only). If provided, returns objectives for this entity. If omitted for admin, returns aggregated objectives for all tiruert-liable entities. */
+                selected_entity_id?: number;
+                /** @description Year of the objectives */
+                year: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SnapshotBalance"];
+                };
+            };
+            /** @description No response body */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -105,7 +105,7 @@ def _build_common_context(entity_id, unit, declaration_year=None):
     }
 
 
-def _build_base_aggregations(context, include_ghg=False):
+def _build_base_aggregations(context, include_ghg=False, include_energy=False):
     aggregations = {
         "available_balance": Sum(
             Case(
@@ -154,6 +154,16 @@ def _build_base_aggregations(context, include_ghg=False):
         aggregations["ghg_reduction_min"] = Min("lot__ghg_reduction_red_ii")
         aggregations["ghg_reduction_max"] = Max("lot__ghg_reduction_red_ii")
 
+    if include_energy:
+        aggregations["energy_mj"] = Sum(
+            Case(
+                When(context["process_cond"] & context["credit_cond"], then=_get_quantity_expression("mj")),
+                When(context["process_cond"] & context["debit_cond"], then=-_get_quantity_expression("mj")),
+                default=Value(0.0),
+                output_field=FloatField(),
+            )
+        )
+
     return aggregations
 
 
@@ -198,7 +208,7 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
     return grouped_contributions
 
 
-def _calculate_default_grouping(balance, details_qs, context):
+def _calculate_default_grouping(balance, details_qs, context, include_energy=False):
     sector_expr = _get_sector_expression()
     group_fields = ("group_sector", "group_customs_category", "group_biofuel_id")
     group_annotations = {
@@ -211,7 +221,7 @@ def _calculate_default_grouping(balance, details_qs, context):
     base_groups = list(
         details_qs.annotate(**group_annotations)
         .values(*group_fields)
-        .annotate(**_build_base_aggregations(context, include_ghg=True))
+        .annotate(**_build_base_aggregations(context, include_ghg=True, include_energy=include_energy))
     )
 
     # Aggregate teneur metrics by operation first, then sum operation-level contributions by output group.
@@ -238,6 +248,8 @@ def _calculate_default_grouping(balance, details_qs, context):
         entry["quantity"]["credit"] = group["quantity_credit"] or 0.0
         entry["quantity"]["debit"] = group["quantity_debit"] or 0.0
         entry["available_balance"] = group["available_balance"] or 0.0
+        if include_energy:
+            entry["energy_mj"] = group["energy_mj"] or 0.0
         entry["saved_emissions"] = group["saved_emissions"] or 0.0
         entry["pending_operations"] = group["pending_operations"] or 0
         entry["ghg_reduction_min"] = group["ghg_reduction_min"]
@@ -326,7 +338,7 @@ def _calculate_sector_grouping(balance, details_qs, context):
 
 
 def calculate_balance_with_annotations(
-    operations, entity_id, group_by, unit, detail_filters, init_entry, declaration_year=None
+    operations, entity_id, group_by, unit, detail_filters, init_entry, declaration_year=None, include_energy=False
 ):
     balance = defaultdict(partial(init_entry, unit))
 
@@ -346,5 +358,5 @@ def calculate_balance_with_annotations(
         _calculate_category_grouping(balance, details_qs, context)
         return balance
 
-    _calculate_default_grouping(balance, details_qs, context)
+    _calculate_default_grouping(balance, details_qs, context, include_energy=include_energy)
     return balance

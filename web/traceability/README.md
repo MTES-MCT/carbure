@@ -29,6 +29,15 @@ uv run python web/traceability/fixtures/load_materials.py
 
 Fichier : [`fixtures/materials.csv`](fixtures/materials.csv), le catalogue éditable. Le script crée ensuite la matière système `VALORIZED_ENERGY` (code `VALORIZED-ENERGY`, unité MJ, sans PCI ni densité). Une migration rattache les actions `VALORIZE` déjà en base à cette matière. Un changement de PCI au catalogue s’applique aux actions liées à cette matière. Chargé automatiquement au deploy (`bin/post_deploy.sh`).
 
+Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
+| `Material` | Catalogue matières (`code`, `name`) |
+
+Le catalogue est chargé au déploiement (`bin/post_deploy.sh`) depuis [`fixtures/materials.csv`](fixtures/materials.csv) :
+
+```bash
+uv run python web/traceability/fixtures/load_materials.py
+```
+
 ## Ce que la filière personnalise
 
 Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`handlers/registry.py`).
@@ -42,7 +51,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 
-Côté front, les catalogues (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.).
+Côté front, les hooks génériques (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.). Une page peut passer `emptyState` à `ActionsPage` : il remplace la liste quand elle est chargée, sans filtre, et sans résultat.
 
 `quantity` affiche la quantité **stockée** (`quantity` + unité de la matière, saisissable). `mass` en est la vue convertie (kg, lecture seule, `null` si le facteur manque). Ce sont des factories privées de `hooks/action-fields` et `hooks/action-columns`. La page choisit lequel poser — lots H2 : `mass`. `volume` / `energy` suivront le même modèle.
 

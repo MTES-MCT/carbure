@@ -29,8 +29,10 @@ class AuthThrottlingTest(TestCase):
     def test_throttle_scope_is_set_for_each_throttled_action(self):
         expected_scopes = {
             "register": "auth-anon",
+            "activate": "auth-anon",
             "request_activation_link": "auth-anon",
             "request_password_reset": "auth-anon",
+            "reset_password": "auth-anon",
             "request_otp": "otp",
             "verify_otp": "otp",
         }
