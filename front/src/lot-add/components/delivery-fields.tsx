@@ -27,8 +27,8 @@ export const DeliveryFields = (props: DeliveryFieldsProps) => {
   const { t } = useTranslation()
   return (
     <Fieldset label={t("Livraison")}>
-      <ClientField {...props} />
       <DeliveryTypeField {...props} />
+      <ClientField {...props} />
       <UsageField {...props} />
       <UsagePrecisionField {...props} />
       <DeliverySiteField {...props} />
@@ -47,6 +47,18 @@ export const ClientField = (
   const bound = bind("client")
   const isKnown = bound.value instanceof Object
   const hasClients = entity.has_mac || entity.has_direct_deliveries || entity.has_trading // prettier-ignore
+  const isDirect = value.delivery_type === DeliveryType.Direct
+
+  if (isDirect) {
+    return (
+      <TextInput
+        label={t("Client")}
+        {...bound}
+        {...props}
+        value={bound.value as string}
+      />
+    )
+  }
 
   return (
     <Autocomplete
@@ -55,7 +67,7 @@ export const ClientField = (
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={api.findBiofuelEntities}
+      getOptions={!isDirect ? api.findBiofuelEntities : undefined}
       normalize={norm.normalizeEntityPreviewOrUnknown}
       {...bound}
       {...props}
@@ -162,6 +174,18 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("delivery_site")
   const isKnown = bound.value instanceof Object
+  const isDirect = value.delivery_type === DeliveryType.Direct
+
+  if (isDirect) {
+    return (
+      <TextInput
+        label={t("Site de livraison")}
+        {...bound}
+        {...props}
+        value={bound.value as string}
+      />
+    )
+  }
 
   return (
     <Autocomplete
@@ -170,7 +194,7 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
       icon={isKnown ? UserCheck : undefined}
       create={norm.identity}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={api.findDepots}
+      getOptions={!isDirect ? api.findDepots : undefined}
       normalize={norm.normalizeDepotOrUnknown}
       {...bound}
       {...props}
@@ -214,8 +238,9 @@ export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("delivery_site_country")
+  const isDirect = value.delivery_type === DeliveryType.Direct
 
-  if (value.delivery_site instanceof Object) {
+  if (value.delivery_site instanceof Object && !isDirect) {
     return (
       <TextInput
         disabled
@@ -236,6 +261,7 @@ export const DeliverySiteCountryField = (props: AutocompleteProps<Country>) => {
       normalize={norm.normalizeCountry}
       {...bound}
       {...props}
+      disabled={isDirect || props.disabled || bound.disabled}
     />
   )
 }

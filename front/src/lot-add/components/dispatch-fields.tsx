@@ -16,6 +16,7 @@ import {
   isLotVendor,
 } from "./lot-form"
 import useEntity from "common/hooks/entity"
+import { DeliveryType } from "transactions/types"
 
 interface DispatchFieldsProps {
   readOnly?: boolean
@@ -55,6 +56,7 @@ export const SupplierField = (
 
   const { value: supplier, ...bound } = bind("supplier")
   const isKnown = supplier instanceof Object
+  const isDirect = value.delivery_type === DeliveryType.Direct
 
   const defaultOptions = uniqueBy(
     compact([supplier, entity]),
@@ -89,7 +91,10 @@ export const SupplierField = (
       {...bound}
       {...props}
       disabled={
-        props.disabled || bound.disabled || isLotProducer(entity, value)
+        props.disabled ||
+        bound.disabled ||
+        isLotProducer(entity, value) ||
+        isDirect
       }
     />
   )
@@ -106,7 +111,7 @@ export const SupplierCertificateField = (props: AutocompleteProps<string>) => {
 
   return (
     <Autocomplete
-      required={isLotClient(entity, value)}
+      required={isLotClient(entity, value) || isLotSupplier(entity, value)}
       label={t("Certificat du fournisseur")}
       icon={<CertificateIcon certificate={certificate} />}
       defaultOptions={bound.value ? [bound.value] : undefined}
@@ -150,9 +155,10 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
 
 export const DispatchSiteField = (props: AutocompleteProps<Site | string>) => {
   const { t } = useTranslation()
-  const { bind } = useFormContext<LotFormValue>()
+  const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("dispatch_site")
   const isKnown = bound.value instanceof Object
+  const isDirect = value.delivery_type === DeliveryType.Direct
 
   return (
     <Autocomplete
@@ -162,6 +168,7 @@ export const DispatchSiteField = (props: AutocompleteProps<Site | string>) => {
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={(query) => api.findSites(query, DISPATCH_SITE_TYPES)}
       normalize={norm.normalizeSiteOrUnknown}
+      required={isDirect}
       {...bound}
       {...props}
     />
@@ -172,6 +179,7 @@ export const DispatchSiteCountryField = (props: AutocompleteProps<Country>) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("dispatch_site_country")
+  const isDirect = value.delivery_type === DeliveryType.Direct
 
   if (value.dispatch_site instanceof Object && value.dispatch_site.country) {
     return (
@@ -181,6 +189,7 @@ export const DispatchSiteCountryField = (props: AutocompleteProps<Country>) => {
         label={t("Pays d'expédition")}
         value={norm.normalizeCountry(value.dispatch_site.country).label}
         error={bound.error}
+        required={isDirect}
       />
     )
   }
@@ -191,6 +200,7 @@ export const DispatchSiteCountryField = (props: AutocompleteProps<Country>) => {
       defaultOptions={bound.value ? [bound.value] : undefined}
       getOptions={api.findCountries}
       normalize={norm.normalizeCountry}
+      required={isDirect}
       {...bound}
       {...props}
     />
