@@ -31,7 +31,7 @@ const CertificatesPage = () => {
       ]}
       columns={[
         { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
-        columns.working_date,
+        columns.period,
         columns.quantity,
         columns.total_emissions,
       ]}
