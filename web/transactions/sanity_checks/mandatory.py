@@ -136,6 +136,30 @@ def check_missing_delivery_site_country(lot: CarbureLot):
         )
 
 
+def check_missing_dispatch_site(lot: CarbureLot):
+    if (
+        lot.delivery_type == CarbureLot.DIRECT
+        and not lot.carbure_dispatch_site
+        and not (lot.unknown_dispatch_site or "").strip()
+    ):
+        return generic_error(
+            error=CarbureSanityCheckErrors.MISSING_DISPATCH_SITE,
+            lot=lot,
+            field="dispatch_site",
+            is_blocking=True,
+        )
+
+
+def check_missing_dispatch_site_country(lot: CarbureLot):
+    if lot.delivery_type == CarbureLot.DIRECT and not lot.dispatch_site_country:
+        return generic_error(
+            error=CarbureSanityCheckErrors.MISSING_DISPATCH_SITE_COUNTRY,
+            lot=lot,
+            field="dispatch_site_country",
+            is_blocking=True,
+        )
+
+
 def check_missing_feedstock_country_of_origin(lot: CarbureLot):
     if lot.delivery_site_country and lot.delivery_site_country.is_in_europe and not lot.country_of_origin:
         return generic_error(

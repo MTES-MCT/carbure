@@ -65,6 +65,8 @@
   "INACTIVE_DOUBLE_COUNTING_CERTIFICATE": "The double counting certificate is no longer valid",
   "LOT_NOT_ELIGIBLE_TIRUERT": "This lot is no longer eligible for TIRUERT",
   "INVALID_DISPATCH_SITE": "The dispatch site type is not allowed",
+  "MISSING_DISPATCH_SITE": "Dispatch site is missing",
+  "MISSING_DISPATCH_SITE_COUNTRY": "Dispatch site country is missing",
   "POTENTIAL_DUPLICATE": "Potential duplicate found",
   "MISSING_DELIVERY_SITE_COUNTRY": "Delivery site country is missing",
   "COULD_NOT_FIND_PRODUCTION_SITE": "The production site is not configured on your company page",
