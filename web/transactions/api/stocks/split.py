@@ -122,19 +122,23 @@ def stock_split(request, *args, **kwargs):
             lot.carbure_client = Entity.objects.get(id=entry.get("carbure_client_id", None))
         except Exception:
             lot.carbure_client = None
+        if lot.volume == 0:
+            return JsonResponse(
+                {"status": "error", "message": "Volume must be greater than 0"},
+                status=400,
+            )
+        if lot.transport_document_reference is None:
+            return JsonResponse(
+                {
+                    "status": "error",
+                    "message": "Missing transport_document_reference",
+                },
+                status=400,
+            )
         if lot.delivery_type in [
             CarbureLot.BLENDING,
-            CarbureLot.DIRECT,
             CarbureLot.PROCESSING,
         ]:
-            if lot.transport_document_reference is None:
-                return JsonResponse(
-                    {
-                        "status": "error",
-                        "message": "Missing transport_document_reference",
-                    },
-                    status=400,
-                )
             if lot.carbure_client is None:
                 return JsonResponse(
                     {"status": "error", "message": "Mandatory carbure_client_id"},
