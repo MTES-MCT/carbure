@@ -173,6 +173,7 @@ export const ActionsPage = ({
           {excelImport && (
             <Button
               iconId="fr-icon-add-line"
+              disabled={!entity.canWrite()}
               onClick={() =>
                 navigate({ search: location.search, hash: "import" })
               }
@@ -210,7 +211,7 @@ export const ActionsPage = ({
         />
       </Content>
 
-      {excelImport && (
+      {excelImport && entity.canWrite() && (
         <HashRoute
           path="import"
           element={

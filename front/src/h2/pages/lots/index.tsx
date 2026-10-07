@@ -65,7 +65,7 @@ const LotsPage = () => {
       ]}
       columns={[
         columns.status,
-        columns.working_date,
+        columns.period,
         columns.pos_id,
         { ...columns.site, header: t("Station") },
         { ...columns.material, header: t("Nature d'H2") },

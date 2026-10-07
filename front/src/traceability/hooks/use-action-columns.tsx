@@ -77,12 +77,6 @@ export function useActionColumns() {
       ),
     },
 
-    working_date: {
-      key: "working_date",
-      header: t("Date de création"),
-      cell: (action) => <Cell text={formatDate(action.working_date)} />,
-    },
-
     total_emissions: {
       key: "total_emissions",
       header: t("Emissions"),
