@@ -5,6 +5,7 @@ import { useActionColumns } from "traceability/hooks/use-action-columns"
 import { useActionFilters } from "traceability/hooks/use-action-filters"
 import { useActionFields } from "traceability/hooks/use-action-fields"
 import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
+import { EmptyCertificates } from "./components/empty-certificates"
 
 const H2_CERTIFICATE_QUERY: Partial<ActionQuery> = {
   type: [ActionType.VALORIZE],
@@ -24,6 +25,7 @@ const CertificatesPage = () => {
       detailTitle={t("Certificat d'hydrogène n˚")}
       subpath="certificates"
       fixedQuery={H2_CERTIFICATE_QUERY}
+      emptyState={<EmptyCertificates />}
       filters={[
         filters.period, //
       ]}
