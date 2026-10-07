@@ -12,6 +12,12 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 | `Material` | Catalogue matières (`code`, `name`) |
 
+Le catalogue est chargé au déploiement (`bin/post_deploy.sh`) depuis [`fixtures/materials.csv`](fixtures/materials.csv) :
+
+```bash
+uv run python web/traceability/fixtures/load_materials.py
+```
+
 ## Ce que la filière personnalise
 
 Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`handlers/registry.py`).
