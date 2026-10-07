@@ -16,6 +16,8 @@
   "EXPIRED_DOUBLE_COUNTING_CERTIFICATE": "Certificat double compte expiré",
   "INVALID_DOUBLE_COUNTING_CERTIFICATE": "Certificat double compte invalide pour cette date de livraison",
   "INVALID_DISPATCH_SITE": "Le type du site d'expédition n'est pas autorisé",
+  "MISSING_DISPATCH_SITE": "Le site d'expédition est manquant",
+  "MISSING_DISPATCH_SITE_COUNTRY": "Le pays d'expédition est manquant",
   "INVALID_DIRECT_DELIVERY_COUNTRY": "Le pays de livraison doit être la France pour une livraison directe",
   "EXPIRED_PRODSITE_CERT": "Certificat du site de production expiré",
   "EXPIRED_SUPPLIER_CERT": "Certificat du fournisseur expiré",
