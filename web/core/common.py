@@ -235,7 +235,7 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot["supplier_certificate"] = lot_row.get("supplier_certificate", "")
         lot["dispatch_date"] = lot_row.get("dispatch_date", "")
         dispatch_site = str(lot_row.get("dispatch_site", "")).strip()
-        if dispatch_site.upper() in prefetched_data["sitesbyname"]:
+        if dispatch_site and dispatch_site.upper() in prefetched_data["sitesbyname"]:
             lot["carbure_dispatch_site_id"] = prefetched_data["sitesbyname"][dispatch_site.upper()].id
         else:
             lot["unknown_dispatch_site"] = dispatch_site
@@ -271,16 +271,21 @@ def convert_template_row_to_formdata(entity, prefetched_data, filepath):
         lot["transport_document_reference"] = lot_row.get("dae", "")
         lot["delivery_date"] = lot_row.get("delivery_date", "")
         delivery_site = str(lot_row.get("delivery_site", ""))
-        if delivery_site.upper() in prefetched_data["depots"]:
+        if lot["delivery_type"] == CarbureLot.DIRECT:
+            lot["unknown_delivery_site"] = delivery_site
+        elif delivery_site and delivery_site.upper() in prefetched_data["depots"]:
             lot["carbure_delivery_site_depot_id"] = prefetched_data["depots"][delivery_site.upper()].depot_id
-        elif delivery_site.upper() in prefetched_data["depotsbyname"]:
+        elif delivery_site and delivery_site.upper() in prefetched_data["depotsbyname"]:
             lot["carbure_delivery_site_depot_id"] = prefetched_data["depotsbyname"][delivery_site.upper()].depot_id
         else:
             lot["unknown_delivery_site"] = delivery_site
             delivery_site_country = lot_row.get("delivery_site_country", "")
             lot["delivery_site_country_code"] = delivery_site_country.strip()
+
         client = lot_row.get("client", "").upper().strip()
-        if client in prefetched_data["clientsbyname"]:
+        if lot["delivery_type"] == CarbureLot.DIRECT:
+            lot["unknown_client"] = client
+        elif client in prefetched_data["clientsbyname"]:
             lot["carbure_client_id"] = prefetched_data["clientsbyname"][client].id
         else:
             lot["unknown_client"] = client
