@@ -36,7 +36,7 @@ Les commentaires ajoutés au code sont en anglais et restent rares : ils expliqu
 - **Frontend :** React 18, TypeScript strict, Vite, `openapi-fetch`, `react-async-hook`, React Router, i18next et `@codegouvfr/react-dsfr`.
 - **Déploiement local :** services conteneurisés via Docker Compose.
 - **Organisation backend :** une app Django par domaine métier (`biomethane`, `saf`, `elec`, `doublecount`, `transactions`, etc.).
-- **Organisation frontend :** un dossier par domaine et une page dans `pages/<page_name>/` pour chaque route significative.
+- **Organisation frontend :** un dossier par domaine. Le code récent place chaque route dans `pages/<page_name>/` selon la section 5. Le legacy conserve son arborescence.
 - **Architecture métier :** les vues, viewsets et serializers orchestrent ; les règles métier complexes vivent dans `services/` et les modules spécialisés.
 - **Contrat API :** Django produit le schéma OpenAPI ; `front/src/api-schema.ts` est généré et ne doit pas être édité à la main.
 
@@ -86,9 +86,54 @@ Les scripts npm racine (`generate-schema`, `generate-schema-ts`, `generate-and-c
 
 Ne pas appeler directement `manage.py` avec l'interpréteur local pour une vérification qui dépend de l'environnement applicatif (base, Redis, S3). Ne pas utiliser `docker compose run` pour un test ciblé si l'image ou l'entrypoint ne garantit pas la présence de `uv`. Si `docker compose exec` échoue dans un terminal sandboxé (`~/.docker/config.json: operation not permitted`), relancer hors sandbox.
 
-Le `Makefile` expose des raccourcis équivalents (`make test-backend`, `make test-frontend`, `make migrate`, `make lint-fix`, `make translate`).
+Le `Makefile` expose des raccourcis équivalents (`make test-backend`, `make test-frontend`, `make migrate`, `make lint-fix`, `make translate`). Les commandes de cette section restent la référence.
+
+### Environnement local
+
+- Application : `http://carbure.local:8090`. Les scripts `uv` locaux lisent `UV_ENV_FILE=.env`.
+- Connexion : `http://carbure.local:8090/auth/login`. Après le mot de passe, un code à 6 chiffres est exigé. Il est stocké sur `EmailDevice`, pas dans une boîte mail. Le lire juste après la soumission du formulaire :
+
+```bash
+docker compose exec carbure-django uv run python3 web/manage.py shell -c "
+from django_otp.plugins.otp_email.models import EmailDevice
+d = EmailDevice.objects.filter(user__email='user@carbure.local').order_by('-id').first()
+print(d.token)
+"
+```
+
+- L'écran d'accueil dépend des seeds déjà lancés. Retrouver la société par son nom, puis prendre son id pour ouvrir `/org/<id>/...`.
+
+### Données de démo
+
+- `docker compose exec carbure-django uv run python3 web/manage.py create_sample_data <module>` (raccourci : `make seed app=<module>`) appelle `web/<module>/factories/sample_data.py`.
+- Comptes communs dans `web/core/factories/sample_data.py` : `admin@carbure.local` et `user@carbure.local`, mot de passe `password`, créés seulement s'ils n'existent pas.
+
+### Git
+
+- Branche : `feature/<numéro-issue>-<slug>` (ex. `feature/2098-dreal-dashboard-recap`).
+- Commits en anglais, format conventionnel (`feat(biomethane): …`, `fix(tiruert): …`).
+- Description de MR en français : objectif, modélisation, subtilités métier.
+- Pas de trailer `Co-authored-by` sans demande explicite.
+
+### Scripts one-shot
+
+- Un seul fichier, périmètre minimal. Pas de tests ni de refactoring autour.
+- Option `--dry-run` quand c'est pertinent (cf. `import_biomethane_producers`).
+- Fichiers SQL de debug dans `web/<module>/sql/`, hors commit sauf demande.
 
 ## 4. Backend Python et Django
+
+### Organisation d'une app
+
+| Couche | Rôle |
+|--------|------|
+| `models/` | Modèles, choices, `translation_model_key` si les libellés partent dans `backend_inputs` |
+| `services/` | Logique métier, calculs, requêtes complexes |
+| `serializers/` | Validation entrée et sortie API |
+| `filters/` | FilterSet django-filter et mixins réutilisables |
+| `views/` | ViewSets fins, qui délèguent aux services et serializers |
+| `views/.../mixins/` | Actions transverses (export Excel, permissions) |
+| `tests/` | Miroir de la structure (`tests/services/`, `tests/views/`) |
 
 ### Style Python
 
@@ -98,7 +143,7 @@ Le `Makefile` expose des raccourcis équivalents (`make test-backend`, `make tes
 - Ne pas utiliser `print()` pour le diagnostic : utiliser le logging du projet.
 - Préférer des fonctions courtes, déterministes et testables. Nommer les variables métier explicitement.
 - Utiliser `Decimal` pour les calculs financiers, réglementaires ou nécessitant une précision décimale. Les littéraux décimaux utilisent un point, par exemple `Decimal("0.995")`.
-- Centraliser les formules partagées plutôt que de recopier une formule dans un modèle, un service et une annotation ORM.
+- Centraliser les formules partagées plutôt que de recopier une formule dans un modèle, un service et une annotation ORM. Quand la même formule existe en Python et en SQL, exposer les deux dans le module partagé (fonction Python et expression ORM), comme `tiruert/services/energy.py` (`energy_mj` / `energy_mj_expression`).
 
 ### Modèles et migrations
 
@@ -130,6 +175,9 @@ Le `Makefile` expose des raccourcis équivalents (`make test-backend`, `make tes
 - Pour tout nouvel endpoint DRF, utiliser les classes de `core/permissions.py` : `IsVerified` (OTP vérifié), `UserRightsFactory(role=..., entity_type=...)`, `HasEntityReadRights`, `HasEntityWriteRights`, `AdminRightsFactory(allow_external=..., allow_role=...)`, ou une classe dérivée propre au domaine (ex. `biomethane/permissions.py`). Ne pas introduire `@check_user_rights` sur du nouveau code.
 - `@check_user_rights` (`core/decorators.py`) est un mécanisme legacy encore très présent (notamment `elec/`) : le conserver uniquement lors de la maintenance d'un endpoint existant qui l'utilise déjà, sans étendre son usage.
 - Pour une action de viewset, suivre le pattern local `ActionMixin`, déclarer explicitement ses permissions et vérifier les droits sur l'entité ciblée.
+- Réutiliser les mixins déjà présents : `RetrieveSingleObjectMixin`, `ListWithObjectPermissionsMixin`, `FiltersActionFactory`. Les permissions d'un viewset passent par le helper du module (`get_biomethane_permissions()` ou équivalent), pas par une liste recopiée.
+- Filtrage société / producteur : `EntityProducerFilter` et `EntityProducerYearFilter` (`web/biomethane/filters/mixins.py`) quand l'écran distingue l'entité connectée et le producteur consulté.
+- Documenter les paramètres de query (`entity_id`, `producer_id`, `year`) avec `@extend_schema`.
 - Utiliser `ErrorResponse(status_code, error, data=None, message=None)` de `core.common` pour les erreurs métier lorsque le module le prévoit.
 - Ne pas retirer un champ dans `get_fields()` uniquement selon le contexte si cela doit rester visible dans OpenAPI : drf-spectacular instancie les serializers avec un contexte vide. Préférer une représentation conditionnelle ou documenter explicitement le champ.
 - Toute nouvelle route doit être protégée par l'authentification OTP (`is_verified()`) et les droits d'entité applicables. `EntityMiddleware` résout `request.entity` depuis le paramètre `entity_id` (POST form ou query string uniquement, pas le body JSON) : le transmettre côté frontend et vérifier les droits sur `request.entity` via les classes de permission.
@@ -139,6 +187,8 @@ Le `Makefile` expose des raccourcis équivalents (`make test-backend`, `make tes
 
 - Le projet utilise les tests Django (`TestCase` et classes proches) et des factories `factory-boy` (dossiers `<app>/factories`) ; ne pas introduire pytest comme convention sans décision explicite.
 - Réutiliser les helpers de `core/tests_utils.py` : `setup_current_user()` pour l'utilisateur OTP/droits d'entité, `PermissionTestMixin` pour tester les permissions d'un viewset, `FiltersActionTestMixin` pour les filtres.
+- Construire les URL avec `reverse()` et affirmer `status.HTTP_*`.
+- Permissions d'une vue : `PermissionTestMixin.assertViewPermissions`, sur le modèle de `web/biomethane/tests/test_permissions.py`. Pas de boucle manuelle sur `get_permissions`.
 - Ajouter un test pour chaque règle métier (avec docstring), branche de permission, cas limite et régression importante.
 - Pour l'ORM, privilégier une base de test réelle (`TestCase` ou équivalent avec DB) plutôt qu'un mocking excessif.
 - Utiliser des fixtures et factories lisibles ; éviter les données hardcodées lorsque la factory existe.
@@ -147,42 +197,113 @@ Le `Makefile` expose des raccourcis équivalents (`make test-backend`, `make tes
 
 ## 5. Frontend React et TypeScript
 
+Le code récent suit la structure ci-dessous. Le legacy (appels Axios, fichiers `*.spec.*`, pages qui ne découpent pas `api.ts` / `*.hooks.tsx`) reste en place : on ne le migre pas pour l'aligner.
+
 ### TypeScript et API
 
 - Maintenir `strict: true`, `noUncheckedIndexedAccess: true` et `forceConsistentCasingInFileNames: true`.
-- Ne pas utiliser `any` dans le nouveau code. Pour un JSON externe, partir de `unknown`, valider ou typer la frontière, puis propager un type précis.
-- Les types de réponses et requêtes API viennent de `front/src/api-schema.ts`, généré depuis Django. Ne pas créer de doublon manuel pour un contrat existant.
-- Pour toute modification backend, régénérer le schéma et les types, lancer `npm run generate-and-check-types`, puis corriger les consommateurs frontend.
-- Utiliser `api.GET()`, `api.POST()`, `api.PATCH()`, etc. depuis `common/services/api-fetch.ts`. Ne pas appeler Axios directement pour l'API applicative.
+- Ne pas introduire `any` dans le code récent. Pour un JSON externe, partir de `unknown`, valider ou typer la frontière, puis propager un type précis. Le `any` déjà présent dans le code partagé (notamment `common/hooks/async.ts`) ne se corrige pas au passage.
+- Les schémas de réponse et de requête passent par `apiTypes` (`common/services/api-fetch.types`). Les types de filtres OpenAPI (`PathsApi…`) s'importent depuis `api-schema` et se réexportent depuis le `types.ts` de la page ou du domaine. Ne pas recréer à la main un contrat déjà généré. Ne pas éditer `front/src/api-schema.ts`.
+- Pour toute modification backend, régénérer le schéma et les types avec `npm run generate-and-check-types` (racine du dépôt), puis corriger les consommateurs frontend.
+- Nouveau code : `api.GET()`, `api.POST()`, `api.PATCH()`, etc. et `download()` depuis `common/services/api-fetch.ts`. Un fichier qui appelle déjà Axios le conserve.
 - Respecter le serializer `toFormData()` configuré par le client pour les uploads et les payloads multipart.
 
 ### Données, état et effets
 
-- Utiliser le hook local `useQuery`/`useMutation` fondé sur `react-async-hook` et le mécanisme d'invalidation existant pour le server state.
+- Utiliser `useQuery` / `useMutation` de `common/hooks/async` (fondés sur `react-async-hook`) et l'invalidation existante (`invalidates: [key]`).
 - Ne pas ajouter TanStack Query sans migration explicite du pattern partagé.
-- Éviter `useEffect` pour un simple chargement de données ; utiliser le hook de requête existant. Réserver les effets aux effets externes réels.
-- Inclure dans `params` toutes les valeurs dont dépend une requête, en particulier l'entité courante. Une closure avec `params: []` peut figer une ancienne valeur et empêcher le refetch.
+- Éviter `useEffect` pour un chargement de données. Réserver les effets aux effets externes réels.
+- `useQuery` ne relance la requête que si `params` change.
+  - Page liste avec `useQueryBuilder` : `params: [query]`. Le builder injecte déjà `entity_id` de la société connectée (`useEntity()`).
+  - Autre page : chaque argument de la fonction API figure dans `params`. `useEntity().id` est la société connectée (droits, query `entity_id`). `useSelectedEntity().selectedEntityId` est une société consultée par un admin (souvent `producer_id`) ; l'inclure quand l'écran dépend de cette sélection. Hors vue admin, ce hook vaut `undefined`.
 - Ne pas utiliser `useMemo` ou `useCallback` par réflexe. Les introduire uniquement lorsqu'un calcul ou une identité de référence mesurable le justifie.
-- Séparer autant que possible la présentation pure, la logique de formulaire et la logique métier/API.
+- Séparer la composition de page, les hooks (requêtes, colonnes, filtres) et les appels HTTP (`api.ts`).
 
-### Structure et interface
+### Structure d'une page récente
 
-- Respecter les dossiers par domaine et par page ; réutiliser `common/` avant de créer un composant global.
-- Utiliser les composants et tokens de `@codegouvfr/react-dsfr` avant un style local.
-- Utiliser i18next (`useTranslation` ou `Trans`) pour tout texte utilisateur. Les clés vivent dans `front/public/locales/{fr,en}` : les extraire avec `npm run translate` (depuis `front/`) puis compléter l'anglais avec `npm run translate-missing` (DeepL) ou à la main.
-- Utiliser les icônes et patterns de navigation déjà présents dans le design system ; conserver l'accessibilité clavier, les labels et les états chargement/erreur/vide.
-- Ne pas mettre la logique d'autorisation uniquement dans l'UI : l'API reste l'autorité.
+Hiérarchie des routes :
+
+```
+common/index.tsx          → /org/:entity/*
+  <module>/index.tsx      → ex. accounting/*, settings/*
+  <module>/routes.tsx     → ex. biomethane/* (module avec sous-routes)
+    lazy(() => import("…/pages/<page>"))
+```
+
+- URLs typées : `ROUTE_URLS` (`common/utils/routes.ts`) et `useRoutes()` (injecte `entity.id`).
+- Titre de navigation : `usePrivateNavigation(title)` dans la page ou le layout.
+- Redirections d'année ou de secteur : `<Navigate replace>` ou un composant dédié dans le fichier de routes.
+- Providers de contexte sur le `element` de la `<Route>`, pas recopiés dans chaque page.
+
+Arborescence cible d'une page liste :
+
+```
+<domaine>/pages/<page>/
+  index.ts              → export default (lazy import)
+  <page>.tsx            → composition UI
+  <page>.hooks.tsx      → queries, mutations, colonnes, filtres
+  api.ts                → appels HTTP typés
+  types.ts              → alias apiTypes, QueryBuilder, filtres
+  utils.ts              → formatters purs (optionnel)
+  components/           → sous-composants (+ *.hooks.tsx)
+  pages/<sous-page>/    → détail, formulaire (optionnel)
+```
+
+- Types partagés par plusieurs pages du domaine : `<domaine>/types.ts`.
+- API partagée : `<domaine>/api/<ressource>.ts` (ex. `accounting/api/biofuels/operations.ts`).
+- Un formulaire ou un dialogue reprend le même découpage `api.ts` / `*.hooks.tsx` / composant, sans le squelette tableau.
+
+`types.ts` d'une page liste :
+
+```typescript
+import { apiTypes } from "common/services/api-fetch.types"
+import { PathsApiModuleItemsFiltersGetParametersQueryFilter as ItemFilter } from "api-schema"
+import { QueryBuilder } from "common/hooks/query-builder-2"
+
+export type Item = apiTypes["Item"]
+export type ItemQueryBuilder = QueryBuilder<never, ItemOrder[]>
+export type ItemQuery = ItemQueryBuilder["query"]
+export { ItemFilter }
+```
+
+Hooks d'une liste :
+
+- `useXxxQuery` : `useQueryBuilder` + `useQuery(fn, { key, params })`.
+- `useGetFilterOptions` : labels i18n, normalizers, appel `/filters/`.
+- `useXxxColumns` : `Column<T>[]` pour `table2`.
+- `useXxxMutation` : `useMutation(fn, { invalidates: [key], onSuccess })`.
+
+Squelette d'une liste : `ActionBar` (recherche, actions, `ExportButton`), `FilterMultiSelect2`, `Table`, `Pagination`, et `HashRoute` pour un détail qui ne change pas de route. Ouverture : `hash: "#/<path>"`. Fermeture : `navigate({ search: location.search, hash: "#" })`, pour conserver les filtres dans l'URL. Contenu : `Portal` + `Dialog` (`dialog2`), `useHashMatch`.
+
+Emplacement des composants :
+
+- `<domaine>/components/` : partagé entre les pages du domaine.
+- `common/components/` : transverse (`button2`, `table2`, `dialog2`, `notice`, `scaffold`).
+- `common/molecules/` : blocs composés (`FilterMultiSelect2`, `RecapQuantity`, `BetaPage`).
+- `@codegouvfr/react-dsfr` : primitives (Badge, Alert, Select), avant un style local.
+
+L'affichage conditionnel (droits, règles d'arrêté) vit dans un hook ou un provider du domaine. Conserver l'accessibilité clavier, les labels et les états chargement, erreur et vide.
+
+### Textes et traductions
+
+- Tout texte d'interface passe par `useTranslation()` ou `Trans`. La clé est le français, dans le namespace par défaut (`translation`). Ne pas créer de namespace.
+- `{ ns: "…" }` uniquement pour un référentiel déjà catalogué : `biofuels`, `feedstocks`, `countries`, `fields`, `errors`, `backend_inputs`.
+- `front/public/locales/{fr,en}/backend_inputs.json` est produit par `export_backend_inputs`. Ne pas l'éditer à la main. Un libellé manquant se corrige en relançant cette commande.
+- Les clés sont le texte français (`keySeparator` et `namespaceSeparator` désactivés dans `i18next-parser.config.js`). Une clé modifiée crée une nouvelle entrée et laisse l'ancienne orpheline. En anglais, une valeur identique à la clé n'est pas traduite.
+- `npm run translate-missing` appelle DeepL lorsque la clé est configurée. Sinon, traduire à la main et relire les termes réglementaires (biocarburant, matière première, teneur, etc.).
+- Le code récent écrit `t("…")`. L'extraction et l'anglais relèvent de l'agent I18n.
 
 ### Tests frontend
 
-- Utiliser Vitest pour les tests unitaires et Storybook/Chromatic pour les composants visuels.
-- Tester les comportements visibles, les erreurs réseau, les changements de contexte d'entité et les états loading/empty/error.
-- Mettre à jour les stories lorsque l'UI réutilisable ou ses états changent.
-- Vérifier `npm run check-types`, `npm run lint` et le test ciblé avant une validation plus large.
+- Tests unitaires du code récent : Vitest, fichiers `*.test.ts` ou `*.test.tsx`. Les fichiers `*.spec.*` sont du legacy : ne pas en créer, ne pas les typer, ne pas les lancer pour valider une tâche. `front/tsconfig.json` les exclut déjà de `check-types`.
+- Stories `*.stories.tsx` lorsque l'UI réutilisable ou ses états changent. Storybook et Chromatic servent au visuel.
+- Couvrir les comportements visibles, les erreurs réseau, le changement d'entité et les états loading, empty et error.
+- Avant une validation plus large : `npm run check-types`, `npm run lint`, et `npm run test -- --run <fichier>`.
 
 ## 6. Sécurité, données externes et asynchronisme
 
 - Ne jamais exposer une variable d'environnement, un secret, une clé API, un token ou une donnée sensible dans le code frontend, les logs, les exports ou les messages d'erreur.
+- Masquer un contrôle dans l'interface ne remplace pas le contrôle d'accès de l'API.
 - Isoler et tester l'assainissement des fichiers importés, PDF, feuilles Excel et données scrappées. Valider taille, format, encodage, colonnes, identifiants et valeurs avant toute écriture.
 - Ne jamais faire confiance à un `entity_id`, rôle, montant, statut ou indicateur fourni par le client ; recalculer et vérifier côté serveur.
 - Préserver les contrôles d'accès existants (`IsVerified`, classes de `core/permissions.py`, `@check_user_rights` legacy). Toute simplification qui les contourne est une régression de sécurité.
@@ -203,7 +324,43 @@ Le `Makefile` expose des raccourcis équivalents (`make test-backend`, `make tes
 - Le module `tiruert/services/energy.py` centralise les formules d'énergie (`energy_mj`) et d'émissions évitées (`avoided_emissions_tco2`) en Python et ORM.
 - Pour les imports Excel TIRUERT, grouper les lignes à partir de `CarbureLot` (`lot.feedstock.category`, `lot.biofuel`) et non du dernier `OperationDetail`.
 
-## 8. Checklist de fin
+## 8. Filières
+
+Lire la sous-section du module avant de le modifier. Elle ne remplace pas le code ni les tests du module.
+
+### Hydrogène
+
+- Entité : `Entity.HRS` (opérateur de station). Admin : `EXTERNAL_ADMIN` + `ExternalAdminRights.H2` (`HasH2AdminRights`), voit les sociétés HRS. Lecture HRS : `HasHRSRights`. Écriture admin ou lecture-écriture : `HasHRSWriteRights`.
+- Périmètre : un HRS voit ses stations (`created_by = request.entity`). Un admin H2 voit toutes les stations, en lecture seule.
+- `H2Station` hérite de `Site`. `access_type` : PUBLIC ou PRIVATE. `distributed_pressure` est multi-valeurs (350 et 700 bars, `JSONChoiceField`) : une station peut distribuer plusieurs pressions. `has_personal_vehicle_connector` : bool. `has_compliant_measuring_instruments` : bool ou null (déclaration de conformité décret 2001-387, optionnelle). `is_renewable_hydrogen` : bool, défaut `False`. `storage_capacity` et `distribution_capacity` : entiers, unités encore à préciser.
+- `H2ActionDetails` : OneToOne sur `Action` (`lot_id`, `producer`, `batch_id`), exposé en `extension`.
+- API : `H2StationViewSet` (CRUD, `entity_id` en query). Front : `front/src/h2/pages/stations/`, page unique opérateur et admin. L'écriture est masquée via `canWriteStations`.
+- Tests : `docker compose exec carbure-django uv run python3 web/manage.py test h2 --keepdb`.
+
+### Biométhane
+
+- `BiomethaneContract` : producteur, `tariff_reference` (2011, 2020, 2021, 2023). `TARIFF_RULE_1` = [2011, 2020], `TARIFF_RULE_2` = [2021, 2023] pour les règles de contrat (Cmax, etc.). Ces groupes sont distincts des régimes de coefficients d'intrants (ils peuvent diverger, ex. AT_2011 et AT_2020_PLUS).
+- `BiomethaneSupplyPlan` / `BiomethaneSupplyInput` : plan d'approvisionnement par producteur et par année. `MatierePremiere` (`core.models`) est le catalogue d'intrants, lié via `feedstock`. `BiomethaneFeedstockTariffCoefficient` : `(feedstock, regime_key)` vers un coefficient (P1, P2, P3, P, PEFF).
+- Proportions P1, P2, etc. : calculées sur le tonnage de matière brute. Convertir le sec vers le brut via le ratio si besoin. Le cas Peff local utilise `collection_type = LOCAL` sur le supply input. Le coefficient effectif d'un intrant vient du régime dérivé du `tariff_reference` du contrat producteur.
+- API plan d'approvisionnement : `BiomethaneSupplyInputViewSet` (mixins Excel, `FiltersActionFactory`). Filtres : `entity_id` pour un producteur, `entity_id` + `producer_id` pour une DREAL. Service : `biomethane/services/supply_plan/`. SQL de debug : `web/biomethane/sql/`.
+- Front : `front/src/biomethane/pages/supply-plan/`. L'affichage selon l'arrêté passe par un hook et `@codegouvfr/react-dsfr/Alert`. Permissions d'écran : `useBiomethanePermissions()`.
+- Import du référentiel : commandes dans `web/biomethane/management/commands/`, Excel dans `web/biomethane/fixtures/`, `--dry-run=true` par défaut. Vérifier qu'une matière première existe par nom avant de la créer.
+- Libellés de champs : `docker compose exec carbure-django uv run python3 web/manage.py export_backend_inputs --modules=biomethane --locales=fr,en`.
+- Tests : `docker compose exec carbure-django uv run python3 web/manage.py test biomethane --keepdb`.
+
+### Traçabilité
+
+Avant de modifier ce module, lire `web/traceability/README.md`.
+
+Après toute évolution de comportement (modèle, handler, colonnes Excel, serializer d'import, permissions, composition front, nouvelle filière), mettre à jour la doc dans le même changement.
+
+- Personnalisation filière : `web/traceability/README.md`.
+- Colonnes Excel : `web/traceability/docs/excel.md`.
+- Documenter, si ça change : où vit la donnée (noyau `Action` ou table d'extension), la `key` Excel, le serializer filière, le lookup.
+- Un rename interne, un test, du formatage ou un correctif qui ne change pas le contrat ne mettent pas la doc à jour.
+- Le README reste la source de vérité : ne pas recopier l'architecture ailleurs.
+
+## 9. Checklist de fin
 
 - [ ] Le comportement a été tracé jusqu'au code qui le décide.
 - [ ] Les permissions, entités, statuts et données sensibles ont été vérifiés.
@@ -211,5 +368,7 @@ Le `Makefile` expose des raccourcis équivalents (`make test-backend`, `make tes
 - [ ] Les types OpenAPI/TypeScript sont régénérés si le contrat a changé.
 - [ ] Les tests ciblés couvrent le changement et ses cas limites.
 - [ ] Les migrations sont nouvelles, relues et testables ; aucune migration existante n'a été réécrite.
-- [ ] Ruff, typecheck, lint ou test frontend pertinent a été exécuté.
+- [ ] Ruff, typecheck, lint ou test frontend pertinent a été exécuté (`npm run check-types`, `npm run lint`, `npm run test -- --run <fichier>`).
+- [ ] Le code frontend récent suit la structure cible ; le legacy (Axios, `*.spec.*`) n'a pas été migré.
+- [ ] Les textes d'interface passent par `t()` ; `backend_inputs.json` n'a pas été édité à la main.
 - [ ] Le diff reste limité à la tâche et ne contient ni secret, ni debug, ni fichier généré oublié.
