@@ -70,6 +70,17 @@ export function useLotForm(
   const errors = useLotFieldErrors(lotErrors)
 
   function setValue(value: LotFormValue): LotFormValue {
+    if (value.delivery_type === DeliveryType.Direct) {
+      value.supplier = entity
+
+      value.delivery_site_country = {
+        code_pays: "FR",
+        name: "France",
+        name_en: "France",
+        is_in_europe: true,
+      }
+    }
+
     if (entity.isAdmin) return value
     if (value.lot && value.lot.lot_status !== "DRAFT") return value
 
