@@ -905,6 +905,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/double-counting/agreements/{id}/update-status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["double_counting_agreements_update_status_partial_update"];
+        trace?: never;
+    };
     "/api/double-counting/agreements/agreement-admin/": {
         parameters: {
             query?: never;
@@ -921,20 +937,20 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/double-counting/agreements/{id}/update-status/": {
+    "/api/double-counting/agreements/agreement-public/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["double_counting_agreements_agreement_public_list"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["double_counting_agreements_update_status_update"];
+        patch?: never;
         trace?: never;
     };
     "/api/double-counting/agreements/bulk-update-status/": {
@@ -947,22 +963,6 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["double_counting_agreements_bulk_update_status_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/double-counting/agreements/agreement-public/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["double_counting_agreements_agreement_public_list"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -3034,6 +3034,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** @description Get snapshot balance for a specific entity and year. */
         get: operations["tiruert_objectives_snapshot_balance_retrieve"];
         put?: never;
         post?: never;
@@ -3645,18 +3646,26 @@ export interface components {
             expired: components["schemas"]["DoubleCountingRegistration"][];
             inactive: components["schemas"]["DoubleCountingRegistration"][];
         };
-        AgreementStatusUpdateRequest: {
-            status: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+        AgreementStatusBulkUpdateErrorResponse: {
+            message: string;
         };
         AgreementStatusBulkUpdateRequest: {
+            status: components["schemas"]["AgreementStatusBulkUpdateStatusEnum"];
             agreement_ids: number[];
-            status: components["schemas"]["AgreementStatusBulkUpdateRequestStatus"];
         };
         AgreementStatusBulkUpdateResponse: {
             updated_count: number;
         };
-        /** @enum {string} */
-        AgreementStatusBulkUpdateRequestStatus: AgreementStatusBulkUpdateRequestStatus;
+        /**
+         * @description * `SUSPENDED` - SUSPENDED
+         *     * `WITHDRAWN` - WITHDRAWN
+         *     * `TERMINATED` - TERMINATED
+         * @enum {string}
+         */
+        AgreementStatusBulkUpdateStatusEnum: AgreementStatusBulkUpdateStatusEnum;
+        AgreementStatusUpdate: {
+            status: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+        };
         Airport: {
             readonly id: number;
             name: string;
@@ -6644,6 +6653,9 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
+        PatchedAgreementStatusUpdateRequest: {
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+        };
         PatchedBiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             producer?: number;
@@ -9455,6 +9467,37 @@ export interface operations {
             };
         };
     };
+    double_counting_agreements_update_status_partial_update: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Certificat Double Compte. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementStatusUpdate"];
+                };
+            };
+        };
+    };
     double_counting_agreements_agreement_admin_retrieve: {
         parameters: {
             query: {
@@ -9499,65 +9542,6 @@ export interface operations {
             };
         };
     };
-    double_counting_agreements_update_status_update: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this Certificat Double Compte. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AgreementStatusUpdateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["AgreementStatusUpdateRequest"];
-                "multipart/form-data": components["schemas"]["AgreementStatusUpdateRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgreementStatusUpdateRequest"];
-                };
-            };
-        };
-    };
-    double_counting_agreements_bulk_update_status_create: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AgreementStatusBulkUpdateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["AgreementStatusBulkUpdateRequest"];
-                "multipart/form-data": components["schemas"]["AgreementStatusBulkUpdateRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgreementStatusBulkUpdateResponse"];
-                };
-            };
-        };
-    };
     double_counting_agreements_agreement_public_list: {
         parameters: {
             query?: {
@@ -9594,6 +9578,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DoubleCountingRegistrationPublic"][];
+                };
+            };
+        };
+    };
+    double_counting_agreements_bulk_update_status_create: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgreementStatusBulkUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AgreementStatusBulkUpdateRequest"];
+                "multipart/form-data": components["schemas"]["AgreementStatusBulkUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementStatusBulkUpdateResponse"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementStatusBulkUpdateErrorResponse"];
                 };
             };
         };
@@ -16356,7 +16376,7 @@ export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     type = "type",
     year = "year"
 }
-export enum AgreementStatusBulkUpdateRequestStatus {
+export enum AgreementStatusBulkUpdateStatusEnum {
     SUSPENDED = "SUSPENDED",
     WITHDRAWN = "WITHDRAWN",
     TERMINATED = "TERMINATED"
