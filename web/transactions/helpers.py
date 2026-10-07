@@ -517,15 +517,7 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
         lot.delivery_site_country = lot.carbure_delivery_site.country
     else:
         lot.carbure_delivery_site = None
-        errors.append(
-            GenericError(
-                lot=lot,
-                field="carbure_delivery_site_depot_id",
-                error=UNKNOWN_DELIVERY_SITE,
-                display_to_creator=True,
-                is_blocking=True,
-            )
-        )
+
     if not lot.carbure_delivery_site:
         lot.unknown_delivery_site = data.get("unknown_delivery_site", None)
         delivery_country_code = data.get("delivery_site_country_code", None)
@@ -537,6 +529,10 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
 
     if entity.entity_type == Entity.POWER_OR_HEAT_PRODUCER:
         lot.delivery_type = CarbureLot.CONSUMPTION
+
+    if lot.delivery_type == CarbureLot.DIRECT:
+        # Direct deliveries are only valid in France; match the form's default.
+        lot.delivery_site_country = prefetched_data["countries"].get("FR")
 
     return errors
 
