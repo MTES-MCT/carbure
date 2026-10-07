@@ -9,7 +9,7 @@ import {
   ApplicationFilter,
 } from "./types"
 import {
-  AgreementStatusBulkUpdateRequestStatus,
+  AgreementStatusBulkUpdateStatusEnum,
   DoubleCountingStatus,
 } from "api-schema"
 import { AgreementRegistrationStatus } from "../double-counting/types"
@@ -173,7 +173,7 @@ export function updateDoubleCountingAgreementStatus(
 export function updateDoubleCountingAgreementsStatus(
   entity_id: number,
   agreement_ids: number[],
-  status: AgreementStatusBulkUpdateRequestStatus
+  status: AgreementStatusBulkUpdateStatusEnum
 ) {
   return apiFetch.POST("/double-counting/agreements/bulk-update-status/", {
     params: { query: { entity_id } },

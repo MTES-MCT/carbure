@@ -4,11 +4,11 @@ import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { Button } from "common/components/button2"
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons"
-import { AgreementStatusBulkUpdateRequestStatus } from "api-schema"
+import { AgreementStatusBulkUpdateStatusEnum } from "api-schema"
 import { AgreementRegistrationStatus } from "double-counting/types"
 import useEntity from "common/hooks/entity"
 import { useMutation } from "common/hooks/async"
-import { useNotify } from "common/components/notifications"
+import { useNotify, useNotifyError } from "common/components/notifications"
 import * as api from "../../api"
 
 type AgreementDetailsDialogChangeStatusProps = {
@@ -26,22 +26,15 @@ const availableStatuses: AgreementRegistrationStatus[] = [
   AgreementRegistrationStatus.TERMINATED,
 ]
 
-const statusLabels: Record<AgreementRegistrationStatus, string> = {
-  [AgreementRegistrationStatus.VALID]: "Valide",
-  [AgreementRegistrationStatus.SUSPENDED]: "Suspendu",
-  [AgreementRegistrationStatus.WITHDRAWN]: "Retiré",
-  [AgreementRegistrationStatus.TERMINATED]: "Interrompu",
-}
-
 const bulkStatusByStatus: Partial<
-  Record<AgreementRegistrationStatus, AgreementStatusBulkUpdateRequestStatus>
+  Record<AgreementRegistrationStatus, AgreementStatusBulkUpdateStatusEnum>
 > = {
   [AgreementRegistrationStatus.SUSPENDED]:
-    AgreementStatusBulkUpdateRequestStatus.SUSPENDED,
+    AgreementStatusBulkUpdateStatusEnum.SUSPENDED,
   [AgreementRegistrationStatus.WITHDRAWN]:
-    AgreementStatusBulkUpdateRequestStatus.WITHDRAWN,
+    AgreementStatusBulkUpdateStatusEnum.WITHDRAWN,
   [AgreementRegistrationStatus.TERMINATED]:
-    AgreementStatusBulkUpdateRequestStatus.TERMINATED,
+    AgreementStatusBulkUpdateStatusEnum.TERMINATED,
 }
 
 const AgreementDetailsDialogChangeStatus = ({
@@ -53,6 +46,7 @@ const AgreementDetailsDialogChangeStatus = ({
 }: AgreementDetailsDialogChangeStatusProps) => {
   const { t } = useTranslation()
   const notify = useNotify()
+  const notifyError = useNotifyError()
   const entity = useEntity()
   const [selectedStatus, setSelectedStatus] = useState<
     AgreementRegistrationStatus | undefined
@@ -65,6 +59,8 @@ const AgreementDetailsDialogChangeStatus = ({
       onClose()
       onSuccess()
     },
+    onError: (error) =>
+      notifyError(error, t("Impossible de modifier le statut de l'agrément.")),
   })
   const updateStatuses = useMutation(api.updateDoubleCountingAgreementsStatus, {
     invalidates: ["dc-agreements", "dc-snapshot"],
@@ -73,6 +69,16 @@ const AgreementDetailsDialogChangeStatus = ({
       onClose()
       onSuccess()
     },
+    onError: (error) =>
+      notifyError(
+        error,
+        t("Impossible de modifier le statut des agréments sélectionnés."),
+        {
+          AGREEMENTS_NOT_UPDATABLE: t(
+            "Un ou plusieurs agréments ne sont plus actifs. Actualisez la liste puis réessayez."
+          ),
+        }
+      ),
   })
 
   const handleConfirm = async () => {
@@ -93,6 +99,18 @@ const AgreementDetailsDialogChangeStatus = ({
   const description = bulk
     ? t("Sélectionnez le nouveau statut pour les agréments sélectionnés.")
     : t("Sélectionnez le nouveau statut pour cet agrément.")
+  const getStatusLabel = (status: AgreementRegistrationStatus) => {
+    switch (status) {
+      case AgreementRegistrationStatus.VALID:
+        return t("Valide")
+      case AgreementRegistrationStatus.SUSPENDED:
+        return t("Suspendu")
+      case AgreementRegistrationStatus.WITHDRAWN:
+        return t("Retiré")
+      case AgreementRegistrationStatus.TERMINATED:
+        return t("Interrompu")
+    }
+  }
 
   return (
     <Dialog
@@ -121,7 +139,7 @@ const AgreementDetailsDialogChangeStatus = ({
       <RadioButtons
         legend={t("Statut")}
         options={statuses.map((status) => ({
-          label: t(statusLabels[status]),
+          label: getStatusLabel(status),
           nativeInputProps: {
             value: status,
             checked: selectedStatus === status,
