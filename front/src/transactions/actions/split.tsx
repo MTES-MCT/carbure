@@ -71,6 +71,15 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
           form.delivery_type = undefined
         }
 
+        if (form.delivery_type === DeliveryType.Direct) {
+          form.delivery_site_country = {
+            code_pays: "FR",
+            name: "France",
+            name_en: "France",
+            is_in_europe: true,
+          }
+        }
+
         Object.assign(form, normalizeUsageFields(form))
 
         return form
@@ -79,6 +88,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
   )
 
   const deliveryTypes = getDeliveryTypes(entity, value.client)
+  const isDirect = value.delivery_type === DeliveryType.Direct
   const showUsageField = value.delivery_type === DeliveryType.RFC
   const showUsagePrecisionField =
     showUsageField && value.usage === FuelUsage.Other
@@ -141,13 +151,6 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               placeholder={entity.default_certificate ?? undefined}
               {...bind("supplier_certificate")}
             />
-            <Autocomplete
-              label={t("Client")}
-              getOptions={findBiofuelEntities}
-              normalize={norm.normalizeEntityPreviewOrUnknown}
-              create={norm.identity}
-              {...bind("client")}
-            />
             {deliveryTypes.length > 0 && (
               <Select
                 clear
@@ -156,6 +159,21 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
                 normalize={norm.normalizeDeliveryType}
                 {...bind("delivery_type")}
                 options={deliveryTypes}
+              />
+            )}
+            {isDirect ? (
+              <TextInput
+                label={t("Client")}
+                {...bind("client")}
+                value={value.client as string}
+              />
+            ) : (
+              <Autocomplete
+                label={t("Client")}
+                getOptions={findBiofuelEntities}
+                normalize={norm.normalizeEntityPreviewOrUnknown}
+                create={norm.identity}
+                {...bind("client")}
               />
             )}
             {showUsageField && <FuelUsageSelect required {...bind("usage")} />}
@@ -167,13 +185,21 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
                 {...bind("usage_precision")}
               />
             )}
-            <Autocomplete
-              label={t("Site de livraison")}
-              getOptions={findDepots}
-              normalize={norm.normalizeDepotOrUnknown}
-              create={norm.identity}
-              {...bind("delivery_site")}
-            />
+            {isDirect ? (
+              <TextInput
+                label={t("Site de livraison")}
+                {...bind("delivery_site")}
+                value={value.delivery_site as string}
+              />
+            ) : (
+              <Autocomplete
+                label={t("Site de livraison")}
+                getOptions={findDepots}
+                normalize={norm.normalizeDepotOrUnknown}
+                create={norm.identity}
+                {...bind("delivery_site")}
+              />
+            )}
             {value.delivery_site instanceof Object ? (
               <TextInput
                 disabled
@@ -187,6 +213,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
                 getOptions={findCountries}
                 normalize={norm.normalizeCountry}
                 {...bind("delivery_site_country")}
+                disabled={isDirect}
               />
             )}
             <DateInput
