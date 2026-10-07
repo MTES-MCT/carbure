@@ -33,6 +33,7 @@ const ALLOWED_ENTITY_TYPES = [
   EntityType.Trader,
   EntityType.Auditor,
   EntityType.PowerOrHeatProducer,
+  EntityType.HRS,
 ]
 
 export const CompanyForm = ({
