@@ -5,7 +5,7 @@ import { useCreateStationDialog } from "./create-station-dialog"
 
 export const EmptyStations = () => {
   const { t } = useTranslation()
-  const { canAccessAdmin } = useH2Permissions()
+  const { canAccessAdmin, canWriteStations } = useH2Permissions()
   const openCreateStationDialog = useCreateStationDialog()
 
   if (canAccessAdmin) {
@@ -26,6 +26,7 @@ export const EmptyStations = () => {
       buttonProps={{
         children: t("Inscrire une station"),
         iconId: "ri-add-line",
+        disabled: !canWriteStations,
         onClick: openCreateStationDialog,
       }}
     />

@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.encoding import force_bytes
@@ -7,6 +6,7 @@ from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from auth.tokens import password_reset_token
 from core.carburetypes import CarbureError
 
 User = get_user_model()
@@ -23,9 +23,8 @@ class PasswordResetTests(TestCase):
         self.reset_password_url = reverse("auth-reset-password")
 
     def test_reset_password_success(self):
-        prtg = PasswordResetTokenGenerator()
         uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
-        token = prtg.make_token(self.user)
+        token = password_reset_token.make_token(self.user)
 
         new_password = "newpassword123"
         data = {
@@ -56,3 +55,36 @@ class PasswordResetTests(TestCase):
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert response.data["message"] == CarbureError.PASSWORD_RESET_INVALID_FORM
+
+    def test_reset_password_token_cannot_be_reused(self):
+        """Reject replay of a password reset token after a successful password update."""
+        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
+        token = password_reset_token.make_token(self.user)
+
+        first_password = "newpassword123"
+        first_response = self.client.post(
+            self.reset_password_url,
+            {
+                "uidb64": uidb64,
+                "token": token,
+                "password1": first_password,
+                "password2": first_password,
+            },
+        )
+        assert first_response.status_code == status.HTTP_200_OK
+
+        second_password = "anotherpassword123"
+        second_response = self.client.post(
+            self.reset_password_url,
+            {
+                "uidb64": uidb64,
+                "token": token,
+                "password1": second_password,
+                "password2": second_password,
+            },
+        )
+        assert second_response.status_code == status.HTTP_400_BAD_REQUEST
+        assert second_response.data["message"] == CarbureError.PASSWORD_RESET_INVALID_FORM
+
+        self.user.refresh_from_db()
+        assert self.user.check_password(first_password)

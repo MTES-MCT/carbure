@@ -10910,6 +10910,7 @@ paths:
   /api/tiruert/objectives/snapshot-balance/:
     get:
       operationId: tiruert_objectives_snapshot_balance_retrieve
+      description: Get snapshot balance for a specific entity and year.
       parameters:
         - in: query
           name: entity_id
@@ -13800,8 +13801,6 @@ components:
         token:
           type: string
           minLength: 1
-        invite:
-          type: integer
       required:
         - token
         - uidb64
