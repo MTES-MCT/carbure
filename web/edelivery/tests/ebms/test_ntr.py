@@ -17,6 +17,17 @@ class NationalTradeRegisterTest(TestCase):
         self.assertEqual("FR_SIREN_CD123456789", ntr.id())
 
     def test_ntr_id_raises_an_error_if_country_code_not_FR(self):
-        ntr = NationalTradeRegister("DE", "123456789")
         with self.assertRaises(NotImplementedError):
-            ntr.id()
+            NationalTradeRegister("DE", "123456789")
+
+    def test_validates_registration_id_format(self):
+        invalid_registration_ids = ["", "XXXXXXXXX", "12345678", "12345678990"]
+        for ri in invalid_registration_ids:
+            with self.assertRaises(ValueError):
+                NationalTradeRegister("FR", ri)
+
+    def test_send_explicit_error_message_on_invalid_registration_id(self):
+        with self.assertRaises(ValueError) as context:
+            NationalTradeRegister("FR", "XXX")
+
+        self.assertEqual("Invalid format for registration id 'XXX'", context.exception.args[0])

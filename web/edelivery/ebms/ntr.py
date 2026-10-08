@@ -11,11 +11,17 @@ class NationalTradeRegister:
         return NationalTradeRegister(country_code, registration_id)
 
     def __init__(self, country_code, registration_id):
+        self.validate(country_code, registration_id)
+
         self.country_code = country_code
         self.registration_id = registration_id
 
     def id(self):
-        if self.country_code != "FR":
-            raise NotImplementedError(f"Country code {self.country_code} is not 'FR'")
-
         return f"{self.country_code}_SIREN_CD{self.registration_id}"
+
+    def validate(self, country_code, registration_id):
+        if country_code != "FR":
+            raise NotImplementedError(f"Country code {country_code} is not 'FR'")
+
+        if not re.search("^[0-9]{9}$", registration_id):
+            raise ValueError(f"Invalid format for registration id '{registration_id}'")
