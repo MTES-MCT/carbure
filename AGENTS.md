@@ -23,9 +23,15 @@ Specifier -> Dev Backend / Dev Frontend -> Contract -> I18n -> Reviewer -> Secu 
                      \-> Migrations (si modèle touché)
 ```
 
-`I18n` n'intervient que si la tâche ajoute ou modifie un texte utilisateur côté frontend ; sinon il est ignoré. `Doc` n'intervient que si la tâche change une convention, une commande, l'architecture ou un workflow documenté ; sinon il le signale et la chaîne s'arrête à `Secu`.
+### Utilisation des rôles et sous-agents
 
-Un agent ne dépasse pas son périmètre : il signale ce qui relève d'un autre agent au lieu de le faire lui-même.
+Les rôles ci-dessous décrivent les responsabilités à couvrir selon le périmètre ; ils n'impliquent pas de lancer un sous-agent pour chaque demande. Pour une correction ponctuelle ou un changement localisé, l'agent principal peut prendre en charge les rôles pertinents et effectuer les vérifications ciblées.
+
+Pour une fonctionnalité full-stack, le `Specifier` produit un plan qui doit être validé avant l'implémentation. Pour un changement qui touche plusieurs domaines ou présente un risque important (contrat API, modèle ou données persistées, permissions, sécurité ou règle métier sensible), déléguer aux rôles spécialisés concernés et demander une revue indépendante (`Reviewer` et, si les données, permissions ou la sécurité sont concernées, `Secu`). N'activer `Contract`, `Migrations`, `I18n` et `Doc` que lorsque leurs conditions de périmètre sont réunies.
+
+Si l'environnement ne permet pas de lancer les sous-agents, l'agent principal couvre les responsabilités pertinentes et signale explicitement qu'aucune revue indépendante n'a été effectuée. Un agent auquel un rôle est confié ne dépasse pas son périmètre : il signale les travaux qui relèvent d'un autre rôle au lieu de les prendre en charge.
+
+`I18n` n'intervient que si la tâche ajoute ou modifie un texte utilisateur côté frontend ; sinon il est ignoré. `Doc` n'intervient que si la tâche change une convention, une commande, l'architecture ou un workflow documenté ; sinon il le signale et la chaîne s'arrête à `Secu`.
 
 ## Agent: Specifier (Spécification & Planification)
 
