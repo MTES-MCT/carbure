@@ -313,16 +313,8 @@ L'affichage conditionnel (droits, règles d'arrêté) vit dans un hook ou un pro
 
 ## 7. Invariants métier et pièges connus
 
-- Les calculs de solde doivent exclure les statuts non actifs et conserver les filtres de période, d'entité et de domaine.
-- Les corrections GHG d'un lot doivent être prises en compte à la fois dans les propriétés Python et dans les annotations SQL.
-- Les calculs de teneur respectent la précision métier : sommer par opération, tronquer au niveau prévu, puis agréger ; ne pas déplacer la troncature au mauvais niveau.
-- Les formules d'énergie et d'émissions doivent réutiliser le module de formules partagé lorsqu'il existe.
-- Dans les imports Excel, filtrer les lignes préremplies sans volume avant validation et agréger les volumes d'un même lot lorsque plusieurs groupes peuvent le référencer.
-- Pour les regroupements d'import, vérifier toutes les dimensions métier de la clé (type, catégorie douanière, biocarburant, entité créditée) et ne pas déduire une donnée du mauvais modèle.
 - Les coordonnées GPS utilisent le format `lat,lon`. Un changement de format nécessite d'analyser les données déjà stockées, pas seulement le code d'écriture.
 - Pour un endpoint ou un serializer qui change, vérifier le schéma OpenAPI, les exports, les mocks MSW (`front/src/mocks.ts`, `front/.storybook/mocks`), les stories et les traductions impactés.
-- Le module `tiruert/services/energy.py` centralise les formules d'énergie (`energy_mj`) et d'émissions évitées (`avoided_emissions_tco2`) en Python et ORM.
-- Pour les imports Excel TIRUERT, grouper les lignes à partir de `CarbureLot` (`lot.feedstock.category`, `lot.biofuel`) et non du dernier `OperationDetail`.
 
 ## 8. Filières
 
