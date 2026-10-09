@@ -486,8 +486,6 @@ if env("IMAGE_TAG") in ("dev", "local"):
     factory.Faker._DEFAULT_LOCALE = "fr_FR"
 
 if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
-    MIDDLEWARE.remove("django.middleware.csrf.CsrfViewMiddleware")
-
     # Disable throtting in local
     REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []
     REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {}
