@@ -3,6 +3,7 @@ import { PortalInstance } from "common/components/portal"
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { Button } from "common/components/button2"
+import { Form } from "common/components/form2"
 import { RadioGroup } from "common/components/inputs2"
 import { AgreementRegistrationStatus } from "double-counting/types"
 import { getAgreementRegistrationStatusLabel } from "double-counting/formatters"
@@ -80,29 +81,27 @@ const AgreementDetailsDialogChangeStatus = ({
         </>
       }
       footer={
-        <>
-          <Button priority="secondary" onClick={onClose} disabled={loading}>
-            {t("Annuler")}
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={!selectedStatus || loading}
-            loading={loading}
-          >
-            {t("Confirmer")}
-          </Button>
-        </>
+        <Button
+          type="submit"
+          loading={loading}
+          nativeButtonProps={{ form: "agreement-change-status-form" }}
+        >
+          {t("Confirmer")}
+        </Button>
       }
     >
-      <RadioGroup
-        label={t("Statut")}
-        options={availableStatuses.map((status) => ({
-          label: getAgreementRegistrationStatusLabel(status, t),
-          value: status,
-        }))}
-        value={selectedStatus}
-        onChange={setSelectedStatus}
-      />
+      <Form id="agreement-change-status-form" onSubmit={handleConfirm}>
+        <RadioGroup
+          label={t("Statut")}
+          options={availableStatuses.map((status) => ({
+            label: getAgreementRegistrationStatusLabel(status, t),
+            value: status,
+          }))}
+          value={selectedStatus}
+          onChange={setSelectedStatus}
+          required
+        />
+      </Form>
     </Dialog>
   )
 }
