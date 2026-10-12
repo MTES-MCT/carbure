@@ -59,6 +59,8 @@ const AgreementList = ({
     {
       header: t("Statut"),
       cell: (a) =>
+        // Display different status tag depending on the tab (active or inactive)
+        // Administrative status is displayed only for inactive agreements
         tab === "inactive" ? (
           <AgreementRegistrationStatusTag status={a.status} />
         ) : (
