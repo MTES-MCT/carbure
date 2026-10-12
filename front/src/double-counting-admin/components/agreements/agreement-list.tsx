@@ -40,7 +40,6 @@ const AgreementList = ({
   const portal = usePortal()
   usePrivateNavigation(t("Agréments actifs"))
   const [tab, setTab] = useState("active")
-  const [selection, setSelection] = useState<number[]>([])
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -49,6 +48,8 @@ const AgreementList = ({
   const { state, actions, query } = useQueryBuilder<
     AgreementListQueryBuilder["config"]
   >({ status: tab })
+  const selection = state.selection
+  const setSelection = actions.setSelection
 
   const agreementsResponse = useQuery(api.getDoubleCountingAgreementList, {
     key: "dc-agreements",
