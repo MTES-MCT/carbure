@@ -51,6 +51,7 @@ class DoubleCountingRegistrationPublicSerializer(serializers.ModelSerializer):
             "certificate_id",
             "valid_from",
             "valid_until",
+            "status",
             "biofuel_list",
         ]
 

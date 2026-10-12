@@ -8,6 +8,7 @@ import { Trans, useTranslation } from "react-i18next"
 import * as api from "../../double-counting/api"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Title } from "common/components/title"
+import { getAgreementRegistrationStatusLabel } from "../formatters"
 
 const AgreementPublicList = () => {
   const { t } = useTranslation()
@@ -59,6 +60,14 @@ const AgreementPublicList = () => {
                 header: t("N° d'agrément"),
                 small: true,
                 cell: (a) => a.certificate_id,
+              },
+              {
+                header: t("Statut"),
+                small: true,
+                cell: (a) =>
+                  a.status
+                    ? getAgreementRegistrationStatusLabel(a.status, t)
+                    : "-",
               },
               {
                 header: t("Validité"),

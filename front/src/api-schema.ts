@@ -5265,6 +5265,7 @@ export interface components {
             valid_from: string;
             /** Format: date */
             valid_until: string;
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
             readonly biofuel_list: string;
         };
         /**

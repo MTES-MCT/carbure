@@ -17345,6 +17345,8 @@ components:
         valid_until:
           type: string
           format: date
+        status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
         biofuel_list:
           type: string
           readOnly: true
