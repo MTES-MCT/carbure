@@ -38,7 +38,7 @@ const AgreementDetailsDialogChangeStatus = ({
   const entity = useEntity()
   const [selectedStatus, setSelectedStatus] = useState<
     AgreementRegistrationStatus | undefined
-  >(initialStatus)
+  >(bulk ? AgreementRegistrationStatus.VALID : initialStatus)
 
   const updateStatuses = useMutation(api.updateDoubleCountingAgreementsStatus, {
     invalidates: ["dc-agreement", "dc-agreements", "dc-snapshot"],
@@ -65,7 +65,6 @@ const AgreementDetailsDialogChangeStatus = ({
   }
 
   const loading = updateStatuses.loading
-  const statuses = bulk ? availableStatuses.slice(1) : availableStatuses
   const description = bulk
     ? t("Sélectionnez le nouveau statut pour les agréments sélectionnés.")
     : t("Sélectionnez le nouveau statut pour cet agrément.")
@@ -108,7 +107,7 @@ const AgreementDetailsDialogChangeStatus = ({
     >
       <RadioGroup
         label={t("Statut")}
-        options={statuses.map((status) => ({
+        options={availableStatuses.map((status) => ({
           label: getStatusLabel(status),
           value: status,
         }))}
