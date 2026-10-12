@@ -5,6 +5,7 @@ import { useState } from "react"
 import { Button } from "common/components/button2"
 import { RadioGroup } from "common/components/inputs2"
 import { AgreementRegistrationStatus } from "double-counting/types"
+import { getAgreementRegistrationStatusLabel } from "double-counting/formatters"
 import useEntity from "common/hooks/entity"
 import { useMutation } from "common/hooks/async"
 import { useNotify, useNotifyError } from "common/components/notifications"
@@ -68,18 +69,6 @@ const AgreementDetailsDialogChangeStatus = ({
   const description = bulk
     ? t("Sélectionnez le nouveau statut pour les agréments sélectionnés.")
     : t("Sélectionnez le nouveau statut pour cet agrément.")
-  const getStatusLabel = (status: AgreementRegistrationStatus) => {
-    switch (status) {
-      case AgreementRegistrationStatus.VALID:
-        return t("Valide")
-      case AgreementRegistrationStatus.SUSPENDED:
-        return t("Suspendu")
-      case AgreementRegistrationStatus.WITHDRAWN:
-        return t("Retiré")
-      case AgreementRegistrationStatus.TERMINATED:
-        return t("Interrompu")
-    }
-  }
 
   return (
     <Dialog
@@ -108,7 +97,7 @@ const AgreementDetailsDialogChangeStatus = ({
       <RadioGroup
         label={t("Statut")}
         options={availableStatuses.map((status) => ({
-          label: getStatusLabel(status),
+          label: getAgreementRegistrationStatusLabel(status, t),
           value: status,
         }))}
         value={selectedStatus}
