@@ -23,7 +23,7 @@ class DoubleCountingApplicationPermissionTest(TestCase, PermissionTestMixin):
                     [HasDoubleCountingAdminRights()],
                 ),
                 (
-                    ["update_status", "bulk_update_status"],
+                    ["bulk_update_status"],
                     [HasDoubleCountingAdminWriteRights()],
                 ),
                 (
