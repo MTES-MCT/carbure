@@ -905,22 +905,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/double-counting/agreements/{id}/update-status/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch: operations["double_counting_agreements_update_status_partial_update"];
-        trace?: never;
-    };
     "/api/double-counting/agreements/agreement-admin/": {
         parameters: {
             query?: never;
@@ -3650,21 +3634,11 @@ export interface components {
             message: string;
         };
         AgreementStatusBulkUpdateRequest: {
-            status: components["schemas"]["AgreementStatusBulkUpdateStatusEnum"];
             agreement_ids: number[];
+            status: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
         };
         AgreementStatusBulkUpdateResponse: {
             updated_count: number;
-        };
-        /**
-         * @description * `SUSPENDED` - SUSPENDED
-         *     * `WITHDRAWN` - WITHDRAWN
-         *     * `TERMINATED` - TERMINATED
-         * @enum {string}
-         */
-        AgreementStatusBulkUpdateStatusEnum: AgreementStatusBulkUpdateStatusEnum;
-        AgreementStatusUpdate: {
-            status: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
         };
         Airport: {
             readonly id: number;
@@ -6653,9 +6627,6 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
-        PatchedAgreementStatusUpdateRequest: {
-            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
-        };
         PatchedBiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             producer?: number;
@@ -9463,37 +9434,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DoubleCountingRegistrationDetails"];
-                };
-            };
-        };
-    };
-    double_counting_agreements_update_status_partial_update: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this Certificat Double Compte. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
-                "multipart/form-data": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgreementStatusUpdate"];
                 };
             };
         };
@@ -16375,11 +16315,6 @@ export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     status = "status",
     type = "type",
     year = "year"
-}
-export enum AgreementStatusBulkUpdateStatusEnum {
-    SUSPENDED = "SUSPENDED",
-    WITHDRAWN = "WITHDRAWN",
-    TERMINATED = "TERMINATED"
 }
 export enum AmendmentObjectEnum {
     CMAX_PAP_UPDATE = "CMAX_PAP_UPDATE",

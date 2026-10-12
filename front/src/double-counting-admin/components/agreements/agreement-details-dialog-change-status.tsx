@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { Button } from "common/components/button2"
 import { RadioGroup } from "common/components/inputs2"
-import { AgreementStatusBulkUpdateStatusEnum } from "api-schema"
 import { AgreementRegistrationStatus } from "double-counting/types"
 import useEntity from "common/hooks/entity"
 import { useMutation } from "common/hooks/async"
@@ -26,17 +25,6 @@ const availableStatuses: AgreementRegistrationStatus[] = [
   AgreementRegistrationStatus.TERMINATED,
 ]
 
-const bulkStatusByStatus: Partial<
-  Record<AgreementRegistrationStatus, AgreementStatusBulkUpdateStatusEnum>
-> = {
-  [AgreementRegistrationStatus.SUSPENDED]:
-    AgreementStatusBulkUpdateStatusEnum.SUSPENDED,
-  [AgreementRegistrationStatus.WITHDRAWN]:
-    AgreementStatusBulkUpdateStatusEnum.WITHDRAWN,
-  [AgreementRegistrationStatus.TERMINATED]:
-    AgreementStatusBulkUpdateStatusEnum.TERMINATED,
-}
-
 const AgreementDetailsDialogChangeStatus = ({
   agreementIds,
   bulk = false,
@@ -52,18 +40,8 @@ const AgreementDetailsDialogChangeStatus = ({
     AgreementRegistrationStatus | undefined
   >(initialStatus)
 
-  const updateStatus = useMutation(api.updateDoubleCountingAgreementStatus, {
-    invalidates: ["dc-agreement", "dc-agreements", "dc-snapshot"],
-    onSuccess: () => {
-      notify(t("Le statut a été changé avec succès."), { variant: "success" })
-      onClose()
-      onSuccess()
-    },
-    onError: (error) =>
-      notifyError(error, t("Impossible de modifier le statut de l'agrément.")),
-  })
   const updateStatuses = useMutation(api.updateDoubleCountingAgreementsStatus, {
-    invalidates: ["dc-agreements", "dc-snapshot"],
+    invalidates: ["dc-agreement", "dc-agreements", "dc-snapshot"],
     onSuccess: () => {
       notify(t("Le statut a été changé avec succès."), { variant: "success" })
       onClose()
@@ -83,18 +61,10 @@ const AgreementDetailsDialogChangeStatus = ({
 
   const handleConfirm = async () => {
     if (!selectedStatus || agreementIds.length === 0) return
-    const agreementId = agreementIds[0]
-    if (!bulk && agreementIds.length === 1 && agreementId !== undefined) {
-      await updateStatus.execute(entity.id, agreementId, selectedStatus)
-    } else {
-      const bulkStatus = bulkStatusByStatus[selectedStatus]
-      if (bulkStatus) {
-        await updateStatuses.execute(entity.id, agreementIds, bulkStatus)
-      }
-    }
+    await updateStatuses.execute(entity.id, agreementIds, selectedStatus)
   }
 
-  const loading = updateStatus.loading || updateStatuses.loading
+  const loading = updateStatuses.loading
   const statuses = bulk ? availableStatuses.slice(1) : availableStatuses
   const description = bulk
     ? t("Sélectionnez le nouveau statut pour les agréments sélectionnés.")

@@ -22,19 +22,16 @@ class AgreementListsSerializer(serializers.Serializer):
     inactive = DoubleCountingRegistrationSerializer(many=True)
 
 
-class AgreementStatusUpdateSerializer(serializers.Serializer):
-    status = serializers.ChoiceField(choices=DoubleCountingRegistration.STATUS_CHOICES)
-
-
-class AgreementStatusBulkUpdateSerializer(AgreementStatusUpdateSerializer):
+class AgreementStatusBulkUpdateSerializer(serializers.Serializer):
     agreement_ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False, max_length=100)
     status = serializers.ChoiceField(
-        choices=[
-            DoubleCountingRegistration.SUSPENDED,
-            DoubleCountingRegistration.WITHDRAWN,
-            DoubleCountingRegistration.TERMINATED,
-        ]
+        choices=DoubleCountingRegistration.STATUS_CHOICES,
     )
+
+    def validate(self, attrs):
+        if len(attrs["agreement_ids"]) > 1 and attrs["status"] == DoubleCountingRegistration.VALID:
+            raise serializers.ValidationError({"status": "Un agrément valide ne peut être sélectionné qu'individuellement."})
+        return attrs
 
 
 class AgreementAdminListActionMixin:
@@ -67,12 +64,10 @@ class AgreementAdminListActionMixin:
 
         agreement_ids = set(serializer.validated_data["agreement_ids"])
         with transaction.atomic():
-            agreements = list(
-                self.get_queryset()
-                .select_related(None)
-                .filter(id__in=agreement_ids, status=DoubleCountingRegistration.VALID)
-                .select_for_update()
-            )
+            agreements_queryset = self.get_queryset().select_related(None).filter(id__in=agreement_ids)
+            if len(agreement_ids) > 1:
+                agreements_queryset = agreements_queryset.filter(status=DoubleCountingRegistration.VALID)
+            agreements = list(agreements_queryset.select_for_update())
             if {agreement.id for agreement in agreements} != agreement_ids:
                 raise ValidationError({"message": DoubleCountingError.AGREEMENTS_NOT_UPDATABLE})
 
@@ -81,29 +76,6 @@ class AgreementAdminListActionMixin:
             DoubleCountingRegistration.objects.bulk_update(agreements, ["status"])
 
         return Response({"updated_count": len(agreement_ids)})
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "entity_id",
-                OpenApiTypes.INT,
-                OpenApiParameter.QUERY,
-                description="Entity ID",
-                required=True,
-            ),
-        ],
-        request=AgreementStatusUpdateSerializer,
-        responses={200: AgreementStatusUpdateSerializer},
-    )
-    @action(methods=["patch"], detail=True, url_path="update-status")
-    def update_status(self, request, *args, **kwargs):
-        serializer = AgreementStatusUpdateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        agreement = self.get_object()
-        agreement.status = serializer.validated_data["status"]
-        agreement.save(update_fields=["status"])
-        return Response({"status": agreement.status})
 
     @extend_schema(
         filters=True,

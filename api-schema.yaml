@@ -2922,45 +2922,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
-  /api/double-counting/agreements/{id}/update-status/:
-    patch:
-      operationId: double_counting_agreements_update_status_partial_update
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Certificat Double Compte.
-          required: true
-      tags:
-        - double-counting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AgreementStatusUpdate"
-          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -13956,13 +13917,13 @@ components:
     AgreementStatusBulkUpdateRequest:
       type: object
       properties:
-        status:
-          $ref: "#/components/schemas/AgreementStatusBulkUpdateStatusEnum"
         agreement_ids:
           type: array
           items:
             type: integer
           maxItems: 100
+        status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
       required:
         - agreement_ids
         - status
@@ -13973,23 +13934,6 @@ components:
           type: integer
       required:
         - updated_count
-    AgreementStatusBulkUpdateStatusEnum:
-      enum:
-        - SUSPENDED
-        - WITHDRAWN
-        - TERMINATED
-      type: string
-      description: |-
-        * `SUSPENDED` - SUSPENDED
-        * `WITHDRAWN` - WITHDRAWN
-        * `TERMINATED` - TERMINATED
-    AgreementStatusUpdate:
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
-      required:
-        - status
     Airport:
       type: object
       properties:
@@ -20496,11 +20440,6 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
-    PatchedAgreementStatusUpdateRequest:
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
