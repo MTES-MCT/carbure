@@ -3,7 +3,7 @@ import { PortalInstance } from "common/components/portal"
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
 import { Button } from "common/components/button2"
-import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons"
+import { RadioGroup } from "common/components/inputs2"
 import { AgreementStatusBulkUpdateStatusEnum } from "api-schema"
 import { AgreementRegistrationStatus } from "double-counting/types"
 import useEntity from "common/hooks/entity"
@@ -136,16 +136,14 @@ const AgreementDetailsDialogChangeStatus = ({
         </>
       }
     >
-      <RadioButtons
-        legend={t("Statut")}
+      <RadioGroup
+        label={t("Statut")}
         options={statuses.map((status) => ({
           label: getStatusLabel(status),
-          nativeInputProps: {
-            value: status,
-            checked: selectedStatus === status,
-            onChange: () => setSelectedStatus(status),
-          },
+          value: status,
         }))}
+        value={selectedStatus}
+        onChange={setSelectedStatus}
       />
     </Dialog>
   )
