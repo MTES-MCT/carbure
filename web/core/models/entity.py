@@ -7,6 +7,7 @@ from django.db.models import Q
 from edelivery.ebms.ntr import NationalTradeRegister
 from transactions.models.site import Site
 
+from .certificate import GenericCertificate
 from .geography import Department, Pays
 from .user import UserRights
 
@@ -98,6 +99,13 @@ class Entity(models.Model):
         registration_id = ntr.registration_id
         country_code = ntr.country_code
         return Entity.objects.filter(registered_country__code_pays=country_code, registration_id=registration_id).last()
+
+    @staticmethod
+    def all_currently_certified_under_national_scheme():
+        return Entity.objects.filter(
+            entitycertificate__certificate__certificate_type=GenericCertificate.SYSTEME_NATIONAL,
+            entitycertificate__certificate__status=GenericCertificate.VALID,
+        )
 
     def __str__(self):
         return self.name

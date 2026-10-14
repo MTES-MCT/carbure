@@ -9,6 +9,22 @@ from edelivery.ebms.requests.get_organisation_by_id_request import GetOrganisati
 from edelivery.soap.requester import Requester
 
 
+def carbure_entities(fetch_all=False, entity_name=None):
+    if fetch_all:
+        entities = Entity.all_currently_certified_under_national_scheme()
+        if not entities:
+            raise RuntimeError("No entity found with currently valid national scheme certificate")
+        return entities
+
+    if not entity_name:
+        raise ValueError("Missing parameter: if --all option not set, an entity name should be provided")
+
+    entities = Entity.objects.filter(name=entity_name)
+    if not entities:
+        raise ValueError(f"Value error: Entity '{entity_name}' not found in CarbuRe")
+    return entities
+
+
 class Command(BaseCommand):
     help = "Export national scheme certificates to UDB"
 
@@ -32,28 +48,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        def carbure_entities(options):
-            export_all_certificates = options["all"]
-            entity_name = options["entity_name"]
-
-            if export_all_certificates:
-                entity_certificates = EntityCertificate.objects.filter(
-                    certificate__certificate_type=GenericCertificate.SYSTEME_NATIONAL,
-                    certificate__status=GenericCertificate.VALID,
-                )
-                return [ec.entity for ec in entity_certificates]
-
-            if not entity_name:
-                self.stderr.write("Missing parameter: if --all option not set, an entity name should be provided")
-                exit(1)
-
-            entities = Entity.objects.filter(name=entity_name)
-            if not entities:
-                self.stderr.write(f"Value error: Entity `{entity_name}` not found in CarbuRe")
-                exit(1)
-
-            return entities
-
         def find_entities_not_in_udb(entities, dry_run):
             entity_names = ", ".join([f"'{e.name}'" for e in entities])
             ntr_ids = [e.ntr_id() for e in entities]
@@ -117,7 +111,10 @@ Would send UDB request with body being:
 
         dry_run = options["dry_run"]
 
-        entities = carbure_entities(options)
+        fetch_all = options["all"]
+        entity_name = options["entity_name"]
+
+        entities = carbure_entities(fetch_all=fetch_all, entity_name=entity_name)
         entities_not_in_udb = find_entities_not_in_udb(entities, dry_run)
         if entities_not_in_udb:
             export_entities(entities_not_in_udb, dry_run)
