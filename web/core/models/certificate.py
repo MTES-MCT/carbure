@@ -66,6 +66,13 @@ class GenericCertificate(models.Model):
     last_status_update = models.DateField()
 
     @staticmethod
+    def all_valid_under_national_scheme():
+        return GenericCertificate.objects.filter(
+            certificate_type=GenericCertificate.SYSTEME_NATIONAL,
+            status=GenericCertificate.VALID,
+        )
+
+    @staticmethod
     def bulk_create_or_update(certificates: list[dict], status: str) -> Tuple[list, list]:
         from core.utils import bulk_update_or_create  # this is imported here to avoid circular dependencies
 

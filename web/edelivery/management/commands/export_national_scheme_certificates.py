@@ -30,6 +30,10 @@ class Command(BaseCommand):
             help="Export all NS certificates with status 'VALID'",
         )
 
+    def carbure_entities(self, export_all_certificates):
+        certificates = GenericCertificate.all_valid_under_national_scheme()
+        return Entity.all_certified_with(certificates)
+
     def handle(self, *args, **options):
         def carbure_entities(options):
             export_all_certificates = options["all"]

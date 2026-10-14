@@ -1,4 +1,5 @@
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 from core.models.certificate import GenericCertificate, valid_certificate_scope
 
@@ -20,3 +21,15 @@ class ValidCertificateScopeTest(TestCase):
 
     def test_returns_false_if_not_national_scheme(self):
         self.assertFalse(valid_certificate_scope(GenericCertificate.ISCC, "FSP"))
+
+class GenericCertificateTest(TestCase):
+    def test_fetches_all_valid_national_scheme_certificates(self):
+        query_result = MagicMock()
+        patched_filter = GenericCertificate.objects.filter = MagicMock(return_value=query_result)
+
+        certificates = GenericCertificate.all_valid_under_national_scheme()
+        patched_filter.assert_called_with(
+            certificate_type=GenericCertificate.SYSTEME_NATIONAL,
+            status=GenericCertificate.VALID,
+        )
+        self.assertEqual(query_result, certificates)
