@@ -1,6 +1,7 @@
-from .certificate import EntityCertificate, GenericCertificate
+from .certificate import GenericCertificate
 from .declaration_period import DeclarationPeriod, SustainabilityDeclaration
 from .entity import Entity, EntityManager, ExternalAdminRights
+from .entity_certificate import EntityCertificate
 from .fields import JSONChoiceField
 from .feedstock import Biocarburant, MatierePremiere, MatierePremiereBiofuelManager, MatierePremiereBiomethaneManager
 from .file import StoredFile
