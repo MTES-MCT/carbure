@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
 
-from core.models.certificate import EntityCertificate, GenericCertificate
+from core.models.certificate import GenericCertificate
 from core.models.entity import Entity
+from core.models.entity_certificate import EntityCertificate
 from edelivery.ebms.requests.add_organisation_request import AddOrganisationRequest
 from edelivery.ebms.requests.add_update_certificate_request import AddUpdateCertificateRequest
 from edelivery.ebms.requests.get_organisation_by_id_request import GetOrganisationByIDRequest
