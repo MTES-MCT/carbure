@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth import get_user_model
 
 from core.models import Entity, Pays, UserRights
@@ -15,7 +17,7 @@ def setup_admin_user() -> User:
         admin = User.objects.create_superuser(
             email=ADMIN_EMAIL,
             name="Carbure Admin",
-            password="password",
+            password=os.getenv("SEED_USER_PASSWORD"),
         )
 
     return admin
@@ -27,7 +29,7 @@ def setup_regular_user() -> User:
         user = User.objects.create_user(
             email=USER_EMAIL,
             name="Carbure User",
-            password="password",
+            password=os.getenv("SEED_USER_PASSWORD"),
         )
 
     return user
