@@ -15786,6 +15786,8 @@ export interface operations {
                  *     * `-site` - Site (décroissant)
                  *     * `shipping_distance` - Shipping distance
                  *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `status` - Status
+                 *     * `-status` - Status (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -15923,6 +15925,8 @@ export interface operations {
                  *     * `-site` - Site (décroissant)
                  *     * `shipping_distance` - Shipping distance
                  *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `status` - Status
+                 *     * `-status` - Status (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -16064,6 +16068,8 @@ export interface operations {
                  *     * `-site` - Site (décroissant)
                  *     * `shipping_distance` - Shipping distance
                  *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `status` - Status
+                 *     * `-status` - Status (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -16629,6 +16635,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinusquantity = "-quantity",
     ValueMinusshipping_distance = "-shipping_distance",
     ValueMinussite = "-site",
+    ValueMinusstatus = "-status",
     ValueMinusworking_date = "-working_date",
     holder = "holder",
     material = "material",
@@ -16636,6 +16643,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     quantity = "quantity",
     shipping_distance = "shipping_distance",
     site = "site",
+    status = "status",
     working_date = "working_date"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryShipping_method {

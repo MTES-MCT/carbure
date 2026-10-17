@@ -8,11 +8,9 @@ import {
   ActionSiteFieldOptions,
   useActionFields,
 } from "traceability/hooks/use-action-fields"
+import { DeleteActionButton } from "traceability/components/delete-action-button"
 import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
-import {
-  ActionsPageProps,
-  DetailAction,
-} from "traceability/components/actions-page"
+import { ActionsPageProps } from "traceability/components/actions-page"
 
 const H2_LOT_QUERY: Partial<ActionQuery> = {
   type: [ActionType.INIT],
@@ -37,7 +35,7 @@ type H2LotsPageConfig = Pick<
 export function useH2LotsPage(): {
   page: H2LotsPageConfig
   excelImport: NonNullable<ActionsPageProps["excelImport"]>
-  detailActions: DetailAction[]
+  renderDetailActions: NonNullable<ActionsPageProps["renderDetailActions"]>
 } {
   const { t } = useTranslation()
 
@@ -134,13 +132,6 @@ export function useH2LotsPage(): {
         working_date: t("Mois d'utilisation / consommation"),
       },
     },
-    detailActions: [
-      {
-        icon: "fr-icon-close-line",
-        label: "Supprimer",
-        variant: "danger",
-        onAction: () => {},
-      },
-    ],
+    renderDetailActions: (action) => <DeleteActionButton action={action} />,
   }
 }
