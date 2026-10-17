@@ -4,23 +4,24 @@ from django.db import transaction
 from django.db.models import QuerySet
 
 from traceability.exceptions import ConversionError, NoEligibleActionError
+from traceability.lifecycle.checks import actions_that_can_change_status
 from traceability.models import Action, ActionStatus, Material
 
 
 @transaction.atomic
 def valorize(actions: QuerySet[Action]) -> list[Action]:
-    """Create a VALORIZE child for each INIT action currently PENDING, then accept the INIT.
+    """Accept each action the matrix lets reach ACCEPTED, then create a VALORIZE child.
 
     Child quantity is the parent's energy. The child material is VALORIZED_ENERGY (unit MJ),
     so the stored quantity is displayed in MJ. That material has no conversion factors.
-    Ineligible rows in `actions` are skipped.
+    The permission on the transition is not checked. Ineligible rows are skipped.
     Raises NoEligibleActionError if none remain, ConversionError if energy cannot be derived.
     """
-    pending_inits = list(actions.filter(type=Action.INIT, status=ActionStatus.PENDING))
-    if not pending_inits:
+    eligible = actions_that_can_change_status(actions, ActionStatus.ACCEPTED)
+    if not eligible:
         raise NoEligibleActionError()
 
-    missing_energy = [action for action in pending_inits if action.energy is None]
+    missing_energy = [action for action in eligible if action.energy is None]
     if missing_energy:
         raise ConversionError(missing_energy)
 
@@ -37,8 +38,8 @@ def valorize(actions: QuerySet[Action]) -> list[Action]:
                 parent=action,
                 material=energy_material,
             )
-            for action in pending_inits
+            for action in eligible
         ]
     )
-    ActionStatus.objects.bulk_create(ActionStatus(status=ActionStatus.ACCEPTED, action=action) for action in pending_inits)
+    ActionStatus.objects.bulk_create(ActionStatus(status=ActionStatus.ACCEPTED, action=action) for action in eligible)
     return list(children)

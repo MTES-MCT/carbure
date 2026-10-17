@@ -2,18 +2,20 @@ from django.db import transaction
 from django.db.models import QuerySet
 
 from traceability.exceptions import NoEligibleActionError
+from traceability.lifecycle.checks import actions_that_can_change_status
 from traceability.models import Action, ActionStatus
 
 
 @transaction.atomic
 def refuse(actions: QuerySet[Action]) -> list[Action]:
-    """Create a REJECTED status for each INIT action currently PENDING.
+    """Reject each action the matrix lets reach REJECTED.
 
-    Ineligible rows in `actions` are skipped. Raises NoEligibleActionError if none remain.
+    The permission on the transition is not checked. Ineligible rows are skipped.
+    Raises NoEligibleActionError if none remain.
     """
-    pending_inits = list(actions.filter(type=Action.INIT, status=ActionStatus.PENDING))
-    if not pending_inits:
+    eligible = actions_that_can_change_status(actions, ActionStatus.REJECTED)
+    if not eligible:
         raise NoEligibleActionError()
 
-    ActionStatus.objects.bulk_create(ActionStatus(status=ActionStatus.REJECTED, action=action) for action in pending_inits)
-    return pending_inits
+    ActionStatus.objects.bulk_create(ActionStatus(status=ActionStatus.REJECTED, action=action) for action in eligible)
+    return eligible

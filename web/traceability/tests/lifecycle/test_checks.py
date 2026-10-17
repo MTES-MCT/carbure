@@ -1,8 +1,11 @@
+from types import SimpleNamespace
+
 from django.test import SimpleTestCase
 from rest_framework.permissions import BasePermission
 
 from traceability.handlers.action import ActionIndustryHandler
-from traceability.lifecycle.checks import can_change_status, can_create
+from traceability.handlers.registry import ACTION_HANDLERS
+from traceability.lifecycle.checks import actions_that_can_change_status, can_change_status, can_create
 from traceability.lifecycle.rules import Creation, Transition
 
 
@@ -54,3 +57,18 @@ class CanCreateTest(SimpleTestCase):
 
     def test_returns_none_when_the_type_is_absent(self):
         self.assertIsNone(can_create(SampleHandler(), "MISSING"))
+
+
+class ActionsThatCanChangeStatusTest(SimpleTestCase):
+    def setUp(self):
+        ACTION_HANDLERS["SAMPLE"] = SampleHandler
+
+    def tearDown(self):
+        ACTION_HANDLERS.pop("SAMPLE", None)
+
+    def test_keeps_only_actions_whose_edge_exists(self):
+        allowed = SimpleNamespace(industry="SAMPLE", type="A", status="FROM")
+        blocked = SimpleNamespace(industry="SAMPLE", type="A", status="OTHER")
+
+        self.assertEqual(actions_that_can_change_status([allowed, blocked], "TO"), [allowed])
+        self.assertEqual(actions_that_can_change_status([blocked], "TO"), [])

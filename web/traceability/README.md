@@ -42,7 +42,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `excel_import_serializer_class` | Validation d’import (surcharge filière) |
 | `read_permission`, `write_permission`, `admin_permission` | Droits pour chaque endpoint |
 | `scope_queryset` | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière |
-| `transitions`, `creations` | Matrices de la filière. Une ligne absente est un droit absent. Rien ne les consulte encore en dehors des checks |
+| `transitions`, `creations` | Matrices de la filière. Une ligne absente est un droit absent. `valorize` et `refuse` lisent `transitions` sans appeler la permission de la ligne |
 
 `can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. La permission portée par la ligne n’est pas appelée. `can_create(handler, type, parent_type=None)` renvoie la `Creation`, ou `None`. Le handler est celui déjà résolu pour la requête.
 
