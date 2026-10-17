@@ -1,7 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from adapters.logger import log_exception
 from core.serializer_fields import LabelChoiceField
 from core.serializer_validators import UniqueInListSerializer
 from core.serializers import EntityPreviewSerializer
@@ -71,9 +70,7 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
         for row in attrs:
             material = row.get("material")
             if material is not None and material.lhv is None and material.density is None:
-                error = RuntimeError("Material is missing lhv and density")
-                log_exception(error)
-                raise error
+                raise RuntimeError("Material is missing lhv and density")
         return attrs
 
     def create(self, validated_data):
