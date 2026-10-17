@@ -5582,6 +5582,642 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
+  /api/entities/admin-users/:
+    get:
+      operationId: entities_admin_users_list
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: entity_type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - HRS
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
+          explode: true
+          style: form
+        - in: query
+          name: is_active
+          schema:
+            type: array
+            items:
+              type: boolean
+              title: Actif
+              enum:
+                - "false"
+                - "true"
+          description: >-
+            Précise si l’utilisateur doit être considéré comme actif. Décochez
+            ceci plutôt que de supprimer le compte.
+
+
+            * `true` - True
+
+            * `false` - False
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -entity_id
+                - -entity_name
+                - -is_active
+                - -role
+                - -user
+                - entity_id
+                - entity_name
+                - is_active
+                - role
+                - user
+          description: |-
+            Ordre
+
+            * `entity_name` - Entity name
+            * `-entity_name` - Entity name (décroissant)
+            * `entity_id` - Entity id
+            * `-entity_id` - Entity id (décroissant)
+            * `user` - Utilisateur
+            * `-user` - Utilisateur (décroissant)
+            * `role` - Role
+            * `-role` - Role (décroissant)
+            * `is_active` - Is active
+            * `-is_active` - Is active (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: role
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ADMIN
+                - AUDITOR
+                - RO
+                - RW
+          description: |-
+            * `RO` - Lecture Seule
+            * `RW` - Lecture/Écriture
+            * `ADMIN` - Administrateur
+            * `AUDITOR` - Auditeur
+          explode: true
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAdminUserRowList"
+          description: ""
+  /api/entities/admin-users/export/:
+    post:
+      operationId: entities_admin_users_export_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: entity_type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - HRS
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
+          explode: true
+          style: form
+        - in: query
+          name: is_active
+          schema:
+            type: array
+            items:
+              type: boolean
+              title: Actif
+              enum:
+                - "false"
+                - "true"
+          description: >-
+            Précise si l’utilisateur doit être considéré comme actif. Décochez
+            ceci plutôt que de supprimer le compte.
+
+
+            * `true` - True
+
+            * `false` - False
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -entity_id
+                - -entity_name
+                - -is_active
+                - -role
+                - -user
+                - entity_id
+                - entity_name
+                - is_active
+                - role
+                - user
+          description: |-
+            Ordre
+
+            * `entity_name` - Entity name
+            * `-entity_name` - Entity name (décroissant)
+            * `entity_id` - Entity id
+            * `-entity_id` - Entity id (décroissant)
+            * `user` - Utilisateur
+            * `-user` - Utilisateur (décroissant)
+            * `role` - Role
+            * `-role` - Role (décroissant)
+            * `is_active` - Is active
+            * `-is_active` - Is active (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: role
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ADMIN
+                - AUDITOR
+                - RO
+                - RW
+          description: |-
+            * `RO` - Lecture Seule
+            * `RW` - Lecture/Écriture
+            * `ADMIN` - Administrateur
+            * `AUDITOR` - Auditeur
+          explode: true
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+          description: ""
+  /api/entities/admin-users/filters/:
+    get:
+      operationId: entities_admin_users_filters_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: entity_type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - HRS
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
+          explode: true
+          style: form
+        - in: query
+          name: filter
+          schema:
+            type: string
+            enum:
+              - entity_type
+              - is_active
+              - order_by
+              - role
+          description: Filter string to apply
+          required: true
+        - in: query
+          name: is_active
+          schema:
+            type: array
+            items:
+              type: boolean
+              title: Actif
+              enum:
+                - "false"
+                - "true"
+          description: >-
+            Précise si l’utilisateur doit être considéré comme actif. Décochez
+            ceci plutôt que de supprimer le compte.
+
+
+            * `true` - True
+
+            * `false` - False
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -entity_id
+                - -entity_name
+                - -is_active
+                - -role
+                - -user
+                - entity_id
+                - entity_name
+                - is_active
+                - role
+                - user
+          description: |-
+            Ordre
+
+            * `entity_name` - Entity name
+            * `-entity_name` - Entity name (décroissant)
+            * `entity_id` - Entity id
+            * `-entity_id` - Entity id (décroissant)
+            * `user` - Utilisateur
+            * `-user` - Utilisateur (décroissant)
+            * `role` - Role
+            * `-role` - Role (décroissant)
+            * `is_active` - Is active
+            * `-is_active` - Is active (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - in: query
+          name: role
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ADMIN
+                - AUDITOR
+                - RO
+                - RW
+          description: |-
+            * `RO` - Lecture Seule
+            * `RW` - Lecture/Écriture
+            * `ADMIN` - Administrateur
+            * `AUDITOR` - Auditeur
+          explode: true
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              examples:
+                ExampleOfFiltersResponse.:
+                  value:
+                    - entity_type
+                    - is_active
+                    - order_by
+                    - role
+                  summary: Example of filters response.
+          description: ""
+  /api/entities/admin-users/search/:
+    post:
+      operationId: entities_admin_users_search_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: entity_type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - Administration
+                - Administration Externe
+                - Auditor
+                - Charge Point Operator
+                - Compagnie aérienne
+                - Fournisseur de biométhane
+                - HRS
+                - Opérateur
+                - Power or Heat Producer
+                - Producteur
+                - Producteur de biométhane
+                - SAF Trader
+                - Trader
+                - Unknown
+          description: |-
+            * `Producteur` - Producteur
+            * `Opérateur` - Opérateur
+            * `Administration` - Administration
+            * `Trader` - Trader
+            * `Auditor` - Auditeur
+            * `Administration Externe` - Administration Externe
+            * `Charge Point Operator` - Charge Point Operator
+            * `Compagnie aérienne` - Compagnie aérienne
+            * `Unknown` - Unknown
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `SAF Trader` - Trader de SAF
+            * `Producteur de biométhane` - Producteur de biométhane
+            * `Fournisseur de biométhane` - Fournisseur de biométhane
+            * `HRS` - Distributeur d'hydrogène pour la mobilité
+          explode: true
+          style: form
+        - in: query
+          name: is_active
+          schema:
+            type: array
+            items:
+              type: boolean
+              title: Actif
+              enum:
+                - "false"
+                - "true"
+          description: >-
+            Précise si l’utilisateur doit être considéré comme actif. Décochez
+            ceci plutôt que de supprimer le compte.
+
+
+            * `true` - True
+
+            * `false` - False
+          explode: true
+          style: form
+        - in: query
+          name: order_by
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - -entity_id
+                - -entity_name
+                - -is_active
+                - -role
+                - -user
+                - entity_id
+                - entity_name
+                - is_active
+                - role
+                - user
+          description: |-
+            Ordre
+
+            * `entity_name` - Entity name
+            * `-entity_name` - Entity name (décroissant)
+            * `entity_id` - Entity id
+            * `-entity_id` - Entity id (décroissant)
+            * `user` - Utilisateur
+            * `-user` - Utilisateur (décroissant)
+            * `role` - Role
+            * `-role` - Role (décroissant)
+            * `is_active` - Is active
+            * `-is_active` - Is active (décroissant)
+          explode: false
+          style: form
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: role
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ADMIN
+                - AUDITOR
+                - RO
+                - RW
+          description: |-
+            * `RO` - Lecture Seule
+            * `RW` - Lecture/Écriture
+            * `ADMIN` - Administrateur
+            * `AUDITOR` - Auditeur
+          explode: true
+          style: form
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AdminEntityIdsRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedAdminUserRowList"
+          description: ""
   /api/entities/certificates/:
     get:
       operationId: entities_certificates_list
@@ -13841,6 +14477,39 @@ components:
       required:
         - delivery_site_id
         - ownership_type
+    AdminEntityIdsRequest:
+      type: object
+      properties:
+        entity_ids:
+          type: string
+    AdminUserRow:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+        is_active:
+          type: boolean
+        entity_id:
+          type: integer
+          readOnly: true
+        entity_name:
+          type: string
+        entity_type:
+          $ref: "#/components/schemas/EntityTypeEnum"
+        role:
+          $ref: "#/components/schemas/RoleEnum"
+      required:
+        - email
+        - entity_id
+        - entity_name
+        - entity_type
+        - is_active
+        - role
+        - user_id
     AgreementLists:
       type: object
       properties:
@@ -19955,6 +20624,29 @@ components:
             $ref: "#/components/schemas/Action"
         total_count:
           type: integer
+    PaginatedAdminUserRowList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminUserRow"
     PaginatedBalanceResponseList:
       type: object
       required:

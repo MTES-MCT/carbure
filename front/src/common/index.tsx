@@ -18,6 +18,7 @@ import { useH2Permissions } from "h2/hooks/use-h2-permissions"
 const Account = lazy(() => import("account"))
 const Auth = lazy(() => import("auth"))
 const Entities = lazy(() => import("companies-admin"))
+const AdminUsers = lazy(() => import("companies-admin/pages/users"))
 const Controls = lazy(() => import("controls"))
 const DoubleCounting = lazy(() => import("double-counting"))
 const DoubleCountingAdmin = lazy(() => import("double-counting-admin"))
@@ -276,6 +277,7 @@ const Org = () => {
 
       {(isAdmin || isExternal) && (
         <>
+          {isAdmin && <Route path="users" element={<AdminUsers />} />}
           <Route path="entities/*" element={<Entities />} />
           <Route path="*" element={<Navigate replace to="entities" />} />
         </>
