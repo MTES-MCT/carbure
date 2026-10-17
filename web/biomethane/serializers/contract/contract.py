@@ -20,7 +20,23 @@ class BiomethaneContractSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BiomethaneContract
-        fields = "__all__"
+        fields = [
+            "amendments",
+            "tracked_amendment_types",
+            "tariff_reference",
+            "buyer",
+            "installation_category",
+            "cmax",
+            "cmax_annualized",
+            "cmax_annualized_value",
+            "pap_contracted",
+            "signature_date",
+            "effective_date",
+            "conditions_file",
+            "has_complementary_investment_aid",
+            "complementary_aid_organisms",
+            "complementary_aid_other_organism_name",
+        ]
 
 
 # Serializer for contract with restricted fields (used for external entities like ADEME)

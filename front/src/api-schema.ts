@@ -3875,12 +3875,12 @@ export interface components {
          */
         BiomethaneAnnualDeclarationStatusEnum: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus;
         BiomethaneContract: {
-            readonly id: number;
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
             readonly tracked_amendment_types: components["schemas"]["TrackedAmendmentTypesEnum"][];
-            complementary_aid_organisms: components["schemas"]["ComplementaryAidOrganismsEnum"][];
             /** Référence de l'arrêté tarifaire */
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
+            /** Acheteur */
+            buyer?: number | null;
             /** Catégorie d'installation */
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /**
@@ -3914,11 +3914,9 @@ export interface components {
             conditions_file?: string | null;
             /** Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement? */
             has_complementary_investment_aid?: boolean | null;
+            complementary_aid_organisms: components["schemas"]["ComplementaryAidOrganismsEnum"][];
             /** Précisez le nom du ou des organismes publics ayant octroyé l'aide */
             complementary_aid_other_organism_name?: string | null;
-            /** Acheteur */
-            buyer?: number | null;
-            producer: number;
         };
         BiomethaneContractAmendment: {
             readonly id: number;
@@ -4186,7 +4184,6 @@ export interface components {
             has_cover?: boolean;
             /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
-            producer: number;
         };
         BiomethaneDigestateStorageInput: {
             readonly id: number;
@@ -4404,7 +4401,6 @@ export interface components {
             energy: number;
         };
         BiomethaneInjectionSite: {
-            readonly id: number;
             /** Numéro d'identifiant unique du site d'injection */
             unique_identification_number: string;
             /** Raccordement à un site d'injection mutualisé */
@@ -4423,7 +4419,6 @@ export interface components {
             network_type?: components["schemas"]["NetworkTypeEnum"] | null;
             /** Nom du gestionnaire de réseau */
             network_manager_name?: string | null;
-            producer: number;
         };
         BiomethaneInjectionSiteInputRequest: {
             /** Numéro d'identifiant unique du site d'injection */
@@ -4585,16 +4580,10 @@ export interface components {
         };
         BiomethaneSupplyInput: {
             readonly id: number;
-            origin_country: components["schemas"]["Country"];
-            feedstock: components["schemas"]["FeedStockClassification"];
             producer: components["schemas"]["EntityPreview"];
-            /**
-             * Format: double
-             * @description Tonnage en matière brute (tMB), converti depuis tMS si besoin.
-             */
-            readonly volume_tmb: number | null;
             /** Provenance */
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
+            feedstock: components["schemas"]["FeedStockClassification"];
             /** Type de CIVE */
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             /** Précisez la culture */
@@ -4613,6 +4602,12 @@ export interface components {
              * Format: double
              */
             volume?: number | null;
+            /**
+             * Format: double
+             * @description Tonnage en matière brute (tMB), converti depuis tMS si besoin.
+             */
+            readonly volume_tmb: number | null;
+            origin_country: components["schemas"]["Country"];
             /** Département d'origine */
             origin_department?: string | null;
             /**
@@ -4625,7 +4620,6 @@ export interface components {
              * Format: double
              */
             maximum_distance_km?: number | null;
-            supply_plan: number;
         };
         BiomethaneSupplyInputCreate: {
             readonly id: number;
@@ -5435,24 +5429,19 @@ export interface components {
         ElecProvisionCertificateQualicharge: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
-            /** Format: double */
-            renewable_energy: number;
-            unknown_siren?: string | null;
+            operating_unit: string;
+            station_id: string;
             /** Format: date */
             date_from: string;
             /** Format: date */
             date_to: string;
-            year: number;
-            operating_unit: string;
-            station_id: string;
             /** Format: double */
             energy_amount: number;
             /** Format: double */
             enr_ratio?: number;
-            is_controlled_by_qualicharge?: boolean;
+            /** Format: double */
+            renewable_energy: number;
             validated_by?: components["schemas"]["ElecQualichargeStatusEnum"];
-            /** Format: date-time */
-            readonly created_at: string | null;
         };
         /** @description Serializer for grouped provision certificate data by operating unit. */
         ElecProvisionCertificateQualichargeGrouped: {
@@ -5894,22 +5883,16 @@ export interface components {
         };
         H2Station: {
             readonly id: number;
-            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
             readonly entity_name: string | null;
             name: string;
             /** SIRET */
             site_siret?: string;
-            site_type?: components["schemas"]["SiteTypeEnum"];
             /** Adresse */
             address?: string;
             /** Code postal */
             postal_code?: string;
             /** Commune */
             city?: string;
-            /** Coordonnées GPS */
-            gps_coordinates?: string | null;
-            private?: boolean;
-            is_enabled?: boolean;
             /**
              * Date de mise en service
              * Format: date
@@ -5917,6 +5900,7 @@ export interface components {
             commissioning_date?: string | null;
             /** Nature d'accès au site */
             access_type: components["schemas"]["AccessTypeEnum"];
+            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
             /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
@@ -5925,9 +5909,6 @@ export interface components {
             storage_capacity: number;
             /** Capacité de distribution */
             distribution_capacity: number;
-            /** Pays */
-            country?: number | null;
-            created_by?: number | null;
         };
         H2StationInput: {
             readonly id: number;

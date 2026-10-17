@@ -14978,9 +14978,6 @@ components:
     BiomethaneContract:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         amendments:
           type: array
           items:
@@ -14991,15 +14988,15 @@ components:
           items:
             $ref: "#/components/schemas/TrackedAmendmentTypesEnum"
           readOnly: true
-        complementary_aid_organisms:
-          type: array
-          items:
-            $ref: "#/components/schemas/ComplementaryAidOrganismsEnum"
         tariff_reference:
           allOf:
             - $ref: "#/components/schemas/TariffReferenceEnum"
           nullable: true
           title: Référence de l'arrêté tarifaire
+        buyer:
+          type: integer
+          nullable: true
+          title: Acheteur
         installation_category:
           allOf:
             - $ref: "#/components/schemas/InstallationCategoryEnum"
@@ -15043,22 +15040,18 @@ components:
           nullable: true
           title: Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s)
             complémentaire(s) à l'investissement?
+        complementary_aid_organisms:
+          type: array
+          items:
+            $ref: "#/components/schemas/ComplementaryAidOrganismsEnum"
         complementary_aid_other_organism_name:
           type: string
           nullable: true
           title: Précisez le nom du ou des organismes publics ayant octroyé l'aide
           maxLength: 255
-        buyer:
-          type: integer
-          nullable: true
-          title: Acheteur
-        producer:
-          type: integer
       required:
         - amendments
         - complementary_aid_organisms
-        - id
-        - producer
         - tracked_amendment_types
     BiomethaneContractAmendment:
       type: object
@@ -15486,12 +15479,9 @@ components:
         has_biogas_recovery:
           type: boolean
           title: Récupération du biogaz
-        producer:
-          type: integer
       required:
         - capacity
         - id
-        - producer
         - type
     BiomethaneDigestateStorageInput:
       type: object
@@ -15828,9 +15818,6 @@ components:
     BiomethaneInjectionSite:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
         unique_identification_number:
           type: string
           title: Numéro d'identifiant unique du site d'injection
@@ -15871,11 +15858,7 @@ components:
           nullable: true
           title: Nom du gestionnaire de réseau
           maxLength: 100
-        producer:
-          type: integer
       required:
-        - id
-        - producer
         - unique_identification_number
     BiomethaneInjectionSiteInputRequest:
       type: object
@@ -16232,23 +16215,15 @@ components:
         id:
           type: integer
           readOnly: true
-        origin_country:
-          $ref: "#/components/schemas/Country"
-        feedstock:
-          $ref: "#/components/schemas/FeedStockClassification"
         producer:
           $ref: "#/components/schemas/EntityPreview"
-        volume_tmb:
-          type: number
-          format: double
-          readOnly: true
-          nullable: true
-          description: Tonnage en matière brute (tMB), converti depuis tMS si besoin.
         source:
           allOf:
             - $ref: "#/components/schemas/BiomethaneSupplyInputSourceEnum"
           nullable: true
           title: Provenance
+        feedstock:
+          $ref: "#/components/schemas/FeedStockClassification"
         type_cive:
           allOf:
             - $ref: "#/components/schemas/TypeCiveEnum"
@@ -16278,6 +16253,14 @@ components:
           format: double
           nullable: true
           title: Tonnage
+        volume_tmb:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
+          description: Tonnage en matière brute (tMB), converti depuis tMS si besoin.
+        origin_country:
+          $ref: "#/components/schemas/Country"
         origin_department:
           type: string
           nullable: true
@@ -16293,14 +16276,11 @@ components:
           format: double
           nullable: true
           title: Distance maximale (Km)
-        supply_plan:
-          type: integer
       required:
         - feedstock
         - id
         - origin_country
         - producer
-        - supply_plan
         - volume_tmb
     BiomethaneSupplyInputCreate:
       type: object
@@ -18268,47 +18248,31 @@ components:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
           readOnly: true
-        renewable_energy:
-          type: number
-          format: double
-        unknown_siren:
-          type: string
-          nullable: true
-          maxLength: 16
-        date_from:
-          type: string
-          format: date
-        date_to:
-          type: string
-          format: date
-        year:
-          type: integer
-          maximum: 2147483647
-          minimum: -2147483648
         operating_unit:
           type: string
           maxLength: 64
         station_id:
           type: string
           maxLength: 64
+        date_from:
+          type: string
+          format: date
+        date_to:
+          type: string
+          format: date
         energy_amount:
           type: number
           format: double
         enr_ratio:
           type: number
           format: double
-        is_controlled_by_qualicharge:
-          type: boolean
+        renewable_energy:
+          type: number
+          format: double
         validated_by:
           $ref: "#/components/schemas/ElecQualichargeStatusEnum"
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-          nullable: true
       required:
         - cpo
-        - created_at
         - date_from
         - date_to
         - energy_amount
@@ -18316,7 +18280,6 @@ components:
         - operating_unit
         - renewable_energy
         - station_id
-        - year
     ElecProvisionCertificateQualichargeGrouped:
       type: object
       description: Serializer for grouped provision certificate data by operating unit.
@@ -19449,10 +19412,6 @@ components:
         id:
           type: integer
           readOnly: true
-        distributed_pressure:
-          type: array
-          items:
-            $ref: "#/components/schemas/DistributedPressureEnum"
         entity_name:
           type: string
           readOnly: true
@@ -19464,8 +19423,6 @@ components:
           type: string
           title: SIRET
           maxLength: 64
-        site_type:
-          $ref: "#/components/schemas/SiteTypeEnum"
         address:
           type: string
           title: Adresse
@@ -19478,15 +19435,6 @@ components:
           type: string
           title: Commune
           maxLength: 128
-        gps_coordinates:
-          type: string
-          nullable: true
-          title: Coordonnées GPS
-          maxLength: 64
-        private:
-          type: boolean
-        is_enabled:
-          type: boolean
         commissioning_date:
           type: string
           format: date
@@ -19496,6 +19444,10 @@ components:
           allOf:
             - $ref: "#/components/schemas/AccessTypeEnum"
           title: Nature d'accès au site
+        distributed_pressure:
+          type: array
+          items:
+            $ref: "#/components/schemas/DistributedPressureEnum"
         has_personal_vehicle_connector:
           type: boolean
           title: Connecteurs compatibles avec les véhicules particuliers
@@ -19512,13 +19464,6 @@ components:
           maximum: 2147483647
           minimum: 1
           title: Capacité de distribution
-        country:
-          type: integer
-          nullable: true
-          title: Pays
-        created_by:
-          type: integer
-          nullable: true
       required:
         - access_type
         - distributed_pressure

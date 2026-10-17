@@ -7,7 +7,17 @@ from core.serializers import check_fields_required
 class BiomethaneInjectionSiteSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneInjectionSite
-        fields = "__all__"
+        fields = [
+            "unique_identification_number",
+            "is_shared_injection_site",
+            "meter_number",
+            "is_different_from_production_site",
+            "company_address",
+            "city",
+            "postal_code",
+            "network_type",
+            "network_manager_name",
+        ]
 
 
 class BiomethaneInjectionSiteInputSerializer(serializers.ModelSerializer):
