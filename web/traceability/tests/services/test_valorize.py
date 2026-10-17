@@ -12,7 +12,7 @@ class ValorizeTest(TestCase):
     fixtures = ["json/countries.json"]
 
     def setUp(self):
-        Material.objects.create(
+        Material.objects.get_or_create(
             code=Material.VALORIZED_ENERGY_CODE,
             name=Material.VALORIZED_ENERGY_NAME,
             unit=Material.MJ,
