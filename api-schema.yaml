@@ -13344,6 +13344,7 @@ paths:
                 - -quantity
                 - -shipping_distance
                 - -site
+                - -status
                 - -working_date
                 - holder
                 - material
@@ -13351,6 +13352,7 @@ paths:
                 - quantity
                 - shipping_distance
                 - site
+                - status
                 - working_date
           description: |-
             Ordre
@@ -13367,6 +13369,8 @@ paths:
             * `-site` - Site (décroissant)
             * `shipping_distance` - Shipping distance
             * `-shipping_distance` - Shipping distance (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `working_date` - Working date
             * `-working_date` - Working date (décroissant)
           explode: false
@@ -13631,6 +13635,7 @@ paths:
                 - -quantity
                 - -shipping_distance
                 - -site
+                - -status
                 - -working_date
                 - holder
                 - material
@@ -13638,6 +13643,7 @@ paths:
                 - quantity
                 - shipping_distance
                 - site
+                - status
                 - working_date
           description: |-
             Ordre
@@ -13654,6 +13660,8 @@ paths:
             * `-site` - Site (décroissant)
             * `shipping_distance` - Shipping distance
             * `-shipping_distance` - Shipping distance (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `working_date` - Working date
             * `-working_date` - Working date (décroissant)
           explode: false
@@ -13913,6 +13921,7 @@ paths:
                 - -quantity
                 - -shipping_distance
                 - -site
+                - -status
                 - -working_date
                 - holder
                 - material
@@ -13920,6 +13929,7 @@ paths:
                 - quantity
                 - shipping_distance
                 - site
+                - status
                 - working_date
           description: |-
             Ordre
@@ -13936,6 +13946,8 @@ paths:
             * `-site` - Site (décroissant)
             * `shipping_distance` - Shipping distance
             * `-shipping_distance` - Shipping distance (décroissant)
+            * `status` - Status
+            * `-status` - Status (décroissant)
             * `working_date` - Working date
             * `-working_date` - Working date (décroissant)
           explode: false
