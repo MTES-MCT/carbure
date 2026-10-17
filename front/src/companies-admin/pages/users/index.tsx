@@ -92,6 +92,8 @@ const AdminUsers = () => {
               rows={rows}
               rowLink={(row) => entityUsersPath(row.entity_id)}
               columns={columns}
+              order={state.order}
+              onOrder={actions.setOrder}
             />
             <Pagination
               defaultPage={query.page}

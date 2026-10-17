@@ -11162,7 +11162,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                entity_ids?: string;
                 /**
                  * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
@@ -11187,6 +11186,21 @@ export interface operations {
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `entity_name` - Entity name
+                 *     * `-entity_name` - Entity name (décroissant)
+                 *     * `entity_id` - Entity id
+                 *     * `-entity_id` - Entity id (décroissant)
+                 *     * `user` - Utilisateur
+                 *     * `-user` - Utilisateur (décroissant)
+                 *     * `role` - Role
+                 *     * `-role` - Role (décroissant)
+                 *     * `is_active` - Is active
+                 *     * `-is_active` - Is active (décroissant)
+                 */
+                order_by?: PathsApiEntitiesAdminUsersGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -11224,7 +11238,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                entity_ids?: string;
                 /**
                  * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
@@ -11249,6 +11262,21 @@ export interface operations {
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `entity_name` - Entity name
+                 *     * `-entity_name` - Entity name (décroissant)
+                 *     * `entity_id` - Entity id
+                 *     * `-entity_id` - Entity id (décroissant)
+                 *     * `user` - Utilisateur
+                 *     * `-user` - Utilisateur (décroissant)
+                 *     * `role` - Role
+                 *     * `-role` - Role (décroissant)
+                 *     * `is_active` - Is active
+                 *     * `-is_active` - Is active (décroissant)
+                 */
+                order_by?: PathsApiEntitiesAdminUsersGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /**
@@ -11288,7 +11316,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                entity_ids?: string;
                 /**
                  * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
@@ -11315,6 +11342,21 @@ export interface operations {
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `entity_name` - Entity name
+                 *     * `-entity_name` - Entity name (décroissant)
+                 *     * `entity_id` - Entity id
+                 *     * `-entity_id` - Entity id (décroissant)
+                 *     * `user` - Utilisateur
+                 *     * `-user` - Utilisateur (décroissant)
+                 *     * `role` - Role
+                 *     * `-role` - Role (décroissant)
+                 *     * `is_active` - Is active
+                 *     * `-is_active` - Is active (décroissant)
+                 */
+                order_by?: PathsApiEntitiesAdminUsersGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /**
@@ -11348,7 +11390,6 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                entity_ids?: string;
                 /**
                  * @description * `Producteur` - Producteur
                  *     * `Opérateur` - Opérateur
@@ -11373,6 +11414,21 @@ export interface operations {
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `entity_name` - Entity name
+                 *     * `-entity_name` - Entity name (décroissant)
+                 *     * `entity_id` - Entity id
+                 *     * `-entity_id` - Entity id (décroissant)
+                 *     * `user` - Utilisateur
+                 *     * `-user` - Utilisateur (décroissant)
+                 *     * `role` - Role
+                 *     * `-role` - Role (décroissant)
+                 *     * `is_active` - Is active
+                 *     * `-is_active` - Is active (décroissant)
+                 */
+                order_by?: PathsApiEntitiesAdminUsersGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
                 /** @description A page number within the paginated result set. */
@@ -16295,6 +16351,18 @@ export enum PathsApiEntitiesAdminUsersGetParametersQueryEntity_type {
     Trader = "Trader",
     Unknown = "Unknown"
 }
+export enum PathsApiEntitiesAdminUsersGetParametersQueryOrder_by {
+    ValueMinusentity_id = "-entity_id",
+    ValueMinusentity_name = "-entity_name",
+    ValueMinusis_active = "-is_active",
+    ValueMinusrole = "-role",
+    ValueMinususer = "-user",
+    entity_id = "entity_id",
+    entity_name = "entity_name",
+    is_active = "is_active",
+    role = "role",
+    user = "user"
+}
 export enum PathsApiEntitiesAdminUsersGetParametersQueryRole {
     ADMIN = "ADMIN",
     AUDITOR = "AUDITOR",
@@ -16304,6 +16372,7 @@ export enum PathsApiEntitiesAdminUsersGetParametersQueryRole {
 export enum PathsApiEntitiesAdminUsersFiltersGetParametersQueryFilter {
     entity_type = "entity_type",
     is_active = "is_active",
+    order_by = "order_by",
     role = "role"
 }
 export enum PathsApiH2StationsGetParametersQueryAccess_type {

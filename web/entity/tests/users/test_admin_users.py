@@ -147,6 +147,7 @@ class AdminUsersTest(FiltersActionTestMixin, TestCase):
                 "is_active": [False, True],
                 "role": [UserRights.RO, UserRights.RW],
             },
+            ignore=["order_by"],
         )
 
     def test_export_returns_every_filtered_row(self):

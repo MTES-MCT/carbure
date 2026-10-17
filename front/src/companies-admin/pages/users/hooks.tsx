@@ -47,7 +47,7 @@ export function useAdminUserColumns(): Column<AdminUserRow>[] {
 
   return [
     {
-      key: "entity",
+      key: "entity_name",
       header: t("Entité"),
       cell: (row) => (
         <Cell
@@ -62,7 +62,7 @@ export function useAdminUserColumns(): Column<AdminUserRow>[] {
       cell: (row) => <Cell text={row.entity_id} />,
     },
     {
-      key: "id",
+      key: "user",
       header: t("Utilisateur"),
       cell: (row) => <Cell text={row.email} />,
     },
@@ -77,12 +77,6 @@ export function useAdminUserColumns(): Column<AdminUserRow>[] {
       key: "is_active",
       header: t("Actif"),
       cell: (row) => (row.is_active ? t("Oui") : t("Non")),
-    },
-    {
-      small: true,
-      key: "actions",
-      header: t("Actions"),
-      cell: () => t("Consulter"),
     },
   ]
 }
