@@ -1,8 +1,18 @@
 from datetime import date
 from decimal import Decimal
 
-from core.factories.sample_data import set_user_access, setup_admin_user, setup_france, setup_regular_user
+from django.core.management import call_command
+
+from core.factories.sample_data import (
+    set_user_access,
+    setup_admin_user,
+    setup_external_admin_entity,
+    setup_france,
+    setup_regular_user,
+)
 from core.models import Entity
+from core.models.certificate import GenericCertificate
+from core.models.entity import ExternalAdminRights
 from entity.factories.entity import EntityFactory
 from h2.factories import H2StationFactory
 from h2.models import H2Station
@@ -20,7 +30,10 @@ def setup_h2_entity() -> Entity:
         entity_type=Entity.HRS,
     )
 
+    admin_h2_entity = setup_external_admin_entity("Admin H2", ExternalAdminRights.H2)
+
     set_user_access(admin_user, hrs_entity, "ADMIN")
+    set_user_access(admin_user, admin_h2_entity, "ADMIN")
     set_user_access(regular_user, hrs_entity, "RO")
 
     return hrs_entity
@@ -181,7 +194,16 @@ def setup_h2_certificates() -> tuple[Action, Action]:
     return h2_certificate_01, h2_certificate_02
 
 
+def setup_h2_producer_certificates() -> None:
+    producer_certificates = GenericCertificate.objects.filter(certificate_type=GenericCertificate.CERTIFHY)
+
+    if not producer_certificates.exists():
+        call_command("import_certifhy_certificates")
+
+
 def create_sample_data():
+    # Get producer certificates from CertifHy
+    setup_h2_producer_certificates()
     setup_h2_entity()
     setup_h2_stations()
     setup_h2_materials()
