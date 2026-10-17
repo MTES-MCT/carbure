@@ -193,7 +193,7 @@ class ActionExcelImportViewTest(APITestCase):
     def test_import_errors_when_material_is_missing_conversion_factors(self):
         material = MaterialFactory(code="MAT-NO", name="Sans facteur", lhv=None, density=None)
 
-        with self.assertRaises(RuntimeError):
+        with patch.object(getLogger("django.request"), "error"), self.assertRaises(RuntimeError):
             self._post(
                 filled_generic_template(
                     material_name=material.name,
