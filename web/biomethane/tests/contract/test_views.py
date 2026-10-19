@@ -88,7 +88,7 @@ class BiomethaneContractViewsTests(TestCase):
         response = self.client.get(self.contract_url, self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["producer"], self.producer_entity.id)
+        self.assertEqual(response.data["tariff_reference"], "2021")
         self.assertEqual(response.data["buyer"], self.buyer_entity.id)
 
     def test_patch_contract_basic_fields(self):

@@ -46,7 +46,6 @@ env = environ.Env(
     WITH_EMAIL_DECORATED_AS_TEST=(bool, False),
     WITH_SENTRY=(bool, False),
     WITH_UDB_ACCEPTANCE_DATA=(bool, False),
-    WITH_CSRF=(bool, True),
     ELEC_READJUSTMENT_ENTITY=(str, ""),
     ENABLE_SAF_LOGISTICS=(bool, True),
     FILE_UPLOAD_MAX_MEMORY_SIZE_MB=(int, 10),
@@ -462,6 +461,7 @@ SPECTACULAR_SETTINGS = {
         "BiomethaneSupplyInputSourceEnum": "biomethane.models.BiomethaneSupplyInput.SOURCE_CHOICES",
         "ElecQualichargeStatusEnum": "elec.models.ElecProvisionCertificateQualicharge.VALIDATION_CHOICES",
         "EntityTypeEnum": "core.models.Entity.ENTITY_TYPES",
+        "RoleEnum": "core.models.UserRights.ROLES",
         "ActionTypeEnum": "traceability.models.action.Action.TYPES",
         "ActionStatusEnum": "traceability.models.action_status.ActionStatus.STATUSES",
         "ActionShippingMethodEnum": "traceability.models.action.Action.SHIPPING_METHODS",
@@ -486,14 +486,6 @@ if env("IMAGE_TAG") in ("dev", "local"):
     import factory
 
     factory.Faker._DEFAULT_LOCALE = "fr_FR"
-
-if not env("WITH_CSRF"):
-    MIDDLEWARE.remove("django.middleware.csrf.CsrfViewMiddleware")
-    # DRF SessionAuthentication enforces CSRF on its own, even without the middleware.
-    REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"] = [
-        "carbure.authentication.CsrfExemptSessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
-    ]
 
 if env("IMAGE_TAG") not in ["dev", "staging", "prod"]:
     # Disable throtting in local

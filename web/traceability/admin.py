@@ -19,7 +19,7 @@ class StoredFileActionInline(admin.TabularInline):
     fk_name = "file"
     extra = 0
     show_change_link = True
-    fields = ("pos_id", "industry", "type", "holder", "quantity", "working_date")
+    fields = ("pos_id", "industry", "site", "holder", "quantity", "working_date")
     readonly_fields = fields
     ordering = ("pos_id",)
 
@@ -115,6 +115,7 @@ class ActionAdmin(admin.ModelAdmin):
 @admin.register(StoredFile)
 class StoredFileAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "entity", "user", "created_at")
+    list_filter = ("entity",)
     fields = ("entity", "user", "name", "url", "created_at")
     search_fields = ("name", "entity__name", "user__email", "actions__pos_id")
     raw_id_fields = ("user", "entity")

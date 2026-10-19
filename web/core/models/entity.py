@@ -137,8 +137,15 @@ class Entity(models.Model):
         return d
 
     def ntr_id(self):
-        ntr = NationalTradeRegister(self.registered_country.code_pays, self.registration_id)
-        return ntr.id()
+        if not self.registered_country:
+            raise ValueError(f"Entity '{self.name}' has no registered country")
+
+        try:
+            ntr = NationalTradeRegister(self.registered_country.code_pays, self.registration_id)
+            return ntr.id()
+
+        except Exception as e:
+            raise RuntimeError(f"Unable to retrieve NTR id for entity '{self.name}': {e.args[0]}") from e
 
     def url_friendly_name(self):
         return self.name.replace(" ", "").upper()
