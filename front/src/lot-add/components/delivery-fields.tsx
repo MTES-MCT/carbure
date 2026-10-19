@@ -13,6 +13,7 @@ import * as api from "common/api"
 import * as norm from "common/utils/normalizers"
 import { compact } from "common/utils/collection"
 import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
+import { hasUsageFields } from "transactions/utils/usage-fields"
 import { isFrenchDelivery, LotFormValue } from "./lot-form"
 import { LotStatus } from "transactions/types"
 import { Country, Depot, EntityPreview } from "common/types"
@@ -231,8 +232,8 @@ export const UsageField = (props: SelectProps<FuelUsage>) => {
   const { value, bind } = useFormContext<LotFormValue>()
 
   if (
-    value.delivery_type !== DeliveryType.RFC ||
-    !canShowDeliveryTypeField(entity, value)
+    !canShowDeliveryTypeField(entity, value) ||
+    !hasUsageFields(value.delivery_type)
   ) {
     return null
   }
@@ -246,9 +247,9 @@ export const UsagePrecisionField = (props: TextInputProps) => {
   const { value, bind } = useFormContext<LotFormValue>()
 
   if (
-    value.delivery_type !== DeliveryType.RFC ||
-    value.usage !== FuelUsage.Other ||
-    !canShowDeliveryTypeField(entity, value)
+    !canShowDeliveryTypeField(entity, value) ||
+    !hasUsageFields(value.delivery_type) ||
+    value.usage !== FuelUsage.Other
   ) {
     return null
   }

@@ -6,10 +6,16 @@ type UsageFields = {
   usage_precision?: string
 }
 
+export function hasUsageFields(deliveryType?: DeliveryType | string): boolean {
+  return (
+    deliveryType === DeliveryType.RFC || deliveryType === DeliveryType.Direct
+  )
+}
+
 export function normalizeUsageFields<T extends UsageFields>(value: T): T {
   const normalized = { ...value }
 
-  if (normalized.delivery_type !== DeliveryType.RFC) {
+  if (!hasUsageFields(normalized.delivery_type)) {
     normalized.usage = undefined
     normalized.usage_precision = undefined
   } else if (normalized.usage !== FuelUsage.Other) {
