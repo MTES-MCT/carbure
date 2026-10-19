@@ -28,8 +28,8 @@ def create_errors(outliers_by_emission_category: dict[str, pd.DataFrame]):
     errors: list[GenericError] = []
 
     for emission_category, outliers in outliers_by_emission_category.items():
-        lof_outlier_filters = Q()
-        lof_outliers = outliers[outliers["is_lof_outlier"]].drop(columns=["is_lof_outlier", "is_if_outlier"])
+        lof_outlier_filters = Q(pk__in=[])
+        lof_outliers = outliers.loc[outliers["is_lof_outlier"].eq(True)].drop(columns=["is_lof_outlier", "is_if_outlier"])
         for _, row in lof_outliers.iterrows():
             filters = row.to_dict()
             lof_outlier_filters |= Q(**filters)
@@ -37,8 +37,8 @@ def create_errors(outliers_by_emission_category: dict[str, pd.DataFrame]):
         lof_outlier_lot_ids = processed_lots.filter(lof_outlier_filters).distinct().values_list("id", flat=True)
         errors += [create_error("LOF_OUTLIER", emission_category, lot_id) for lot_id in lof_outlier_lot_ids]
 
-        if_outlier_filters = Q()
-        if_outliers = outliers[outliers["is_if_outlier"]].drop(columns=["is_lof_outlier", "is_if_outlier"])
+        if_outlier_filters = Q(pk__in=[])
+        if_outliers = outliers.loc[outliers["is_if_outlier"].eq(True)].drop(columns=["is_lof_outlier", "is_if_outlier"])
         for _, row in if_outliers.iterrows():
             filters = row.to_dict()
             if_outlier_filters |= Q(**filters)
@@ -46,8 +46,9 @@ def create_errors(outliers_by_emission_category: dict[str, pd.DataFrame]):
         if_outlier_lot_ids = processed_lots.filter(if_outlier_filters).distinct().values_list("id", flat=True)
         errors += [create_error("IF_OUTLIER", emission_category, lot_id) for lot_id in if_outlier_lot_ids]
 
-    lot_ids: list[int] = [e.lot_id for e in errors]
-    GenericError.objects.filter(error__in=["LOF_OUTLIER", "IF_OUTLIER"], lot_id__in=lot_ids).delete()
+    lot_ids: list[int] = list(dict.fromkeys(e.lot_id for e in errors))
+    # Replace previous detections, including lots no longer flagged after retuning.
+    GenericError.objects.filter(error__in=["LOF_OUTLIER", "IF_OUTLIER"], lot__in=processed_lots).delete()
     GenericError.objects.bulk_create(errors, batch_size=1000)
 
     return lot_ids
