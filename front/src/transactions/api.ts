@@ -182,12 +182,15 @@ export function acceptForConsumption(
 
 export function acceptForDirectDelivery(
   query: LotQuery,
-  selection: number[] | undefined
+  selection: number[] | undefined,
+  usage: string,
+  usage_precision?: string
 ) {
-  return api.post<Api<void>>(
-    "/transactions/lots/accept-direct-delivery",
-    selectionOrQuery(query, selection)
-  )
+  return api.post<Api<void>>("/transactions/lots/accept-direct-delivery", {
+    ...selectionOrQuery(query, selection),
+    usage,
+    usage_precision,
+  })
 }
 
 export function acceptForExport(

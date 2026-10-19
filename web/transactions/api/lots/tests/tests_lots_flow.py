@@ -366,15 +366,36 @@ class LotsFlowTest(TestCase):
         assert lot.delivery_type == CarbureLot.EXPORT
 
     def test_accept_direct_delivery(self):
+        for usage, expected_precision in ((CarbureLot.USAGE_ROAD, ""), (CarbureLot.USAGE_OTHER, "Details")):
+            with self.subTest(usage=usage):
+                lot = self.create_draft(carbure_client_id=self.operator.id)
+                lot = self.send_lot(lot)
+                response = self.client.post(
+                    reverse("transactions-lots-accept-direct-delivery"),
+                    {
+                        "entity_id": self.operator.id,
+                        "selection": [lot.id],
+                        "usage": usage,
+                        "usage_precision": "Details",
+                    },
+                )
+                assert response.status_code == 200
+                lot.refresh_from_db()
+                assert lot.lot_status == CarbureLot.ACCEPTED
+                assert lot.delivery_type == CarbureLot.DIRECT
+                assert lot.usage == usage
+                assert lot.usage_precision == expected_precision
+
+    def test_accept_direct_delivery_requires_usage_fields(self):
         lot = self.create_draft(carbure_client_id=self.operator.id)
         lot = self.send_lot(lot)
-        assert lot.lot_status == CarbureLot.PENDING
-        assert lot.delivery_type == CarbureLot.UNKNOWN
-        response = self.client.post(
-            reverse("transactions-lots-accept-direct-delivery"),
-            {"entity_id": self.operator.id, "selection": [lot.id]},
-        )
-        assert response.status_code == 200
-        lot = CarbureLot.objects.get(id=lot.id)
-        assert lot.lot_status == CarbureLot.ACCEPTED
-        assert lot.delivery_type == CarbureLot.DIRECT
+        for fields in ({}, {"usage": "INVALID"}, {"usage": CarbureLot.USAGE_OTHER, "usage_precision": " "}):
+            with self.subTest(fields=fields):
+                response = self.client.post(
+                    reverse("transactions-lots-accept-direct-delivery"),
+                    {"entity_id": self.operator.id, "selection": [lot.id], **fields},
+                )
+                assert response.status_code == 400
+                lot.refresh_from_db()
+                assert lot.lot_status == CarbureLot.PENDING
+                assert lot.delivery_type == CarbureLot.UNKNOWN
