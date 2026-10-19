@@ -2,8 +2,32 @@ from datetime import date
 from unittest import TestCase
 
 from core.models import CarbureLot, Entity
-from transactions.helpers import INCORRECT_FORMAT_DISPATCH_DATE, construct_carbure_lot, fill_dispatch_data
+from transactions.helpers import INCORRECT_FORMAT_DISPATCH_DATE, construct_carbure_lot, fill_dispatch_data, fill_usage_data
 from transactions.models import Site
+from transactions.sanity_checks.mandatory import check_missing_usage, check_missing_usage_precision_for_other_usage
+
+
+class UsageFieldsTest(TestCase):
+    def test_usage_fields_for_delivery_types(self):
+        for delivery_type in (CarbureLot.RFC, CarbureLot.DIRECT, CarbureLot.EXPORT):
+            with self.subTest(delivery_type=delivery_type):
+                lot = CarbureLot(delivery_type=delivery_type)
+                relevant = delivery_type != CarbureLot.EXPORT
+                self.assertEqual(check_missing_usage(lot) is not None, relevant)
+
+                fill_usage_data(lot, {"usage": CarbureLot.USAGE_OTHER, "usage_precision": "Details"})
+                self.assertEqual(lot.usage, CarbureLot.USAGE_OTHER if relevant else "")
+                self.assertEqual(lot.usage_precision, "Details" if relevant else "")
+                self.assertIsNone(check_missing_usage(lot))
+                self.assertIsNone(check_missing_usage_precision_for_other_usage(lot))
+
+                lot.usage_precision = ""
+                self.assertEqual(check_missing_usage_precision_for_other_usage(lot) is not None, relevant)
+
+                fill_usage_data(lot, {"usage": CarbureLot.USAGE_ROAD, "usage_precision": "Details"})
+                self.assertEqual(lot.usage, CarbureLot.USAGE_ROAD if relevant else "")
+                self.assertEqual(lot.usage_precision, "")
+                self.assertIsNone(check_missing_usage_precision_for_other_usage(lot))
 
 
 class ConstructCarbureLotTest(TestCase):

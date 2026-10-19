@@ -499,8 +499,8 @@ def fill_usage_data(lot, data):
     usage = (data.get("usage") or "").strip()
     usage_precision = (data.get("usage_precision") or "").strip()
 
-    # Usage fields are only meaningful for RFC deliveries.
-    if lot.delivery_type != CarbureLot.RFC:
+    # Usage fields are only meaningful for RFC and direct deliveries.
+    if lot.delivery_type not in (CarbureLot.RFC, CarbureLot.DIRECT):
         lot.usage = ""
         lot.usage_precision = ""
         return
