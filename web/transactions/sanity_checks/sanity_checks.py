@@ -56,7 +56,7 @@ from .mandatory import (
     check_missing_production_site_comdate,
     check_missing_supplier_certificate,
     check_missing_transport_document_reference,
-    check_missing_usage_for_rfc,
+    check_missing_usage,
     check_missing_usage_precision_for_other_usage,
     check_missing_vendor_certificate,
     check_missing_volume,
@@ -89,7 +89,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         check_missing_supplier_certificate(lot),
         check_missing_vendor_certificate(lot),
         check_production_info(lot),
-        check_missing_usage_for_rfc(lot),
+        check_missing_usage(lot),
         check_missing_usage_precision_for_other_usage(lot),
         # double counting errors
         check_missing_ref_dbl_counting(lot),
