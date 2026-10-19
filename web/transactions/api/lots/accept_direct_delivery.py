@@ -11,6 +11,7 @@ from core.models import (
     Entity,
     UserRights,
 )
+from transactions.helpers import fill_usage_data
 
 
 @check_user_rights(role=[UserRights.RW, UserRights.ADMIN])
@@ -18,6 +19,15 @@ def accept_direct_delivery(request, *args, **kwargs):
     context = kwargs["context"]
     entity_id = context["entity_id"]
     status = request.POST.get("status", False)
+    usage = request.POST.get("usage", "").strip()
+    usage_precision = request.POST.get("usage_precision", "").strip()
+
+    if not usage:
+        return JsonResponse({"status": "error", "message": "Usage is required for DIRECT"}, status=400)
+    if usage not in {value for value, _label in CarbureLot.USAGE_CHOICES}:
+        return JsonResponse({"status": "error", "message": "Invalid usage"}, status=400)
+    if usage == CarbureLot.USAGE_OTHER and not usage_precision:
+        return JsonResponse({"status": "error", "message": "Usage precision is required when usage is OTHER"}, status=400)
 
     entity = Entity.objects.get(id=entity_id)
     lots = get_entity_lots_by_status(entity, status)
@@ -50,6 +60,7 @@ def accept_direct_delivery(request, *args, **kwargs):
 
         lot.lot_status = CarbureLot.ACCEPTED
         lot.delivery_type = CarbureLot.DIRECT
+        fill_usage_data(lot, {"usage": usage, "usage_precision": usage_precision})
         lot.save()
         event = CarbureLotEvent()
         event.event_type = CarbureLotEvent.ACCEPTED
