@@ -24,7 +24,10 @@ import Select from "common/components/select"
 import { formatNumber } from "common/utils/formatters"
 import { getDeliveryTypes } from "lot-add/components/delivery-fields"
 import { FuelUsageSelect } from "transactions/components/fuel-usage-select"
-import { normalizeUsageFields } from "transactions/utils/usage-fields"
+import {
+  hasUsageFields,
+  normalizeUsageFields,
+} from "transactions/utils/usage-fields"
 
 export interface SplitOneButtonProps {
   disabled?: boolean
@@ -89,7 +92,7 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
 
   const deliveryTypes = getDeliveryTypes(entity, value.client, entity)
   const isDirect = value.delivery_type === DeliveryType.Direct
-  const showUsageField = value.delivery_type === DeliveryType.RFC
+  const showUsageField = hasUsageFields(value.delivery_type)
   const showUsagePrecisionField =
     showUsageField && value.usage === FuelUsage.Other
   const canSubmit =
