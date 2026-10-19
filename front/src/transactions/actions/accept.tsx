@@ -494,6 +494,12 @@ const DirectDeliveryDialog = ({
   const notify = useNotify()
   const matomo = useMatomo()
   const entity = useEntity()
+  const [usage, setUsage] = useState<FuelUsage | undefined>()
+  const [usagePrecision, setUsagePrecision] = useState<string | undefined>()
+  const requiresPrecision = usage === FuelUsage.Other
+  const canSubmit =
+    usage !== undefined &&
+    (!requiresPrecision || Boolean(usagePrecision?.trim()))
 
   const v = variations(selection.length)
 
@@ -546,18 +552,39 @@ const DirectDeliveryDialog = ({
             "En acceptant ces lots pour livraison directe, vous indiquez qu'ils seront utilisés dans le cadre d'incorporations de biocarburant faites à l'étranger mais destinées au marché français"
           )}
         </section>
+        <section>
+          <Form id="direct-delivery">
+            <FuelUsageSelect
+              autoFocus
+              required
+              value={usage}
+              onChange={setUsage}
+            />
+            {requiresPrecision && (
+              <TextInput
+                required
+                label={t("Précisions")}
+                placeholder={t("Préciser l'usage")}
+                value={usagePrecision}
+                onChange={setUsagePrecision}
+              />
+            )}
+          </Form>
+        </section>
 
         {summary && <LotSummary query={query} selection={selection} />}
       </main>
       <footer>
         <Button
           asideX
-          autoFocus
+          submit="direct-delivery"
           loading={acceptLots.loading}
+          disabled={!canSubmit}
           variant="success"
           icon={Check}
           label={t("Livraison directe")}
           action={() => {
+            if (!usage || (requiresPrecision && !usagePrecision?.trim())) return
             matomo.push([
               "trackEvent",
               "lots-accept",
@@ -565,7 +592,7 @@ const DirectDeliveryDialog = ({
               "",
               selection.length,
             ])
-            acceptLots.execute(query, selection)
+            acceptLots.execute(query, selection, usage, usagePrecision?.trim())
           }}
         />
         <Button
