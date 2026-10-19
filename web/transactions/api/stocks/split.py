@@ -13,7 +13,7 @@ from core.models import (
     Pays,
     UserRights,
 )
-from transactions.helpers import try_get_date
+from transactions.helpers import fill_usage_data, try_get_date
 from transactions.models import Depot
 from transactions.sanity_checks import get_prefetched_data
 
@@ -120,8 +120,7 @@ def stock_split(request, *args, **kwargs):
                 lot.delivery_site_country = None
         lot.transport_document_type = entry.get("transport_document_type", CarbureLot.OTHER)
         lot.delivery_type = entry.get("delivery_type", CarbureLot.UNKNOWN)
-        lot.usage = entry.get("usage", "")
-        lot.usage_precision = entry.get("usage_precision", "")
+        fill_usage_data(lot, entry)
         lot.transport_document_reference = entry.get("transport_document_reference", lot.delivery_type)
         delivery_site_id = entry.get("carbure_delivery_site_id", None)
         try:
