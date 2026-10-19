@@ -194,8 +194,8 @@ def check_missing_vendor_certificate(lot: CarbureLot):
             )
 
 
-def check_missing_usage_for_rfc(lot: CarbureLot):
-    if lot.delivery_type == CarbureLot.RFC and not lot.usage:
+def check_missing_usage(lot: CarbureLot):
+    if lot.delivery_type in (CarbureLot.RFC, CarbureLot.DIRECT) and not lot.usage:
         return generic_error(
             error=CarbureSanityCheckErrors.MISSING_USAGE,
             lot=lot,
@@ -206,7 +206,7 @@ def check_missing_usage_for_rfc(lot: CarbureLot):
 
 def check_missing_usage_precision_for_other_usage(lot: CarbureLot):
     if (
-        lot.delivery_type == CarbureLot.RFC
+        lot.delivery_type in (CarbureLot.RFC, CarbureLot.DIRECT)
         and lot.usage == CarbureLot.USAGE_OTHER
         and not (lot.usage_precision or "").strip()
     ):
