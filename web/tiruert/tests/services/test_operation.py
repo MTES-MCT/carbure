@@ -1,5 +1,6 @@
 from unittest.mock import Mock, patch
 
+from django.db.models import Q
 from django.http import QueryDict
 from django.test import TestCase
 from rest_framework.exceptions import ValidationError
@@ -59,7 +60,8 @@ class OperationServiceTestCase(TestCase):
         )
 
         cls.lot_direct = CarbureLotFactory.create(
-            carbure_client=cls.entity,
+            carbure_supplier=cls.entity,
+            carbure_client=None,
             feedstock=cls.feedstock_conv,
             biofuel=cls.biofuel_eth,
             lot_status="ACCEPTED",
@@ -114,7 +116,9 @@ class OperationServiceTestCase(TestCase):
             carbure_delivery_site=cls.depot,
         )
 
-        cls.entity_lots = CarbureLot.objects.filter(carbure_client=cls.entity)
+        cls.entity_lots = CarbureLot.objects.filter(
+            Q(carbure_client=cls.entity) | Q(carbure_supplier=cls.entity, delivery_type=CarbureLot.DIRECT)
+        )
 
 
 class OperationServiceEmissionRatesTest(OperationServiceTestCase):
@@ -270,12 +274,34 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         self.assertIsNotNone(operation.biofuel)
         self.assertIsNotNone(operation.customs_category)
 
+    def test_direct_operations_credit_each_supplier(self):
+        other_supplier = Entity.objects.exclude(pk=self.entity.pk).first()
+        other_lot = CarbureLotFactory.create(
+            carbure_supplier=other_supplier,
+            carbure_client=self.entity,
+            delivery_type=CarbureLot.DIRECT,
+            lot_status=CarbureLot.ACCEPTED,
+            feedstock=self.lot_direct.feedstock,
+            biofuel=self.lot_direct.biofuel,
+            carbure_delivery_site=self.depot,
+        )
+        lots = CarbureLot.objects.filter(pk__in=[self.lot_direct.pk, other_lot.pk])
+
+        OperationService.create_operations_from_lots(lots)
+
+        operations = Operation.objects.filter(type=Operation.LIVRAISON_DIRECTE)
+        self.assertEqual(operations.count(), 2)
+        for lot in lots:
+            operation = operations.get(details__lot=lot)
+            self.assertEqual(operation.credited_entity_id, lot.carbure_supplier_id)
+            self.assertIsNone(operation.debited_entity_id)
+
 
 class OperationServiceFilterLotsTest(OperationServiceTestCase):
     """Test OperationService.filter_valid_lots() method."""
 
     def test_filter_valid_lots_returns_only_valid_lots(self):
-        """Should apply RFC usage whitelist while still allowing empty RFC usage."""
+        """Should apply the RFC/DIRECT usage whitelist while still allowing empty usage."""
         excluded_rfc = CarbureLotFactory.create(
             carbure_client=self.entity,
             feedstock=self.feedstock_conv,
@@ -323,8 +349,8 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
         for lot in valid_lots:
             self.assertIn(lot.delivery_type, ["RFC", "BLENDING", "DIRECT"])
 
-        # Verify RFC-specific usage whitelist constraint
-        for lot in valid_lots.filter(delivery_type="RFC"):
+        # Verify the usage whitelist for RFC and DIRECT deliveries
+        for lot in valid_lots.filter(delivery_type__in=[CarbureLot.RFC, CarbureLot.DIRECT]):
             self.assertIn(
                 lot.usage,
                 [
@@ -337,6 +363,20 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
                     CarbureLot.USAGE_RAIL,
                 ],
             )
+
+    def test_filter_valid_lots_applies_usage_filter_to_direct(self):
+        for usage, included in (
+            (CarbureLot.USAGE_ROAD, True),
+            ("", True),
+            (CarbureLot.USAGE_COMBUSTIBLE, False),
+            (CarbureLot.USAGE_FISHING, False),
+            (CarbureLot.USAGE_OTHER, False),
+        ):
+            with self.subTest(usage=usage):
+                self.lot_direct.usage = usage
+                self.lot_direct.save(update_fields=["usage"])
+                valid_lots = OperationService.filter_valid_lots(self.entity_lots)
+                self.assertEqual(valid_lots.filter(pk=self.lot_direct.pk).exists(), included)
 
     def test_filter_fr_delivery_site_keeps_fr_and_no_delivery_site_lots(self):
         """Should keep lots with a FR delivery site and lots with no delivery site."""

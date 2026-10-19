@@ -104,6 +104,19 @@ class ValidateDeclarationTest(TestCase):
         assert response.json()["status"] == "error"
         assert response.json()["error"] == CarbureError.YEAR_LOCKED
 
+    @patch("transactions.api.declarations.validate.background_create_tiruert_operations_from_lots")
+    def test_direct_lots_selected_on_supplier_declaration(self, mock_tiruert):
+        self.entity.has_mac = False
+        self.entity.save(update_fields=["has_mac"])
+        response = self.client.post(
+            reverse("transactions-declarations-validate"), {"entity_id": self.entity.id, "period": 202201}
+        )
+        assert response.status_code == 200
+        mock_tiruert.assert_called_once()
+        selected_lots = mock_tiruert.call_args[0][0]
+        sent_lots, _ = self.get_entity_lots()
+        self.assertSetEqual(set(selected_lots.values_list("pk", flat=True)), set(sent_lots.values_list("pk", flat=True)))
+
 
 class ValidateDeclarationMacLotsTest(TestCase):
     """Tests for the mac_lots inclusion in validate_declaration."""
@@ -135,7 +148,7 @@ class ValidateDeclarationMacLotsTest(TestCase):
             delivery_type=CarbureLot.RFC,
         )
 
-        # Create non-RFC lots sent by supplier with has_mac=True (should NOT be mac_lots)
+        # Create blending lots sent by supplier with has_mac=True (should NOT be mac_lots)
         CarbureLotFactory.create_batch(
             3,
             lot_status=CarbureLot.ACCEPTED,
@@ -146,7 +159,7 @@ class ValidateDeclarationMacLotsTest(TestCase):
             year=2022,
             declared_by_supplier=False,
             declared_by_client=True,
-            delivery_type=CarbureLot.DIRECT,
+            delivery_type=CarbureLot.BLENDING,
         )
 
     @patch("transactions.api.declarations.validate.background_create_tiruert_operations_from_lots")
@@ -186,16 +199,15 @@ class ValidateDeclarationMacLotsTest(TestCase):
         tiruert_lots_qs = mock_tiruert.call_args[0][0]
         tiruert_lot_ids = set(tiruert_lots_qs.values_list("id", flat=True))
 
-        # Non-RFC lots from supplier (DIRECT) should not appear as extra "mac_lots"
-        # (they could appear as received lots but here carbure_client != supplier, so they won't)
-        direct_sent_lots = CarbureLot.objects.filter(
-            carbure_supplier=self.supplier_with_mac, delivery_type=CarbureLot.DIRECT
+        # Sent blending lots are excluded when the declarant is not their client.
+        blending_sent_lots = CarbureLot.objects.filter(
+            carbure_supplier=self.supplier_with_mac, delivery_type=CarbureLot.BLENDING
         )
-        for lot in direct_sent_lots:
+        for lot in blending_sent_lots:
             self.assertNotIn(
                 lot.id,
                 tiruert_lot_ids,
-                f"DIRECT lot {lot.id} should not be included as mac_lot",
+                f"BLENDING lot {lot.id} should not be included as mac_lot",
             )
 
     @patch("transactions.api.declarations.validate.background_create_tiruert_operations_from_lots")
