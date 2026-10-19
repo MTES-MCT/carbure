@@ -84,11 +84,12 @@ def validate_declaration(request, *args, **kwargs):
         # Create SAF ticket sources for declared received lots
         background_create_ticket_sources_from_lots(received_lots)
 
-        # Create TIRUERT operations for declared received lots + mac lots
+        # Create TIRUERT operations for received lots and supplier-side RFC/DIRECT lots
         mac_lots = sent_lots.filter(
             delivery_type=CarbureLot.RFC, carbure_supplier__has_mac=True
         )  # TODO: limit to OPERATOR, TRADER and PRODUCER?
-        tiruert_lots = received_lots | mac_lots
+        direct_lots = sent_lots.filter(delivery_type=CarbureLot.DIRECT)
+        tiruert_lots = received_lots.exclude(delivery_type=CarbureLot.DIRECT) | mac_lots | direct_lots
         background_create_tiruert_operations_from_lots(tiruert_lots)
 
         # Freeze lots that are marked as declared by both supplier and client

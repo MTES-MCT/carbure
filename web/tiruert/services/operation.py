@@ -288,7 +288,7 @@ class OperationService:
         """
         Create TIRUERT operations from CarbureLots.
 
-        Groups lots by delivery_type, feedstock category, biofuel and depot,
+        Groups lots by delivery_type, feedstock category, biofuel, depot and credited entity,
         then creates one operation per group with associated details.
         """
 
@@ -308,10 +308,17 @@ class OperationService:
         OperationService.calculate_volume_ethanol_15(valid_lots)
         OperationService.convert_emag_lots(valid_lots)
 
-        # Group validated_lots by delivery_type, feedstock, biofuel and depot
+        # Group lots by delivery type, feedstock, biofuel, depot and credited entity
         lots_by_delivery_type = defaultdict(list)
         for lot in valid_lots:
-            key = (lot.delivery_type, lot.feedstock.category, lot.biofuel.code, lot.carbure_delivery_site)
+            credited_entity = (
+                lot.carbure_supplier
+                if lot.delivery_type == CarbureLot.DIRECT
+                else lot.carbure_client or lot.carbure_supplier
+            )
+            if not credited_entity:
+                continue
+            key = (lot.delivery_type, lot.feedstock.category, lot.biofuel.code, lot.carbure_delivery_site, credited_entity)
             lots_by_delivery_type[key].append(lot)
 
         matching_types = {
@@ -321,16 +328,12 @@ class OperationService:
         }
 
         for key, lots in lots_by_delivery_type.items():
-            credited_entity = lots[0].carbure_client or lots[0].carbure_supplier
-            if not credited_entity:
-                continue  # skip if no credited entity (should not happen for valid lots)
-
             operation_data = {
                 "type": matching_types[key[0]],
                 "status": Operation.VALIDATED,  # TODO: Set to PENDING when DGGDI validation will be implemented
                 "customs_category": key[1],
                 "biofuel": lots[0].biofuel,
-                "credited_entity": credited_entity,
+                "credited_entity": key[4],
                 "debited_entity": None,
                 "from_depot": None,
                 "to_depot": lots[0].carbure_delivery_site,
@@ -352,9 +355,9 @@ class OperationService:
         Valid lots must have:
         - lot_status in ["ACCEPTED", "FROZEN"]
         - delivery_type in [RFC, BLENDING, DIRECT]
-        - if delivery_type is RFC, keep only some usage values or empty usage
+        - if delivery_type is RFC or DIRECT, keep only some usage values or empty usage
         """
-        DELIVERY_TYPES_ACCEPTED = [CarbureLot.BLENDING, CarbureLot.DIRECT]
+        DELIVERY_TYPES_WITH_USAGE = [CarbureLot.RFC, CarbureLot.DIRECT]
 
         USAGE_WHITELIST = [
             CarbureLot.USAGE_ROAD,
@@ -366,9 +369,9 @@ class OperationService:
         ]
 
         return lots.filter(lot_status__in=["ACCEPTED", "FROZEN"]).filter(
-            Q(delivery_type=CarbureLot.RFC, usage__in=USAGE_WHITELIST)
-            | Q(delivery_type=CarbureLot.RFC, usage="")
-            | Q(delivery_type__in=DELIVERY_TYPES_ACCEPTED)
+            Q(delivery_type__in=DELIVERY_TYPES_WITH_USAGE, usage__in=USAGE_WHITELIST)
+            | Q(delivery_type__in=DELIVERY_TYPES_WITH_USAGE, usage="")
+            | Q(delivery_type=CarbureLot.BLENDING)
         )
 
     @staticmethod
