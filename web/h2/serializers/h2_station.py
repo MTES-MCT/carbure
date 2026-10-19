@@ -13,7 +13,22 @@ class H2StationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = H2Station
-        fields = "__all__"
+        fields = [
+            "id",
+            "entity_name",
+            "name",
+            "site_siret",
+            "address",
+            "postal_code",
+            "city",
+            "commissioning_date",
+            "access_type",
+            "distributed_pressure",
+            "has_personal_vehicle_connector",
+            "has_compliant_measuring_instruments",
+            "storage_capacity",
+            "distribution_capacity",
+        ]
 
 
 class H2StationInputSerializer(serializers.ModelSerializer):

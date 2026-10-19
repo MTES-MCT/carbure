@@ -101,7 +101,8 @@ class ElecProvisionCertificateQualichargeViewSetListTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["count"], 1)
-        self.assertEqual(data["results"][0]["year"], 2024)
+        self.assertEqual(data["results"][0]["station_id"], "FRXYZP888888")
+        self.assertNotIn("year", data["results"][0])
 
     def test_list_metadata(self):
         """Test pagination metadata (total_quantity)"""

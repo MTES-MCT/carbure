@@ -24,7 +24,23 @@ class BiomethaneSupplyInputSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = BiomethaneSupplyInput
-        fields = "__all__"
+        fields = [
+            "id",
+            "producer",
+            "source",
+            "feedstock",
+            "type_cive",
+            "culture_details",
+            "collection_type",
+            "material_unit",
+            "dry_matter_ratio_percent",
+            "volume",
+            "volume_tmb",
+            "origin_country",
+            "origin_department",
+            "average_weighted_distance_km",
+            "maximum_distance_km",
+        ]
 
 
 class BiomethaneSupplyInputCreateSerializer(serializers.ModelSerializer):

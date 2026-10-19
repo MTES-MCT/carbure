@@ -8,12 +8,23 @@ from elec.permissions import HasElecAdminRights
 
 
 class ElecProvisionCertificateQualichargeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ElecProvisionCertificateQualicharge
-        fields = "__all__"
-
     cpo = EntityPreviewSerializer(read_only=True)
     renewable_energy = serializers.FloatField()
+
+    class Meta:
+        model = ElecProvisionCertificateQualicharge
+        fields = [
+            "id",
+            "cpo",
+            "operating_unit",
+            "station_id",
+            "date_from",
+            "date_to",
+            "energy_amount",
+            "enr_ratio",
+            "renewable_energy",
+            "validated_by",
+        ]
 
 
 class ElecProvisionCertificateQualichargeGroupedSerializer(serializers.Serializer):

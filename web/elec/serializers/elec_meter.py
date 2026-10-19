@@ -6,4 +6,10 @@ from elec.models import ElecMeter
 class ElecMeterSerializer(serializers.ModelSerializer):
     class Meta:
         model = ElecMeter
-        fields = "__all__"
+        fields = [
+            "id",
+            "mid_certificate",
+            "initial_index",
+            "initial_index_date",
+            "charge_point",
+        ]
