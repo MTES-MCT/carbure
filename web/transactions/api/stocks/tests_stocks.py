@@ -98,6 +98,40 @@ class StocksFlowTest(TestCase):
             assert response.status_code == 400
             return None
 
+    def test_stock_split_normalizes_usage_fields(self):
+        parent_lot = CarbureLotFactory.create(
+            carbure_client=self.producer,
+            delivery_type=CarbureLot.STOCK,
+            lot_status=CarbureLot.ACCEPTED,
+        )
+        stock = CarbureStockFactory.create(
+            parent_lot=parent_lot,
+            carbure_client=self.producer,
+            remaining_volume=10000,
+        )
+        cases = [
+            (CarbureLot.EXPORT, CarbureLot.USAGE_OTHER, "Details", "", ""),
+            (CarbureLot.RFC, CarbureLot.USAGE_OTHER, "Details", CarbureLot.USAGE_OTHER, "Details"),
+            (CarbureLot.RFC, CarbureLot.USAGE_ROAD, "Details", CarbureLot.USAGE_ROAD, ""),
+        ]
+        for delivery_type, usage, precision, expected_usage, expected_precision in cases:
+            with self.subTest(delivery_type=delivery_type, usage=usage):
+                lot = self.stock_split(
+                    [
+                        {
+                            "stock_id": stock.carbure_id,
+                            "volume": 1000,
+                            "delivery_date": datetime.date.today().strftime("%d/%m/%Y"),
+                            "delivery_site_country_id": "FR",
+                            "delivery_type": delivery_type,
+                            "usage": usage,
+                            "usage_precision": precision,
+                        }
+                    ]
+                )
+                assert lot.usage == expected_usage
+                assert lot.usage_precision == expected_precision
+
     def test_stock_split(self):
         parent_lot = CarbureLotFactory.create(
             carbure_client_id=self.producer.id,
