@@ -1,19 +1,19 @@
-import { Main } from "common/components/scaffold"
-import { usePrivateNavigation } from "common/layouts/navigation"
-import { useTranslation } from "react-i18next"
+import { useH2CertificatesPage } from "h2/pages/certificates/certificates.hooks"
+import { ActionsPage } from "traceability/components/actions-page"
+import { useActionColumns } from "traceability/hooks/use-action-columns"
+import { useActionFilters } from "traceability/hooks/use-action-filters"
 
 const AdminCertificatesPage = () => {
-  const { t } = useTranslation()
-  usePrivateNavigation(t("Certificats d'hydrogène"))
+  const { page } = useH2CertificatesPage()
+  const columns = useActionColumns()
+  const filters = useActionFilters()
 
   return (
-    <Main>
-      <header>
-        <section>
-          <h1>{t("Certificats d'hydrogène")}</h1>
-        </section>
-      </header>
-    </Main>
+    <ActionsPage
+      {...page}
+      columns={[columns.holder, ...page.columns]}
+      filters={[filters.holder, ...page.filters]}
+    />
   )
 }
 

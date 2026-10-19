@@ -61,6 +61,7 @@ export function useH2LotsPage(): {
       subpath: "lots",
       fixedQuery: H2_LOT_QUERY,
       filters: [
+        filters.status,
         { ...filters.material, label: t("Nature d'H2") },
         filters.period,
         filters.site,
