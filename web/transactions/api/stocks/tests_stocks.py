@@ -113,6 +113,8 @@ class StocksFlowTest(TestCase):
             (CarbureLot.EXPORT, CarbureLot.USAGE_OTHER, "Details", "", ""),
             (CarbureLot.RFC, CarbureLot.USAGE_OTHER, "Details", CarbureLot.USAGE_OTHER, "Details"),
             (CarbureLot.RFC, CarbureLot.USAGE_ROAD, "Details", CarbureLot.USAGE_ROAD, ""),
+            (CarbureLot.DIRECT, CarbureLot.USAGE_OTHER, "Details", CarbureLot.USAGE_OTHER, "Details"),
+            (CarbureLot.DIRECT, CarbureLot.USAGE_ROAD, "Details", CarbureLot.USAGE_ROAD, ""),
         ]
         for delivery_type, usage, precision, expected_usage, expected_precision in cases:
             with self.subTest(delivery_type=delivery_type, usage=usage):
