@@ -168,7 +168,11 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               <TextInput
                 label={t("Client")}
                 {...bind("client")}
-                value={value.client as string}
+                value={
+                  value.client instanceof Object
+                    ? value.client.name
+                    : value.client
+                }
               />
             ) : (
               <Autocomplete
@@ -192,7 +196,11 @@ const SplitDialog = ({ stock, onClose }: ApproveFixDialogProps) => {
               <TextInput
                 label={t("Site de livraison")}
                 {...bind("delivery_site")}
-                value={value.delivery_site as string}
+                value={
+                  value.delivery_site instanceof Object
+                    ? value.delivery_site.name
+                    : value.delivery_site
+                }
               />
             ) : (
               <Autocomplete
