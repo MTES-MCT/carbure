@@ -56,7 +56,7 @@ export const ClientField = (
         label={t("Client")}
         {...bound}
         {...props}
-        value={bound.value as string}
+        value={bound.value instanceof Object ? bound.value.name : bound.value}
       />
     )
   }
@@ -207,7 +207,7 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
         label={t("Site de livraison")}
         {...bound}
         {...props}
-        value={bound.value as string}
+        value={bound.value instanceof Object ? bound.value.name : bound.value}
       />
     )
   }

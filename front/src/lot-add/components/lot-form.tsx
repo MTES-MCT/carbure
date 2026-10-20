@@ -70,7 +70,13 @@ export function useLotForm(
   const errors = useLotFieldErrors(lotErrors)
 
   function setValue(value: LotFormValue): LotFormValue {
-    if (value.delivery_type === DeliveryType.Direct) {
+    if (entity.isAdmin) return value
+    if (value.lot && value.lot.lot_status !== "DRAFT") return value
+
+    if (
+      value.delivery_type === DeliveryType.Direct &&
+      (!value.lot || value.lot.added_by.id === entity.id)
+    ) {
       value.supplier = entity
 
       value.delivery_site_country = {
@@ -80,9 +86,6 @@ export function useLotForm(
         is_in_europe: true,
       }
     }
-
-    if (entity.isAdmin) return value
-    if (value.lot && value.lot.lot_status !== "DRAFT") return value
 
     // for producers
     if (entity.isProducer) {
