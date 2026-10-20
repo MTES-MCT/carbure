@@ -10,8 +10,8 @@ from traceability.models import Action, ActionStatus
 class H2ActionHandler(ActionIndustryHandler):
     industry = Action.H2
     transitions = (
-        Transition(Action.INIT, ActionStatus.PENDING, ActionStatus.ACCEPTED, HasH2AdminRights),
-        Transition(Action.INIT, ActionStatus.PENDING, ActionStatus.REJECTED, HasH2AdminRights),
+        Transition(Action.INIT, ActionStatus.PENDING, ActionStatus.ACCEPTED),
+        Transition(Action.INIT, ActionStatus.PENDING, ActionStatus.REJECTED),
     )
     creations = (
         Creation(Action.INIT, ActionStatus.PENDING, root=True),

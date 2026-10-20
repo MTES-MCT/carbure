@@ -1,23 +1,22 @@
 from dataclasses import dataclass
 
-from rest_framework.permissions import BasePermission
+
+class Rule:
+    def is_allowed(self) -> bool:
+        return True
 
 
 @dataclass(frozen=True)
-class Transition:
-    """A status change allowed for one action type.
-
-    permission is the class checked later, when an endpoint asks for the change.
-    """
+class Transition(Rule):
+    """A status change allowed for one action type."""
 
     action_type: str
     from_status: str
     to_status: str
-    permission: type[BasePermission]
 
 
 @dataclass(frozen=True)
-class Creation:
+class Creation(Rule):
     """Where an action type is allowed to be born, and in which status.
 
     A root line has no parent. Any other line names exactly one parent type

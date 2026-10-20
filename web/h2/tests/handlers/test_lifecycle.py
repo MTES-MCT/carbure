@@ -3,7 +3,6 @@ from types import SimpleNamespace
 from django.test import SimpleTestCase
 
 from h2.handlers.action import H2ActionHandler
-from h2.permissions import HasH2AdminRights
 from traceability.lifecycle.checks import can_change_status, can_create
 from traceability.models import Action, ActionStatus
 
@@ -17,9 +16,7 @@ class H2LifecycleTest(SimpleTestCase):
         rejected = can_change_status(self.handler, Action.INIT, ActionStatus.PENDING, ActionStatus.REJECTED)
 
         self.assertEqual(accepted.to_status, ActionStatus.ACCEPTED)
-        self.assertEqual(accepted.permission, HasH2AdminRights)
         self.assertEqual(rejected.to_status, ActionStatus.REJECTED)
-        self.assertEqual(rejected.permission, HasH2AdminRights)
 
     def test_refuses_unknown_status_edges(self):
         self.assertIsNone(can_change_status(self.handler, Action.INIT, ActionStatus.CREATED, ActionStatus.ACCEPTED))

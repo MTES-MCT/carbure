@@ -1,20 +1,14 @@
 from types import SimpleNamespace
 
 from django.test import SimpleTestCase
-from rest_framework.permissions import BasePermission
 
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.lifecycle.checks import can_change_status, can_create
 from traceability.lifecycle.rules import Creation, Transition
 
 
-class Allow(BasePermission):
-    def has_permission(self, request, view):
-        return True
-
-
 class SampleHandler(ActionIndustryHandler):
-    transitions = (Transition("A", "FROM", "TO", Allow),)
+    transitions = (Transition("A", "FROM", "TO"),)
     creations = (
         Creation("ROOT", "PENDING", root=True),
         Creation("CHILD", "CREATED", parent="ROOT", parent_status="PENDING"),
@@ -25,7 +19,7 @@ class CanChangeStatusTest(SimpleTestCase):
     def test_returns_the_matching_transition(self):
         transition = can_change_status(SampleHandler(), "A", "FROM", "TO")
 
-        self.assertEqual(transition.permission, Allow)
+        self.assertEqual(transition.to_status, "TO")
 
     def test_returns_none_when_one_field_differs(self):
         handler = SampleHandler()
