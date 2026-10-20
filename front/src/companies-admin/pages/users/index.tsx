@@ -25,6 +25,7 @@ import {
   AdminUserQueryBuilder,
   AdminUserQueryFilter,
 } from "companies-admin/types"
+import { RecapQuantity } from "common/molecules/recap-quantity"
 
 const AdminUsers = () => {
   const { t } = useTranslation()
@@ -87,6 +88,9 @@ const AdminUsers = () => {
           <NoResult filters={state.filters} onFilter={actions.setFilters} />
         ) : (
           <>
+            <RecapQuantity
+              text={t("{{count}} utilisateur", { count: rows.length })}
+            />
             <Table
               loading={loading}
               rows={rows}
