@@ -4,9 +4,8 @@ from django.test import SimpleTestCase
 from rest_framework.permissions import BasePermission
 
 from traceability.handlers.action import ActionIndustryHandler
-from traceability.handlers.registry import ACTION_HANDLERS
-from traceability.lifecycle.checks import actions_that_can_change_status, can_change_status, can_create
-from traceability.lifecycle.rules import Creation, Transition
+from traceability.lifecycle.checks import can_change_status, can_create
+from traceability.lifecycle.rules import Creation, Parent, Transition
 
 
 class Allow(BasePermission):
@@ -18,7 +17,7 @@ class SampleHandler(ActionIndustryHandler):
     transitions = (Transition("A", "FROM", "TO", Allow),)
     creations = (
         Creation("ROOT", root=True),
-        Creation("CHILD", root=False, parents=("ROOT",)),
+        Creation("CHILD", parents=(Parent("ROOT", "PENDING"),)),
     )
 
 
@@ -47,28 +46,16 @@ class CanCreateTest(SimpleTestCase):
         self.assertIsNone(can_create(SampleHandler(), "CHILD"))
 
     def test_returns_a_child_creation_under_an_allowed_parent(self):
-        self.assertEqual(can_create(SampleHandler(), "CHILD", parent_type="ROOT").action_type, "CHILD")
+        parent = SimpleNamespace(type="ROOT", status="PENDING")
 
-    def test_returns_none_when_the_parent_is_not_allowed(self):
+        self.assertEqual(can_create(SampleHandler(), "CHILD", parent=parent).action_type, "CHILD")
+
+    def test_returns_none_when_the_parent_type_or_status_is_not_allowed(self):
         handler = SampleHandler()
 
-        self.assertIsNone(can_create(handler, "CHILD", parent_type="OTHER"))
-        self.assertIsNone(can_create(handler, "ROOT", parent_type="ROOT"))
+        self.assertIsNone(can_create(handler, "CHILD", parent=SimpleNamespace(type="OTHER", status="PENDING")))
+        self.assertIsNone(can_create(handler, "CHILD", parent=SimpleNamespace(type="ROOT", status="OTHER")))
+        self.assertIsNone(can_create(handler, "ROOT", parent=SimpleNamespace(type="ROOT", status="PENDING")))
 
     def test_returns_none_when_the_type_is_absent(self):
         self.assertIsNone(can_create(SampleHandler(), "MISSING"))
-
-
-class ActionsThatCanChangeStatusTest(SimpleTestCase):
-    def setUp(self):
-        ACTION_HANDLERS["SAMPLE"] = SampleHandler
-
-    def tearDown(self):
-        ACTION_HANDLERS.pop("SAMPLE", None)
-
-    def test_keeps_only_actions_whose_edge_exists(self):
-        allowed = SimpleNamespace(industry="SAMPLE", type="A", status="FROM")
-        blocked = SimpleNamespace(industry="SAMPLE", type="A", status="OTHER")
-
-        self.assertEqual(actions_that_can_change_status([allowed, blocked], "TO"), [allowed])
-        self.assertEqual(actions_that_can_change_status([blocked], "TO"), [])

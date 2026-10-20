@@ -1,6 +1,6 @@
 from traceability.handlers.action import ActionIndustryHandler
-from traceability.handlers.registry import get_action_handler
 from traceability.lifecycle.rules import Creation, Transition
+from traceability.models import Action
 
 
 def can_change_status(
@@ -20,31 +20,19 @@ def can_change_status(
     return None
 
 
-def can_create(handler: ActionIndustryHandler, action_type: str, parent_type: str | None = None) -> Creation | None:
-    """Return the creation allowed by this handler, or None."""
+def can_create(handler: ActionIndustryHandler, action_type: str, parent: Action | None = None) -> Creation | None:
+    """Return the creation allowed by this handler, or None.
+
+    Without a parent, only a root creation matches.
+    With a parent, its type and current status must match a Parent row.
+    """
     for creation in handler.creations:
-        # First : find the correct action type
         if creation.action_type != action_type:
             continue
-
-        # Then : check if the creation is allowed when there is no parent
-        if parent_type is None and creation.root:
-            return creation
-
-        # Then : check if the creation is allowed when there is a parent
-        if parent_type is not None and parent_type in creation.parents:
+        if parent is None:
+            if creation.root:
+                return creation
+            continue
+        if any(rule.action_type == parent.type and rule.status == parent.status for rule in creation.parents):
             return creation
     return None
-
-
-def actions_that_can_change_status(actions, to_status: str) -> list:
-    """Actions whose industry matrix allows the current status to become `to_status`.
-
-    The permission stored on the transition is not called.
-    """
-    eligible = []
-    for action in actions:
-        handler = get_action_handler(action.industry)
-        if can_change_status(handler, action.type, action.status, to_status):
-            eligible.append(action)
-    return eligible

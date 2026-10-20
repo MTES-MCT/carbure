@@ -3,7 +3,7 @@ from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 from h2.serializers.action import SHIPPING_FUEL_TYPES, H2ActionExcelImportSerializer
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.excel import EXCEL_CONSUMPTION_COLOR, EXCEL_PRODUCTION_COLOR, EXCEL_TRANSPORT_COLOR, excel_column
-from traceability.lifecycle.rules import Creation, Transition
+from traceability.lifecycle.rules import Creation, Parent, Transition
 from traceability.models import Action, ActionStatus
 
 
@@ -15,7 +15,7 @@ class H2ActionHandler(ActionIndustryHandler):
     )
     creations = (
         Creation(Action.INIT, root=True),
-        Creation(Action.VALORIZE, root=False, parents=(Action.INIT,)),
+        Creation(Action.VALORIZE, parents=(Parent(Action.INIT, ActionStatus.PENDING),)),
     )
     lookups = lookups
     read_permission = HasHRSRights

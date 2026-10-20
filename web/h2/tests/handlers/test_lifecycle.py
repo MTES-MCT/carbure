@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 from django.test import SimpleTestCase
 
 from h2.handlers.action import H2ActionHandler
@@ -25,7 +27,23 @@ class H2LifecycleTest(SimpleTestCase):
         self.assertIsNone(can_change_status(self.handler, Action.VALORIZE, ActionStatus.PENDING, ActionStatus.ACCEPTED))
 
     def test_creation_rights(self):
+        pending_init = SimpleNamespace(type=Action.INIT, status=ActionStatus.PENDING)
+
         self.assertEqual(can_create(self.handler, Action.INIT).action_type, Action.INIT)
-        self.assertIsNone(can_create(self.handler, Action.INIT, parent_type=Action.INIT))
+        self.assertIsNone(can_create(self.handler, Action.INIT, parent=pending_init))
         self.assertIsNone(can_create(self.handler, Action.VALORIZE))
-        self.assertEqual(can_create(self.handler, Action.VALORIZE, parent_type=Action.INIT).action_type, Action.VALORIZE)
+        self.assertEqual(can_create(self.handler, Action.VALORIZE, parent=pending_init).action_type, Action.VALORIZE)
+        self.assertIsNone(
+            can_create(
+                self.handler,
+                Action.VALORIZE,
+                parent=SimpleNamespace(type=Action.INIT, status=ActionStatus.ACCEPTED),
+            )
+        )
+        self.assertIsNone(
+            can_create(
+                self.handler,
+                Action.VALORIZE,
+                parent=SimpleNamespace(type=Action.VALORIZE, status=ActionStatus.PENDING),
+            )
+        )

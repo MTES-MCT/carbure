@@ -17,9 +17,17 @@ class Transition:
 
 
 @dataclass(frozen=True)
+class Parent:
+    """An action allowed to bear a child: its type and its current status."""
+
+    action_type: str
+    status: str
+
+
+@dataclass(frozen=True)
 class Creation:
     """Where an action type is allowed to be born."""
 
     action_type: str
-    root: bool
-    parents: tuple[str, ...] = ()
+    root: bool = False
+    parents: tuple[Parent, ...] = ()
