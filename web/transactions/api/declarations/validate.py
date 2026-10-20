@@ -88,8 +88,8 @@ def validate_declaration(request, *args, **kwargs):
         mac_lots = sent_lots.filter(
             delivery_type=CarbureLot.RFC, carbure_supplier__has_mac=True
         )  # TODO: limit to OPERATOR, TRADER and PRODUCER?
-        direct_lots = sent_lots.filter(delivery_type=CarbureLot.DIRECT)
-        tiruert_lots = received_lots.exclude(delivery_type=CarbureLot.DIRECT) | mac_lots | direct_lots
+        direct_lots = sent_lots.filter(delivery_type=CarbureLot.DIRECT, carbure_client__isnull=True)
+        tiruert_lots = received_lots | mac_lots | direct_lots
         background_create_tiruert_operations_from_lots(tiruert_lots)
 
         # Freeze lots that are marked as declared by both supplier and client
