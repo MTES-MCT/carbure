@@ -311,11 +311,7 @@ class OperationService:
         # Group lots by delivery type, feedstock, biofuel, depot and credited entity
         lots_by_delivery_type = defaultdict(list)
         for lot in valid_lots:
-            credited_entity = (
-                lot.carbure_supplier
-                if lot.delivery_type == CarbureLot.DIRECT
-                else lot.carbure_client or lot.carbure_supplier
-            )
+            credited_entity = lot.carbure_client or lot.carbure_supplier
             if not credited_entity:
                 continue
             key = (lot.delivery_type, lot.feedstock.category, lot.biofuel.code, lot.carbure_delivery_site, credited_entity)

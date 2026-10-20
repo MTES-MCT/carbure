@@ -284,7 +284,7 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         other_supplier = Entity.objects.exclude(pk=self.entity.pk).first()
         other_lot = CarbureLotFactory.create(
             carbure_supplier=other_supplier,
-            carbure_client=self.entity,
+            carbure_client=None,
             delivery_type=CarbureLot.DIRECT,
             lot_status=CarbureLot.ACCEPTED,
             feedstock=self.lot_direct.feedstock,
@@ -918,7 +918,7 @@ class OperationServiceConvertEmagLotsTest(TestCase):
 
 
 class OperationServiceCreditedEntityFallbackTest(TestCase):
-    """Test that credited_entity falls back to carbure_producer then carbure_supplier."""
+    """Test credit priority: client, then supplier; the lot creator grants no credit."""
 
     fixtures = [
         "json/biofuels.json",
@@ -937,45 +937,35 @@ class OperationServiceCreditedEntityFallbackTest(TestCase):
         cls.feedstock_conv = MatierePremiere.biofuel.filter(category="CONV").first()
         cls.biofuel_eth = Biocarburant.objects.get(code="ETH")
 
-    def test_credited_entity_uses_carbure_supplier_when_no_client(self):
-        """Should use carbure_supplier as credited_entity when carbure_client is None."""
-        lot = CarbureLotFactory.create(
-            carbure_client=None,
-            carbure_supplier=self.trader,
-            feedstock=self.feedstock_conv,
-            biofuel=self.biofuel_eth,
-            lot_status="ACCEPTED",
-            delivery_type="RFC",
-            volume=1000,
-            ghg_total=5.0,
-            carbure_delivery_site=self.depot,
+    def test_credited_entity_fallback_priority(self):
+        cases = (
+            (self.operator, self.trader, self.trader, self.operator),
+            (None, self.trader, self.operator, self.trader),
+            (None, None, self.operator, None),
         )
+        for delivery_type in (CarbureLot.RFC, CarbureLot.DIRECT):
+            for client, supplier, added_by, expected in cases:
+                with self.subTest(delivery_type=delivery_type, client=client, supplier=supplier, added_by=added_by):
+                    lot = CarbureLotFactory.create(
+                        carbure_client=client,
+                        carbure_supplier=supplier,
+                        added_by=added_by,
+                        feedstock=self.feedstock_conv,
+                        biofuel=self.biofuel_eth,
+                        lot_status=CarbureLot.ACCEPTED,
+                        delivery_type=delivery_type,
+                        volume=1000,
+                        ghg_total=5.0,
+                        carbure_delivery_site=self.depot,
+                    )
+                    OperationService.create_operations_from_lots(CarbureLot.objects.filter(pk=lot.pk))
 
-        lots_qs = CarbureLot.objects.filter(id=lot.id)
-        OperationService.create_operations_from_lots(lots_qs)
-
-        operation = Operation.objects.get(type=Operation.MAC_BIO)
-        self.assertEqual(operation.credited_entity, self.trader)
-
-    def test_credited_entity_prefers_carbure_client_over_supplier(self):
-        """Should prefer carbure_client over carbure_supplier."""
-        lot = CarbureLotFactory.create(
-            carbure_client=self.operator,
-            carbure_supplier=self.trader,
-            feedstock=self.feedstock_conv,
-            biofuel=self.biofuel_eth,
-            lot_status="ACCEPTED",
-            delivery_type="RFC",
-            volume=1000,
-            ghg_total=5.0,
-            carbure_delivery_site=self.depot,
-        )
-
-        lots_qs = CarbureLot.objects.filter(id=lot.id)
-        OperationService.create_operations_from_lots(lots_qs)
-
-        operation = Operation.objects.get(type=Operation.MAC_BIO)
-        self.assertEqual(operation.credited_entity, self.operator)
+                    operation = Operation.objects.filter(details__lot=lot).first()
+                    if expected is None:
+                        self.assertIsNone(operation)
+                    else:
+                        self.assertIsNotNone(operation)
+                        self.assertEqual(operation.credited_entity, expected)
 
 
 class OperationServiceBulkCheckVolumesTest(TestCase):
