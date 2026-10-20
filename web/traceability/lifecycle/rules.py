@@ -17,17 +17,15 @@ class Transition:
 
 
 @dataclass(frozen=True)
-class Parent:
-    """An action allowed to bear a child: its type and its current status."""
+class Creation:
+    """Where an action type is allowed to be born, and in which status.
+
+    A root line has no parent. Any other line names exactly one parent type
+    and the status that parent must currently have.
+    """
 
     action_type: str
     status: str
-
-
-@dataclass(frozen=True)
-class Creation:
-    """Where an action type is allowed to be born."""
-
-    action_type: str
     root: bool = False
-    parents: tuple[Parent, ...] = ()
+    parent: str | None = None
+    parent_status: str | None = None

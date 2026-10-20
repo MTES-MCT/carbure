@@ -5,7 +5,7 @@ from rest_framework.permissions import BasePermission
 
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.lifecycle.checks import can_change_status, can_create
-from traceability.lifecycle.rules import Creation, Parent, Transition
+from traceability.lifecycle.rules import Creation, Transition
 
 
 class Allow(BasePermission):
@@ -16,8 +16,8 @@ class Allow(BasePermission):
 class SampleHandler(ActionIndustryHandler):
     transitions = (Transition("A", "FROM", "TO", Allow),)
     creations = (
-        Creation("ROOT", root=True),
-        Creation("CHILD", parents=(Parent("ROOT", "PENDING"),)),
+        Creation("ROOT", "PENDING", root=True),
+        Creation("CHILD", "CREATED", parent="ROOT", parent_status="PENDING"),
     )
 
 
@@ -40,7 +40,10 @@ class CanChangeStatusTest(SimpleTestCase):
 
 class CanCreateTest(SimpleTestCase):
     def test_returns_a_root_creation_without_parent(self):
-        self.assertEqual(can_create(SampleHandler(), "ROOT").action_type, "ROOT")
+        creation = can_create(SampleHandler(), "ROOT")
+
+        self.assertEqual(creation.action_type, "ROOT")
+        self.assertEqual(creation.status, "PENDING")
 
     def test_returns_none_for_a_child_without_parent(self):
         self.assertIsNone(can_create(SampleHandler(), "CHILD"))
@@ -48,7 +51,10 @@ class CanCreateTest(SimpleTestCase):
     def test_returns_a_child_creation_under_an_allowed_parent(self):
         parent = SimpleNamespace(type="ROOT", status="PENDING")
 
-        self.assertEqual(can_create(SampleHandler(), "CHILD", parent=parent).action_type, "CHILD")
+        creation = can_create(SampleHandler(), "CHILD", parent=parent)
+
+        self.assertEqual(creation.action_type, "CHILD")
+        self.assertEqual(creation.status, "CREATED")
 
     def test_returns_none_when_the_parent_type_or_status_is_not_allowed(self):
         handler = SampleHandler()

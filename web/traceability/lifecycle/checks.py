@@ -6,10 +6,7 @@ from traceability.models import Action
 def can_change_status(
     handler: ActionIndustryHandler, action_type: str, from_status: str, to_status: str
 ) -> Transition | None:
-    """Return the transition allowed by this handler, or None.
-
-    The permission stored on the transition is not called here.
-    """
+    """Return the transition allowed by this handler, or None."""
     for transition in handler.transitions:
         if (
             transition.action_type == action_type
@@ -24,7 +21,7 @@ def can_create(handler: ActionIndustryHandler, action_type: str, parent: Action 
     """Return the creation allowed by this handler, or None.
 
     Without a parent, only a root creation matches.
-    With a parent, its type and current status must match a Parent row.
+    With a parent, its type and current status must match the line's parent and parent_status.
     """
     for creation in handler.creations:
         if creation.action_type != action_type:
@@ -33,6 +30,6 @@ def can_create(handler: ActionIndustryHandler, action_type: str, parent: Action 
             if creation.root:
                 return creation
             continue
-        if any(rule.action_type == parent.type and rule.status == parent.status for rule in creation.parents):
+        if creation.parent == parent.type and creation.parent_status == parent.status:
             return creation
     return None

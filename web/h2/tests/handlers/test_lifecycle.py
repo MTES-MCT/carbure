@@ -29,10 +29,15 @@ class H2LifecycleTest(SimpleTestCase):
     def test_creation_rights(self):
         pending_init = SimpleNamespace(type=Action.INIT, status=ActionStatus.PENDING)
 
-        self.assertEqual(can_create(self.handler, Action.INIT).action_type, Action.INIT)
+        root = can_create(self.handler, Action.INIT)
+        child = can_create(self.handler, Action.VALORIZE, parent=pending_init)
+
+        self.assertEqual(root.action_type, Action.INIT)
+        self.assertEqual(root.status, ActionStatus.PENDING)
         self.assertIsNone(can_create(self.handler, Action.INIT, parent=pending_init))
         self.assertIsNone(can_create(self.handler, Action.VALORIZE))
-        self.assertEqual(can_create(self.handler, Action.VALORIZE, parent=pending_init).action_type, Action.VALORIZE)
+        self.assertEqual(child.action_type, Action.VALORIZE)
+        self.assertEqual(child.status, ActionStatus.CREATED)
         self.assertIsNone(
             can_create(
                 self.handler,
