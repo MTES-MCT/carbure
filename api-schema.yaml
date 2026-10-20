@@ -2061,6 +2061,57 @@ paths:
                 items:
                   type: string
           description: List of watched fields
+  /api/biomethane/provider/declarations/:
+    get:
+      operationId: biomethane_provider_declarations_list
+      description: Validated annual declarations of the producers under contract with
+        the gas provider.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Gas provider entity ID.
+          required: true
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+      tags:
+        - biomethane
+      security:
+        - jwtAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedBiomethaneProviderDeclarationList"
+          description: ""
   /api/biomethane/supply-input/:
     get:
       operationId: biomethane_supply_input_list
@@ -16067,6 +16118,26 @@ components:
         - id
         - name
         - producer
+    BiomethaneProductionUnitPreview:
+      type: object
+      properties:
+        insee_code:
+          type: string
+          nullable: true
+          title: Code INSEE
+          maxLength: 5
+        address:
+          type: string
+          title: Adresse
+          maxLength: 256
+        postal_code:
+          type: string
+          title: Code postal
+          maxLength: 32
+        city:
+          type: string
+          title: Commune
+          maxLength: 128
     BiomethaneProductionUnitUpsertRequest:
       type: object
       properties:
@@ -16209,6 +16280,20 @@ components:
           nullable: true
       required:
         - name
+    BiomethaneProviderDeclaration:
+      type: object
+      properties:
+        producer:
+          allOf:
+            - $ref: "#/components/schemas/EntityPreview"
+          readOnly: true
+        production_unit:
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneProductionUnitPreview"
+          readOnly: true
+      required:
+        - producer
+        - production_unit
     BiomethaneSupplyInput:
       type: object
       properties:
@@ -20675,6 +20760,29 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BiomethaneContractAmendment"
+    PaginatedBiomethaneProviderDeclarationList:
+      type: object
+      required:
+        - count
+        - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/BiomethaneProviderDeclaration"
     PaginatedBiomethaneSupplyInputList:
       type: object
       required:

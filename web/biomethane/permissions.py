@@ -1,6 +1,20 @@
+from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework_api_key.permissions import HasAPIKey
+
 from biomethane.services.admin.ademe import AdemeService
 from core.models import Entity, ExternalAdminRights, UserRights
 from core.permissions import AdminRightsFactory, HasAdminRights, UserRightsFactory
+
+
+class HasBiomethaneProviderRights(BasePermission):
+    """The JWT user must be linked to the BIOMETHANE_PROVIDER entity given by `entity_id` (no OTP on this API)."""
+
+    def has_permission(self, request, view):
+        entity = request.entity
+        if not entity or entity.entity_type != Entity.BIOMETHANE_PROVIDER:
+            return False
+
+        return UserRights.objects.filter(user=request.user, entity=entity).exists()
 
 
 class HasExternalAdminDepartmentsRights(HasAdminRights):
@@ -96,6 +110,9 @@ CanAccessInjection = HasBiomethaneProducerRights | HasDrealRights
 ## Permission to access admin endpoints
 CanAccessAdminModule = HasDrealRights | HasAdemeRights
 CanDownloadDeclaration = HasDrealRights
+
+## Permission for the biomethane gas provider API (API key + JWT)
+CanAccessProviderApi = HasAPIKey & IsAuthenticated & HasBiomethaneProviderRights
 
 
 def get_biomethane_permissions(write_actions, action):
