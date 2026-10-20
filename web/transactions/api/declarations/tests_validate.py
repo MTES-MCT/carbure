@@ -105,17 +105,45 @@ class ValidateDeclarationTest(TestCase):
         assert response.json()["error"] == CarbureError.YEAR_LOCKED
 
     @patch("transactions.api.declarations.validate.background_create_tiruert_operations_from_lots")
-    def test_direct_lots_selected_on_supplier_declaration(self, mock_tiruert):
+    def test_direct_lots_selected_for_credited_entity(self, mock_tiruert):
         self.entity.has_mac = False
         self.entity.save(update_fields=["has_mac"])
+        other_entity = Entity.objects.exclude(pk=self.entity.pk).first()
+        expected_ids = set(CarbureLot.objects.values_list("pk", flat=True))
+        cases = (
+            (self.entity, other_entity, other_entity, True),
+            (None, self.entity, other_entity, True),
+            (None, None, self.entity, False),
+            (other_entity, self.entity, self.entity, False),
+            (None, other_entity, self.entity, False),
+        )
+        for client, supplier, added_by, included in cases:
+            lot = CarbureLotFactory.create(
+                carbure_client=client,
+                carbure_supplier=supplier,
+                added_by=added_by,
+                delivery_type=CarbureLot.DIRECT,
+                lot_status=CarbureLot.ACCEPTED,
+                correction_status=CarbureLot.NO_PROBLEMO,
+                period=202201,
+                year=2022,
+                declared_by_supplier=False,
+                declared_by_client=False,
+            )
+            if included:
+                expected_ids.add(lot.pk)
+
         response = self.client.post(
             reverse("transactions-declarations-validate"), {"entity_id": self.entity.id, "period": 202201}
         )
         assert response.status_code == 200
         mock_tiruert.assert_called_once()
         selected_lots = mock_tiruert.call_args[0][0]
-        sent_lots, _ = self.get_entity_lots()
-        self.assertSetEqual(set(selected_lots.values_list("pk", flat=True)), set(sent_lots.values_list("pk", flat=True)))
+        self.assertSetEqual(set(selected_lots.values_list("pk", flat=True)), expected_ids)
+        added_by_lot = CarbureLot.objects.get(carbure_client=None, carbure_supplier=None, added_by=self.entity)
+        self.assertEqual(added_by_lot.lot_status, CarbureLot.ACCEPTED)
+        self.assertFalse(added_by_lot.declared_by_supplier)
+        self.assertFalse(added_by_lot.declared_by_client)
 
 
 class ValidateDeclarationMacLotsTest(TestCase):
