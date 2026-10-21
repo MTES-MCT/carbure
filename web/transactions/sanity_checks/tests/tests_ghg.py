@@ -230,12 +230,6 @@ class GhgSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
 
-    def test_etd_no_eu_too_low(self):
-        pass
-
-    def x_test_etd_eu_default_value(self):
-        pass
-
     def x_test_eec_anormal_low(self):
         pass
 

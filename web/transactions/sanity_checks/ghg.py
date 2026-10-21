@@ -9,34 +9,6 @@ oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
 
 
-def check_etd_no_eu_too_low(lot: CarbureLot, prefetched_data):
-    etd = get_etd(lot, prefetched_data)
-    if etd is None:
-        return
-
-    if (not lot.country_of_origin or not lot.country_of_origin.is_in_europe) and lot.etd < etd:
-        return generic_error(
-            error=CarbureMLGHGErrors.ETD_NO_EU_TOO_LOW,
-            lot=lot,
-            display_to_creator=False,
-            field="etd",
-        )
-
-
-def check_etd_eu_default_value(lot: CarbureLot, prefetched_data):
-    etd = get_etd(lot, prefetched_data)
-    if etd is None:
-        return
-
-    if lot.country_of_origin and lot.country_of_origin.is_in_europe and lot.etd == etd:
-        return generic_error(
-            error=CarbureMLGHGErrors.ETD_EU_DEFAULT_VALUE,
-            lot=lot,
-            display_to_creator=False,
-            field="etd",
-        )
-
-
 def check_eec_anormal_low(lot: CarbureLot, prefetched_data):
     eec = get_eec(lot, prefetched_data)
     if eec is None:
@@ -163,14 +135,6 @@ def check_ghg_reduc_for_production_site(lot: CarbureLot):
                 lot=lot,
                 is_blocking=True,
             )
-
-
-def get_etd(lot: CarbureLot, prefetched_data):
-    if not lot.feedstock:
-        return None
-
-    etd = prefetched_data["etd"]
-    return etd.get(lot.feedstock)
 
 
 def get_eec(lot: CarbureLot, prefetched_data):
