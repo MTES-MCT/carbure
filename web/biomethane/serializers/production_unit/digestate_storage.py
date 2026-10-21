@@ -6,7 +6,13 @@ from biomethane.models import BiomethaneDigestateStorage
 class BiomethaneDigestateStorageSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneDigestateStorage
-        fields = "__all__"
+        fields = [
+            "id",
+            "type",
+            "capacity",
+            "has_cover",
+            "has_biogas_recovery",
+        ]
 
 
 class BiomethaneDigestateStorageInputSerializer(serializers.ModelSerializer):

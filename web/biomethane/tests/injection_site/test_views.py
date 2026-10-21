@@ -42,8 +42,6 @@ class BiomethaneInjectionSiteViewsTests(TestCase):
         response = self.client.get(self.injection_site_url, self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["id"], injection_site.id)
-        self.assertEqual(response.data["producer"], self.producer_entity.id)
         self.assertEqual(response.data["unique_identification_number"], injection_site.unique_identification_number)
 
     def test_create_injection_site_success(self):
@@ -147,4 +145,4 @@ class BiomethaneInjectionSiteViewsTests(TestCase):
         response = self.client.get(self.injection_site_url, params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["id"], injection_site.id)
+        self.assertEqual(response.data["unique_identification_number"], injection_site.unique_identification_number)

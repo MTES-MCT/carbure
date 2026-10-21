@@ -72,7 +72,7 @@ export const useActionExcelImportDialog = ({
   })
 
   const { execute, loading } = useMutation(importActionsFromExcel, {
-    invalidates: ["traceability-actions", "traceability-actions-years"],
+    invalidates: ["traceability-actions", "years"],
     onSuccess: () => {
       notify(t("Les lots ont bien été importés."), { variant: "success" })
       onClose()

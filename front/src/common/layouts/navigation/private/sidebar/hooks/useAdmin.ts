@@ -24,6 +24,13 @@ export const useAdmin = (params?: AdminParams) => {
         iconActive: "ri-book-2-fill",
       },
       {
+        path: routes.ADMIN().USERS,
+        condition: isAdmin,
+        title: t("Utilisateurs"),
+        icon: "ri-group-line",
+        iconActive: "ri-group-fill",
+      },
+      {
         path: routes.ADMIN().DASHBOARD,
         condition: isAdmin,
         title: t("Tableau de bord"),

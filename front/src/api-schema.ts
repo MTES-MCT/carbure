@@ -1662,6 +1662,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/entities/admin-users/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["entities_admin_users_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/entities/admin-users/export/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["entities_admin_users_export_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/entities/admin-users/filters/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["entities_admin_users_filters_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/entities/admin-users/search/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["entities_admin_users_search_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/entities/certificates/": {
         parameters: {
             query?: never;
@@ -3607,6 +3671,19 @@ export interface components {
             blending_is_outsourced: boolean;
             blending_entity_id?: number;
         };
+        AdminEntityIdsRequest: {
+            entity_ids?: string;
+        };
+        AdminUserRow: {
+            readonly user_id: number;
+            /** Format: email */
+            email: string;
+            is_active: boolean;
+            readonly entity_id: number;
+            entity_name: string;
+            entity_type: components["schemas"]["EntityTypeEnum"];
+            role: components["schemas"]["RoleEnum"];
+        };
         AgreementLists: {
             active: components["schemas"]["DoubleCountingRegistration"][];
             incoming: components["schemas"]["DoubleCountingRegistration"][];
@@ -3798,12 +3875,12 @@ export interface components {
          */
         BiomethaneAnnualDeclarationStatusEnum: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryStatus;
         BiomethaneContract: {
-            readonly id: number;
             readonly amendments: components["schemas"]["BiomethaneContractAmendment"][];
             readonly tracked_amendment_types: components["schemas"]["TrackedAmendmentTypesEnum"][];
-            complementary_aid_organisms: components["schemas"]["ComplementaryAidOrganismsEnum"][];
             /** Référence de l'arrêté tarifaire */
             tariff_reference?: components["schemas"]["TariffReferenceEnum"] | null;
+            /** Acheteur */
+            buyer?: number | null;
             /** Catégorie d'installation */
             installation_category?: components["schemas"]["InstallationCategoryEnum"] | null;
             /**
@@ -3837,11 +3914,9 @@ export interface components {
             conditions_file?: string | null;
             /** Est-ce que votre installation a bénéficié d'une ou plusieurs aide(s) complémentaire(s) à l'investissement? */
             has_complementary_investment_aid?: boolean | null;
+            complementary_aid_organisms: components["schemas"]["ComplementaryAidOrganismsEnum"][];
             /** Précisez le nom du ou des organismes publics ayant octroyé l'aide */
             complementary_aid_other_organism_name?: string | null;
-            /** Acheteur */
-            buyer?: number | null;
-            producer: number;
         };
         BiomethaneContractAmendment: {
             readonly id: number;
@@ -4109,7 +4184,6 @@ export interface components {
             has_cover?: boolean;
             /** Récupération du biogaz */
             has_biogas_recovery?: boolean;
-            producer: number;
         };
         BiomethaneDigestateStorageInput: {
             readonly id: number;
@@ -4327,7 +4401,6 @@ export interface components {
             energy: number;
         };
         BiomethaneInjectionSite: {
-            readonly id: number;
             /** Numéro d'identifiant unique du site d'injection */
             unique_identification_number: string;
             /** Raccordement à un site d'injection mutualisé */
@@ -4346,7 +4419,6 @@ export interface components {
             network_type?: components["schemas"]["NetworkTypeEnum"] | null;
             /** Nom du gestionnaire de réseau */
             network_manager_name?: string | null;
-            producer: number;
         };
         BiomethaneInjectionSiteInputRequest: {
             /** Numéro d'identifiant unique du site d'injection */
@@ -4508,16 +4580,10 @@ export interface components {
         };
         BiomethaneSupplyInput: {
             readonly id: number;
-            origin_country: components["schemas"]["Country"];
-            feedstock: components["schemas"]["FeedStockClassification"];
             producer: components["schemas"]["EntityPreview"];
-            /**
-             * Format: double
-             * @description Tonnage en matière brute (tMB), converti depuis tMS si besoin.
-             */
-            readonly volume_tmb: number | null;
             /** Provenance */
             source?: components["schemas"]["BiomethaneSupplyInputSourceEnum"] | null;
+            feedstock: components["schemas"]["FeedStockClassification"];
             /** Type de CIVE */
             type_cive?: components["schemas"]["TypeCiveEnum"] | null;
             /** Précisez la culture */
@@ -4536,6 +4602,12 @@ export interface components {
              * Format: double
              */
             volume?: number | null;
+            /**
+             * Format: double
+             * @description Tonnage en matière brute (tMB), converti depuis tMS si besoin.
+             */
+            readonly volume_tmb: number | null;
+            origin_country: components["schemas"]["Country"];
             /** Département d'origine */
             origin_department?: string | null;
             /**
@@ -4548,7 +4620,6 @@ export interface components {
              * Format: double
              */
             maximum_distance_km?: number | null;
-            supply_plan: number;
         };
         BiomethaneSupplyInputCreate: {
             readonly id: number;
@@ -5358,24 +5429,19 @@ export interface components {
         ElecProvisionCertificateQualicharge: {
             readonly id: number;
             readonly cpo: components["schemas"]["EntityPreview"];
-            /** Format: double */
-            renewable_energy: number;
-            unknown_siren?: string | null;
+            operating_unit: string;
+            station_id: string;
             /** Format: date */
             date_from: string;
             /** Format: date */
             date_to: string;
-            year: number;
-            operating_unit: string;
-            station_id: string;
             /** Format: double */
             energy_amount: number;
             /** Format: double */
             enr_ratio?: number;
-            is_controlled_by_qualicharge?: boolean;
+            /** Format: double */
+            renewable_energy: number;
             validated_by?: components["schemas"]["ElecQualichargeStatusEnum"];
-            /** Format: date-time */
-            readonly created_at: string | null;
         };
         /** @description Serializer for grouped provision certificate data by operating unit. */
         ElecProvisionCertificateQualichargeGrouped: {
@@ -5817,22 +5883,16 @@ export interface components {
         };
         H2Station: {
             readonly id: number;
-            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
             readonly entity_name: string | null;
             name: string;
             /** SIRET */
             site_siret?: string;
-            site_type?: components["schemas"]["SiteTypeEnum"];
             /** Adresse */
             address?: string;
             /** Code postal */
             postal_code?: string;
             /** Commune */
             city?: string;
-            /** Coordonnées GPS */
-            gps_coordinates?: string | null;
-            private?: boolean;
-            is_enabled?: boolean;
             /**
              * Date de mise en service
              * Format: date
@@ -5840,6 +5900,7 @@ export interface components {
             commissioning_date?: string | null;
             /** Nature d'accès au site */
             access_type: components["schemas"]["AccessTypeEnum"];
+            distributed_pressure: components["schemas"]["DistributedPressureEnum"][];
             /** Connecteurs compatibles avec les véhicules particuliers */
             has_personal_vehicle_connector?: boolean;
             /** Instruments de mesure de la masse d'H2 conformes au décret 2001-387 */
@@ -5848,9 +5909,6 @@ export interface components {
             storage_capacity: number;
             /** Capacité de distribution */
             distribution_capacity: number;
-            /** Pays */
-            country?: number | null;
-            created_by?: number | null;
         };
         H2StationInput: {
             readonly id: number;
@@ -6335,6 +6393,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["Action"][];
             total_count?: number;
+        };
+        PaginatedAdminUserRowList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["AdminUserRow"][];
         };
         PaginatedBalanceResponseList: {
             /** @example 123 */
@@ -11065,6 +11138,316 @@ export interface operations {
             };
         };
     };
+    entities_admin_users_list: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /**
+                 * @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
+                 */
+                entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
+                /**
+                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 *
+                 *     * `true` - True
+                 *     * `false` - False
+                 */
+                is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `entity_name` - Entity name
+                 *     * `-entity_name` - Entity name (décroissant)
+                 *     * `entity_id` - Entity id
+                 *     * `-entity_id` - Entity id (décroissant)
+                 *     * `user` - Utilisateur
+                 *     * `-user` - Utilisateur (décroissant)
+                 *     * `role` - Role
+                 *     * `-role` - Role (décroissant)
+                 *     * `is_active` - Is active
+                 *     * `-is_active` - Is active (décroissant)
+                 */
+                order_by?: PathsApiEntitiesAdminUsersGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /**
+                 * @description * `RO` - Lecture Seule
+                 *     * `RW` - Lecture/Écriture
+                 *     * `ADMIN` - Administrateur
+                 *     * `AUDITOR` - Auditeur
+                 */
+                role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAdminUserRowList"];
+                };
+            };
+        };
+    };
+    entities_admin_users_export_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /**
+                 * @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
+                 */
+                entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
+                /**
+                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 *
+                 *     * `true` - True
+                 *     * `false` - False
+                 */
+                is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `entity_name` - Entity name
+                 *     * `-entity_name` - Entity name (décroissant)
+                 *     * `entity_id` - Entity id
+                 *     * `-entity_id` - Entity id (décroissant)
+                 *     * `user` - Utilisateur
+                 *     * `-user` - Utilisateur (décroissant)
+                 *     * `role` - Role
+                 *     * `-role` - Role (décroissant)
+                 *     * `is_active` - Is active
+                 *     * `-is_active` - Is active (décroissant)
+                 */
+                order_by?: PathsApiEntitiesAdminUsersGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /**
+                 * @description * `RO` - Lecture Seule
+                 *     * `RW` - Lecture/Écriture
+                 *     * `ADMIN` - Administrateur
+                 *     * `AUDITOR` - Auditeur
+                 */
+                role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AdminEntityIdsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AdminEntityIdsRequest"];
+                "multipart/form-data": components["schemas"]["AdminEntityIdsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.ms-excel": File;
+                };
+            };
+        };
+    };
+    entities_admin_users_filters_retrieve: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /**
+                 * @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
+                 */
+                entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
+                /** @description Filter string to apply */
+                filter: PathsApiEntitiesAdminUsersFiltersGetParametersQueryFilter;
+                /**
+                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 *
+                 *     * `true` - True
+                 *     * `false` - False
+                 */
+                is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `entity_name` - Entity name
+                 *     * `-entity_name` - Entity name (décroissant)
+                 *     * `entity_id` - Entity id
+                 *     * `-entity_id` - Entity id (décroissant)
+                 *     * `user` - Utilisateur
+                 *     * `-user` - Utilisateur (décroissant)
+                 *     * `role` - Role
+                 *     * `-role` - Role (décroissant)
+                 *     * `is_active` - Is active
+                 *     * `-is_active` - Is active (décroissant)
+                 */
+                order_by?: PathsApiEntitiesAdminUsersGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /**
+                 * @description * `RO` - Lecture Seule
+                 *     * `RW` - Lecture/Écriture
+                 *     * `ADMIN` - Administrateur
+                 *     * `AUDITOR` - Auditeur
+                 */
+                role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
+    entities_admin_users_search_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /**
+                 * @description * `Producteur` - Producteur
+                 *     * `Opérateur` - Opérateur
+                 *     * `Administration` - Administration
+                 *     * `Trader` - Trader
+                 *     * `Auditor` - Auditeur
+                 *     * `Administration Externe` - Administration Externe
+                 *     * `Charge Point Operator` - Charge Point Operator
+                 *     * `Compagnie aérienne` - Compagnie aérienne
+                 *     * `Unknown` - Unknown
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `SAF Trader` - Trader de SAF
+                 *     * `Producteur de biométhane` - Producteur de biométhane
+                 *     * `Fournisseur de biométhane` - Fournisseur de biométhane
+                 *     * `HRS` - Distributeur d'hydrogène pour la mobilité
+                 */
+                entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
+                /**
+                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 *
+                 *     * `true` - True
+                 *     * `false` - False
+                 */
+                is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
+                /**
+                 * @description Ordre
+                 *
+                 *     * `entity_name` - Entity name
+                 *     * `-entity_name` - Entity name (décroissant)
+                 *     * `entity_id` - Entity id
+                 *     * `-entity_id` - Entity id (décroissant)
+                 *     * `user` - Utilisateur
+                 *     * `-user` - Utilisateur (décroissant)
+                 *     * `role` - Role
+                 *     * `-role` - Role (décroissant)
+                 *     * `is_active` - Is active
+                 *     * `-is_active` - Is active (décroissant)
+                 */
+                order_by?: PathsApiEntitiesAdminUsersGetParametersQueryOrder_by[];
+                /** @description Which field to use when ordering the results. */
+                ordering?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /**
+                 * @description * `RO` - Lecture Seule
+                 *     * `RW` - Lecture/Écriture
+                 *     * `ADMIN` - Administrateur
+                 *     * `AUDITOR` - Auditeur
+                 */
+                role?: PathsApiEntitiesAdminUsersGetParametersQueryRole[];
+                /** @description A search term. */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AdminEntityIdsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AdminEntityIdsRequest"];
+                "multipart/form-data": components["schemas"]["AdminEntityIdsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedAdminUserRowList"];
+                };
+            };
+        };
+    };
     entities_certificates_list: {
         parameters: {
             query: {
@@ -13298,7 +13681,7 @@ export interface operations {
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
                  *     * `HRS` - Distributeur d'hydrogène pour la mobilité
                  */
-                client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
+                client_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
                  * @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
@@ -13561,7 +13944,7 @@ export interface operations {
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
                  *     * `HRS` - Distributeur d'hydrogène pour la mobilité
                  */
-                client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
+                client_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
                  * @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
@@ -13653,7 +14036,7 @@ export interface operations {
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
                  *     * `HRS` - Distributeur d'hydrogène pour la mobilité
                  */
-                client_type?: PathsApiSafTicketsGetParametersQueryClient_type[];
+                client_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
                  * @description * `MAC` - MAC
                  *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
@@ -15384,6 +15767,8 @@ export interface operations {
                  *     * `-site` - Site (décroissant)
                  *     * `shipping_distance` - Shipping distance
                  *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `status` - Status
+                 *     * `-status` - Status (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -15521,6 +15906,8 @@ export interface operations {
                  *     * `-site` - Site (décroissant)
                  *     * `shipping_distance` - Shipping distance
                  *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `status` - Status
+                 *     * `-status` - Status (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -15662,6 +16049,8 @@ export interface operations {
                  *     * `-site` - Site (décroissant)
                  *     * `shipping_distance` - Shipping distance
                  *     * `-shipping_distance` - Shipping distance (décroissant)
+                 *     * `status` - Status
+                 *     * `-status` - Status (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -15933,6 +16322,46 @@ export enum PathsApiElecTransferCertificatesFiltersGetParametersQueryFilter {
     used_in_tiruert = "used_in_tiruert",
     year = "year"
 }
+export enum PathsApiEntitiesAdminUsersGetParametersQueryEntity_type {
+    Administration = "Administration",
+    Administration_Externe = "Administration Externe",
+    Auditor = "Auditor",
+    Charge_Point_Operator = "Charge Point Operator",
+    Compagnie_a_rienne = "Compagnie a\u00E9rienne",
+    Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane",
+    HRS = "HRS",
+    Op_rateur = "Op\u00E9rateur",
+    Power_or_Heat_Producer = "Power or Heat Producer",
+    Producteur = "Producteur",
+    Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
+    SAF_Trader = "SAF Trader",
+    Trader = "Trader",
+    Unknown = "Unknown"
+}
+export enum PathsApiEntitiesAdminUsersGetParametersQueryOrder_by {
+    ValueMinusentity_id = "-entity_id",
+    ValueMinusentity_name = "-entity_name",
+    ValueMinusis_active = "-is_active",
+    ValueMinusrole = "-role",
+    ValueMinususer = "-user",
+    entity_id = "entity_id",
+    entity_name = "entity_name",
+    is_active = "is_active",
+    role = "role",
+    user = "user"
+}
+export enum PathsApiEntitiesAdminUsersGetParametersQueryRole {
+    ADMIN = "ADMIN",
+    AUDITOR = "AUDITOR",
+    RO = "RO",
+    RW = "RW"
+}
+export enum PathsApiEntitiesAdminUsersFiltersGetParametersQueryFilter {
+    entity_type = "entity_type",
+    is_active = "is_active",
+    order_by = "order_by",
+    role = "role"
+}
 export enum PathsApiH2StationsGetParametersQueryAccess_type {
     PRIVATE = "PRIVATE",
     PUBLIC = "PUBLIC"
@@ -15993,22 +16422,6 @@ export enum PathsApiSafTicketSourcesFiltersGetParametersQueryFilter {
     production_site = "production_site",
     supplier = "supplier",
     year = "year"
-}
-export enum PathsApiSafTicketsGetParametersQueryClient_type {
-    Administration = "Administration",
-    Administration_Externe = "Administration Externe",
-    Auditor = "Auditor",
-    Charge_Point_Operator = "Charge Point Operator",
-    Compagnie_a_rienne = "Compagnie a\u00E9rienne",
-    Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane",
-    HRS = "HRS",
-    Op_rateur = "Op\u00E9rateur",
-    Power_or_Heat_Producer = "Power or Heat Producer",
-    Producteur = "Producteur",
-    Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
-    SAF_Trader = "SAF Trader",
-    Trader = "Trader",
-    Unknown = "Unknown"
 }
 export enum PathsApiSafTicketsGetParametersQueryConsumption_type {
     MAC = "MAC",
@@ -16203,6 +16616,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinusquantity = "-quantity",
     ValueMinusshipping_distance = "-shipping_distance",
     ValueMinussite = "-site",
+    ValueMinusstatus = "-status",
     ValueMinusworking_date = "-working_date",
     holder = "holder",
     material = "material",
@@ -16210,6 +16624,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     quantity = "quantity",
     shipping_distance = "shipping_distance",
     site = "site",
+    status = "status",
     working_date = "working_date"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryShipping_method {
