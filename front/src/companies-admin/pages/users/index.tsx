@@ -89,7 +89,9 @@ const AdminUsers = () => {
         ) : (
           <>
             <RecapQuantity
-              text={t("{{count}} utilisateur", { count: rows.length })}
+              text={t("{{count}} utilisateur", {
+                count: result?.data?.count ?? 0,
+              })}
             />
             <Table
               loading={loading}
