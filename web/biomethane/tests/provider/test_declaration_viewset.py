@@ -1,13 +1,27 @@
+from datetime import timedelta
+
+from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
+from django_otp import DEVICE_ID_SESSION_KEY
+from django_otp.plugins.otp_email.models import EmailDevice
 from rest_framework import status
 from rest_framework.test import APIClient
+from rest_framework_api_key.models import APIKey
+from rest_framework_simplejwt.tokens import AccessToken
 
 from biomethane.factories import BiomethaneContractFactory, BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneAnnualDeclaration
-from core.models import Entity
+from core.models import Entity, UserRights
 from core.tests_utils import setup_current_user, setup_current_user_with_jwt
 from entity.factories import EntityFactory
+
+provider_test_middleware = [
+    middleware for middleware in settings.MIDDLEWARE if middleware != "django_otp.middleware.OTPMiddleware"
+]
+authentication_middleware_index = provider_test_middleware.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+provider_test_middleware.insert(authentication_middleware_index + 1, "django_otp.middleware.OTPMiddleware")
 
 
 class BiomethaneProviderDeclarationViewSetTest(TestCase):
@@ -32,6 +46,15 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
     def _get(self, **params):
         return self.client.get(self.url, {"entity_id": self.provider.id, **params})
+
+    def _authenticated_api_client(self, token=None):
+        _, api_key = APIKey.objects.create_key(name="provider integration")
+        client = APIClient()
+        client.credentials(
+            HTTP_X_API_KEY=api_key,
+            HTTP_AUTHORIZATION=f"Bearer {token or AccessToken.for_user(self.user)}",
+        )
+        return client
 
     def test_returns_only_validated_declarations_of_own_contracts(self):
         """Only validated declarations of producers under contract with the provider are returned."""
@@ -115,7 +138,44 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_accepts_a_real_signed_jwt(self):
+        """A signed JWT and a valid API key authenticate the provider API request."""
+        response = self._authenticated_api_client().get(self.url, {"entity_id": self.provider.id})
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_rejects_an_invalid_jwt(self):
+        """A valid API key does not compensate for an invalid JWT."""
+        response = self._authenticated_api_client("not.a.valid.jwt").get(self.url, {"entity_id": self.provider.id})
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_rejects_an_expired_jwt(self):
+        """An expired but correctly signed JWT is rejected."""
+        token = AccessToken.for_user(self.user)
+        token.set_exp(lifetime=timedelta(seconds=-1))
+
+        response = self._authenticated_api_client(token).get(self.url, {"entity_id": self.provider.id})
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_rejects_a_revoked_api_key(self):
+        """A revoked API key is rejected even when the JWT is valid."""
+        api_key, key = APIKey.objects.create_key(name="revoked provider key")
+        api_key.revoked = True
+        api_key.save(update_fields=["revoked"])
+        client = APIClient()
+        client.credentials(
+            HTTP_X_API_KEY=key,
+            HTTP_AUTHORIZATION=f"Bearer {AccessToken.for_user(self.user)}",
+        )
+
+        response = client.get(self.url, {"entity_id": self.provider.id})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+@override_settings(MIDDLEWARE=provider_test_middleware)
 class BiomethaneProviderDeclarationFrontTest(TestCase):
     fixtures = ["json/countries.json"]
 
@@ -133,15 +193,38 @@ class BiomethaneProviderDeclarationFrontTest(TestCase):
         BiomethaneAnnualDeclaration.objects.create(producer=producer, year=2024, status=BiomethaneAnnualDeclaration.DECLARED)
         return producer
 
+    def _verify_session_otp(self):
+        device = EmailDevice.objects.create(user=self.user, name="email", confirmed=True)
+        session = self.client.session
+        session[DEVICE_ID_SESSION_KEY] = device.persistent_id
+        session.save()
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
+
     def test_session_user_without_api_key_can_list(self):
         """A frontend session user of the provider entity can list its declarations without API key."""
         producer = self._create_declaration(self.provider)
         self._create_declaration(self.other_provider, name="Other producer")
+        self._verify_session_otp()
 
         response = self.client.get(self.url, {"entity_id": self.provider.id})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([item["producer"]["id"] for item in response.data["results"]], [producer.id])
+
+    def test_session_without_verified_otp_is_forbidden(self):
+        """A logged-in session without a verified OTP cannot access the provider page API."""
+        response = self.client.get(self.url, {"entity_id": self.provider.id})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_revoked_provider_rights_block_the_next_session_request(self):
+        """Removing provider rights immediately prevents further session access."""
+        self._verify_session_otp()
+        UserRights.objects.filter(user=self.user, entity=self.provider).delete()
+
+        response = self.client.get(self.url, {"entity_id": self.provider.id})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_forbidden_for_another_provider_entity(self):
         """A session user cannot read through another provider entity it has no rights on."""

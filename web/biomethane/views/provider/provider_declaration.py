@@ -13,6 +13,7 @@ from biomethane.services.provider_declaration import get_provider_declarations
 
 
 @extend_schema(
+    auth=[{"jwtAuth": [], "apiKeyAuth": []}, {"cookieAuth": []}],
     parameters=[
         OpenApiParameter(
             name="entity_id",
@@ -21,7 +22,7 @@ from biomethane.services.provider_declaration import get_provider_declarations
             description="Gas provider entity ID.",
             required=True,
         ),
-    ]
+    ],
 )
 class BiomethaneProviderDeclarationViewSet(GenericViewSet, ListModelMixin):
     """Validated annual declarations of the producers under contract with the gas provider."""
@@ -30,6 +31,7 @@ class BiomethaneProviderDeclarationViewSet(GenericViewSet, ListModelMixin):
     permission_classes = [CanAccessProviderApi]
     serializer_class = BiomethaneProviderDeclarationSerializer
     filterset_class = BiomethaneProviderDeclarationFilter
+    search_fields = None
     queryset = BiomethaneAnnualDeclaration.objects.none()
 
     def initialize_request(self, request, *args, **kwargs):

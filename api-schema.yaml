@@ -2105,6 +2105,8 @@ paths:
         - biomethane
       security:
         - jwtAuth: []
+          apiKeyAuth: []
+        - cookieAuth: []
       responses:
         "200":
           content:
@@ -16291,6 +16293,7 @@ components:
           allOf:
             - $ref: "#/components/schemas/BiomethaneProductionUnitPreview"
           readOnly: true
+          nullable: true
       required:
         - producer
         - production_unit
@@ -23248,6 +23251,10 @@ components:
         * `ACCEPTED` - Accepté
         * `REJECTED` - Refusé
   securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
     basicAuth:
       type: http
       scheme: basic

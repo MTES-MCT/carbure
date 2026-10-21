@@ -4607,7 +4607,7 @@ export interface components {
         };
         BiomethaneProviderDeclaration: {
             readonly producer: components["schemas"]["EntityPreview"];
-            readonly production_unit: components["schemas"]["BiomethaneProductionUnitPreview"];
+            readonly production_unit: components["schemas"]["BiomethaneProductionUnitPreview"] | null;
         };
         BiomethaneSupplyInput: {
             readonly id: number;
