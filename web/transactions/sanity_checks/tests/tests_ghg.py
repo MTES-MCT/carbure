@@ -2,9 +2,8 @@ import datetime
 
 from django.test import TestCase
 
-from core.carburetypes import CarbureMLGHGErrors, CarbureSanityCheckErrors
+from core.carburetypes import CarbureSanityCheckErrors
 from core.models import Entity, MatierePremiere
-from ml.models import ETDStats
 from transactions.factories import CarbureLotFactory
 
 from ..ghg import jan2021, oct2015
@@ -231,23 +230,6 @@ class GhgSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
 
-    def test_etd_anormal_high(self):
-        error = CarbureMLGHGErrors.ETD_ANORMAL_HIGH
-
-        etd = ETDStats.objects.first()
-        if not etd:
-            return
-
-        lot = self.create_lot(feedstock=etd.feedstock, etd=1)
-
-        error_list = self.run_checks(lot)
-        assert not has_error(error, error_list)
-
-        lot.etd = max(2 * etd.default_value, 5) + 1
-        error_list = self.run_checks(lot)
-
-        assert has_error(error, error_list)
-
     def test_etd_no_eu_too_low(self):
         pass
 
@@ -257,11 +239,5 @@ class GhgSanityChecksTest(TestCase):
     def x_test_eec_anormal_low(self):
         pass
 
-    def x_test_eec_anormal_high(self):
-        pass
-
     def x_test_ep_anormal_low(self):
-        pass
-
-    def x_test_ep_anormal_high(self):
         pass

@@ -81,11 +81,11 @@ class LotGHGTest(TestCase):
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="EEC_ANORMAL_LOW").count()
         assert nb_errors == 1
 
-    def test_eec_too_high(self):
+    def test_high_eec_does_not_raise_anomaly(self):
         lot = self.create_draft(biofuel_code="ETH", feedstock_code="BETTERAVE", eec=22)
         lot = self.send_lot(lot)
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="EEC_ANORMAL_HIGH").count()
-        assert nb_errors == 1
+        assert nb_errors == 0
 
     def test_ep_too_low(self):
         lot = self.create_draft(biofuel_code="EMHV", feedstock_code="COLZA", ep=1)
@@ -93,17 +93,17 @@ class LotGHGTest(TestCase):
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="EP_ANORMAL_LOW").count()
         assert nb_errors == 1
 
-    def test_ep_too_high(self):
+    def test_high_ep_does_not_raise_anomaly(self):
         lot = self.create_draft(biofuel_code="EMHV", feedstock_code="COLZA", ep=32)
         lot = self.send_lot(lot)
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="EP_ANORMAL_HIGH").count()
-        assert nb_errors == 1
+        assert nb_errors == 0
 
-    def test_etd_too_high(self):
+    def test_high_etd_does_not_raise_anomaly(self):
         lot = self.create_draft(biofuel_code="ETH", feedstock_code="BETTERAVE", etd=5.1)
         lot = self.send_lot(lot)
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_ANORMAL_HIGH").count()
-        assert nb_errors == 1
+        assert nb_errors == 0
 
     def x_test_etd_eu_default(self):
         lot = self.create_draft(biofuel_code="ETH", feedstock_code="BETTERAVE", country_code="FR", etd=2.3)
@@ -111,7 +111,7 @@ class LotGHGTest(TestCase):
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_EU_DEFAULT_VALUE").count()
         assert nb_errors == 1
 
-    def test_etd_no_eu_too_high(self):
+    def test_etd_no_eu_too_low(self):
         lot = self.create_draft(biofuel_code="ETH", feedstock_code="BETTERAVE", country_code="US", etd=0.9)
         lot = self.send_lot(lot)
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_NO_EU_TOO_LOW").count()

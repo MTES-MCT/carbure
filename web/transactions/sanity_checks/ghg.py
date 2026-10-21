@@ -9,20 +9,6 @@ oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
 
 
-def check_etd_anormal_high(lot: CarbureLot, prefetched_data):
-    etd = get_etd(lot, prefetched_data)
-    if etd is None:
-        return
-
-    if lot.etd > 2 * etd and lot.etd > 5:
-        return generic_error(
-            error=CarbureMLGHGErrors.ETD_ANORMAL_HIGH,
-            lot=lot,
-            display_to_creator=False,
-            field="etd",
-        )
-
-
 def check_etd_no_eu_too_low(lot: CarbureLot, prefetched_data):
     etd = get_etd(lot, prefetched_data)
     if etd is None:
@@ -65,20 +51,6 @@ def check_eec_anormal_low(lot: CarbureLot, prefetched_data):
         )
 
 
-def check_eec_anormal_high(lot: CarbureLot, prefetched_data):
-    eec = get_eec(lot, prefetched_data)
-    if eec is None:
-        return
-
-    if lot.eec > 1.3 * max(eec.default_value, eec.average):
-        return generic_error(
-            error=CarbureMLGHGErrors.EEC_ANORMAL_HIGH,
-            lot=lot,
-            display_to_creator=False,
-            field="eec",
-        )
-
-
 def check_ep_anormal_low(lot: CarbureLot, prefetched_data):
     ep = get_ep(lot, prefetched_data)
     if ep is None:
@@ -87,20 +59,6 @@ def check_ep_anormal_low(lot: CarbureLot, prefetched_data):
     if lot.ep < 0.5 * min(ep.average, ep.default_value_min_ep):
         return generic_error(
             error=CarbureMLGHGErrors.EP_ANORMAL_LOW,
-            lot=lot,
-            display_to_creator=False,
-            field="ep",
-        )
-
-
-def check_ep_anormal_high(lot: CarbureLot, prefetched_data):
-    ep = get_ep(lot, prefetched_data)
-    if ep is None:
-        return
-
-    if lot.ep > 1.5 * max(ep.average, ep.default_value_max_ep):
-        return generic_error(
-            error=CarbureMLGHGErrors.EP_ANORMAL_HIGH,
             lot=lot,
             display_to_creator=False,
             field="ep",
