@@ -6,4 +6,4 @@ from core.serializers import EntityPreviewSerializer
 
 class BiomethaneProviderDeclarationSerializer(serializers.Serializer):
     producer = EntityPreviewSerializer(read_only=True)
-    production_unit = BiomethaneProductionUnitPreviewSerializer(read_only=True)
+    production_unit = BiomethaneProductionUnitPreviewSerializer(read_only=True, allow_null=True)
