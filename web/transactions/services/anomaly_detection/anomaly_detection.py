@@ -12,7 +12,6 @@ DB_TABLE_NAMES = [
     "biocarburants",
     "double_counting_registrations",
     "entities",
-    "entity_depot",
     "entity_site",
     "matieres_premieres",
     "pays",
@@ -45,7 +44,7 @@ CATEGORICAL_VARIABLES = [
 
 DEFAULT_IF_PARAMS = {
     "bootstrap": False,
-    "contamination": 0.00033,
+    "contamination": 0.01,
     "max_features": 1.0,
     "max_samples": "auto",
     "n_estimators": 300,
@@ -57,7 +56,7 @@ DEFAULT_IF_PARAMS = {
 
 DEFAULT_LOF_PARAMS = {
     "algorithm": "auto",
-    "contamination": 0.00033,
+    "contamination": 0.004,
     "leaf_size": 40,
     "metric": "minkowski",
     "metric_params": None,
