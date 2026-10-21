@@ -99,20 +99,8 @@ class LotGHGTest(TestCase):
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="EP_ANORMAL_HIGH").count()
         assert nb_errors == 0
 
-    def test_high_etd_does_not_raise_anomaly(self):
-        lot = self.create_draft(biofuel_code="ETH", feedstock_code="BETTERAVE", etd=5.1)
-        lot = self.send_lot(lot)
-        nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_ANORMAL_HIGH").count()
-        assert nb_errors == 0
-
-    def x_test_etd_eu_default(self):
-        lot = self.create_draft(biofuel_code="ETH", feedstock_code="BETTERAVE", country_code="FR", etd=2.3)
-        lot = self.send_lot(lot)
-        nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_EU_DEFAULT_VALUE").count()
-        assert nb_errors == 1
-
-    def test_etd_no_eu_too_low(self):
+    def test_low_etd_does_not_raise_reference_anomaly(self):
         lot = self.create_draft(biofuel_code="ETH", feedstock_code="BETTERAVE", country_code="US", etd=0.9)
         lot = self.send_lot(lot)
         nb_errors = GenericError.objects.filter(lot_id=lot.id, error="ETD_NO_EU_TOO_LOW").count()
-        assert nb_errors == 1
+        assert nb_errors == 0

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from ml.models import EECStats, EPStats, ETDStats
+from ml.models import EECStats, EPStats
 
 
 @admin.register(EECStats)
@@ -20,8 +20,3 @@ class EPStatsAdmin(admin.ModelAdmin):
         "feedstock",
         "biofuel",
     )
-
-
-@admin.register(ETDStats)
-class ETDStatsAdmin(admin.ModelAdmin):
-    list_display = ("feedstock", "default_value")

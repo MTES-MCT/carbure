@@ -30,13 +30,3 @@ class EPStats(models.Model):
         db_table = "ml_ep_stats"
         verbose_name = "ML EP Stat"
         verbose_name_plural = "ML EP Stats"
-
-
-class ETDStats(models.Model):
-    feedstock = models.ForeignKey(MatierePremiere, null=False, blank=False, on_delete=models.CASCADE)
-    default_value = models.FloatField(null=False, blank=False, default=0.0)
-
-    class Meta:
-        db_table = "ml_etd_stats"
-        verbose_name = "ML ETD Stat"
-        verbose_name_plural = "ML ETD Stats"
