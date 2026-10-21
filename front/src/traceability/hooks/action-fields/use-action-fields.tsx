@@ -98,7 +98,9 @@ export function useActionFields() {
       key: "material",
       label: t("Matière"),
       field: ({ form, props }) => {
-        const bound = form.bind("material")
+        const bound = form.bind("material", {
+          value: form.value.inherited_fields?.material ?? undefined,
+        })
 
         return (
           <Autocomplete<ActionMaterial, ActionMaterial>

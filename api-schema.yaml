@@ -14291,6 +14291,10 @@ components:
             - $ref: "#/components/schemas/ActionTotalEmissions"
           readOnly: true
           nullable: true
+        inherited_fields:
+          allOf:
+            - $ref: "#/components/schemas/ActionInheritedFields"
+          readOnly: true
         mass:
           type: string
           format: decimal
@@ -14388,6 +14392,7 @@ components:
         - holder
         - id
         - industry
+        - inherited_fields
         - mass
         - material
         - parent
@@ -14426,6 +14431,17 @@ components:
           format: binary
       required:
         - file
+    ActionInheritedFields:
+      type: object
+      description: Nearest declared values along the parent chain, including the
+        action itself.
+      properties:
+        material:
+          allOf:
+            - $ref: "#/components/schemas/Material"
+          nullable: true
+      required:
+        - material
     ActionParent:
       type: object
       description: Small representation used for the parent action relation.
