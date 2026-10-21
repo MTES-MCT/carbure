@@ -8,7 +8,7 @@ from core.models import Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory
 from traceability.models import Action
-from traceability.services.total_emissions import annotate_total_emissions
+from traceability.services.parent_chain import annotate_parent_chain
 
 
 class ActionViewsetQuerysetTest(TestCase):
@@ -73,6 +73,43 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertIn("volume", by_id[self.own_action.id])
         self.assertIn("energy", by_id[self.own_action.id])
 
+    def test_list_includes_inherited_material(self):
+        child = ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=None,
+        )
+
+        response = self.client.get(self.list_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        by_id = {item["id"]: item for item in response.data["results"]}
+        self.assertIsNone(by_id[child.id]["material"])
+        self.assertEqual(by_id[child.id]["inherited_fields"]["material"]["id"], self.own_action.material_id)
+        self.assertEqual(
+            by_id[self.own_action.id]["inherited_fields"]["material"]["id"],
+            self.own_action.material_id,
+        )
+
+    def test_retrieve_includes_inherited_material(self):
+        child = ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=None,
+        )
+
+        response = self.client.get(
+            reverse("traceability-action-detail", args=[child.id]),
+            self.base_params,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(response.data["material"])
+        self.assertEqual(response.data["inherited_fields"]["material"]["code"], self.own_action.material.code)
+        self.assertEqual(response.data["inherited_fields"]["material"]["name"], self.own_action.material.name)
+
     def test_retrieve_includes_total_emissions(self):
         response = self.client.get(
             reverse("traceability-action-detail", args=[self.own_action.id]),
@@ -86,11 +123,11 @@ class ActionViewsetQuerysetTest(TestCase):
     def test_retrieve_annotates_only_the_requested_action(self):
         seen_pks = []
 
-        def capture(queryset):
+        def capture(queryset, **kwargs):
             seen_pks.extend(queryset.values_list("pk", flat=True))
-            return annotate_total_emissions(queryset)
+            return annotate_parent_chain(queryset, **kwargs)
 
-        with patch("traceability.views.action.annotate_total_emissions", side_effect=capture):
+        with patch("traceability.views.action.annotate_parent_chain", side_effect=capture):
             response = self.client.get(
                 reverse("traceability-action-detail", args=[self.own_action.id]),
                 self.base_params,

@@ -8,6 +8,7 @@ from traceability.models import Action
 from traceability.models.action_status import ActionStatus
 from traceability.serializers.certificate import ActionCertificateSerializer
 from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField, LookupSlugRelatedField
+from traceability.serializers.inherited_fields import ActionInheritedFieldsSerializer
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
 from traceability.serializers.total_emissions import ActionTotalEmissionsSerializer
@@ -31,6 +32,7 @@ class ActionSerializer(serializers.ModelSerializer):
     certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
 
     total_emissions = ActionTotalEmissionsSerializer(read_only=True, allow_null=True)
+    inherited_fields = ActionInheritedFieldsSerializer(read_only=True)
     mass = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
     volume = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
     energy = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)

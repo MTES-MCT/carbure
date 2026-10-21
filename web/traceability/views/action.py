@@ -13,7 +13,8 @@ from traceability.middlewares import ActionHandlerMiddleware
 from traceability.models import Action
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
 from traceability.services.delete import delete_action
-from traceability.services.total_emissions import annotate_total_emissions
+from traceability.services.inherited_fields import attach_inherited_fields
+from traceability.services.parent_chain import annotate_parent_chain
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
 
@@ -59,19 +60,32 @@ class ActionViewset(
 
     def get_queryset(self):
         queryset = self.request.handler.scope_queryset(self.request, self.queryset)
+        # Detail annotates the requested row only. List annotates after pagination.
         if self.action == "retrieve":
-            queryset = annotate_total_emissions(queryset.filter(pk=self.kwargs["pk"]))
+            queryset = annotate_parent_chain(queryset.filter(pk=self.kwargs["pk"]))
         return queryset
+
+    def get_object(self):
+        action = super().get_object()
+        if self.action == "retrieve":
+            attach_inherited_fields([action])
+        return action
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
-        if page is None:
-            return None
-        # Annotate the current page only: the CTE cannot run on a sliced queryset
-        # (MySQL rejects LIMIT in the pk__in subquery). Re-index to keep page order.
+        if not page:
+            return page
+
+        # The CTE runs on the page ids. MySQL rejects LIMIT in that subquery.
         ids = [action.pk for action in page]
-        by_id = {action.pk: action for action in annotate_total_emissions(queryset.filter(pk__in=ids))}
-        return [by_id[action_id] for action_id in ids]
+        annotated = annotate_parent_chain(queryset.filter(pk__in=ids))
+
+        # Re-index to keep page order.
+        actions_by_id = {action.pk: action for action in annotated}
+        actions = [actions_by_id[pk] for pk in ids]
+
+        # Attach the inherited fields.
+        return attach_inherited_fields(actions)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

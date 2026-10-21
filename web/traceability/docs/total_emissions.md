@@ -1,6 +1,6 @@
 # Cumul GES (`total_emissions`)
 
-Code : `services/total_emissions.py`. Tests : `tests/services/test_total_emissions.py`.
+Colonnes : `services/total_emissions.py`. Parcours : `services/parent_chain.py`. Tests : `tests/services/test_total_emissions.py`.
 
 On annote chaque action listée avec les GES **de sa chaîne de parents** (elle-même → parent → … → racine).
 
@@ -37,7 +37,9 @@ root ne cumule qu’elle-même (`total=5`) ; middle = root+middle (`total=55`).
 
 django-cte sépare ce que MySQL écrit en **un** `WITH RECURSIVE … SELECT`.
 
-### 1. `_parent_path_cte` — remonter et additionner
+### 1. `parent_chain` — remonter et additionner
+
+Le parcours est partagé avec `inherited_fields`. Quand les deux sont demandés, la même CTE porte les sommes GES et `found_material_id` (`COALESCE` de la première matière non vide). `annotate_total_emissions` ne demande que les sommes.
 
 Pour chaque action demandée (`origin_id`), une ligne par **étape** (un cran vers le parent) :
 
@@ -68,7 +70,7 @@ WITH RECURSIVE cte AS (
 SELECT * FROM cte;
 ```
 
-### 2. `annotate_total_emissions` — garder la dernière étape
+### 2. `annotate_parent_chain` — garder la dernière étape
 
 La CTE a **toutes** les étapes. On ne veut que celle arrivée à la racine (`next_parent_id IS NULL`) : les sommes sont alors complètes. On la `JOIN` sur l’action d’origine pour conserver `select_related` / statut, et on construit le JSON.
 
@@ -87,6 +89,6 @@ La CTE a **toutes** les étapes. On ne veut que celle arrivée à la racine (`ne
 
 ## Où c’est branché
 
-`ActionViewset` : **retrieve** annote après le filtre `pk` ; **list** pagine d’abord, puis annote les ids de la page (MySQL interdit `LIMIT` dans la sous-requête de la CTE). Le `COUNT` de pagination s’exécute donc sur le queryset **sans** CTE.
+`ActionViewset` appelle `annotate_parent_chain` : **retrieve** après le filtre `pk` ; **list** pagine d’abord, puis annote les ids de la page (MySQL interdit `LIMIT` dans la sous-requête de la CTE). Le `COUNT` de pagination s’exécute donc sur le queryset **sans** CTE.
 
-Ne pas remettre `annotate_total_emissions` sur `Action.objects` (manager) : ça recalculerait le cumul pour toute la table, y compris `/years/` et `/filters/`.
+Ne pas remettre cette annotation sur `Action.objects` (manager) : ça recalculerait le cumul pour toute la table, y compris `/years/` et `/filters/`.
