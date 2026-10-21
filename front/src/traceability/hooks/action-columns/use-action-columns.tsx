@@ -41,7 +41,7 @@ export function useActionColumns() {
     material: {
       key: "material",
       header: t("Matière"),
-      cell: (action) => <Cell text={action.material?.name} />,
+      cell: (action) => <Cell text={action.inherited_fields.material?.name} />,
     },
 
     certificate: {

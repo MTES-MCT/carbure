@@ -3557,6 +3557,7 @@ export interface components {
             readonly site: components["schemas"]["ActionSite"];
             readonly certificate: components["schemas"]["ActionCertificate"] | null;
             readonly total_emissions: components["schemas"]["ActionTotalEmissions"] | null;
+            readonly inherited_fields: components["schemas"]["ActionInheritedFields"];
             /** Format: decimal */
             readonly mass: string | null;
             /** Format: decimal */
@@ -3616,6 +3617,10 @@ export interface components {
         ActionExcelUploadRequest: {
             /** Format: binary */
             file: File;
+        };
+        /** @description Nearest declared values along the parent chain, including the action itself. */
+        ActionInheritedFields: {
+            material: components["schemas"]["Material"] | null;
         };
         /** @description Small representation used for the parent action relation. */
         ActionParent: {
