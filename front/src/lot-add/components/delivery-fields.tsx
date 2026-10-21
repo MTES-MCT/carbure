@@ -288,13 +288,8 @@ function canShowDeliveryTypeField(
     value.client === undefined || typeof value.client === "string"
   const isClientEntity =
     value.client instanceof Object && value.client.id === entity.id
-  const isIntermediateLot =
-    value.delivery_type === DeliveryType.Trading ||
-    value.delivery_type === DeliveryType.Processing
 
-  return (
-    isClientUnknown || (isIntermediateLot ? !isClientEntity : isClientEntity)
-  )
+  return isClientUnknown || isClientEntity
 }
 
 export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
