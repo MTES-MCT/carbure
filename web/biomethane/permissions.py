@@ -114,6 +114,9 @@ CanDownloadDeclaration = HasDrealRights
 ## Permission for the biomethane gas provider API (API key + JWT)
 CanAccessProviderApi = HasAPIKey & IsAuthenticated & HasBiomethaneProviderRights
 
+## Permission for the biomethane gas provider pages in the frontend (session + OTP)
+CanAccessProviderModule = UserRightsFactory(entity_type=[Entity.BIOMETHANE_PROVIDER])
+
 
 def get_biomethane_permissions(write_actions, action):
     if not isinstance(write_actions, list):

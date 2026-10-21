@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 from biomethane.factories import BiomethaneContractFactory, BiomethaneProductionUnitFactory
 from biomethane.models import BiomethaneAnnualDeclaration
 from core.models import Entity
-from core.tests_utils import setup_current_user_with_jwt
+from core.tests_utils import setup_current_user, setup_current_user_with_jwt
 from entity.factories import EntityFactory
 
 
@@ -98,11 +98,70 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_forbidden_without_api_key(self):
-        """Without an API key, access is denied."""
+    def test_forbidden_without_api_key_nor_session(self):
+        """Without an API key and without a frontend session, access is denied."""
         self.client.credentials()
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=None)
 
         response = self._get()
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_forbidden_with_invalid_api_key(self):
+        """An invalid API key is rejected even for a user with rights on the provider entity."""
+        self.client.credentials(HTTP_X_API_KEY="invalid")
+
+        response = self._get()
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class BiomethaneProviderDeclarationFrontTest(TestCase):
+    fixtures = ["json/countries.json"]
+
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse("biomethane-provider-declarations-list")
+
+        self.provider = EntityFactory.create(name="Provider A", entity_type=Entity.BIOMETHANE_PROVIDER)
+        self.other_provider = EntityFactory.create(name="Provider B", entity_type=Entity.BIOMETHANE_PROVIDER)
+        self.user = setup_current_user(self, "provider@carbure.local", "Provider", "gogogo", [(self.provider, "RO")])
+
+    def _create_declaration(self, buyer, name="Producer"):
+        producer = EntityFactory.create(name=name, entity_type=Entity.BIOMETHANE_PRODUCER)
+        BiomethaneContractFactory.create(producer=producer, buyer=buyer)
+        BiomethaneAnnualDeclaration.objects.create(producer=producer, year=2024, status=BiomethaneAnnualDeclaration.DECLARED)
+        return producer
+
+    def test_session_user_without_api_key_can_list(self):
+        """A frontend session user of the provider entity can list its declarations without API key."""
+        producer = self._create_declaration(self.provider)
+        self._create_declaration(self.other_provider, name="Other producer")
+
+        response = self.client.get(self.url, {"entity_id": self.provider.id})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual([item["producer"]["id"] for item in response.data["results"]], [producer.id])
+
+    def test_forbidden_for_another_provider_entity(self):
+        """A session user cannot read through another provider entity it has no rights on."""
+        response = self.client.get(self.url, {"entity_id": self.other_provider.id})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_forbidden_for_non_provider_entity(self):
+        """A session user of a producer entity cannot access the provider declarations."""
+        producer = self._create_declaration(self.provider)
+        setup_current_user(self, "producer@carbure.local", "Producer", "gogogo", [(producer, "ADMIN")])
+
+        response = self.client.get(self.url, {"entity_id": producer.id})
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_forbidden_when_not_authenticated(self):
+        """An anonymous user cannot access the provider declarations."""
+        self.client.logout()
+
+        response = self.client.get(self.url, {"entity_id": self.provider.id})
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

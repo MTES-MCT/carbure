@@ -45,6 +45,9 @@ const CustomerSatisfaction = lazy(
 const BiomethaneAdminDashboardPage = lazy(
   () => import("biomethane/pages/admin/dashboard/dashboard")
 )
+const BiomethaneProviderDeclarationsPage = lazy(
+  () => import("biomethane/pages/provider/declarations/declarations")
+)
 const Users = lazy(
   () => import("biomethane/pages/admin/declaration-detail/pages/users")
 )
@@ -137,9 +140,12 @@ const BiomethaneRoutesContent = () => {
 
 export const BiomethaneRoutes = () => {
   const { isBiomethaneProducer } = useEntity()
-  const { adminPermissions } = useBiomethanePermissions()
+  const { adminPermissions, canAccessProviderModule } =
+    useBiomethanePermissions()
 
   if (adminPermissions.canAccessAdmin) return <BiomethaneAdminRoutes />
+
+  if (canAccessProviderModule) return <BiomethaneProviderRoutes />
 
   if (!isBiomethaneProducer) return null
 
@@ -172,6 +178,20 @@ export const BiomethaneSettingsRoutes = () => {
     </Routes>
   )
 }
+
+export const BiomethaneProviderRoutes = () => (
+  <Routes>
+    <Route
+      path="provider/declarations/:year"
+      element={<BiomethaneProviderDeclarationsPage />}
+    />
+    <Route
+      path="provider/declarations"
+      element={<Navigate replace to={`${lastAnnualDeclarationYearAdmin}`} />}
+    />
+    <Route path="*" element={<Navigate replace to="provider/declarations" />} />
+  </Routes>
+)
 
 export const BiomethaneAdminRoutes = () => {
   const { adminPermissions } = useBiomethanePermissions()

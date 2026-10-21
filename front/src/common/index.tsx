@@ -118,8 +118,10 @@ const currentYear = new Date().getFullYear()
 
 const Org = () => {
   const entity = useEntity()
-  const { canAccessModule: canAccessBiomethaneModule } =
-    useBiomethanePermissions()
+  const {
+    canAccessModule: canAccessBiomethaneModule,
+    canAccessProviderModule: canAccessBiomethaneProviderModule,
+  } = useBiomethanePermissions()
   const { canAccessModule: canAccessAccountingModule } =
     useAccountingPermissions()
   const { canAccessAdmin: canAccessH2Admin } = useH2Permissions()
@@ -258,7 +260,7 @@ const Org = () => {
         <Route path="*" element={<Navigate replace to="entities" />} />
       )}
 
-      {canAccessBiomethaneModule && (
+      {(canAccessBiomethaneModule || canAccessBiomethaneProviderModule) && (
         <>
           <Route path="biomethane/*" element={<BiomethaneRoutes />} />
           <Route path="*" element={<Navigate replace to="biomethane" />} />
