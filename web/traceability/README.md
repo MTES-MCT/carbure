@@ -31,6 +31,8 @@ Fichier : [`fixtures/materials.csv`](fixtures/materials.csv), le catalogue édit
 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 
+`inherited_fields` et `total_emissions` sont calculés à la lecture (liste paginée et détail) par le même parcours de parents (`services/parent_chain.py`). Aujourd'hui, le seul champ hérité est `material`. Voir [`docs/inherited_fields.md`](docs/inherited_fields.md).
+
 ## Ce que la filière personnalise
 
 Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`handlers/registry.py`).
