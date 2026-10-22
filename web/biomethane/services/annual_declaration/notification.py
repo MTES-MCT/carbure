@@ -1,9 +1,7 @@
 import os
 
 from django.conf import settings
-from django.db import transaction
 
-from biomethane.models import BiomethaneAnnualDeclaration
 from core.helpers import send_mail
 from core.models import UserRights
 
@@ -37,15 +35,3 @@ def notify_declaration_reopened(declaration, request=None):
         recipient_list=recipients,
     )
     return recipients
-
-
-def reopen_declaration(declaration, request=None):
-    try:
-        with transaction.atomic():
-            declaration.is_open = True
-            declaration.status = BiomethaneAnnualDeclaration.IN_PROGRESS
-            declaration.save(update_fields=["is_open", "status"])
-            return notify_declaration_reopened(declaration, request=request)
-    except Exception:
-        declaration.refresh_from_db(fields=["is_open", "status"])
-        raise

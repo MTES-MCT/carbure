@@ -3,10 +3,8 @@ import argparse
 from django.core.management.base import BaseCommand
 
 from biomethane.models import BiomethaneAnnualDeclaration
-from biomethane.services.annual_declaration.notification import (
-    get_reopen_notification_recipients,
-    reopen_declaration,
-)
+from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationService
+from biomethane.services.annual_declaration.notification import get_reopen_notification_recipients
 from core.models import Entity
 
 
@@ -73,7 +71,7 @@ class Command(BaseCommand):
             )
             return
 
-        recipients = reopen_declaration(declaration)
+        recipients = BiomethaneAnnualDeclarationService.reopen_declaration(declaration)
         if not recipients:
             self.stdout.write(self.style.WARNING(f"Declaration {year} reopened for entity {entity_id}, no recipients."))
             return
