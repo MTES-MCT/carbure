@@ -5,6 +5,7 @@ from factory import fuzzy
 from faker import Faker
 
 from biomethane.models import BiomethaneSupplyInput, BiomethaneSupplyPlan
+from core.factories.sample_data import setup_france
 from core.models import Entity, MatierePremiere, Pays
 from entity.factories.entity import EntityFactory
 
@@ -44,6 +45,14 @@ class BiomethaneSupplyInputFactory(factory.django.DjangoModelFactory):
     maximum_distance_km = factory.Faker("random_int", min=50, max=1000)
 
 
+SAMPLE_SUPPLY_INPUTS = (
+    {"origin_department": "75", "volume": 1200},
+    {"origin_department": "69", "volume": 800},
+    {"origin_department": "33", "volume": 500},
+    {"origin_department": "44", "volume": 300},
+)
+
+
 def create_supply_plan(entity):
     current_year = datetime.today().year
     create_supply_plan_for_year(entity, current_year - 1)
@@ -51,15 +60,20 @@ def create_supply_plan(entity):
 
 
 def create_supply_plan_for_year(entity, year):
+    france = setup_france()
     supply_plan = BiomethaneSupplyPlanFactory.create(producer=entity, year=year)
+    feedstocks = list(MatierePremiere.biomethane.order_by("name")[: len(SAMPLE_SUPPLY_INPUTS)])
 
-    for origin_department in range(10, 20):
-        origin_department = str(origin_department)
-        if not BiomethaneSupplyInput.objects.filter(
+    for sample, feedstock in zip(SAMPLE_SUPPLY_INPUTS, feedstocks):
+        BiomethaneSupplyInput.objects.update_or_create(
             supply_plan=supply_plan,
-            origin_department=origin_department,
-        ).exists():
-            BiomethaneSupplyInputFactory.create(
-                supply_plan=supply_plan,
-                origin_department=origin_department,
-            )
+            origin_department=sample["origin_department"],
+            defaults={
+                "feedstock": feedstock,
+                "material_unit": BiomethaneSupplyInput.WET,
+                "volume": sample["volume"],
+                "origin_country": france,
+                "average_weighted_distance_km": 40,
+                "maximum_distance_km": 120,
+            },
+        )
