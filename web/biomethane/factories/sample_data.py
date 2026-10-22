@@ -20,6 +20,12 @@ def create_sample_data():
     set_user_access(admin_user, entity, "ADMIN")
     set_user_access(regular_user, entity, "RO")
 
+    provider = EntityFactory.create(
+        name="Fournisseur de biométhane Test",
+        entity_type=Entity.BIOMETHANE_PROVIDER,
+    )
+    set_user_access(regular_user, provider, "RO")
+
     create_contract_with_amendments(entity)
     create_production_unit(entity)
     create_injection_site(entity)
