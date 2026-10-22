@@ -8,7 +8,7 @@ import { Pagination } from "common/components/pagination2"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { Content, LoaderOverlay, Main } from "common/components/scaffold"
 import { RecapQuantity } from "common/molecules/recap-quantity"
-import { SelectYearsAdmin } from "biomethane/pages/admin/components/select-years-admin"
+import { SelectYears } from "biomethane/components/select-years"
 import { getBiomethaneProviderDeclarations } from "../api"
 import { BiomethaneProviderDeclarationsQueryBuilder } from "../types"
 import { useProviderDeclarationsColumns } from "./declarations.hooks"
@@ -37,7 +37,7 @@ const ProviderDeclarations = () => {
   return (
     <Main>
       <Content>
-        <SelectYearsAdmin urlRoot="biomethane/provider/declarations" />
+        <SelectYears urlRoot="biomethane/provider/declarations" />
         {!loading && declarations && (
           <RecapQuantity
             text={t("{{count}} déclarations", {

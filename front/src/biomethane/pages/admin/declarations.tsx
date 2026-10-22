@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom"
 import { useRoutes } from "common/hooks/routes"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Autocomplete } from "common/components/autocomplete2"
-import { getAnnualDeclarationYearsAdmin } from "./hooks/use-annual-declaration-years-admin"
+import { getSelectableDeclarationYears } from "../../hooks/use-selectable-declaration-years"
 import { AnnualDeclarationExportCard } from "biomethane/components/annual-declaration-export-card"
 import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
 
@@ -20,7 +20,7 @@ const BiomethaneAdminDeclarationsPage = () => {
   const entity = useEntity()
   const navigate = useNavigate()
   const routes = useRoutes()
-  const years = getAnnualDeclarationYearsAdmin()
+  const years = getSelectableDeclarationYears()
   const { adminPermissions } = useBiomethanePermissions()
   usePrivateNavigation(t("Déclarations par établissement"))
 
