@@ -183,7 +183,6 @@ export const ClientField = (
   )
 }
 
-// DeliveryType field should only appear when the client is either the current entity or an unknown one
 export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
   const { t } = useTranslation()
   const entity = useEntity()
@@ -195,7 +194,7 @@ export const DeliveryTypeField = (props: SelectProps<DeliveryType>) => {
     value.lot?.lot_status
   )
 
-  if (deliveryTypes.length === 0 || value.lot?.lot_status === "PENDING") {
+  if (!canShowDeliveryTypeField(entity, value, deliveryTypes)) {
     return null
   }
 
@@ -271,6 +270,28 @@ export function getDeliveryTypes(
   ])
 }
 
+function canShowDeliveryTypeField(
+  entity: EntityManager,
+  value: LotFormValue,
+  deliveryTypes = getDeliveryTypes(entity, value.client, value.lot?.lot_status)
+) {
+  if (
+    value.lot?.lot_status === LotStatus.Pending ||
+    deliveryTypes.length === 0
+  ) {
+    return false
+  }
+
+  if (entity.isAdmin) return true
+
+  const isClientUnknown =
+    value.client === undefined || typeof value.client === "string"
+  const isClientEntity =
+    value.client instanceof Object && value.client.id === entity.id
+
+  return isClientUnknown || isClientEntity
+}
+
 export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
   const { t } = useTranslation()
   const { value, bind } = useFormContext<LotFormValue>()
@@ -293,9 +314,13 @@ export const DeliverySiteField = (props: AutocompleteProps<Depot | string>) => {
 }
 
 export const UsageField = (props: SelectProps<FuelUsage>) => {
+  const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
 
-  if (value.delivery_type !== DeliveryType.RFC) {
+  if (
+    value.delivery_type !== DeliveryType.RFC ||
+    !canShowDeliveryTypeField(entity, value)
+  ) {
     return null
   }
 
@@ -304,11 +329,13 @@ export const UsageField = (props: SelectProps<FuelUsage>) => {
 
 export const UsagePrecisionField = (props: TextInputProps) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { value, bind } = useFormContext<LotFormValue>()
 
   if (
     value.delivery_type !== DeliveryType.RFC ||
-    value.usage !== FuelUsage.Other
+    value.usage !== FuelUsage.Other ||
+    !canShowDeliveryTypeField(entity, value)
   ) {
     return null
   }
