@@ -1,7 +1,5 @@
-import os
 from datetime import date
 
-from django.conf import settings
 from django.core.management import call_command
 
 from biomethane.factories.contract import create_contract_with_amendments
@@ -15,6 +13,7 @@ from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationSe
 from core.factories.sample_data import set_user_access, setup_admin_user, setup_regular_user
 from core.models import Entity
 from entity.factories.entity import EntityFactory
+from fixtures.load_matierespremieres import load_matieres_premieres
 
 
 def setup_declaration_period():
@@ -28,16 +27,17 @@ def setup_declaration_period():
             "end_date": date(calendar_year, 12, 31),
         },
     )
+    return declaration_year
 
 
 def setup_feedstocks():
-    """Import the biomethane feedstock catalog used by the supply plan."""
-    os.environ.setdefault("CARBURE_HOME", settings.CARBURE_HOME)
+    """Load the shared feedstock catalog, then the biomethane classifications."""
+    load_matieres_premieres()
     call_command("import_biomethane_feedstocks_and_classifications")
 
 
 def create_sample_data():
-    setup_declaration_period()
+    declaration_year = setup_declaration_period()
     setup_feedstocks()
 
     admin_user = setup_admin_user()
@@ -60,6 +60,6 @@ def create_sample_data():
     create_contract_with_amendments(entity)
     create_production_unit(entity)
     create_injection_site(entity)
-    create_biomethane_energy(entity)
-    create_supply_plan(entity)
-    create_digestate(entity)
+    create_biomethane_energy(entity, declaration_year)
+    create_supply_plan(entity, declaration_year)
+    create_digestate(entity, declaration_year)

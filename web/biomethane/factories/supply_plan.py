@@ -53,10 +53,9 @@ SAMPLE_SUPPLY_INPUTS = (
 )
 
 
-def create_supply_plan(entity):
-    current_year = datetime.today().year
-    create_supply_plan_for_year(entity, current_year - 1)
-    create_supply_plan_for_year(entity, current_year)
+def create_supply_plan(entity, year):
+    create_supply_plan_for_year(entity, year)
+    create_supply_plan_for_year(entity, year - 1)
 
 
 def create_supply_plan_for_year(entity, year):
