@@ -1,6 +1,6 @@
 import { useH2CertificatesPage } from "h2/pages/certificates/certificates.hooks"
 import { ActionsPage } from "traceability/components/actions-page"
-import { useActionColumns } from "traceability/hooks/use-action-columns"
+import { useActionColumns } from "traceability/hooks/action-columns"
 import { useActionFilters } from "traceability/hooks/use-action-filters"
 
 const AdminCertificatesPage = () => {

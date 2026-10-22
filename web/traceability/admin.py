@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 
 from core.models import StoredFile
-from traceability.exceptions import NoEligibleActionError
+from traceability.exceptions import ConversionError, NoEligibleActionError
 from traceability.models import Action, ActionStatus, Material
 from traceability.services.refuse import refuse
 from traceability.services.valorize import valorize
@@ -48,7 +48,7 @@ class LatestStatusFilter(admin.SimpleListFilter):
 
 @admin.register(Material)
 class MaterialAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "name")
+    list_display = ("id", "code", "name", "unit", "lhv", "density")
     search_fields = ("code", "name")
 
 
@@ -58,6 +58,10 @@ def valorize_actions_into_certificates(modeladmin, request, queryset):
         created = valorize(queryset)
     except NoEligibleActionError:
         modeladmin.message_user(request, "Aucune action éligible à valoriser", messages.WARNING)
+        return
+    except ConversionError as exc:
+        pos_ids = ", ".join(action.pos_id for action in exc.actions)
+        modeladmin.message_user(request, f"Conversion impossible vers MJ pour : {pos_ids}", messages.ERROR)
         return
     modeladmin.message_user(request, f"{len(created)} certificat(s) créé(s).")
 
@@ -82,6 +86,9 @@ class ActionAdmin(admin.ModelAdmin):
         "holder",
         "material__name",
         "quantity",
+        "material__unit",
+        "material__lhv",
+        "material__density",
         "site",
         "shipping_date",
         "working_date",
@@ -89,6 +96,7 @@ class ActionAdmin(admin.ModelAdmin):
     list_filter = (
         "industry",
         "type",
+        "material__unit",
         LatestStatusFilter,
         "material__name",
         "shipping_method",
