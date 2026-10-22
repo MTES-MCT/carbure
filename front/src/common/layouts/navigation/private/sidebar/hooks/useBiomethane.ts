@@ -11,9 +11,8 @@ export const useBiomethane = () => {
   const routes = useRoutes()
   const { t } = useTranslation()
   const loc = useLocation()
-  const { isBiomethaneProducer } = useEntity()
-  const { adminPermissions, canAccessProviderModule } =
-    useBiomethanePermissions()
+  const { isBiomethaneProducer, isBiomethaneProvider } = useEntity()
+  const { adminPermissions } = useBiomethanePermissions()
 
   const { digestate } = useBiomethaneBusinessRules()
 
@@ -53,7 +52,7 @@ export const useBiomethane = () => {
 
   const biomethaneAdminMenu: MenuSection = {
     title: t("Biométhane"),
-    condition: adminPermissions.canAccessAdmin || canAccessProviderModule,
+    condition: adminPermissions.canAccessAdmin,
     children: [
       {
         path: routes.BIOMETHANE().ADMIN.DASHBOARD,
@@ -76,15 +75,21 @@ export const useBiomethane = () => {
         iconActive: "ri-file-text-fill",
         condition: adminPermissions.canAccessAdmin,
       },
+    ],
+  }
+
+  const biomethaneProviderMenu: MenuSection = {
+    title: t("Biométhane"),
+    condition: isBiomethaneProvider,
+    children: [
       {
         path: routes.BIOMETHANE().PROVIDER.DECLARATIONS,
         title: t("Déclarations"),
         icon: "ri-file-text-line",
         iconActive: "ri-file-text-fill",
-        condition: canAccessProviderModule,
       },
     ],
   }
 
-  return [biomethaneProducerMenu, biomethaneAdminMenu]
+  return [biomethaneProducerMenu, biomethaneAdminMenu, biomethaneProviderMenu]
 }

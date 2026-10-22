@@ -11,7 +11,7 @@ import {
 import { useRoutes } from "common/hooks/routes"
 import { ClosedDeclaration } from "biomethane/components/closed-declaration"
 import { Contact } from "./pages/admin/declaration-detail/pages/contact"
-import { lastAnnualDeclarationYearAdmin } from "./pages/admin/hooks/use-annual-declaration-years-admin"
+import { lastSelectableDeclarationYear } from "./hooks/use-selectable-declaration-years"
 import SupplyInputsAdminPage from "./pages/admin/supply-inputs"
 import { MissingFieldsSettings } from "./components/missing-fields"
 import { useBiomethanePermissions } from "./hooks/use-biomethane-permissions"
@@ -139,13 +139,12 @@ const BiomethaneRoutesContent = () => {
 }
 
 export const BiomethaneRoutes = () => {
-  const { isBiomethaneProducer } = useEntity()
-  const { adminPermissions, canAccessProviderModule } =
-    useBiomethanePermissions()
+  const { isBiomethaneProducer, isBiomethaneProvider } = useEntity()
+  const { adminPermissions } = useBiomethanePermissions()
 
   if (adminPermissions.canAccessAdmin) return <BiomethaneAdminRoutes />
 
-  if (canAccessProviderModule) return <BiomethaneProviderRoutes />
+  if (isBiomethaneProvider) return <BiomethaneProviderRoutes />
 
   if (!isBiomethaneProducer) return null
 
@@ -187,7 +186,7 @@ export const BiomethaneProviderRoutes = () => (
     />
     <Route
       path="provider/declarations"
-      element={<Navigate replace to={`${lastAnnualDeclarationYearAdmin}`} />}
+      element={<Navigate replace to={`${lastSelectableDeclarationYear}`} />}
     />
     <Route path="*" element={<Navigate replace to="provider/declarations" />} />
   </Routes>
@@ -228,16 +227,14 @@ export const BiomethaneAdminRoutes = () => {
         />
         <Route
           path="dashboard"
-          element={
-            <Navigate replace to={`${lastAnnualDeclarationYearAdmin}`} />
-          }
+          element={<Navigate replace to={`${lastSelectableDeclarationYear}`} />}
         />
 
         {adminPermissions.canAccessSupplyPlan && (
           <>
             <Route
               path="supply-plan"
-              element={<Navigate to={`${lastAnnualDeclarationYearAdmin}`} />}
+              element={<Navigate to={`${lastSelectableDeclarationYear}`} />}
             />
             <Route
               path="supply-plan/:year"

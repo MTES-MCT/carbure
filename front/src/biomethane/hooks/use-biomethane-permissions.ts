@@ -13,9 +13,6 @@ export type BiomethanePermissionKey =
 export interface BiomethanePermissionsManager {
   canAccessModule: boolean
 
-  // Biomethane gas provider pages (declarations of the producers under contract)
-  canAccessProviderModule: boolean
-
   // Can edit the declaration if the entity has write rights and is a DREAL
   canEditDeclaration: boolean
 
@@ -39,7 +36,6 @@ export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
     if (!user.isAuthenticated())
       return {
         canAccessModule: false,
-        canAccessProviderModule: false,
         canEditDeclaration: false,
         adminPermissions: {
           canAccessAdmin: false,
@@ -55,8 +51,10 @@ export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
     ])
 
     return {
-      canAccessModule: entity.isBiomethaneProducer || canAccessAdmin,
-      canAccessProviderModule: entity.isBiomethaneProvider,
+      canAccessModule:
+        entity.isBiomethaneProducer ||
+        entity.isBiomethaneProvider ||
+        canAccessAdmin,
       canEditDeclaration: entity.canWrite() && isDreal,
       adminPermissions: {
         canAccessAdmin: canAccessAdmin,
