@@ -10,7 +10,7 @@ import { DownloadSupplyPlan } from "biomethane/pages/supply-plan/components/down
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 import { SupplyPlanTable } from "biomethane/pages/supply-plan/components/supply-plan-table"
 import { Select } from "common/components/selects2"
-import { useAnnualDeclarationYearsAdmin } from "../hooks/use-annual-declaration-years-admin"
+import { useSelectableDeclarationYears } from "../../../hooks/use-selectable-declaration-years"
 import { Tabs } from "common/components/tabs2"
 import { useMemo } from "react"
 import { useRoutes } from "common/hooks/routes"
@@ -24,7 +24,7 @@ import { SupplyInputDialog } from "biomethane/pages/supply-plan/supply-input-dia
 export const SupplyInputsAdminPage = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
-  const years = useAnnualDeclarationYearsAdmin(
+  const years = useSelectableDeclarationYears(
     routes.BIOMETHANE().ADMIN.SUPPLY_INPUTS
   )
   const selectedYear = useAnnualDeclarationYear()

@@ -20,6 +20,7 @@ export interface EntityManager extends Entity {
   isTrader: boolean
   isPowerOrHeatProducer: boolean
   isBiomethaneProducer: boolean
+  isBiomethaneProvider: boolean
   isIndustry: boolean
   isCPO: boolean
   isSafTrader: boolean
@@ -86,6 +87,7 @@ export function useEntityManager(
     isCPO: type === EntityType.CPO,
     isSafTrader: type === EntityType.SAF_Trader,
     isBiomethaneProducer: type === EntityType.Producteur_de_biom_thane,
+    isBiomethaneProvider: type === EntityType.Fournisseur_de_biom_thane,
     isHRS: type === EntityType.HRS,
     isIndustry: isIndustry(type),
     canTrade: canTrade,

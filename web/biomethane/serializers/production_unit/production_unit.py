@@ -49,3 +49,14 @@ class BiomethaneProductionUnitUpsertSerializer(BaseBiomethaneProductionUnitSeria
         if BiomethaneAnnualDeclarationService.has_watched_field_changed(instance, validated_data.keys()):
             BiomethaneAnnualDeclarationService.reset_annual_declaration_status(instance.producer)
         return super().update(instance, validated_data)
+
+
+class BiomethaneProductionUnitPreviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BiomethaneProductionUnit
+        fields = [
+            "insee_code",
+            "address",
+            "postal_code",
+            "city",
+        ]
