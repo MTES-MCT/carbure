@@ -13,6 +13,7 @@ from biomethane.services.annual_declaration import BiomethaneAnnualDeclarationSe
 from core.factories.sample_data import set_user_access, setup_admin_user, setup_regular_user
 from core.models import Entity
 from entity.factories.entity import EntityFactory
+from fixtures.load_matierespremieres import load_matieres_premieres
 
 
 def setup_declaration_period():
@@ -30,7 +31,8 @@ def setup_declaration_period():
 
 
 def setup_feedstocks():
-    """Import the biomethane feedstock catalog used by the supply plan."""
+    """Load the shared feedstock catalog, then the biomethane classifications."""
+    load_matieres_premieres()
     call_command("import_biomethane_feedstocks_and_classifications")
 
 
