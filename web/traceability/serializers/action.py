@@ -66,13 +66,6 @@ _ACTION_MODEL_FIELDS = {field.name for field in Action._meta.fields}
 class ActionExcelImportListSerializer(UniqueInListSerializer):
     unique_fields = ["pos_id"]
 
-    def validate(self, attrs):
-        for row in attrs:
-            material = row.get("material")
-            if material is not None and material.lhv is None and material.density is None:
-                raise RuntimeError("Material is missing lhv and density")
-        return attrs
-
     def create(self, validated_data):
         holder = self.context["entity"]
         industry = self.context["handler"].industry
