@@ -46,8 +46,9 @@ class ValorizeTest(TestCase):
         attach_inherited_fields([child])
         self.assertEqual(child.quantity, Decimal("50.000"))
         self.assertIsNone(child.material_id)
-        self.assertEqual(child.inherited_fields["material"].pk, action.material_id)
-        self.assertEqual(child.inherited_fields["material"].unit, Material.L)
+        self.assertEqual(child.inherited_fields["previous_material"].pk, action.material_id)
+        self.assertEqual(child.inherited_fields["previous_material"].unit, Material.L)
+        self.assertEqual(child.inherited_fields["origin_material"].pk, action.material_id)
 
     def test_skips_ineligible_actions(self):
         pending = self._pending_init()

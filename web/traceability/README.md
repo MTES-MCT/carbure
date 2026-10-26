@@ -31,7 +31,7 @@ Fichier : [`fixtures/materials.csv`](fixtures/materials.csv), le catalogue édit
 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 
-`inherited_fields` et `total_emissions` sont calculés à la lecture (liste paginée et détail) par le même parcours de parents (`services/parent_chain.py`). Aujourd'hui, le seul champ hérité est `material`. Voir [`docs/inherited_fields.md`](docs/inherited_fields.md).
+`inherited_fields` et `total_emissions` sont calculés à la lecture (liste paginée et détail) par le même parcours de parents (`services/parent_chain.py`). Les matières résolues sont `previous_material` (la plus proche au-dessus) et `origin_material` (la première depuis la racine). Voir [`docs/inherited_fields.md`](docs/inherited_fields.md).
 
 ## Ce que la filière personnalise
 
@@ -49,7 +49,7 @@ Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à 
 
 Côté front, les catalogues (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.). Une page peut passer `emptyState` à `ActionsPage` : il remplace la liste quand elle est chargée, sans filtre, et sans résultat.
 
-`quantity` affiche la quantité **stockée** avec l’unité de la matière héritée (`inherited_fields.material.unit`). Un `VALORIZE` n’a pas de matière stockée : l’unité vient donc du parent. `mass` en est la vue convertie depuis la matière stockée (kg, lecture seule, `null` si elle ou le facteur manque). Ce sont des factories privées de `hooks/action-fields` et `hooks/action-columns`. La page choisit lequel poser — lots H2 : `mass`, certificats H2 : `quantity`. `volume` / `energy` suivent le même modèle.
+`quantity` affiche la quantité **stockée** avec l’unité de la matière stockée, ou celle de `previous_material` quand l’action n’en a pas. `mass` en est la vue convertie depuis la matière stockée (kg, lecture seule, `null` si elle ou le facteur manque). Ce sont des factories privées de `hooks/action-fields` et `hooks/action-columns`. La page choisit lequel poser — lots H2 : `mass`, certificats H2 : `quantity`. `volume` / `energy` suivent le même modèle.
 
 ---
 

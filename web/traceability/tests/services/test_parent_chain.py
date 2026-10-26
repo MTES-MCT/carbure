@@ -29,15 +29,18 @@ class ParentChainTest(TestCase):
         attach_inherited_fields([action])
 
         self.assertEqual(sql.lower().count("with recursive"), 1)
-        self.assertIn("found_material_id", sql)
+        self.assertIn("previous_material_id", sql)
+        self.assertIn("origin_material_id", sql)
         self.assertIn("ei_sum", sql)
-        self.assertEqual(action.inherited_fields["material"].code, "H2")
+        self.assertEqual(action.inherited_fields["previous_material"].code, "H2")
+        self.assertEqual(action.inherited_fields["origin_material"].code, "H2")
         self.assertEqual(action.total_emissions["ei"], Decimal("11.000"))
 
     def test_emissions_only_omits_the_material_column(self):
         sql = self._sql(inherited_fields=False)
 
-        self.assertNotIn("found_material_id", sql)
+        self.assertNotIn("previous_material_id", sql)
+        self.assertNotIn("origin_material_id", sql)
         self.assertIn("ei_sum", sql)
 
     def test_neither_flag_leaves_the_queryset_unchanged(self):

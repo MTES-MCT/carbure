@@ -39,7 +39,7 @@ django-cte sépare ce que MySQL écrit en **un** `WITH RECURSIVE … SELECT`.
 
 ### 1. `parent_chain` — remonter et additionner
 
-Le parcours est partagé avec `inherited_fields`. Quand les deux sont demandés, la même CTE porte les sommes GES et `found_material_id` (`COALESCE` de la première matière non vide). `annotate_total_emissions` ne demande que les sommes.
+Le parcours est partagé avec `inherited_fields`. Quand les deux sont demandés, la même CTE porte les sommes GES, `previous_material_id` et `origin_material_id`. `annotate_total_emissions` ne demande que les sommes.
 
 Pour chaque action demandée (`origin_id`), une ligne par **étape** (un cran vers le parent) :
 

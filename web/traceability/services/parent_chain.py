@@ -66,7 +66,7 @@ def annotate_parent_chain(
     emissions: bool = True,
     inherited_fields: bool = True,
 ) -> QuerySet[Action]:
-    """Annotate `total_emissions` and/or `found_material_id` from the parent chain."""
+    """Annotate `total_emissions` and/or the inherited material ids from the parent chain."""
     if not emissions and not inherited_fields:
         return queryset
 
