@@ -6402,6 +6402,7 @@ export interface components {
          *     * `TRANSFERT` - TRANSFERT
          *     * `EXPIRATION` - EXPIRATION
          *     * `REPORT` - REPORT
+         *     * `CORRECTION` - CORRECTION
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -14928,6 +14929,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15305,6 +15307,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15426,6 +15429,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15566,6 +15570,7 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -16619,6 +16624,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     ACQUISITION = "ACQUISITION",
     CESSION = "CESSION",
+    CORRECTION = "CORRECTION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     DEVALUATION = "DEVALUATION",
     EXPEDITION = "EXPEDITION",
@@ -16987,7 +16993,8 @@ export enum OperationTypeEnum {
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     TRANSFERT = "TRANSFERT",
     EXPIRATION = "EXPIRATION",
-    REPORT = "REPORT"
+    REPORT = "REPORT",
+    CORRECTION = "CORRECTION"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",

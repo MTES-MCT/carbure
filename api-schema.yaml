@@ -11712,6 +11712,7 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
@@ -11736,6 +11737,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12295,6 +12297,7 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
@@ -12319,6 +12322,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12593,6 +12597,7 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
@@ -12617,6 +12622,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12923,6 +12929,7 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
                 - DEVALUATION
                 - EXPEDITION
@@ -12947,6 +12954,7 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -19961,7 +19969,7 @@ components:
           readOnly: true
         code:
           type: string
-          maxLength: 8
+          maxLength: 16
         name:
           type: string
           maxLength: 64
@@ -20622,6 +20630,7 @@ components:
         - TRANSFERT
         - EXPIRATION
         - REPORT
+        - CORRECTION
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -20636,6 +20645,7 @@ components:
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT
+        * `CORRECTION` - CORRECTION
     OperationUpdate:
       type: object
       properties:
