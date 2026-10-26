@@ -25,7 +25,7 @@ from biomethane.services.provider_declaration import get_provider_declarations
     ],
 )
 class BiomethaneProviderDeclarationViewSet(GenericViewSet, ListModelMixin):
-    """Validated annual declarations of the producers under contract with the gas provider."""
+    """Annual declarations (any status) of the producers under contract with the gas provider."""
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [CanAccessProviderApi]

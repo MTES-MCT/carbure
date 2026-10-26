@@ -683,7 +683,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Validated annual declarations of the producers under contract with the gas provider. */
+        /** @description Annual declarations (any status) of the producers under contract with the gas provider. */
         get: operations["biomethane_provider_declarations_list"];
         put?: never;
         post?: never;
@@ -4536,6 +4536,8 @@ export interface components {
             producer: number;
         };
         BiomethaneProductionUnitPreview: {
+            /** SIRET */
+            site_siret?: string;
             /** Code INSEE */
             insee_code?: string | null;
             /** Adresse */
@@ -4612,6 +4614,7 @@ export interface components {
             created_by?: number | null;
         };
         BiomethaneProviderDeclaration: {
+            readonly status: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             readonly producer: components["schemas"]["EntityPreview"];
             readonly production_unit: components["schemas"]["BiomethaneProductionUnitPreview"] | null;
         };
@@ -9075,7 +9078,7 @@ export interface operations {
                 page_size?: number;
                 /** @description A search term. */
                 search?: string;
-                year?: number;
+                year: number;
             };
             header?: never;
             path?: never;
