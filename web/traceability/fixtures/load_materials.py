@@ -36,5 +36,3 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
                 "unit": unit,
             },
         )
-
-Material.update_or_create_valorized_energy()

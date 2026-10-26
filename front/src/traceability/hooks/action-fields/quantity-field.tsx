@@ -22,16 +22,13 @@ export function quantityField(
     label: i18next.t("Quantité"),
     field: ({ form, props }) => {
       if (key === "quantity") {
+        const unit = form.value.inherited_fields?.material?.unit
+
         return (
           <DecimalInput
             step={ACTION_DECIMAL_STEP}
             readOnlyValue={
-              form.value.material?.unit
-                ? formatUnitActionDecimal(
-                    form.value.quantity,
-                    form.value.material?.unit
-                  )
-                : "-"
+              unit ? formatUnitActionDecimal(form.value.quantity, unit) : "-"
             }
             {...props}
             {...form.bind("quantity")}

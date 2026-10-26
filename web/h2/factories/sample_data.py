@@ -77,7 +77,6 @@ def setup_h2_materials() -> tuple[Material, Material]:
         code="H2-BIO",
         defaults={"name": "Bio-H2", "lhv": Decimal("120"), "unit": Material.KG},
     )
-    Material.update_or_create_valorized_energy()
     return h2_rfnbo, h2_bio
 
 
@@ -158,8 +157,6 @@ def setup_h2_certificates() -> tuple[Action, Action]:
     ActionStatus.objects.create(action=h2_lot_03, status=ActionStatus.ACCEPTED)
     ActionStatus.objects.create(action=h2_lot_04, status=ActionStatus.ACCEPTED)
 
-    valorized_energy = Material.valorized_energy()
-
     h2_certificate_01 = ActionFactory(
         parent=h2_lot_03,
         status=ActionStatus.CREATED,
@@ -167,9 +164,9 @@ def setup_h2_certificates() -> tuple[Action, Action]:
         type=Action.VALORIZE,
         pos_id="H2-DEMO-VALORIZE-001",
         holder=h2_lot_03.holder,
-        quantity=h2_lot_03.quantity * h2_lot_03.material.lhv,
+        quantity=h2_lot_03.quantity,
         working_date=h2_lot_03.working_date,
-        material=valorized_energy,
+        material=None,
         site=None,
         shipping_date=None,
         shipping_distance=None,
@@ -183,9 +180,9 @@ def setup_h2_certificates() -> tuple[Action, Action]:
         type=Action.VALORIZE,
         pos_id="H2-DEMO-VALORIZE-002",
         holder=h2_lot_04.holder,
-        quantity=h2_lot_04.quantity * h2_lot_04.material.lhv,
+        quantity=h2_lot_04.quantity,
         working_date=h2_lot_04.working_date,
-        material=valorized_energy,
+        material=None,
         site=None,
         shipping_date=None,
         shipping_distance=None,
