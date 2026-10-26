@@ -28,7 +28,7 @@ const Auth = () => {
       <Route path="reset-password-request" element={<ResetPasswordRequest />} />
       <Route path="reset-password-pending" element={<ResetPasswordPending />} />
       <Route path="reset-password" element={<ResetPassword />} />
-      <Route path="*" element={<Navigate replace to="login" />} />
+      <Route path="*" element={<Navigate replace to="../login" />} />
     </Routes>
   )
 }

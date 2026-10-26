@@ -32,7 +32,7 @@ const DoubleCounting = () => {
           path="agreements"
           element={<AgreementList snapshot={snapshot} />}
         />
-        <Route path="*" element={<Navigate to="applications" />} />
+        <Route path="*" element={<Navigate to="../applications" />} />
       </Routes>
     </Main>
   )

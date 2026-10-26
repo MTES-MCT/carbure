@@ -1,3 +1,4 @@
+import { useRouteBase } from "common/hooks/route-base"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
 import {
@@ -7,7 +8,6 @@ import {
 } from "./api"
 import { ActionBar, Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
-import { useState } from "react"
 import { Tabs } from "common/components/tabs2"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { useQuery } from "common/hooks/async"
@@ -40,11 +40,13 @@ import { ExportButton } from "common/components/export"
 
 export const Qualicharge = () => {
   const { state, actions, query, status, years } = useQualichargeQueryBuilder()
+  const basePath = useRouteBase(
+    "/org/:entity/charge-points/qualicharge/:year/*"
+  )
   const { t } = useTranslation()
   const notify = useNotify()
   const columns = useQualichargeColumns(status)
   const portal = usePortal()
-  const [tab, setTab] = useState(status)
   const routes = useRoutes()
   const entity = useEntity()
 
@@ -124,6 +126,13 @@ export const Qualicharge = () => {
 
   usePrivateNavigation(t("Données Qualicharge"))
 
+  if (
+    status !== QualichargeTab.PENDING &&
+    status !== QualichargeTab.VALIDATED
+  ) {
+    return <Navigate replace to={`${basePath}/${QualichargeTab.PENDING}`} />
+  }
+
   return (
     <Main>
       <Select
@@ -137,8 +146,7 @@ export const Qualicharge = () => {
 
       <Tabs
         keepSearch
-        focus={tab}
-        onFocus={setTab}
+        focus={status}
         tabs={[
           {
             key: QualichargeTab.PENDING,
@@ -279,7 +287,12 @@ export const Qualicharge = () => {
               )
             }
           />
-          <Route path="*" element={<Navigate to={QualichargeTab.PENDING} />} />
+          <Route
+            path="*"
+            element={
+              <Navigate replace to={`${basePath}/${QualichargeTab.PENDING}`} />
+            }
+          />
         </Routes>
         <HashRoute path="data/:id" element={<QualichargeDataDetail />} />
       </Content>

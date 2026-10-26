@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useLocation, Navigate } from "react-router-dom"
+import { useRouteBase } from "common/hooks/route-base"
 import * as api from "../../api"
 import { Entity, UserRole } from "common/types"
 import {
@@ -40,6 +41,7 @@ export interface LotsProps {
 }
 
 export const Lots = ({ year, snapshot }: LotsProps) => {
+  const basePath = useRouteBase("/org/:entity/transactions/:year/*")
   const matomo = useMatomo()
   const location = useLocation()
 
@@ -82,7 +84,7 @@ export const Lots = ({ year, snapshot }: LotsProps) => {
 
   if (category === undefined) {
     const defaultCategory = getDefaultCategory(status, snapshot)
-    return <Navigate to={`${status}/${defaultCategory}`} />
+    return <Navigate to={`${basePath}/${status}/${defaultCategory}`} />
   }
 
   return (

@@ -1,3 +1,4 @@
+import { useRouteBase } from "common/hooks/route-base"
 import cl from "clsx"
 import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
@@ -166,14 +167,15 @@ export function useStatus() {
 
 export function useAutoStatus() {
   const navigate = useNavigate()
+  const basePath = useRouteBase("/org/:entity/transactions/:year/*")
   const match = useMatch("/org/:entity/transactions/:year/:status/*")
   const status = match?.params.status as Status | undefined
 
   useEffect(() => {
     if (status === undefined) {
-      navigate("drafts/imported", { replace: true })
+      navigate(`${basePath}/drafts/imported`, { replace: true })
     }
-  }, [status, navigate])
+  }, [status, navigate, basePath])
 
   return status ?? "drafts"
 }

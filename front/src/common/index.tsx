@@ -164,7 +164,7 @@ const Org = () => {
             path="transactions"
             element={<Navigate replace to={`${currentYear}`} />}
           />
-          <Route path="*" element={<Navigate replace to="transactions" />} />
+          <Route path="*" element={<Navigate replace to="../transactions" />} />
         </>
       )}
 
@@ -183,7 +183,12 @@ const Org = () => {
           />
           <Route
             path="double-counting/*"
-            element={<Navigate replace to="agreements" />}
+            element={
+              <Navigate
+                replace
+                to={`/org/${entity.id}/double-counting/agreements`}
+              />
+            }
           />
         </>
       )}
@@ -238,11 +243,14 @@ const Org = () => {
       )}
       {isAdmin && <Route path="dashboard" element={<Dashboard />} />}
       {isAuditor && (
-        <Route path="*" element={<Navigate replace to="controls" />} />
+        <Route path="*" element={<Navigate replace to="../controls" />} />
       )}
 
       {isAdminDC && (
-        <Route path="*" element={<Navigate replace to="double-counting" />} />
+        <Route
+          path="*"
+          element={<Navigate replace to="../double-counting" />}
+        />
       )}
 
       {(isAdmin || isElecAdmin) && (
@@ -255,13 +263,13 @@ const Org = () => {
         </>
       )}
       {isSafAdmin && (
-        <Route path="*" element={<Navigate replace to="entities" />} />
+        <Route path="*" element={<Navigate replace to="../entities" />} />
       )}
 
       {canAccessBiomethaneModule && (
         <>
           <Route path="biomethane/*" element={<BiomethaneRoutes />} />
-          <Route path="*" element={<Navigate replace to="biomethane" />} />
+          <Route path="*" element={<Navigate replace to="../biomethane" />} />
         </>
       )}
 
@@ -269,17 +277,17 @@ const Org = () => {
         <Route path="h2/*" element={<H2Routes />} />
       )}
       {isHRS && (
-        <Route path="*" element={<Navigate replace to="h2/stations" />} />
+        <Route path="*" element={<Navigate replace to="../h2/stations" />} />
       )}
       {canAccessH2Admin && (
-        <Route path="*" element={<Navigate replace to="h2/admin/lots" />} />
+        <Route path="*" element={<Navigate replace to="../h2/admin/lots" />} />
       )}
 
       {(isAdmin || isExternal) && (
         <>
           {isAdmin && <Route path="users" element={<AdminUsers />} />}
           <Route path="entities/*" element={<Entities />} />
-          <Route path="*" element={<Navigate replace to="entities" />} />
+          <Route path="*" element={<Navigate replace to="../entities" />} />
         </>
       )}
     </Routes>

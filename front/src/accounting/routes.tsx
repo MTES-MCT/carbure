@@ -77,7 +77,10 @@ const AccountingLiableRoutes = () => {
         </Route>
       )}
 
-      <Route path="*" element={<Navigate replace to={lastSector} />} />
+      <Route
+        path="*"
+        element={<Navigate replace to={`../operations/${lastSector}`} />}
+      />
     </Routes>
   )
 }
@@ -116,7 +119,7 @@ const AccountingAdminRoutes = () => {
         </Route>
       )}
 
-      <Route path="*" element={<Navigate replace to="admin/operations" />} />
+      <Route path="*" element={<Navigate replace to="../admin/operations" />} />
     </Routes>
   )
 }
