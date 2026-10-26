@@ -81,6 +81,7 @@ class Operation(models.Model):
     EXPEDITION = "EXPEDITION"
     EXPIRATION = "EXPIRATION"
     REPORT = "REPORT"  # Used once for switching from TIRUERT to IRICC regulation
+    CORRECTION = "CORRECTION"  # Generated when the volume of a CarbureLot is corrected
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -94,6 +95,7 @@ class Operation(models.Model):
         (TRANSFERT, TRANSFERT),
         (EXPIRATION, EXPIRATION),
         (REPORT, REPORT),
+        (CORRECTION, CORRECTION),
     )
 
     API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION]
