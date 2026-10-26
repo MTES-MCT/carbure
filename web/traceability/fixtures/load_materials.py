@@ -37,12 +37,4 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
             },
         )
 
-Material.objects.update_or_create(
-    code=Material.VALORIZED_ENERGY_CODE,
-    defaults={
-        "name": Material.VALORIZED_ENERGY_NAME,
-        "unit": Material.MJ,
-        "lhv": None,
-        "density": None,
-    },
-)
+Material.update_or_create_valorized_energy()

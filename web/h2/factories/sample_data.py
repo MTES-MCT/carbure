@@ -77,6 +77,7 @@ def setup_h2_materials() -> tuple[Material, Material]:
         code="H2-BIO",
         defaults={"name": "Bio-H2", "lhv": Decimal("120"), "unit": Material.KG},
     )
+    Material.update_or_create_valorized_energy()
     return h2_rfnbo, h2_bio
 
 
@@ -194,6 +195,61 @@ def setup_h2_certificates() -> tuple[Action, Action]:
     return h2_certificate_01, h2_certificate_02
 
 
+def setup_h2_inherited_material_chain() -> Action:
+    """INIT lot with no stored material, so the lots page shows the parent's.
+
+    The leaf is an INIT (what the H2 lots page lists). Its parent has no material
+    either. The material is resolved one step further, on the root INIT.
+    """
+    holder = setup_h2_entity()
+    paris_station, _lyon_station = setup_h2_stations()
+    h2_rfnbo, _h2_bio = setup_h2_materials()
+
+    parent = ActionFactory(
+        pos_id="H2-DEMO-INHERIT-PARENT",
+        holder=holder,
+        industry=Action.H2,
+        type=Action.INIT,
+        material=h2_rfnbo,
+        quantity=Decimal("80000.000"),
+        site=paris_station,
+        shipping_date=date(2026, 5, 10),
+        shipping_distance=30,
+        shipping_method=Action.ROAD,
+        working_date=date(2026, 5, 10),
+    )
+
+    middle = ActionFactory(
+        pos_id="H2-DEMO-INHERIT-MIDDLE",
+        parent=parent,
+        holder=holder,
+        industry=Action.H2,
+        type=Action.INIT,
+        material=None,
+        quantity=Decimal("40000.000"),
+        site=paris_station,
+        shipping_date=date(2026, 6, 12),
+        shipping_distance=45,
+        shipping_method=Action.ROAD,
+        working_date=date(2026, 6, 12),
+    )
+
+    return ActionFactory(
+        pos_id="H2-DEMO-INHERIT-INIT",
+        parent=middle,
+        holder=holder,
+        industry=Action.H2,
+        type=Action.INIT,
+        material=None,
+        quantity=Decimal("20000.000"),
+        site=paris_station,
+        shipping_date=date(2026, 7, 18),
+        shipping_distance=60,
+        shipping_method=Action.ROAD,
+        working_date=date(2026, 7, 18),
+    )
+
+
 def setup_h2_producer_certificates() -> None:
     producer_certificates = GenericCertificate.objects.filter(certificate_type=GenericCertificate.CERTIFHY)
 
@@ -209,3 +265,4 @@ def create_sample_data():
     setup_h2_materials()
     setup_h2_lots_init()
     setup_h2_certificates()
+    setup_h2_inherited_material_chain()
