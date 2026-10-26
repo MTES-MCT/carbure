@@ -86,9 +86,11 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         by_id = {item["id"]: item for item in response.data["results"]}
         self.assertIsNone(by_id[child.id]["material"])
-        self.assertEqual(by_id[child.id]["inherited_fields"]["material"]["id"], self.own_action.material_id)
+        self.assertEqual(by_id[child.id]["inherited_fields"]["previous_material"]["id"], self.own_action.material_id)
+        self.assertEqual(by_id[child.id]["inherited_fields"]["origin_material"]["id"], self.own_action.material_id)
+        self.assertIsNone(by_id[self.own_action.id]["inherited_fields"]["previous_material"])
         self.assertEqual(
-            by_id[self.own_action.id]["inherited_fields"]["material"]["id"],
+            by_id[self.own_action.id]["inherited_fields"]["origin_material"]["id"],
             self.own_action.material_id,
         )
 
@@ -107,8 +109,8 @@ class ActionViewsetQuerysetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNone(response.data["material"])
-        self.assertEqual(response.data["inherited_fields"]["material"]["code"], self.own_action.material.code)
-        self.assertEqual(response.data["inherited_fields"]["material"]["name"], self.own_action.material.name)
+        self.assertEqual(response.data["inherited_fields"]["previous_material"]["code"], self.own_action.material.code)
+        self.assertEqual(response.data["inherited_fields"]["origin_material"]["name"], self.own_action.material.name)
 
     def test_retrieve_includes_total_emissions(self):
         response = self.client.get(
