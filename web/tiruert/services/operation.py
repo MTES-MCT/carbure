@@ -301,10 +301,7 @@ class OperationService:
 
         valid_lots = list(valid_lots)
 
-        # Process EP2 lots, calculate ethanol 15° volumes for valid lots and convert EMAG lots
-        valid_lots = OperationService.process_ep2_lots(valid_lots)
-        OperationService.calculate_volume_ethanol_15(valid_lots)
-        OperationService.convert_emag_lots(valid_lots)
+        valid_lots = OperationService.convert_lots_for_operations(valid_lots)
 
         # Group validated_lots by delivery_type, feedstock, biofuel and depot
         lots_by_delivery_type = defaultdict(list)
@@ -383,6 +380,16 @@ class OperationService:
         """
         existing_lots = OperationDetail.objects.filter(lot__in=lots).values_list("lot_id").distinct()
         return lots.exclude(id__in=existing_lots)
+
+    @staticmethod
+    def convert_lots_for_operations(lots: list[CarbureLot]) -> list[CarbureLot]:
+        """
+        Apply EP2 split, ethanol 15° volume and EMAG conversions. Mutates the given lots in place.
+        """
+        converted_lots = OperationService.process_ep2_lots(lots)
+        OperationService.calculate_volume_ethanol_15(converted_lots)
+        OperationService.convert_emag_lots(converted_lots)
+        return converted_lots
 
     @staticmethod
     def process_ep2_lots(lots: list[CarbureLot]) -> list[CarbureLot]:
