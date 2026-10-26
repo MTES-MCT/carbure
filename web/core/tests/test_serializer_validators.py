@@ -34,7 +34,7 @@ class UniqueInListSerializerTests(SimpleTestCase):
         self.assertFalse(serializer.is_valid())
         message = _("Cette valeur est déjà utilisée ailleurs dans le fichier.")
         self.assertEqual(serializer.errors[0], {"code": [message]})
-        self.assertEqual(serializer.errors[1], {})
+        self.assertNotIn(1, serializer.errors)
         self.assertEqual(serializer.errors[2], {"code": [message]})
 
     def test_ignores_empty_values(self):
