@@ -13,6 +13,7 @@ from core.traceability import (
     get_traceability_nodes,
     serialize_integrity_errors,
 )
+from tiruert.services.correction import CorrectionService
 from transactions.forms import LotForm
 from transactions.helpers import compute_lot_quantity
 from transactions.sanity_checks import bulk_sanity_checks, get_prefetched_data
@@ -85,6 +86,7 @@ def update_many(request):
 
     # prepare lot events and comments
     updated_lots = []
+    updated_lot_ids_with_volume_change = []
     update_events = []
     update_comments = []
 
@@ -94,6 +96,10 @@ def update_many(request):
 
         # list all the affected CarbureLots
         updated_lots.append(node.data)
+
+        volume_diff = node.diff.get("volume")
+        if volume_diff is not None and volume_diff[0] != volume_diff[1]:
+            updated_lot_ids_with_volume_change.append(node.data.id)
 
         # recompute the GHG values in case something changed
         diff_ghg = update_data_diff_with_ghg(node)
@@ -160,6 +166,11 @@ def update_many(request):
             CarbureNotification.objects.bulk_create(update_notifications)
             GenericError.objects.filter(lot__in=updated_lots).delete()
             GenericError.objects.bulk_create(sanity_check_errors)
+
+            if updated_lot_ids_with_volume_change:
+                CorrectionService.create_correction_operations_for_lot_volume_update(
+                    sorted(set(updated_lot_ids_with_volume_change))
+                )
 
     # prepare the response data
     updates = [serialize_node(node) for node in updated_nodes]

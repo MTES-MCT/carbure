@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import patch
 
 from django.db.models import Count
 from django.test import TestCase
@@ -154,6 +155,20 @@ class LotCorrectionTest(TestCase):
         lot = CarbureLot.objects.get(id=lot.id)
         assert lot.correction_status == CarbureLot.NO_PROBLEMO
         assert lot.lot_status == CarbureLot.ACCEPTED
+
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
+    def test_submit_fix_triggers_volume_correction_service(self, correction_mock):
+        """Trigger volume correction creation when a lot fix is submitted."""
+        lot = self.prepare_lot(self.producer, self.trader)
+        lot = self.request_fix(lot, self.trader)
+        self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
+        )
+
+        self.submit_fix(lot, self.producer)
+
+        correction_mock.assert_called_once_with([lot.id])
 
     def test_simple_correction_on_locked_year(self):
         lot = self.prepare_lot(self.producer, self.trader)
