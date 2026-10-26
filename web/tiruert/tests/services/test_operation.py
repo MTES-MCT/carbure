@@ -5,6 +5,7 @@ from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.operation import OperationService, OperationServiceErrors
 from transactions.factories import CarbureLotFactory
@@ -175,26 +176,30 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
     @patch("tiruert.services.operation.OperationService.calculate_volume_ethanol_15")
     @patch("tiruert.services.operation.OperationService.process_ep2_lots")
     @patch("tiruert.services.operation.OperationService.remove_existing_lots")
+    @patch("tiruert.services.operation.OperationService.exclude_saf_biofuel")
     @patch("tiruert.services.operation.OperationService.filter_fr_delivery_site")
     @patch("tiruert.services.operation.OperationService.filter_valid_lots")
     def test_create_operations_from_lots_calls_filter_and_transform_steps(
         self,
         mock_filter_valid_lots,
         mock_filter_fr_delivery_site,
+        mock_exclude_saf_biofuel,
         mock_remove_existing_lots,
         mock_process_ep2_lots,
         mock_calculate_volume_ethanol_15,
         mock_convert_emag_lots,
     ):
-        """Should call the 3 lot filters and 3 transformation methods in order."""
+        """Should call the 4 lot filters and 3 transformation methods in order."""
         input_lots = Mock(name="input_lots")
         lots_after_valid_filter = Mock(name="lots_after_valid_filter")
         lots_after_fr_filter = Mock(name="lots_after_fr_filter")
+        lots_after_saf_filter = Mock(name="lots_after_saf_filter")
         lots_after_existing_filter = [Mock(name="lot")]
         lots_after_ep2 = []
 
         mock_filter_valid_lots.return_value = lots_after_valid_filter
         mock_filter_fr_delivery_site.return_value = lots_after_fr_filter
+        mock_exclude_saf_biofuel.return_value = lots_after_saf_filter
         mock_remove_existing_lots.return_value = lots_after_existing_filter
         mock_process_ep2_lots.return_value = lots_after_ep2
         mock_calculate_volume_ethanol_15.return_value = None
@@ -204,7 +209,8 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
 
         mock_filter_valid_lots.assert_called_once_with(input_lots)
         mock_filter_fr_delivery_site.assert_called_once_with(lots_after_valid_filter)
-        mock_remove_existing_lots.assert_called_once_with(lots_after_fr_filter)
+        mock_exclude_saf_biofuel.assert_called_once_with(lots_after_fr_filter)
+        mock_remove_existing_lots.assert_called_once_with(lots_after_saf_filter)
         mock_process_ep2_lots.assert_called_once_with(lots_after_existing_filter)
         mock_calculate_volume_ethanol_15.assert_called_once_with(lots_after_ep2)
         mock_convert_emag_lots.assert_called_once_with(lots_after_ep2)
@@ -375,6 +381,30 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
         self.assertSetEqual(
             set(filtered_lots.values_list("id", flat=True)),
             {self.lot_blending_accepted.id, lot_without_delivery_site.id},
+        )
+
+    def test_exclude_saf_biofuel_removes_only_saf_lots(self):
+        """Should exclude lots whose biofuel is a SAF type and keep all the others."""
+        saf_lots = [
+            CarbureLotFactory.create(
+                carbure_client=self.entity,
+                feedstock=self.feedstock_conv,
+                biofuel=Biocarburant.objects.get(code=code),
+                lot_status="ACCEPTED",
+                delivery_type="BLENDING",
+                volume=500,
+                carbure_delivery_site=self.depot,
+            )
+            for code in SAF_BIOFUEL_TYPES
+        ]
+
+        filtered_lots = OperationService.exclude_saf_biofuel(self.entity_lots)
+
+        filtered_ids = set(filtered_lots.values_list("id", flat=True))
+        self.assertTrue(filtered_ids.isdisjoint({lot.id for lot in saf_lots}))
+        self.assertSetEqual(
+            filtered_ids,
+            set(self.entity_lots.values_list("id", flat=True)) - {lot.id for lot in saf_lots},
         )
 
 
