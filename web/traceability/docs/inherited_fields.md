@@ -14,7 +14,7 @@ Aujourd'hui le seul champ résolu est `material`. Il a la même forme que `mater
 
 Si aucune action de la chaîne ne porte de matière, `material` vaut `null`. L'action reste dans la liste.
 
-`material` sur l'action elle-même ne change pas : c'est la valeur stockée. `inherited_fields.material` est la matière à afficher.
+`material` sur l'action elle-même ne change pas : c'est la valeur stockée. `inherited_fields.material` est la matière à afficher. Son `unit` est l'unité affichée à côté de `quantity`. Un `VALORIZE` ne stocke pas de matière : l'unité du certificat est donc celle du parent.
 
 ---
 

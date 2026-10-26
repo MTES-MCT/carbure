@@ -55,7 +55,7 @@ export function useH2CertificatesPage(): {
           legend: t("Certificat"),
           fields: [
             fields.carbure_id,
-            { ...fields.energy, label: t("Quantité certifiée") },
+            { ...fields.quantity, label: t("Quantité certifiée") },
             { ...fields.working_date, label: t("Date de création") },
           ],
         },
