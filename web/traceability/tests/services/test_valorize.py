@@ -12,11 +12,7 @@ class ValorizeTest(TestCase):
     fixtures = ["json/countries.json"]
 
     def setUp(self):
-        Material.objects.get_or_create(
-            code=Material.VALORIZED_ENERGY_CODE,
-            name=Material.VALORIZED_ENERGY_NAME,
-            unit=Material.MJ,
-        )
+        Material.update_or_create_valorized_energy()
 
     def _pending_init(self, **kwargs):
         action = ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, **kwargs)
