@@ -45,7 +45,7 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
         return producer
 
     def _get(self, **params):
-        return self.client.get(self.url, {"entity_id": self.provider.id, **params})
+        return self.client.get(self.url, {"entity_id": self.provider.id, "year": self.year, **params})
 
     def _authenticated_api_client(self, token=None):
         _, api_key = APIKey.objects.create_key(name="provider integration")
@@ -56,16 +56,20 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
         )
         return client
 
-    def test_returns_only_validated_declarations_of_own_contracts(self):
-        """Only validated declarations of producers under contract with the provider are returned."""
+    def test_returns_declarations_of_any_status_of_own_contracts(self):
+        """Declarations of any status of producers under contract with the provider are returned, with their status."""
         own = self._create_producer("Own", self.provider)
-        self._create_producer("In progress", self.provider, status_=BiomethaneAnnualDeclaration.IN_PROGRESS)
+        in_progress = self._create_producer("In progress", self.provider, status_=BiomethaneAnnualDeclaration.IN_PROGRESS)
         self._create_producer("Other", self.other_provider)
 
         response = self._get()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual([item["producer"]["id"] for item in response.data["results"]], [own.id])
+        # An unfinished declaration of a past year is exposed with the virtual OVERDUE status
+        self.assertEqual(
+            {item["producer"]["id"]: item["status"] for item in response.data["results"]},
+            {own.id: "DECLARED", in_progress.id: "OVERDUE"},
+        )
 
     def test_year_filter(self):
         """The year filter restricts results to the requested year."""
@@ -76,20 +80,38 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
         self.assertEqual([item["producer"]["id"] for item in response.data["results"]], [producer_2023.id])
 
-    def test_response_exposes_producer_and_production_unit(self):
-        """Each item exposes the producer and the location of its production unit."""
+    def test_year_is_required(self):
+        """The year query parameter is mandatory."""
+        response = self.client.get(self.url, {"entity_id": self.provider.id})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_response_exposes_status_producer_and_production_unit(self):
+        """Each item exposes the declaration status, the producer and its production unit."""
         producer = self._create_producer("Producer", self.provider)
         BiomethaneProductionUnitFactory.create(
-            producer=producer, insee_code="75056", address="1 rue de Paris", postal_code="75001", city="Paris"
+            producer=producer,
+            site_siret="12345678901234",
+            insee_code="75056",
+            address="1 rue de Paris",
+            postal_code="75001",
+            city="Paris",
         )
 
         item = self._get().data["results"][0]
 
-        self.assertEqual(set(item.keys()), {"producer", "production_unit"})
+        self.assertEqual(set(item.keys()), {"status", "producer", "production_unit"})
+        self.assertEqual(item["status"], "DECLARED")
         self.assertEqual(item["producer"]["id"], producer.id)
         self.assertEqual(
             item["production_unit"],
-            {"insee_code": "75056", "address": "1 rue de Paris", "postal_code": "75001", "city": "Paris"},
+            {
+                "site_siret": "12345678901234",
+                "insee_code": "75056",
+                "address": "1 rue de Paris",
+                "postal_code": "75001",
+                "city": "Paris",
+            },
         )
 
     def test_production_unit_is_null_without_production_unit(self):
@@ -140,7 +162,7 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
     def test_accepts_a_real_signed_jwt(self):
         """A signed JWT and a valid API key authenticate the provider API request."""
-        response = self._authenticated_api_client().get(self.url, {"entity_id": self.provider.id})
+        response = self._authenticated_api_client().get(self.url, {"entity_id": self.provider.id, "year": self.year})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -206,7 +228,7 @@ class BiomethaneProviderDeclarationFrontTest(TestCase):
         self._create_declaration(self.other_provider, name="Other producer")
         self._verify_session_otp()
 
-        response = self.client.get(self.url, {"entity_id": self.provider.id})
+        response = self.client.get(self.url, {"entity_id": self.provider.id, "year": 2024})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual([item["producer"]["id"] for item in response.data["results"]], [producer.id])

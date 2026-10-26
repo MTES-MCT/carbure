@@ -1,5 +1,7 @@
 import { Cell, Column } from "common/components/table2"
 import { useTranslation } from "react-i18next"
+import { AnnualDeclarationStatus } from "biomethane/types"
+import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
 import { BiomethaneProviderDeclaration } from "../types"
 
 export const useProviderDeclarationsColumns =
@@ -13,7 +15,7 @@ export const useProviderDeclarationsColumns =
       },
       {
         header: t("Siret"),
-        cell: (row) => <Cell text={row.producer.registration_id || "-"} />,
+        cell: (row) => <Cell text={row.production_unit?.site_siret || "-"} />,
         style: { flex: "0 0 160px" },
       },
       {
@@ -29,6 +31,15 @@ export const useProviderDeclarationsColumns =
           return <Cell text={text || "-"} />
         },
         style: { flex: "2 1 0%" },
+      },
+      {
+        header: t("Statut"),
+        cell: (row) => (
+          <AnnualDeclarationStatusBadge
+            status={row.status as AnnualDeclarationStatus}
+          />
+        ),
+        style: { minWidth: "260px" },
       },
     ]
   }

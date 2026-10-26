@@ -55,6 +55,7 @@ class BiomethaneProductionUnitPreviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = BiomethaneProductionUnit
         fields = [
+            "site_siret",
             "insee_code",
             "address",
             "postal_code",

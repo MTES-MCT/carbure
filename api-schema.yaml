@@ -2064,8 +2064,8 @@ paths:
   /api/biomethane/provider/declarations/:
     get:
       operationId: biomethane_provider_declarations_list
-      description: Validated annual declarations of the producers under contract with
-        the gas provider.
+      description: Annual declarations (any status) of the producers under contract
+        with the gas provider.
       parameters:
         - in: query
           name: entity_id
@@ -2101,6 +2101,7 @@ paths:
           name: year
           schema:
             type: integer
+          required: true
       tags:
         - biomethane
       security:
@@ -16144,6 +16145,10 @@ components:
     BiomethaneProductionUnitPreview:
       type: object
       properties:
+        site_siret:
+          type: string
+          title: SIRET
+          maxLength: 64
         insee_code:
           type: string
           nullable: true
@@ -16306,6 +16311,10 @@ components:
     BiomethaneProviderDeclaration:
       type: object
       properties:
+        status:
+          allOf:
+            - $ref: "#/components/schemas/BiomethaneAnnualDeclarationStatusEnum"
+          readOnly: true
         producer:
           allOf:
             - $ref: "#/components/schemas/EntityPreview"
@@ -16318,6 +16327,7 @@ components:
       required:
         - producer
         - production_unit
+        - status
     BiomethaneSupplyInput:
       type: object
       properties:
