@@ -34,6 +34,23 @@ def transport_data(file_path, charge_point_ids, chunksize=1000):
 
 
 class TransportDataGouvTest(unittest.TestCase):
+    def test_enrichment_converts_integer_power_to_fractional_megawatts(self):
+        transport = transport_data(FIXTURE_PATH, ["FRAAAA111101"])
+        transport["nominal_power"] = 1500
+        application = pd.DataFrame(
+            [
+                {
+                    **dict.fromkeys(TransportDataGouv.DB_COLUMNS, ""),
+                    "charge_point_id": "FRAAAA111101",
+                    "is_in_application": True,
+                }
+            ]
+        )
+
+        enriched = TransportDataGouv.enrich_charge_point_data(application, transport)
+
+        self.assertEqual(enriched.iloc[0]["nominal_power"], 1.5)
+
     def test_selecting_one_charge_point_returns_its_whole_station(self):
         result = transport_data(FIXTURE_PATH, ["FRAAAA111101"])
 
