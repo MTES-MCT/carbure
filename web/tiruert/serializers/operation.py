@@ -27,6 +27,16 @@ class OperationEntitySerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
+class OperationDebtLotSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    carbure_id = serializers.CharField()
+
+
+class OperationDebtSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    lot = OperationDebtLotSerializer()
+
+
 class BaseOperationSerializer(serializers.ModelSerializer):
     from_depot = OperationDepotSerializer()
     to_depot = OperationDepotSerializer()
@@ -120,9 +130,11 @@ class OperationSerializer(BaseOperationSerializer):
             "details",
             "year",
             "devaluation_type",
+            "debt",
         ]
 
     export_country = CountrySerializer(read_only=True)
+    debt = OperationDebtSerializer(read_only=True, allow_null=True)
 
 
 class OperationLotSerializer(serializers.Serializer):
@@ -274,6 +286,15 @@ class OperationUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
         fields = ["to_depot", "status"]
+
+    def validate_status(self, value):
+        # A repayment draft already reserves its volume: validating it is its only transition
+        if self.instance is not None and self.instance.type == Operation.DEBT_REPAYMENT:
+            if self.instance.status != Operation.DRAFT or value != Operation.VALIDATED:
+                raise serializers.ValidationError(
+                    _("Un acquittement de dette ne peut passer que du statut DRAFT au statut VALIDATED.")
+                )
+        return value
 
 
 class OperationCorrectionSerializer(serializers.Serializer):
