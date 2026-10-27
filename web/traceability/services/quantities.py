@@ -1,56 +1,61 @@
-from django.db.models import Case, DecimalField, Expression, ExpressionWrapper, F, Value, When
-from django.db.models.functions import Round
+from decimal import ROUND_HALF_UP, Decimal
 
-QUANTITY_FIELD = DecimalField(max_digits=13, decimal_places=3)
+from traceability.models.material import Material
 
-
-def _expression_wrapper(expression: Expression) -> ExpressionWrapper:
-    return ExpressionWrapper(expression, output_field=QUANTITY_FIELD)
+_PLACES = Decimal("0.001")
 
 
-def quantities_db_annotation() -> dict:
-    """Annotate mass (kg), volume (l) and energy (MJ) from the material's factors.
+def _round(value):
+    if value is None:
+        return None
+    return Decimal(value).quantize(_PLACES, rounding=ROUND_HALF_UP)
+
+
+def _multiply(left, right):
+    if left is None or right is None:
+        return None
+    return Decimal(left) * Decimal(right)
+
+
+def _divide(left, right):
+    if left is None or not right:
+        return None
+    return Decimal(left) / Decimal(right)
+
+
+def convert_quantity(quantity, material):
+    """Return mass (kg), volume (l) and energy (MJ).
 
     mass   = volume × density
     energy = mass × lhv
 
-    Reads `material.lhv` / `material.density`. Missing factors yield NULL.
+    A missing material or factor yields None for the value that needs it.
     """
-    from traceability.models.material import Material
+    if quantity is None or material is None:
+        return None, None, None
 
-    quantity = F("quantity")
-    lhv = F("material__lhv")
-    density = F("material__density")
-    empty = Value(None, output_field=QUANTITY_FIELD)
+    quantity = Decimal(quantity)
+    if material.unit == Material.KG:
+        mass, volume, energy = quantity, _divide(quantity, material.density), _multiply(quantity, material.lhv)
+    elif material.unit == Material.L:
+        mass = _multiply(quantity, material.density)
+        volume = quantity
+        energy = _multiply(mass, material.lhv)
+    elif material.unit == Material.MJ:
+        mass = _divide(quantity, material.lhv)
+        volume = _divide(mass, material.density)
+        energy = quantity
+    else:
+        return None, None, None
+    return _round(mass), _round(volume), _round(energy)
 
-    mass = Round(
-        Case(
-            When(material__unit=Material.KG, then=quantity),
-            When(material__unit=Material.L, then=_expression_wrapper(quantity * density)),
-            When(material__unit=Material.MJ, then=_expression_wrapper(quantity / lhv)),
-            default=empty,
-            output_field=QUANTITY_FIELD,
-        ),
-        precision=3,
-    )
-    volume = Round(
-        Case(
-            When(material__unit=Material.L, then=quantity),
-            When(material__unit=Material.KG, then=_expression_wrapper(quantity / density)),
-            When(material__unit=Material.MJ, then=_expression_wrapper(quantity / lhv / density)),
-            default=empty,
-            output_field=QUANTITY_FIELD,
-        ),
-        precision=3,
-    )
-    energy = Round(
-        Case(
-            When(material__unit=Material.MJ, then=quantity),
-            When(material__unit=Material.KG, then=_expression_wrapper(quantity * lhv)),
-            When(material__unit=Material.L, then=_expression_wrapper(quantity * density * lhv)),
-            default=empty,
-            output_field=QUANTITY_FIELD,
-        ),
-        precision=3,
-    )
-    return {"mass": mass, "volume": volume, "energy": energy}
+
+def attach_quantities(actions: list) -> list:
+    """Set mass, volume and energy from the stored material, or previous_material.
+
+    Call after ``attach_inherited_fields``.
+    """
+    for action in actions:
+        material = action.material or action.inherited_fields["previous_material"]
+        action.mass, action.volume, action.energy = convert_quantity(action.quantity, material)
+    return actions

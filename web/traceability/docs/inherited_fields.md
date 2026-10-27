@@ -15,7 +15,7 @@ On annote chaque action listée en remontant sa chaîne de parents, jusqu'à la 
 
 `origin_material` est la première matière non vide en partant de la racine. Si l'action est la seule à en déclarer une, c'est la sienne.
 
-`material` sur l'action elle-même ne change pas : c'est la valeur stockée. L'unité affichée à côté de `quantity` est celle de cette matière, ou celle de `previous_material` quand l'action n'en stocke pas.
+`material` sur l'action elle-même ne change pas : c'est la valeur stockée. L'unité affichée à côté de `quantity` est celle de cette matière, ou celle de `previous_material` quand l'action n'en stocke pas. `mass`, `volume` et `energy` sont calculés à la lecture avec cette même matière.
 
 Si aucune action de la chaîne ne porte de matière, les deux valent `null`. L'action reste dans la liste.
 

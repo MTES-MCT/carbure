@@ -22,7 +22,7 @@ export function quantityField(
     label: i18next.t("Quantité"),
     field: ({ form, props }) => {
       if (key === "quantity") {
-        const unit = form.value.inherited_fields?.material?.unit
+        const unit = form.value.inherited_fields?.previous_material?.unit
 
         return (
           <DecimalInput
