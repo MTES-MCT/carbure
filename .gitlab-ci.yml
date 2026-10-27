@@ -1,5 +1,6 @@
 stages:
   - check
+  - security
   - pass
 
 workflow:
@@ -70,6 +71,14 @@ check-frontend:
     - changes:
         - front/**/*
         - .gitlab-ci.yml
+
+security-audit:
+  stage: security
+  image:
+    name: aquasec/trivy:0.76.1
+    entrypoint: [""]
+  script:
+    - trivy fs --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 .
 
 # job: always succeed so we can merge MR that do not change front/back code
 pass:
