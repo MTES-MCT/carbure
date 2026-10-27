@@ -86,7 +86,12 @@ pass:
   script:
     - echo "Forcing pipeline to pass"
   rules:
-    - when: always
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - front/**/*
+        - web/**/*
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 .backend:
   image: python:3.12
