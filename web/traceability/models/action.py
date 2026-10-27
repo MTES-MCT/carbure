@@ -5,8 +5,6 @@ from django.db.models import CharField, OuterRef, QuerySet, Subquery, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
-from traceability.services.quantities import quantities_db_annotation
-
 from .action_status import ActionStatus
 
 
@@ -30,7 +28,6 @@ class ActionManager(models.Manager):
                     output_field=CharField(),
                 )
             )
-            .annotate(**quantities_db_annotation())
         )
 
 
