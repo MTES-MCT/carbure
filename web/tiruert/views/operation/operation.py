@@ -1,4 +1,17 @@
-from django.db.models import Case, CharField, ExpressionWrapper, F, FloatField, OuterRef, Q, Subquery, Sum, Value, When
+from django.db.models import (
+    Case,
+    CharField,
+    ExpressionWrapper,
+    F,
+    FloatField,
+    OuterRef,
+    Prefetch,
+    Q,
+    Subquery,
+    Sum,
+    Value,
+    When,
+)
 from django.db.models.functions import Coalesce, Round
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
@@ -9,7 +22,7 @@ from core.pagination import MetadataPageNumberPagination
 from entity.permissions import HasDgddiWriteRights
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation, OperationDetail, TiruertDebt
 from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights, TiruertAdminRights
 from tiruert.serializers import (
     OperationInputSerializer,
@@ -88,6 +101,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "download_import_template",
             "import_operations_from_excel",
             "declare_teneur",
+            "repay_debt",
         ]:
             return [HasTiruertWriteRights()]
         elif self.action == "correct":
@@ -207,6 +221,11 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             queryset = queryset.prefetch_related(None)
         elif self.action in ["retrieve", "correct", "export_operations_to_excel"] or details_requested:
             queryset = queryset.prefetch_related("details")
+
+        if self.action == "retrieve":
+            queryset = queryset.prefetch_related(
+                Prefetch("debt", queryset=TiruertDebt.objects.select_related("lot").only("id", "lot_id", "lot__carbure_id"))
+            )
 
         # exclude operations that are drafts and credits
         queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))

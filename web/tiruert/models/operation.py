@@ -31,6 +31,7 @@ class OperationManager(models.Manager):
                 "from_depot_id",
                 "to_depot_id",
                 "export_country_id",
+                "debt_id",
                 # Champs des modèles liés utilisés
                 "biofuel__code",
                 "biofuel__pci_litre",
@@ -101,7 +102,7 @@ class Operation(models.Model):
     )
 
     API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION]
-    API_DELETABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION, CESSION]
+    API_DELETABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION, CESSION, DEBT_REPAYMENT]
 
     # Types that generate initial credit volumes (from physical operations)
     CREDIT_TYPES = [INCORPORATION, MAC_BIO, LIVRAISON_DIRECTE]
