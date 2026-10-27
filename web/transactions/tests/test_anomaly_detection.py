@@ -54,11 +54,11 @@ class CreateAnomalyErrorsTest(SimpleTestCase):
 
         self.errors.bulk_create.assert_called_once_with([], batch_size=1000)
         # Even an empty run must remove previous detections in the processed scope.
-        self.errors.filter.assert_called_once_with(error__in=["LOF_OUTLIER", "IF_OUTLIER"], lot__in=self.processed_lots)
+        self.errors.filter.assert_called_once_with(error="OUTLIER_EP", lot__in=self.processed_lots)
         self.errors.filter.return_value.delete.assert_called_once_with()
 
-    def test_model_without_outliers_does_not_flag_all_lots(self):
-        for flag, error in [("is_lof_outlier", "LOF_OUTLIER"), ("is_if_outlier", "IF_OUTLIER")]:
+    def test_each_detection_model_creates_the_emission_outlier_error(self):
+        for flag in ["is_lof_outlier", "is_if_outlier"]:
             with self.subTest(model=flag):
                 self.errors.reset_mock()
                 outliers = pd.DataFrame({"ep": [1.0], "is_lof_outlier": [False], "is_if_outlier": [False]})
@@ -67,7 +67,7 @@ class CreateAnomalyErrorsTest(SimpleTestCase):
                 self.assertEqual(create_errors({"ep": outliers}), [123])
 
                 created = self.errors.bulk_create.call_args.args[0]
-                self.assertEqual([(item.error, item.lot_id) for item in created], [(error, 123)])
+                self.assertEqual([(item.error, item.field, item.lot_id) for item in created], [("OUTLIER_EP", "ep", 123)])
 
     def test_returned_lot_ids_are_unique_across_models_and_emissions(self):
         outliers = pd.DataFrame({"ep": [1.0], "is_lof_outlier": [True], "is_if_outlier": [True]})
@@ -75,4 +75,6 @@ class CreateAnomalyErrorsTest(SimpleTestCase):
         lot_ids = create_errors({"ep": outliers, "eec": outliers.rename(columns={"ep": "eec"})})
 
         self.assertEqual(lot_ids, [123])
-        self.assertEqual(len(self.errors.bulk_create.call_args.args[0]), 4)
+        created = self.errors.bulk_create.call_args.args[0]
+        self.assertEqual(len(created), 4)
+        self.assertEqual({item.error for item in created}, {"OUTLIER_EEC", "OUTLIER_EP"})
