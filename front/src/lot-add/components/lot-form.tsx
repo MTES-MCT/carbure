@@ -100,7 +100,10 @@ export function useLotForm(
 
     // for operators
     if (entity.isOperator) {
-      if (value.client === undefined) {
+      if (
+        value.client === undefined &&
+        value.delivery_type != DeliveryType.Direct
+      ) {
         value.client = entity
       }
     }
