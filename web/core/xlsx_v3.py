@@ -5,7 +5,7 @@ import traceback
 import pandas as pd
 import xlsxwriter
 
-from core.models import Biocarburant, CarbureStock, Entity, GenericCertificate, MatierePremiere, Pays
+from core.models import Biocarburant, CarbureLot, CarbureStock, Entity, GenericCertificate, MatierePremiere, Pays
 from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
 from transactions.models import Depot, ProductionSite, Site
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerCSVSerializer
@@ -1066,6 +1066,30 @@ def export_carbure_stock(stocks):
 #### NEW MODEL
 
 
+def add_lot_choice_validations(worksheet, columns):
+    """Add dropdowns for the lot fields that have fixed model choices."""
+    last_row = 1048575  # Excel's last row, zero-based for xlsxwriter.
+    choices = {
+        "delivery_type": [value for value, _label in CarbureLot.DELIVERY_TYPES],
+        "usage": [value for value, _label in CarbureLot.USAGE_CHOICES],
+    }
+    for field, values in choices.items():
+        col = columns.index(field)
+        worksheet.data_validation(
+            1,
+            col,
+            last_row,
+            col,
+            {
+                "validate": "list",
+                "source": values,
+                "ignore_blank": True,
+                "error_title": "Invalid value",
+                "error_message": f"Select a value from the {field} dropdown.",
+            },
+        )
+
+
 def make_template_carbure_lots_sheet(workbook, entity):
     worksheet_lots = workbook.add_worksheet("lots")
     psites = ProductionSite.objects.filter(created_by=entity)
@@ -1114,6 +1138,7 @@ def make_template_carbure_lots_sheet(workbook, entity):
     ]
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
+    add_lot_choice_validations(worksheet_lots, columns)
 
     today = datetime.date.today().strftime("%d/%m/%Y")
     rows = []
@@ -1419,6 +1444,7 @@ def make_template_carbure_stocks_sheet(workbook, entity):
     ]
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
+    add_lot_choice_validations(worksheet_lots, columns)
 
     today = datetime.date.today().strftime("%d/%m/%Y")
     rows = []
