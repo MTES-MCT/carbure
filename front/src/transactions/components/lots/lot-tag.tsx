@@ -24,9 +24,14 @@ export const LotTag = ({ lot, ...props }: LotTagProps) => {
   const delivery = lot.delivery_type
 
   const isClient = lot.carbure_client?.id === entity.id
+  const isClientUnknown = !lot.carbure_client
+  const isSupplier = lot.carbure_supplier?.id === entity.id
 
   const knowsDelivery =
-    (isClient || entity.isAdmin || entity.isExternal) &&
+    (isClient ||
+      (isSupplier && isClientUnknown) ||
+      entity.isAdmin ||
+      entity.isExternal) &&
     delivery !== DeliveryType.Unknown
 
   if (status === LotStatus.Draft) {
