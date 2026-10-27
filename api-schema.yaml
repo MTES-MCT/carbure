@@ -14392,15 +14392,28 @@ components:
         - file
     ActionInheritedFields:
       type: object
-      description: Nearest declared values along the parent chain, including the
-        action itself.
+      description: >-
+        Materials resolved along the parent chain.
+
+
+        previous_material is the nearest declared material above the action.
+
+        origin_material is the first declared material from the root. It is the
+        action's
+
+        own material when nothing above declares one.
       properties:
-        material:
+        previous_material:
+          allOf:
+            - $ref: "#/components/schemas/Material"
+          nullable: true
+        origin_material:
           allOf:
             - $ref: "#/components/schemas/Material"
           nullable: true
       required:
-        - material
+        - origin_material
+        - previous_material
     ActionParent:
       type: object
       description: Small representation used for the parent action relation.
@@ -19977,7 +19990,7 @@ components:
           readOnly: true
         code:
           type: string
-          maxLength: 8
+          maxLength: 16
         name:
           type: string
           maxLength: 64

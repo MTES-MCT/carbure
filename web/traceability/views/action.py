@@ -15,6 +15,7 @@ from traceability.serializers.action import ActionQuerySerializer, ActionSeriali
 from traceability.services.delete import delete_action
 from traceability.services.inherited_fields import attach_inherited_fields
 from traceability.services.parent_chain import annotate_parent_chain
+from traceability.services.quantities import attach_quantities
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
 
@@ -69,6 +70,7 @@ class ActionViewset(
         action = super().get_object()
         if self.action == "retrieve":
             attach_inherited_fields([action])
+            attach_quantities([action])
         return action
 
     def paginate_queryset(self, queryset):
@@ -84,8 +86,7 @@ class ActionViewset(
         actions_by_id = {action.pk: action for action in annotated}
         actions = [actions_by_id[pk] for pk in ids]
 
-        # Attach the inherited fields.
-        return attach_inherited_fields(actions)
+        return attach_quantities(attach_inherited_fields(actions))
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

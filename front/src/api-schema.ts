@@ -3618,9 +3618,16 @@ export interface components {
             /** Format: binary */
             file: File;
         };
-        /** @description Nearest declared values along the parent chain, including the action itself. */
+        /**
+         * @description Materials resolved along the parent chain.
+         *
+         *     previous_material is the nearest declared material above the action.
+         *     origin_material is the first declared material from the root. It is the action's
+         *     own material when nothing above declares one.
+         */
         ActionInheritedFields: {
-            material: components["schemas"]["Material"] | null;
+            previous_material: components["schemas"]["Material"] | null;
+            origin_material: components["schemas"]["Material"] | null;
         };
         /** @description Small representation used for the parent action relation. */
         ActionParent: {

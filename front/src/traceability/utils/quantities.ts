@@ -18,7 +18,7 @@ export function getActionQuantity(
   if (key === "quantity") {
     return {
       value: action.quantity,
-      unit: action.inherited_fields.material?.unit,
+      unit: action.inherited_fields.previous_material?.unit,
     }
   }
 

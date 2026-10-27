@@ -6,7 +6,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 - **Les facteurs vivent sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont lus sur `Material` à chaque calcul. Un changement de PCI au catalogue s’applique aux actions déjà créées. À l’import Excel, une matière sans `lhv` **et** sans `density` lève une erreur interne (oubli catalogue, pas une erreur de cellule).
 - **La valorisation recopie la quantité.** `valorize()` crée un enfant `VALORIZE` avec la `quantity` du parent et sans matière. Rien n’est converti ni figé en MJ.
-- **Le reste est calculé, pas persisté.** `mass` / `volume` / `energy` sont des annotations SQL à partir de la matière **stockée** (`material.lhv` / `material.density`, NULL si la matière ou le facteur manque) :
+- **Le reste est calculé, pas persisté.** À la lecture (liste paginée et détail), `mass` / `volume` / `energy` sont calculés en Python depuis la matière stockée, ou `previous_material` si l'action n'en a pas. Un facteur manquant laisse la valeur vide :
 
 ```
 mass   = volume × density
@@ -49,7 +49,7 @@ Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à 
 
 Côté front, les catalogues (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.). Une page peut passer `emptyState` à `ActionsPage` : il remplace la liste quand elle est chargée, sans filtre, et sans résultat.
 
-`quantity` affiche la quantité **stockée** avec l’unité de la matière stockée, ou celle de `previous_material` quand l’action n’en a pas. `mass` en est la vue convertie depuis la matière stockée (kg, lecture seule, `null` si elle ou le facteur manque). Ce sont des factories privées de `hooks/action-fields` et `hooks/action-columns`. La page choisit lequel poser — lots H2 : `mass`, certificats H2 : `quantity`. `volume` / `energy` suivent le même modèle.
+`quantity` affiche la quantité **stockée** avec l’unité de la matière stockée, ou celle de `previous_material` quand l’action n’en a pas.
 
 ---
 

@@ -99,7 +99,7 @@ export function useActionFields() {
       label: t("Matière"),
       field: ({ form, props }) => {
         const bound = form.bind("material", {
-          value: form.value.inherited_fields?.material ?? undefined,
+          value: form.value.inherited_fields?.previous_material ?? undefined,
         })
 
         return (
