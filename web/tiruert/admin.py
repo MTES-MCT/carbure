@@ -9,6 +9,7 @@ from tiruert.models import (
     MacFossilFuel,
     Objective,
     Operation,
+    TiruertDebt,
 )
 from tiruert.models.elec_operation import ElecOperation
 
@@ -130,3 +131,11 @@ class MacFossilFuelAdmin(admin.ModelAdmin):
     list_display = ["fuel", "operator", "volume", "period", "year", "depot"]
     list_filter = ["year", "operator__name"]
     search_fields = ["operator__name"]
+
+
+@admin.register(TiruertDebt)
+class TiruertDebtAdmin(admin.ModelAdmin):
+    list_display = ["id", "type", "value", "entity", "biofuel__code", "customs_category", "lot", "created_at"]
+    list_filter = ["type", "customs_category"]
+    list_select_related = ["entity", "biofuel", "lot"]
+    search_fields = ["entity__name"]

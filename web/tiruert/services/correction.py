@@ -2,11 +2,11 @@ from collections import defaultdict
 from copy import copy
 
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Sum
 
 from core.models import CarbureLot
 from core.utils import truncate
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation, OperationDetail, TiruertDebt
 from tiruert.services.balance import BalanceService
 from tiruert.services.operation import OperationService
 
@@ -21,8 +21,9 @@ class CorrectionService:
         For each (lot, customs_category, biofuel) credited by an initial operation, the gap between
         the expected volume and the net volume already credited (initial operation + previous
         corrections) is turned into a CORRECTION operation:
-        - volume added: credit, whatever the lot balance is
-        - volume removed: debit, only when the lot balance of the credited entity covers it
+        - volume added: reduce the open debts of the lot first, then credit the rest whatever the lot balance is
+        - volume removed: debit when the lot balance of the credited entity covers it, otherwise record a
+          TiruertDebt of the whole volume (no debit)
         """
         if not lot_ids:
             return
@@ -55,11 +56,60 @@ class CorrectionService:
                     lot.feedstock.category,
                     lot.biofuel,
                 )
-                # Insufficient balance: debt repayment is not handled yet
                 if available < abs(volume_delta):
+                    TiruertDebt.objects.create(
+                        type=TiruertDebt.VOLUME,
+                        value=abs(volume_delta),
+                        entity_id=entity_id,
+                        biofuel=lot.biofuel,
+                        customs_category=lot.feedstock.category,
+                        lot_id=lot.id,
+                    )
+                    continue
+            else:
+                volume_delta = CorrectionService._reduce_open_debts(lot, volume_delta)
+                if volume_delta == 0:
                     continue
 
             CorrectionService._create_volume_correction(lot, credit_data, volume_delta)
+
+    @staticmethod
+    def _reduce_open_debts(converted_lot, volume: float) -> float:
+        """
+        Reduce the open VOLUME debts of (lot, customs_category, biofuel), oldest first, by `volume`.
+        A debt never goes below its repaid part: it is deleted when nothing was repaid, kept otherwise.
+        Returns the volume left to credit.
+        """
+        debts = (
+            TiruertDebt.objects.with_remaining()
+            .filter(
+                lot_id=converted_lot.id,
+                type=TiruertDebt.VOLUME,
+                customs_category=converted_lot.feedstock.category,
+                biofuel_id=converted_lot.biofuel_id,
+                remaining__gt=0,
+            )
+            .order_by("created_at", "id")
+        )
+
+        left = volume
+        for debt in debts:
+            if left <= 0:
+                break
+            if left >= debt.remaining:
+                left -= debt.remaining
+                debt.value = debt.repaid
+            else:
+                debt.value -= left
+                left = 0
+
+            # Cancelled repayments still reference the debt (PROTECT), so it can only be deleted without any
+            if debt.value <= 0 and not debt.repayments.exists():
+                debt.delete()
+            else:
+                debt.save(update_fields=["value"])
+
+        return truncate(left)
 
     @staticmethod
     def _get_current_credited_volume_by_lot_category_biofuel(lot_ids: list[int]) -> dict[tuple, dict]:
@@ -70,7 +120,8 @@ class CorrectionService:
         Returns {key: {"entity_id", "durability_period", "volume"}}:
         - entity_id: the entity credited by the initial operation
         - durability_period: the durability period of the initial operation
-        - volume: the net volume credited (initial operation + corrections)
+        - volume: the net volume credited (initial operation + corrections) minus the VOLUME debts of the lot,
+          so that a debt is not recreated by the next correction
         """
         rows = (
             OperationDetail.objects.filter(lot_id__in=lot_ids, operation__status__in=Operation.ACTIVE_STATUSES)
@@ -98,6 +149,16 @@ class CorrectionService:
                 credit_data["entity_id"] = credited_entity_id
                 credit_data["durability_period"] = durability_period
                 credit_data["volume"] += volume
+
+        debts = (
+            TiruertDebt.objects.filter(lot_id__in=lot_ids, type=TiruertDebt.VOLUME)
+            .values("lot_id", "customs_category", "biofuel_id")
+            .annotate(total=Sum("value"))
+        )
+        for debt in debts:
+            key = (debt["lot_id"], debt["customs_category"], debt["biofuel_id"])
+            if key in credit_volume_by_lot_category_biofuel:
+                credit_volume_by_lot_category_biofuel[key]["volume"] -= debt["total"]
 
         return {
             key: credit_data
