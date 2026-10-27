@@ -1414,6 +1414,8 @@ def make_template_carbure_stocks_sheet(workbook, entity):
         "delivery_site",
         "delivery_site_country",
         "delivery_type",
+        "usage",
+        "usage_precision",
     ]
     for i, c in enumerate(columns):
         worksheet_lots.write(0, i, c, bold)
