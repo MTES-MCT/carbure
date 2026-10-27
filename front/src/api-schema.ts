@@ -3274,6 +3274,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/operations/debts/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Remaining debt volume of the entity per biofuel and customs category */
+        get: operations["list_debts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/operations/export/": {
         parameters: {
             query?: never;
@@ -3335,6 +3352,23 @@ export interface paths {
         get: operations["download_operations_import_template"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tiruert/operations/repay_debt/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Repay the open debts of a biofuel / customs category by debiting lots of the entity */
+        post: operations["repay_debt"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5112,6 +5146,25 @@ export interface components {
          * @enum {string}
          */
         CropTypeEnum: CropTypeEnum;
+        DebtRepaymentInputRequest: {
+            biofuel: number;
+            customs_category: components["schemas"]["MPCategoriesEnum"];
+            lots: components["schemas"]["OperationLotRequest"][];
+            /** @default VALIDATED */
+            status: components["schemas"]["DebtRepaymentInputStatusEnum"];
+        };
+        /**
+         * @description * `VALIDATED` - VALIDATED
+         *     * `DRAFT` - DRAFT
+         * @enum {string}
+         */
+        DebtRepaymentInputStatusEnum: DebtRepaymentInputStatusEnum;
+        DebtSummary: {
+            biofuel: components["schemas"]["BalanceBiofuel"];
+            customs_category: components["schemas"]["MPCategoriesEnum"];
+            /** Format: double */
+            remaining_volume: number;
+        };
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -6357,10 +6410,19 @@ export interface components {
             readonly avoided_emissions: number;
             readonly year: number;
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
+            readonly debt: components["schemas"]["OperationDebt"] | null;
         };
         OperationCorrectionRequest: {
             /** Format: double */
             correction_volume: number;
+        };
+        OperationDebt: {
+            id: number;
+            lot: components["schemas"]["OperationDebtLot"];
+        };
+        OperationDebtLot: {
+            id: number;
+            carbure_id: string;
         };
         OperationDepot: {
             id: number;
@@ -6489,6 +6551,7 @@ export interface components {
          *     * `EXPIRATION` - EXPIRATION
          *     * `REPORT` - REPORT
          *     * `CORRECTION` - CORRECTION
+         *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -15116,6 +15179,7 @@ export interface operations {
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
                  *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15494,6 +15558,7 @@ export interface operations {
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
                  *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15616,6 +15681,7 @@ export interface operations {
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
                  *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15699,6 +15765,28 @@ export interface operations {
             };
         };
     };
+    list_debts: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebtSummary"][];
+                };
+            };
+        };
+    };
     tiruert_operations_export_retrieve: {
         parameters: {
             query: {
@@ -15757,6 +15845,7 @@ export interface operations {
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
                  *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15887,6 +15976,34 @@ export interface operations {
                 };
                 content: {
                     "application/json": File;
+                };
+            };
+        };
+    };
+    repay_debt: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DebtRepaymentInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DebtRepaymentInputRequest"];
+                "multipart/form-data": components["schemas"]["DebtRepaymentInputRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperationList"][];
                 };
             };
         };
@@ -16815,6 +16932,7 @@ export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     CESSION = "CESSION",
     CORRECTION = "CORRECTION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+    DEBT_REPAYMENT = "DEBT_REPAYMENT",
     DEVALUATION = "DEVALUATION",
     EXPEDITION = "EXPEDITION",
     EXPIRATION = "EXPIRATION",
@@ -17008,6 +17126,10 @@ export enum CropTypeEnum {
     PRIMARY = "PRIMARY",
     INTERMEDIATE = "INTERMEDIATE"
 }
+export enum DebtRepaymentInputStatusEnum {
+    VALIDATED = "VALIDATED",
+    DRAFT = "DRAFT"
+}
 export enum DeliveryTypeEnum {
     UNKNOWN = "UNKNOWN",
     RFC = "RFC",
@@ -17190,7 +17312,8 @@ export enum OperationTypeEnum {
     TRANSFERT = "TRANSFERT",
     EXPIRATION = "EXPIRATION",
     REPORT = "REPORT",
-    CORRECTION = "CORRECTION"
+    CORRECTION = "CORRECTION",
+    DEBT_REPAYMENT = "DEBT_REPAYMENT"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",

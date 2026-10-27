@@ -11812,6 +11812,7 @@ paths:
                 - CESSION
                 - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -11836,6 +11837,7 @@ paths:
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
             * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12397,6 +12399,7 @@ paths:
                 - CESSION
                 - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -12421,6 +12424,7 @@ paths:
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
             * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12697,6 +12701,7 @@ paths:
                 - CESSION
                 - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -12721,6 +12726,7 @@ paths:
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
             * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12908,6 +12914,31 @@ paths:
                     - TERF SAF
                   summary: Example of filters response.
           description: ""
+  /api/tiruert/operations/debts/:
+    get:
+      operationId: list_debts
+      description: Remaining debt volume of the entity per biofuel and customs category
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DebtSummary"
+          description: ""
   /api/tiruert/operations/export/:
     get:
       operationId: tiruert_operations_export_retrieve
@@ -13029,6 +13060,7 @@ paths:
                 - CESSION
                 - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -13053,6 +13085,7 @@ paths:
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
             * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -13299,6 +13332,44 @@ paths:
                 type: string
                 format: binary
           description: Fichier Excel généré
+  /api/tiruert/operations/repay_debt/:
+    post:
+      operationId: repay_debt
+      description: Repay the open debts of a biofuel / customs category by debiting
+        lots of the entity
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DebtRepaymentInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DebtRepaymentInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DebtRepaymentInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OperationList"
+          description: ""
   /api/tiruert/operations/simulate/:
     post:
       operationId: simulate
@@ -17484,6 +17555,47 @@ components:
       description: |-
         * `PRIMARY` - PRIMARY
         * `INTERMEDIATE` - INTERMEDIATE
+    DebtRepaymentInputRequest:
+      type: object
+      properties:
+        biofuel:
+          type: integer
+        customs_category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        lots:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationLotRequest"
+        status:
+          allOf:
+            - $ref: "#/components/schemas/DebtRepaymentInputStatusEnum"
+          default: VALIDATED
+      required:
+        - biofuel
+        - customs_category
+        - lots
+    DebtRepaymentInputStatusEnum:
+      enum:
+        - VALIDATED
+        - DRAFT
+      type: string
+      description: |-
+        * `VALIDATED` - VALIDATED
+        * `DRAFT` - DRAFT
+    DebtSummary:
+      type: object
+      properties:
+        biofuel:
+          $ref: "#/components/schemas/BalanceBiofuel"
+        customs_category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        remaining_volume:
+          type: number
+          format: double
+      required:
+        - biofuel
+        - customs_category
+        - remaining_volume
     DeleteCertificateRequest:
       type: object
       properties:
@@ -20500,6 +20612,11 @@ components:
           allOf:
             - $ref: "#/components/schemas/DevaluationTypeEnum"
           nullable: true
+        debt:
+          allOf:
+            - $ref: "#/components/schemas/OperationDebt"
+          readOnly: true
+          nullable: true
       required:
         - _depot
         - _entity
@@ -20508,6 +20625,7 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - debt
         - energy
         - export_country
         - from_depot
@@ -20525,6 +20643,26 @@ components:
           format: double
       required:
         - correction_volume
+    OperationDebt:
+      type: object
+      properties:
+        id:
+          type: integer
+        lot:
+          $ref: "#/components/schemas/OperationDebtLot"
+      required:
+        - id
+        - lot
+    OperationDebtLot:
+      type: object
+      properties:
+        id:
+          type: integer
+        carbure_id:
+          type: string
+      required:
+        - carbure_id
+        - id
     OperationDepot:
       type: object
       properties:
@@ -20847,6 +20985,7 @@ components:
         - EXPIRATION
         - REPORT
         - CORRECTION
+        - DEBT_REPAYMENT
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -20862,6 +21001,7 @@ components:
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT
         * `CORRECTION` - CORRECTION
+        * `DEBT_REPAYMENT` - DEBT_REPAYMENT
     OperationUpdate:
       type: object
       properties:
