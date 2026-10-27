@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation, OperationDetail, TiruertDebt
 from tiruert.services.correction import CorrectionService
 from tiruert.services.operation import OperationService
 from transactions.factories import CarbureLotFactory
@@ -60,6 +60,27 @@ class CorrectionServiceVolumeTest(TestCase):
     def corrections(self):
         return Operation.objects.filter(type=Operation.CORRECTION).order_by("id")
 
+    def repay(self, debt, volume, status=Operation.VALIDATED):
+        operation = Operation.objects.create(
+            type=Operation.DEBT_REPAYMENT,
+            status=status,
+            customs_category=debt.customs_category,
+            biofuel=debt.biofuel,
+            debited_entity=self.entity,
+            debt=debt,
+        )
+        OperationDetail.objects.create(
+            operation=operation, lot=debt.lot, volume=volume, emission_rate_per_mj=debt.lot.ghg_total
+        )
+        return operation
+
+    def create_debt_of_300(self):
+        """Consume 800 L then lower the lot to 700 L: the 200 L balance cannot cover the 300 L decrease."""
+        lot = self.create_lot()
+        self.consume(lot, 800)
+        self.update_volume(lot, 700)
+        return lot, TiruertDebt.objects.get()
+
     def test_volume_increase_creates_credit_correction(self):
         """Create a credit correction for volume added to a lot."""
         lot = self.create_lot()
@@ -97,15 +118,102 @@ class CorrectionServiceVolumeTest(TestCase):
         self.assertEqual(correction.debited_entity, self.entity)
         self.assertIsNone(correction.credited_entity)
         self.assertEqual(correction.details.get().volume, 300)
+        self.assertFalse(TiruertDebt.objects.exists())
 
-    def test_volume_decrease_with_insufficient_balance_creates_nothing(self):
-        """Leave the decrease uncorrected when the lot balance is insufficient."""
+    def test_volume_decrease_with_insufficient_balance_creates_debt(self):
+        """Record the whole decrease as a debt, without any debit, when the lot balance is insufficient."""
         lot = self.create_lot()
-        self.consume(lot, 800)
+        self.consume(lot, 950)
 
-        self.update_volume(lot, 700)
+        self.update_volume(lot, 900)
 
         self.assertFalse(self.corrections().exists())
+        debt = TiruertDebt.objects.get()
+        self.assertEqual(debt.type, TiruertDebt.VOLUME)
+        self.assertEqual(debt.value, 100)
+        self.assertEqual(debt.lot_id, lot.id)
+        self.assertEqual(debt.entity_id, self.entity.id)
+        self.assertEqual(debt.biofuel_id, self.biofuel_emag.id)
+        self.assertEqual(debt.customs_category, self.feedstock_conv.category)
+
+    def test_existing_debt_is_not_recreated_by_a_second_correction(self):
+        """Running the correction again with the same lot volume leaves the debt unique."""
+        lot, debt = self.create_debt_of_300()
+
+        CorrectionService.create_correction_operations_for_lot_volume_update([lot.id])
+        CorrectionService.create_correction_operations_for_lot_volume_update([lot.id])
+
+        self.assertEqual(list(TiruertDebt.objects.values_list("id", "value")), [(debt.id, 300)])
+        self.assertFalse(self.corrections().exists())
+
+    def test_volume_increase_below_debt_only_reduces_the_debt(self):
+        """Reduce the open debt without crediting anything when the increase is lower than the debt."""
+        lot, debt = self.create_debt_of_300()
+
+        self.update_volume(lot, 800)
+        self.update_volume(lot, 800)
+
+        debt.refresh_from_db()
+        self.assertEqual(debt.value, 200)
+        self.assertFalse(self.corrections().exists())
+
+    def test_volume_increase_above_debt_deletes_the_debt_and_credits_the_rest(self):
+        """Delete a debt cleared by the increase, then credit only the remaining volume."""
+        lot, _ = self.create_debt_of_300()
+
+        self.update_volume(lot, 1100)
+        self.update_volume(lot, 1100)
+
+        self.assertFalse(TiruertDebt.objects.exists())
+        correction = self.corrections().get()
+        self.assertEqual(correction.credited_entity, self.entity)
+        self.assertEqual(correction.details.get().volume, 100)
+
+    def test_volume_increase_clears_oldest_debt_first(self):
+        """Reduce the debts in creation order."""
+        lot, first = self.create_debt_of_300()
+        self.consume(lot, 150)
+        self.update_volume(lot, 600)
+        second = TiruertDebt.objects.exclude(id=first.id).get()
+        self.assertEqual(second.value, 100)
+
+        self.update_volume(lot, 950)
+
+        self.assertEqual(list(TiruertDebt.objects.values_list("id", "value")), [(second.id, 50)])
+        self.assertFalse(self.corrections().exists())
+
+    def test_partially_repaid_debt_is_not_reduced_below_the_repaid_volume(self):
+        """Keep the repaid part of a debt and credit the volume that exceeds the remaining debt."""
+        lot, debt = self.create_debt_of_300()
+        self.repay(debt, 100)
+
+        self.update_volume(lot, 1100)
+        self.update_volume(lot, 1100)
+
+        debt.refresh_from_db()
+        self.assertEqual(debt.value, 100)
+        self.assertEqual(self.corrections().get().details.get().volume, 200)
+
+    def test_debt_with_only_a_canceled_repayment_is_kept_at_zero(self):
+        """Do not delete a cleared debt still referenced by a canceled repayment."""
+        lot, debt = self.create_debt_of_300()
+        self.repay(debt, 100, status=Operation.CANCELED)
+
+        self.update_volume(lot, 1000)
+
+        debt.refresh_from_db()
+        self.assertEqual(debt.value, 0)
+        self.assertFalse(self.corrections().exists())
+
+    def test_debt_remaining_ignores_inactive_repayments(self):
+        """Compute the remaining volume from the active repayments only."""
+        _, debt = self.create_debt_of_300()
+        self.repay(debt, 100)
+        self.repay(debt, 50, status=Operation.CANCELED)
+
+        annotated = TiruertDebt.objects.with_remaining().get()
+
+        self.assertEqual((annotated.repaid, annotated.remaining), (100, 200))
 
     def test_unchanged_volume_creates_nothing(self):
         """Avoid creating corrections when the converted volume has not changed."""
