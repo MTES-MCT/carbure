@@ -82,6 +82,7 @@ class Operation(models.Model):
     EXPIRATION = "EXPIRATION"
     REPORT = "REPORT"  # Used once for switching from TIRUERT to IRICC regulation
     CORRECTION = "CORRECTION"  # Generated when the volume of a CarbureLot is corrected
+    DEBT_REPAYMENT = "DEBT_REPAYMENT"  # Repays one TiruertDebt
     OPERATION_TYPES = (
         (INCORPORATION, INCORPORATION),
         (CESSION, CESSION),
@@ -96,6 +97,7 @@ class Operation(models.Model):
         (EXPIRATION, EXPIRATION),
         (REPORT, REPORT),
         (CORRECTION, CORRECTION),
+        (DEBT_REPAYMENT, DEBT_REPAYMENT),
     )
 
     API_CREATABLE_TYPES = [TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION]
@@ -152,6 +154,10 @@ class Operation(models.Model):
     validation_date = models.DateField(null=True, blank=True)
     renewable_energy_share = models.FloatField(default=1)
     durability_period = models.CharField(max_length=6, blank=True, null=True)
+    # Set only on DEBT_REPAYMENT operations
+    debt = models.ForeignKey(
+        "tiruert.TiruertDebt", null=True, blank=True, on_delete=models.PROTECT, related_name="repayments"
+    )
 
     # Allows overriding the sector objective, when the declared sector differs from the natural sector of the biofuel
     objective_sector = models.CharField(max_length=20, choices=SECTOR_CODE_CHOICES, null=True, blank=True)
