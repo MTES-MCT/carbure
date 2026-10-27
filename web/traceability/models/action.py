@@ -5,6 +5,8 @@ from django.db.models import CharField, OuterRef, QuerySet, Subquery, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
+from traceability.services.quantities import quantities_db_annotation
+
 from .action_status import ActionStatus
 
 
@@ -28,6 +30,7 @@ class ActionManager(models.Manager):
                     output_field=CharField(),
                 )
             )
+            .annotate(**quantities_db_annotation())
         )
 
 
@@ -64,7 +67,6 @@ class Action(models.Model):
         related_name="actions",
     )
 
-    # Quantity in MJ
     quantity = models.DecimalField(verbose_name="Quantité de matière", max_digits=13, decimal_places=3)
 
     site = models.ForeignKey("transactions.Site", on_delete=models.PROTECT, verbose_name="Site", null=True)

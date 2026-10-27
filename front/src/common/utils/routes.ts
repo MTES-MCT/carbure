@@ -107,6 +107,9 @@ export const ROUTE_URLS = {
         },
         EXPORTS: `${baseUrl}/admin/exports`,
       },
+      PROVIDER: {
+        DECLARATIONS: `${baseUrl}/provider/declarations`,
+      },
     }
   },
 

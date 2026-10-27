@@ -31,6 +31,9 @@ class ActionSerializer(serializers.ModelSerializer):
     certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
 
     total_emissions = ActionTotalEmissionsSerializer(read_only=True, allow_null=True)
+    mass = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
+    volume = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
+    energy = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
 
     class Meta:
         model = Action
@@ -75,15 +78,16 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
             action_data["file"] = stored_file
 
         try:
-            actions = [
-                Action(
-                    **{key: value for key, value in action_data.items() if key in _ACTION_MODEL_FIELDS},
-                    holder=holder,
-                    industry=industry,
-                    type=Action.INIT,
+            actions = []
+            for attrs in validated_data:
+                actions.append(
+                    Action(
+                        **{key: value for key, value in attrs.items() if key in _ACTION_MODEL_FIELDS},
+                        holder=holder,
+                        industry=industry,
+                        type=Action.INIT,
+                    )
                 )
-                for action_data in validated_data
-            ]
 
             return Action.bulk_create(actions, default_status=ActionStatus.PENDING)
         except Exception:

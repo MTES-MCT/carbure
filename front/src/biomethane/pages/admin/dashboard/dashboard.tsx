@@ -15,7 +15,7 @@ import { Pagination } from "common/components/pagination2"
 import { Content, LoaderOverlay, Main } from "common/components/scaffold"
 import { useRoutes } from "common/hooks/routes"
 import { RecapQuantity } from "common/molecules/recap-quantity"
-import { SelectYearsAdmin } from "../components/select-years-admin"
+import { SelectYears } from "../../../components/select-years"
 import { useParams } from "react-router-dom"
 
 const currentYear = new Date().getFullYear()
@@ -46,7 +46,7 @@ const Dashboard = () => {
   return (
     <Main>
       <Content>
-        <SelectYearsAdmin urlRoot="biomethane/admin/dashboard" />
+        <SelectYears urlRoot="biomethane/admin/dashboard" />
         <FilterMultiSelect2
           filterLabels={filterLabels}
           selected={state.filters}
