@@ -47,6 +47,7 @@ class CancelClosedPeriodOperationsCommandTest(TestCase):
                 Operation.TENEUR,
                 Operation.DEVALUATION,
                 Operation.CESSION,
+                Operation.DEBT_REPAYMENT,
             ],
         )
 

@@ -5,6 +5,7 @@ from .excel_export import ExcelExportActionMixin
 from .filter import FilterActionMixin
 from .operation_detail_excel_export import OperationDetailExcelExportActionMixin
 from .reject import RejectActionMixin
+from .repay_debt import RepayDebtActionMixin
 from .simulate import SimulateActionMixin
 from .excel_import import ExcelImportActionMixin
 
@@ -18,5 +19,6 @@ class ActionMixin(
     ExcelExportActionMixin,
     OperationDetailExcelExportActionMixin,
     ExcelImportActionMixin,
+    RepayDebtActionMixin,
 ):
     pass
