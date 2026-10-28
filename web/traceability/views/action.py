@@ -5,7 +5,7 @@ from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveMod
 from rest_framework.viewsets import GenericViewSet
 
 from core.filters import FiltersActionFactory
-from core.pagination import TotalCountPagination
+from core.utils import CustomPageNumberPagination
 from traceability.exceptions import ActionNotDeletableError
 from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
@@ -51,7 +51,7 @@ class ActionViewset(
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     filterset_class = ActionFilter
-    pagination_class = TotalCountPagination
+    pagination_class = CustomPageNumberPagination
     search_fields = ["holder__name", "pos_id"]
 
     def get_permissions(self):
@@ -60,15 +60,12 @@ class ActionViewset(
         return handler.get_permissions(self.action)
 
     def get_queryset(self):
-        queryset = self.request.handler.scope_queryset(self.request, self.queryset)
-        # Detail annotates the requested row only. List annotates after pagination.
-        if self.action == "retrieve":
-            queryset = annotate_parent_chain(queryset.filter(pk=self.kwargs["pk"]))
-        return queryset
+        return self.request.handler.scope_queryset(self.request, self.queryset)
 
     def get_object(self):
         action = super().get_object()
         if self.action == "retrieve":
+            action = annotate_parent_chain(self.get_queryset().filter(pk=action.pk)).get()
             attach_inherited_fields([action])
             attach_quantities([action])
         return action
@@ -78,14 +75,12 @@ class ActionViewset(
         if not page:
             return page
 
-        # The CTE runs on the page ids. MySQL rejects LIMIT in that subquery.
+        # The walk runs on the page ids. MySQL rejects LIMIT inside the CTE.
+        # origin_material has already reduced this queryset to the matching ids.
         ids = [action.pk for action in page]
         annotated = annotate_parent_chain(queryset.filter(pk__in=ids))
-
-        # Re-index to keep page order.
         actions_by_id = {action.pk: action for action in annotated}
         actions = [actions_by_id[pk] for pk in ids]
-
         return attach_quantities(attach_inherited_fields(actions))
 
     def get_serializer_context(self):

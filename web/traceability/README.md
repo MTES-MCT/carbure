@@ -31,7 +31,7 @@ Fichier : [`fixtures/materials.csv`](fixtures/materials.csv), le catalogue édit
 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 
-`inherited_fields` et `total_emissions` sont calculés à la lecture (liste paginée et détail) par le même parcours de parents (`services/parent_chain.py`). Les matières résolues sont `previous_material` (la plus proche au-dessus) et `origin_material` (la première depuis la racine). Voir [`docs/inherited_fields.md`](docs/inherited_fields.md).
+`inherited_fields` et `total_emissions` sont calculés à la lecture par le même parcours de parents (`services/parent_chain.py`), sur la page ou l'action du détail. Les matières résolues sont `previous_material` (la plus proche au-dessus) et `origin_material` (la première depuis la racine). Voir [`docs/inherited_fields.md`](docs/inherited_fields.md).
 
 ## Ce que la filière personnalise
 

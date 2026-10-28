@@ -13426,6 +13426,14 @@ paths:
           explode: true
           style: form
         - in: query
+          name: origin_material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: order_by
           schema:
             type: array
@@ -13683,6 +13691,7 @@ paths:
               - holder
               - material
               - order_by
+              - origin_material
               - period
               - shipping_method
               - site
@@ -13710,6 +13719,14 @@ paths:
           required: true
         - in: query
           name: material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: origin_material
           schema:
             type: array
             items:
@@ -13996,6 +14013,14 @@ paths:
           required: true
         - in: query
           name: material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: origin_material
           schema:
             type: array
             items:
@@ -20837,8 +20862,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Action"
-        total_count:
-          type: integer
     PaginatedAdminUserRowList:
       type: object
       required:

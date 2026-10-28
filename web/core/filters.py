@@ -114,8 +114,13 @@ def FiltersActionFactory():
             # Get DB field from FilterSet programmatically
             filter_obj = filterset.filters.get(filter_param)
 
-            # Use pre-filtered queryset for distinct values
-            values = filterset.qs.values_list(filter_obj.field_name, flat=True).distinct().order_by(filter_obj.field_name)
+            # A filter that walks a chain exposes its own distinct values.
+            # values_list cannot read that annotation.
+            if hasattr(filter_obj, "distinct_values"):
+                values = filter_obj.distinct_values(filterset.qs)
+            else:
+                values = filterset.qs.values_list(filter_obj.field_name, flat=True)
+                values = values.distinct().order_by(filter_obj.field_name)
             return Response([v for v in values if v is not None])
 
     return FiltersActionMixin
