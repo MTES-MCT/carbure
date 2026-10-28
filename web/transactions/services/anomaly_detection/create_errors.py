@@ -3,6 +3,8 @@ from django.db.models import Q
 
 from core.models import CarbureLot, GenericError
 
+OUTLIER_ERRORS = ["OUTLIER_EEC", "OUTLIER_EP", "OUTLIER_ETD"]
+
 
 def create_error(error: str, emission_category: str, lot_id: int):
     return GenericError(
@@ -49,8 +51,8 @@ def create_errors(outliers_by_emission_category: dict[str, pd.DataFrame]):
         errors += [create_error(ERROR, emission_category, lot_id) for lot_id in if_outlier_lot_ids]
 
     lot_ids: list[int] = list(dict.fromkeys(e.lot_id for e in errors))
-    # Replace previous detections, including lots no longer flagged after retuning.
-    GenericError.objects.filter(error=ERROR, lot__in=processed_lots).delete()
+    # Replace all previous detections, including errors for lots no longer in scope.
+    GenericError.objects.filter(error__in=OUTLIER_ERRORS).delete()
     GenericError.objects.bulk_create(errors, batch_size=1000)
 
     return lot_ids

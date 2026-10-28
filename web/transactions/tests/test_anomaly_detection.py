@@ -53,8 +53,8 @@ class CreateAnomalyErrorsTest(SimpleTestCase):
         self.assertEqual(create_errors({"ep": outliers}), [])
 
         self.errors.bulk_create.assert_called_once_with([], batch_size=1000)
-        # Even an empty run must remove previous detections in the processed scope.
-        self.errors.filter.assert_called_once_with(error="OUTLIER_EP", lot__in=self.processed_lots)
+        # Even an empty run must remove all previous outlier detections.
+        self.errors.filter.assert_called_once_with(error__in=["OUTLIER_EEC", "OUTLIER_EP", "OUTLIER_ETD"])
         self.errors.filter.return_value.delete.assert_called_once_with()
 
     def test_each_detection_model_creates_the_emission_outlier_error(self):
