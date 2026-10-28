@@ -46,7 +46,7 @@ def try_get_date(dd):
     if dd == "":
         return None
     if dd is None:
-        return dd
+        return None
     if pd.isna(dd):
         return None
     if isinstance(dd, int):
@@ -639,6 +639,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot.copy_production_details(original_lot)
         lot.copy_sustainability_data(original_lot)
         lot.carbure_dispatch_site = parent_stock.depot
+        lot.unknown_dispatch_site = None
         lot.dispatch_site_country = lot.carbure_dispatch_site.country if lot.carbure_dispatch_site else None
         lot.carbure_supplier = parent_stock.carbure_client
         lot.biofuel = parent_stock.biofuel
