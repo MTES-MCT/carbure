@@ -151,6 +151,18 @@ class LotsExcelImportTest(TestCase):
             site_type=Site.POWER_PLANT,
             country=self.FR,
         )
+        private_dispatch_site = Site.objects.create(
+            name="Private Dispatch Site",
+            site_type=Site.EFS,
+            country=self.FR,
+            private=True,
+        )
+        disabled_dispatch_site = Site.objects.create(
+            name="Disabled Dispatch Site",
+            site_type=Site.EFS,
+            country=self.FR,
+            is_enabled=False,
+        )
 
         template_path = template_v4(self.owner)
         workbook = openpyxl.load_workbook(template_path, read_only=True)
@@ -166,6 +178,8 @@ class LotsExcelImportTest(TestCase):
         assert self.owner_production_site.name in dispatch_names
         assert self.owner_depot.name in dispatch_names
         assert invalid_dispatch_site.name not in dispatch_names
+        assert private_dispatch_site.name not in dispatch_names
+        assert disabled_dispatch_site.name not in dispatch_names
 
     def test_lot_export_contains_dispatch_fields(self):
         lot = CarbureLot(

@@ -552,7 +552,11 @@ def make_deliverysites_sheet(workbook):
 
 def make_dispatchsites_sheet(workbook):
     worksheet_sites = workbook.add_worksheet("SitesDExpedition")
-    dispatch_sites = Site.objects.filter(site_type__in=DISPATCH_SITE_TYPES).order_by("country", "id")
+    dispatch_sites = Site.objects.filter(
+        site_type__in=DISPATCH_SITE_TYPES,
+        private=False,
+        is_enabled=True,
+    ).order_by("country", "id")
     bold = workbook.add_format({"bold": True})
     columns = ["name", "city", "country", "site_type"]
 

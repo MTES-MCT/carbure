@@ -7,6 +7,7 @@ from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Susta
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
 from transactions.factories import CarbureLotFactory
+from transactions.forms import LotForm
 from transactions.models import Depot, EntitySite, Site, YearConfig
 from transactions.sanity_checks.general import check_missing_delivery_type
 
@@ -35,6 +36,18 @@ class GeneralSanityChecksTest(TestCase):
     def create_lot(self, **kwargs):
         lot = CarbureLotFactory.create(**kwargs)
         return enrich_lot(lot)
+
+    def test_dispatch_sites_only_include_enabled_sites_and_allow_private_sites(self):
+        private_site = Site.objects.create(name="Private dispatch", site_type=Site.EFS, private=True)
+        disabled_site = Site.objects.create(name="Disabled dispatch", site_type=Site.EFS, is_enabled=False)
+
+        prefetched_data = get_prefetched_data()
+        form = LotForm()
+
+        assert private_site.pk in prefetched_data["sites"]
+        assert disabled_site.pk not in prefetched_data["sites"]
+        assert form.fields["carbure_dispatch_site_id"].queryset.filter(pk=private_site.pk).exists()
+        assert not form.fields["carbure_dispatch_site_id"].queryset.filter(pk=disabled_site.pk).exists()
 
     def test_mac_bc_wrong(self):
         error = CarbureSanityCheckErrors.MAC_BC_WRONG
