@@ -146,7 +146,7 @@ def get_prefetched_data(entity=None):
     }
 
     data["countries"] = {p.code_pays: p for p in Pays.objects.all()}
-    data["sites"] = {site.pk: site for site in Site.objects.all()}
+    data["sites"] = {site.pk: site for site in Site.objects.filter(is_enabled=True)}
     data["sitesbyname"] = {site.name.upper(): site for site in data["sites"].values()}
     data["biofuels"] = {b.code: b for b in Biocarburant.objects.all()}
     data["feedstocks"] = {m.code: m for m in MatierePremiere.biofuel.all()}

@@ -27,7 +27,7 @@ class LotForm(forms.Form):
     COUNTRIES = Pays.objects.all()
     PRODUCTION_SITES = ProductionSite.objects.all()
     DEPOTS = Depot.objects.all()
-    DISPATCH_SITES = Site.objects.filter(site_type__in=DISPATCH_SITE_TYPES)
+    DISPATCH_SITES = Site.objects.filter(site_type__in=DISPATCH_SITE_TYPES, is_enabled=True)
 
     # lot fields
     transport_document_type = forms.CharField(required=False)
