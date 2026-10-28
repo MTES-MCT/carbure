@@ -21,8 +21,6 @@ DISPLAY_ONLY_COLUMNS = [
     "credited_entity_name",
     "available_volume",
     "emission_rate_per_mj",
-    "biofuel",
-    "customs_category",
     "carbure_id",
     "feedstock",
 ]
@@ -102,20 +100,25 @@ class OperationExcelImportService:
         """
         lot_ids = OperationExcelImportService._extract_ids(rows, "lot_id")
         entity_ids = OperationExcelImportService._extract_ids(rows, "credited_entity")
+        biofuel_codes = {str(row["biofuel"]).strip() for row in rows if row.get("biofuel")}
 
         lot_cache = {lot.id: lot for lot in CarbureLot.objects.filter(id__in=lot_ids).select_related("biofuel", "feedstock")}
         credited_entity_cache = {entity.id: entity for entity in get_tiruert_operator_queryset().filter(id__in=entity_ids)}
+        biofuel_cache = {biofuel.code: biofuel for biofuel in Biocarburant.objects.filter(code__in=biofuel_codes)}
 
-        return {"lot_cache": lot_cache, "credited_entity_cache": credited_entity_cache}
+        return {
+            "lot_cache": lot_cache,
+            "credited_entity_cache": credited_entity_cache,
+            "biofuel_cache": biofuel_cache,
+        }
 
     @staticmethod
     def _group_key(row: dict) -> tuple:
-        lot = row["lot_id"]
         credited_entity = row["credited_entity"]
         return (
             row["operation_type"],
-            lot.feedstock.category,
-            lot.biofuel_id,
+            row["customs_category"],
+            row["biofuel"].id,
             credited_entity.id if credited_entity else None,
         )
 
@@ -123,7 +126,7 @@ class OperationExcelImportService:
     def _build_group_from_rows(key: tuple, rows: list[dict], debited_entity: Entity) -> OperationGroup:
         operation_type, customs_category, biofuel_id, _ = key
         first_row = rows[0]
-        first_lot = first_row["lot_id"]
+        biofuel = first_row["biofuel"]
 
         lot_volumes: dict[int, float] = defaultdict(float)
         row_numbers = []
@@ -140,9 +143,9 @@ class OperationExcelImportService:
             operation_type=operation_type,
             customs_category=customs_category,
             biofuel_id=biofuel_id,
-            biofuel_code=first_lot.biofuel.code,
-            biofuel=first_lot.biofuel,
-            sector=_get_sector(first_lot.biofuel),
+            biofuel_code=biofuel.code,
+            biofuel=biofuel,
+            sector=_get_sector(biofuel),
             credited_entity=first_row["credited_entity"],
             debited_entity=debited_entity,
             row_numbers=row_numbers,

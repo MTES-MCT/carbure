@@ -4,7 +4,7 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from core.models import Pays
+from core.models import Biocarburant, MatierePremiere, Pays
 from core.models.lot import CarbureLot
 from core.serializer_fields import CachedPrimaryKeyRelatedField
 from core.serializers import CountrySerializer
@@ -174,6 +174,16 @@ class OperationExcelRowSerializer(serializers.Serializer):
         allow_null=True,
         error_messages={"does_not_exist": _("Destinataire inconu")},
     )
+    # Biofuel and category booked in the ledger: they can differ from the lot's own (e.g. EMHV lot booked as EMAG).
+    biofuel = serializers.CharField()
+    customs_category = serializers.ChoiceField(choices=MatierePremiere.MP_CATEGORIES)
+
+    def validate_biofuel(self, value):
+        cache = self.context.get("biofuel_cache")
+        biofuel = cache.get(value) if cache is not None else Biocarburant.objects.filter(code=value).first()
+        if biofuel is None:
+            raise serializers.ValidationError(_("Biocarburant inconnu"))
+        return biofuel
 
     def validate_volume(self, value):
         if value <= 0:

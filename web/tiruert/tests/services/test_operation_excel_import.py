@@ -5,8 +5,11 @@ from django.test import TestCase
 from rest_framework import serializers
 
 from core.excel_importer import ExcelValidationError
-from tiruert.models import Operation
+from core.models import Biocarburant, Entity, MatierePremiere
+from tiruert.models import Operation, OperationDetail
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation_excel_import import OperationExcelImportService, OperationGroup, _default_status
+from transactions.factories import CarbureLotFactory
 
 
 class OperationExcelImportServiceHelpersTest(TestCase):
@@ -114,8 +117,15 @@ class OperationExcelImportServiceHelpersTest(TestCase):
         debited = SimpleNamespace(id=7, name="Debited")
 
         validated_rows = [
-            {"operation_type": Operation.TRANSFERT, "lot_id": lot, "credited_entity": credited, "volume": 40.0},
-            {"operation_type": Operation.TRANSFERT, "lot_id": lot, "credited_entity": credited, "volume": 60.0},
+            {
+                "operation_type": Operation.TRANSFERT,
+                "lot_id": lot,
+                "credited_entity": credited,
+                "volume": volume,
+                "biofuel": biofuel,
+                "customs_category": "CONV",
+            }
+            for volume in (40.0, 60.0)
         ]
 
         groups = OperationExcelImportService._build_groups(validated_rows, debited)
@@ -124,6 +134,31 @@ class OperationExcelImportServiceHelpersTest(TestCase):
         group = groups[0]
         self.assertEqual(group.row_numbers, [3, 4])
         self.assertEqual(group.lot_volumes, {10: 100.0})
+
+    def test_build_groups_uses_biofuel_and_customs_category_of_the_row(self):
+        """Should group by the biofuel/category booked in the ledger (template columns), not by the lot's own."""
+        lot_biofuel = self._make_biofuel(1, "EMHV")
+        ledger_biofuel = self._make_biofuel(2, "EMAG")
+        lot = self._make_lot(10, "CONV", lot_biofuel)
+        debited = SimpleNamespace(id=7, name="Debited")
+
+        validated_rows = [
+            {
+                "operation_type": Operation.TENEUR,
+                "lot_id": lot,
+                "credited_entity": None,
+                "volume": 40.0,
+                "biofuel": ledger_biofuel,
+                "customs_category": "ANN-IX-B",
+            },
+        ]
+
+        (group,) = OperationExcelImportService._build_groups(validated_rows, debited)
+
+        self.assertEqual(group.biofuel, ledger_biofuel)
+        self.assertEqual(group.biofuel_id, 2)
+        self.assertEqual(group.biofuel_code, "EMAG")
+        self.assertEqual(group.customs_category, "ANN-IX-B")
 
     @patch("tiruert.services.operation_excel_import.OperationService.bulk_check_volumes")
     def test_validate_shared_lot_volumes_calls_bulk_check_for_multi_groups_only(self, mock_bulk_check_volumes):
@@ -506,3 +541,88 @@ class OperationExcelImportServiceCreateOperationsTest(TestCase):
         mock_get_emission_rates_by_lot.assert_called_once_with([10, 11, 12])
         self.assertEqual(mock_create_operation_for_group.call_count, 2)
         self.assertEqual(len(operations), 2)
+
+
+class OperationExcelImportServiceLedgerBiofuelTest(TestCase):
+    """Import of a lot whose ledger biofuel differs from the one stored on the lot (e.g. EMHV lot booked as EMAG)."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/entities.json",
+        "json/depots.json",
+    ]
+
+    @classmethod
+    def setUpTestData(cls):
+        # Reuse fixture entities: CarbureLotFactory caches entities in factory.Iterator, so created ones would leak.
+        operators = Entity.objects.filter(entity_type=Entity.OPERATOR).order_by("id")
+        cls.entity, cls.recipient = operators[:2]
+        for entity in (cls.entity, cls.recipient):
+            entity.is_enabled = True
+            entity.is_tiruert_liable = True
+            entity.accise_number = f"ACC-{entity.id}"
+            entity.save()
+        cls.lot_biofuel = Biocarburant.objects.get(code="EMHV")
+        cls.ledger_biofuel = Biocarburant.objects.get(code="EMAG")
+        cls.lot = CarbureLotFactory.create(
+            carbure_client=cls.entity,
+            feedstock=MatierePremiere.biofuel.filter(category="ANN-IX-B").first(),
+            biofuel=cls.lot_biofuel,
+            lot_status="FROZEN",
+            volume=1000,
+        )
+        # Operations created from lots convert EMHV/EMHU/EMHA/B100 to EMAG, so the credit is booked under EMAG.
+        credit = Operation.objects.create(
+            type=Operation.MAC_BIO,
+            status=Operation.VALIDATED,
+            customs_category="ANN-IX-B",
+            biofuel=cls.ledger_biofuel,
+            credited_entity=cls.entity,
+        )
+        OperationDetail.objects.create(operation=credit, lot=cls.lot, volume=1000, emission_rate_per_mj=10)
+
+    def _execute(self, row_extra):
+        rows = [
+            {
+                "lot_id": self.lot.id,
+                "volume": 100,
+                "operation_type": "TRANSFERT",
+                "credited_entity": self.recipient.id,
+                **row_extra,
+            }
+        ]
+        with (
+            patch("tiruert.services.operation_excel_import.ExcelImporter.parse", return_value=rows),
+            patch.object(DeclarationPeriodService, "get_current_declaration_year", return_value=2026),
+        ):
+            return OperationExcelImportService.execute(Mock(), "validate", self.entity)
+
+    def test_execute_validates_lot_booked_under_another_biofuel_than_its_own(self):
+        """Should use the biofuel and category of the template row, where the lot volume is actually available."""
+        result = self._execute({"biofuel": "EMAG", "customs_category": "ANN-IX-B"})
+
+        (group,) = result["operations"]
+        self.assertEqual(group["biofuel"], "EMAG")
+        self.assertEqual(group["customs_category"], "ANN-IX-B")
+        self.assertEqual(group["total_volume"], 100)
+
+    def test_execute_reports_rows_without_biofuel_and_customs_category(self):
+        """Should reject rows missing the biofuel and customs category columns, with their Excel row number."""
+        with self.assertRaises(ExcelValidationError) as context:
+            self._execute({})
+
+        (error,) = context.exception.validation_errors
+        self.assertEqual(error["row"], 3)
+        self.assertEqual(set(error["errors"]), {"biofuel", "customs_category"})
+
+    def test_execute_reports_lot_without_volume_for_the_wrong_biofuel(self):
+        """Should still report an unavailable volume when the row targets a biofuel the lot is not booked under."""
+        with self.assertRaises(ExcelValidationError) as context:
+            self._execute({"biofuel": "ETH", "customs_category": "ANN-IX-B"})
+
+        self.assertEqual(
+            context.exception.validation_errors,
+            [{"errors": {"validation": [f"{self.lot.id}: Ce lot n'a pas de volume disponible"]}}],
+        )
