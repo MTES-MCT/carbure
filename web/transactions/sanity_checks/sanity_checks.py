@@ -20,7 +20,6 @@ from .general import (
     check_mac_bc_wrong,
     check_mac_not_efpe,
     check_missing_delivery_type,
-    check_volume_faible,
     check_year_locked,
 )
 from .ghg import (
@@ -100,7 +99,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         check_ghg_reduc_for_production_site(lot),
         # general errors
         check_declaration_already_validated(lot, prefetched_data),
-        check_volume_faible(lot),
+        # check_volume_faible(lot),
         check_year_locked(lot, prefetched_data),
         check_mac_bc_wrong(lot),
         check_mac_not_efpe(lot),
