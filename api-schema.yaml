@@ -13551,9 +13551,15 @@ paths:
               title: Type d'action
               enum:
                 - INIT
+                - TEST1
+                - TEST2
+                - TEST3
                 - VALORIZE
           description: |-
             * `INIT` - INIT
+            * `TEST1` - TEST1
+            * `TEST2` - TEST2
+            * `TEST3` - TEST3
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -13866,9 +13872,15 @@ paths:
               title: Type d'action
               enum:
                 - INIT
+                - TEST1
+                - TEST2
+                - TEST3
                 - VALORIZE
           description: |-
             * `INIT` - INIT
+            * `TEST1` - TEST1
+            * `TEST2` - TEST2
+            * `TEST3` - TEST3
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -14184,9 +14196,15 @@ paths:
               title: Type d'action
               enum:
                 - INIT
+                - TEST1
+                - TEST2
+                - TEST3
                 - VALORIZE
           description: |-
             * `INIT` - INIT
+            * `TEST1` - TEST1
+            * `TEST2` - TEST2
+            * `TEST3` - TEST3
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -14654,10 +14672,16 @@ components:
     ActionTypeEnum:
       enum:
         - INIT
+        - TEST1
+        - TEST2
+        - TEST3
         - VALORIZE
       type: string
       description: |-
         * `INIT` - INIT
+        * `TEST1` - TEST1
+        * `TEST2` - TEST2
+        * `TEST3` - TEST3
         * `VALORIZE` - VALORIZE
     ActivateAccountRequest:
       type: object

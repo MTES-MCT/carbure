@@ -22,6 +22,10 @@ export type ActionQuery = ActionQueryBuilder["query"] & {
   [ActionFilter.holder]?: string[]
   [ActionFilter.type]?: ActionType[]
   [ActionFilter.material]?: string[]
+  [ActionFilter.origin_material]?: string[]
+  [ActionFilter.producer]?: string[]
+  [ActionFilter.root_pos]?: string[]
+  [ActionFilter.nearest_site]?: string[]
   [ActionFilter.shipping_method]?: ActionShippingMethod[]
   [ActionFilter.site]?: string[]
 }
