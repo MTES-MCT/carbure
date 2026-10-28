@@ -22,9 +22,7 @@ from .general import (
     check_year_locked,
 )
 from .ghg import (
-    check_eec_anormal_low,
     check_eec_with_residue,
-    check_ep_anormal_low,
     check_ghg_eec_0,
     check_ghg_el_neg,
     check_ghg_ep_0,
@@ -87,8 +85,6 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         *check_provenance_mp(lot),  # same here
         check_deprecated_mp(lot),
         # ghg errors
-        check_eec_anormal_low(lot, prefetched_data),
-        check_ep_anormal_low(lot, prefetched_data),
         check_ghg_etd_0(lot),
         check_ghg_ep_0(lot),
         check_ghg_el_neg(lot),
