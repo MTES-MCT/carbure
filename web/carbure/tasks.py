@@ -1,4 +1,3 @@
-import datetime
 from os import environ as env
 
 from django.core.management import call_command
@@ -14,8 +13,6 @@ from elec.scripts.create_meter_readings_application_deadline_reminder import (
     create_meter_readings_application_deadline_reminder,
 )
 from elec.scripts.create_meter_readings_application_reminder import create_meter_readings_application_reminder
-from ml.scripts.calc_ml_score import calc_ml_score
-from ml.scripts.load_data import load_ml_data
 from saf.models.saf_ticket_source import create_ticket_sources_from_lots
 from tiruert.services.operation import OperationService
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks, bulk_scoring
@@ -74,18 +71,6 @@ if env.get("IMAGE_TAG") == "prod":
     @db_periodic_task(crontab(day=23, hour=8, minute=0))
     def periodic_send_declaration_reminder() -> None:
         create_declaration_reminder()
-
-    @db_periodic_task(crontab(day=14, hour=1, minute=30))
-    def periodic_load_ml_data() -> None:
-        load_ml_data()
-
-    @db_periodic_task(crontab(day=15, hour=1, minute=30))
-    def periodic_calculate_ml_scores() -> None:
-        today = datetime.datetime.today()
-        first = today.replace(day=1)
-        last_month = first - datetime.timedelta(days=1)
-        period = last_month.year * 100 + last_month.month
-        calc_ml_score(period=period)
 
     # Elec
     @db_periodic_task(crontab(month="3,6,9,12", day=21, hour=8, minute=0))
