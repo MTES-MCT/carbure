@@ -578,7 +578,7 @@ def make_dispatchsites_sheet(workbook):
 def template_producers_simple(entity):
     # Create an new Excel file and add a worksheet.
     location = "/tmp/carbure_template_simple.xlsx"
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_producers_lots_sheet_simple(workbook, entity)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
@@ -592,7 +592,7 @@ def template_producers_simple(entity):
 def template_producers_advanced(entity, nb_lots=10):
     # Create an new Excel file and add a worksheet.
     location = "/tmp/carbure_template_advanced.xlsx"
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots, is_producer=True)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
@@ -606,7 +606,7 @@ def template_producers_advanced(entity, nb_lots=10):
 def template_operators(entity):
     # Create an new Excel file and add a worksheet.
     location = "/tmp/carbure_template_operators.xlsx"
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_operators_lots_sheet(workbook, entity)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
@@ -619,7 +619,7 @@ def template_operators(entity):
 def template_traders(entity):
     # Create an new Excel file and add a worksheet.
     location = "/tmp/carbure_template_traders.xlsx"
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_producers_or_traders_lots_sheet_advanced(workbook, entity, nb_lots=10, is_producer=False)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
@@ -858,7 +858,7 @@ def make_dump_stocks_sheet(workbook, entity, transactions):
 def export_transactions(entity, transactions, stocks=False):
     today = datetime.date.today()
     location = "/tmp/carbure_export_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_dump_lots_sheet(workbook, entity, transactions, stocks)
     make_countries_sheet(workbook)
     make_mps_sheet(workbook)
@@ -872,7 +872,7 @@ def export_transactions(entity, transactions, stocks=False):
 def export_dca(dca):
     today = datetime.date.today()
     location = "/tmp/double_counting_agreement_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     # sourcing sheet
     sourcing_worksheet = workbook.add_worksheet("sourcing")
     # header
@@ -944,7 +944,7 @@ def export_dca(dca):
 def export_stocks(entity, transactions):
     today = datetime.date.today()
     location = "/tmp/carbure_stock_export_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_dump_stocks_sheet(workbook, entity, transactions)
     make_countries_sheet(workbook)
     make_mps_sheet(workbook)
@@ -1037,7 +1037,7 @@ def make_carbure_stock_sheet(workbook, lots):
 def export_carbure_lots(entity, transactions):
     today = datetime.date.today()
     location = "/tmp/carbure_lots_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_carbure_lots_sheet(workbook, entity, transactions)
     make_countries_sheet(workbook)
     make_mps_sheet(workbook)
@@ -1052,7 +1052,7 @@ def export_carbure_lots(entity, transactions):
 def export_carbure_stock(stocks):
     today = datetime.date.today()
     location = "/tmp/carbure_stock_%s.xlsx" % (today.strftime("%Y%m%d_%H%M"))
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_carbure_stock_sheet(workbook, stocks)
     make_countries_sheet(workbook)
     make_mps_sheet(workbook)
@@ -1472,7 +1472,7 @@ def make_template_carbure_stocks_sheet(workbook, entity):
 def template_v4(entity):
     # Create an new Excel file and add a worksheet.
     location = "/tmp/carbure_template.xlsx"
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_template_carbure_lots_sheet(workbook, entity)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
@@ -1487,7 +1487,7 @@ def template_v4(entity):
 def template_v4_stocks(entity):
     # Create an new Excel file and add a worksheet.
     location = "/tmp/carbure_template_stocks.xlsx"
-    workbook = xlsxwriter.Workbook(location)
+    workbook = xlsxwriter.Workbook(location, {"strings_to_formulas": False})
     make_template_carbure_stocks_sheet(workbook, entity)
     make_mps_sheet(workbook)
     make_biofuels_sheet(workbook)
