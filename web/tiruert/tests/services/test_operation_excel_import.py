@@ -142,8 +142,7 @@ class OperationExcelImportServiceHelpersTest(TestCase):
 
         self.assertEqual(messages, [])
         mock_bulk_check_volumes.assert_called_once()
-        entries, unit = mock_bulk_check_volumes.call_args.args
-        self.assertEqual(unit, "l")
+        (entries,) = mock_bulk_check_volumes.call_args.args
         self.assertEqual(len(entries), 2)
 
     @patch("tiruert.services.operation_excel_import.OperationService.bulk_check_volumes")

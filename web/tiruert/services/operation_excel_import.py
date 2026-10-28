@@ -231,7 +231,7 @@ class OperationExcelImportService:
             ]
 
             try:
-                OperationService.bulk_check_volumes(entries, "l")
+                OperationService.bulk_check_volumes(entries)
             except serializers.ValidationError as exc:
                 messages.extend(OperationExcelImportService._flatten_error_messages(exc))
 
