@@ -42,7 +42,11 @@ export function useH2CertificatesPage(): {
       fixedQuery: H2_CERTIFICATE_QUERY,
       emptyState: <EmptyCertificates />,
       filters: [
-        filters.period, //
+        filters.period,
+        filters.origin_material,
+        filters.producer,
+        filters.root_pos,
+        filters.nearest_site,
       ],
       columns: [
         { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
