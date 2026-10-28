@@ -33,7 +33,10 @@ def _contributions(*, emissions: bool, inherited_fields: bool):
 
 def _chain_cte(queryset: QuerySet[Action], *, emissions: bool, inherited_fields: bool) -> CTE:
     actions = _plain_actions()
-    listed = actions.filter(pk__in=queryset)
+    # Mysql refuse les sous-requetes et order by dans une requete récursive
+    # Ici "queryset" a les sous-requetes status, created_at, updated_at etc... + l'order by par défaut définit sur la table
+    # Donc on réinitialise l'order by et on ne prend que les ids
+    listed = actions.filter(pk__in=queryset.order_by().values("pk"))
     parts = _contributions(emissions=emissions, inherited_fields=inherited_fields)
 
     def columns(cte=None):
@@ -76,6 +79,40 @@ def annotate_parent_chain(
     for _start, _climb, annotate in _contributions(emissions=emissions, inherited_fields=inherited_fields):
         annotations.update(annotate(cte))
 
-    # Keep the row that reached the root and put it back on the action.
+    # Keep the caller's sort. Fall back to id when the queryset has none.
+    ordering = queryset.query.order_by or ("id",)
     at_root = cte.join(queryset, id=cte.col.origin_id).annotate(**annotations).filter(_next_parent_id__isnull=True)
-    return with_cte(cte, select=at_root.order_by("id"))
+    return with_cte(cte, select=at_root.order_by(*ordering))
+
+
+def _origin_ids(queryset: QuerySet[Action], material_ids: list[int] | None = None):
+    """Walk to the root and return ``(action id, origin material id)``.
+
+    The recursive member carries material ids only. The action row, its status
+    subqueries and the GES sums stay out of this statement. ``material_ids``
+    restricts the rows that come back; the walk itself still sees every action.
+    """
+    cte = _chain_cte(queryset, emissions=False, inherited_fields=True)
+    # Meta.ordering is `id`, which is not a column of this CTE.
+    at_root = cte.queryset().filter(next_parent_id__isnull=True).order_by()
+    if material_ids is not None:
+        at_root = at_root.filter(origin_material_id__in=material_ids)
+    return with_cte(cte, select=at_root).values_list("origin_id", "origin_material_id")
+
+
+def filter_by_origin_material(queryset: QuerySet[Action], material_ids: list[int]) -> QuerySet[Action]:
+    """Keep actions whose origin material is one of ``material_ids``.
+
+    The walk runs once. The returned queryset is the caller's, restricted to
+    the matching ids, so the page count does not walk again.
+    """
+    if not material_ids:
+        return queryset.none()
+
+    matching_ids = [action_id for action_id, _origin_material_id in _origin_ids(queryset, material_ids)]
+    return queryset.filter(pk__in=matching_ids)
+
+
+def origin_material_ids(queryset: QuerySet[Action]) -> list[int]:
+    """Distinct origin material ids for a queryset. One walk, no action join."""
+    return list({origin_material_id for _action_id, origin_material_id in _origin_ids(queryset) if origin_material_id})

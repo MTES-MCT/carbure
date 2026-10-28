@@ -77,8 +77,8 @@ Un champ de plus se déclare aux mêmes endroits : `inherited_start`, `inherited
 
 ## Où c'est branché
 
-`ActionViewset` appelle `annotate_parent_chain` : **retrieve** sur l'action demandée, **list** après pagination, sur les ids de la page. Pas de `LIMIT` dans la sous-requête de la CTE. `attach_inherited_fields` suit, sur cette même action ou cette même page.
+`ActionViewset.get_queryset` reste le périmètre (filière, détenteur ou parent), sans parcours. La liste pagine d'abord, puis `annotate_parent_chain` sur les ids de la page. Pas de `LIMIT` dans la sous-requête de la CTE. Le détail annote uniquement l'action demandée. `attach_inherited_fields` suit, sur la page ou sur cette action. `/years/` et `/filters/` ne lancent pas le parcours.
 
-`/years/` et `/filters/` n'appellent pas cette annotation.
+Le filtre `material` continue de porter sur la matière **stockée**.
 
-Le filtre `material` continue de porter sur la matière **stockée**. Brancher un filtre sur `inherited_fields` demanderait d'exécuter la CTE avant la pagination.
+`origin_material` filtre la matière première, la première matière non vide depuis la racine. Il s'applique après les autres filtres. Le parcours ne transporte que les ids de matière, sans les sous-requêtes de statut ni les sommes de GES, et il ne s'exécute qu'une fois : les ids trouvés restreignent le queryset, le total de la page compte ce queryset, puis l'annotation complète (GES compris) ne porte que sur les ids de la page. Sans ce paramètre, la liste ne parcourt toujours que la page.
