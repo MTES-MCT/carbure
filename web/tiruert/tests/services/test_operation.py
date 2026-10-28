@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.http import QueryDict
@@ -7,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation, OperationDetail
+from tiruert.services.energy import energy_mj
 from tiruert.services.operation import OperationService, OperationServiceErrors
 from transactions.factories import CarbureLotFactory
 from transactions.factories.depot import DepotFactory
@@ -563,6 +565,35 @@ class OperationServiceCheckVolumesTest(TestCase):
 class OperationServiceCheckObjectivesComplianceTest(TestCase):
     """Test OperationService.check_objectives_compliance() validation with mocks."""
 
+    @patch("tiruert.services.operation.BalanceService.calculate_balance")
+    @patch("tiruert.services.operation.OperationFilterForBalance")
+    @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
+    def test_teneur_target_filter_receives_entity_and_category(
+        self,
+        mock_calculate_target,
+        mock_filter,
+        mock_calculate_balance,
+    ):
+        """Should scope balance by entity and pass customs_category as a valid filter value."""
+        mock_calculate_target.return_value = 100000
+        mock_filter.return_value.qs = Mock()
+        mock_calculate_balance.return_value = {"CONV": {"pending_teneur": 0, "declared_teneur": 0}}
+
+        request = Mock()
+        request.entity.id = 1
+        request.GET = {}
+        data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
+
+        OperationService.check_objectives_compliance(
+            request,
+            [{"id": 1, "volume": 1000}],
+            data,
+            entity_id=1,
+            declaration_year=2025,
+        )
+
+        self.assertEqual(mock_filter.call_args.args[0], {"entity_id": 1, "customs_category": ["CONV"]})
+
     @patch("tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category")
     def test_check_objectives_compliance_passes_when_no_target(self, mock_calculate_target):
         """Should pass when target is None (no objective or already reached)."""
@@ -593,6 +624,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
+        mock_request.entity.has_external_admin_right.return_value = False
         mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=21.3)}
@@ -629,6 +661,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
+        mock_request.entity.has_external_admin_right.return_value = False
         mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
@@ -658,6 +691,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
+        mock_request.entity.has_external_admin_right.return_value = False
         mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=10)}
@@ -691,6 +725,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
+        mock_request.entity.has_external_admin_right.return_value = False
         mock_request.GET = QueryDict("")
 
         data = {
@@ -719,6 +754,7 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
 
         mock_request = Mock()
         mock_request.entity.id = 1
+        mock_request.entity.has_external_admin_right.return_value = False
         mock_request.GET = QueryDict("")
 
         data = {"type": Operation.TENEUR, "customs_category": "CONV", "biofuel": Mock(code="ETH", pci_litre=27)}
@@ -756,6 +792,78 @@ class OperationServiceCheckObjectivesComplianceTest(TestCase):
             entity_id,
             declaration_year=None,
         )
+
+
+class OperationServiceCheckTeneurTargetBalanceTest(TestCase):
+    """Test _check_teneur_target() on real operations, with the request shape built by the Excel import."""
+
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/depots.json",
+        "json/entities.json",
+        "json/entities_sites.json",
+    ]
+
+    declaration_year = 2026
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.entity, cls.other_entity = Entity.objects.filter(entity_type=Entity.OPERATOR).order_by("id")[:2]
+        cls.biofuel = Biocarburant.objects.get(code="ETH")
+        cls.lot = CarbureLotFactory.create(
+            carbure_client=cls.entity,
+            feedstock=MatierePremiere.biofuel.filter(category="CONV").first(),
+            biofuel=cls.biofuel,
+            lot_status="ACCEPTED",
+            delivery_type="BLENDING",
+            volume=1000,
+            carbure_delivery_site=Depot.objects.first(),
+        )
+        cls.teneur_mj = int(energy_mj(1000, cls.biofuel.pci_litre))
+
+        # Only the first one must be counted for (cls.entity, CONV).
+        cls._create_pending_teneur(cls.entity, "CONV")
+        cls._create_pending_teneur(cls.entity, "ANN-IX-A")
+        cls._create_pending_teneur(cls.other_entity, "CONV")
+
+    @classmethod
+    def _create_pending_teneur(cls, entity, customs_category):
+        operation = Operation.objects.create(
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            customs_category=customs_category,
+            biofuel=cls.biofuel,
+            debited_entity=entity,
+            declaration_year=cls.declaration_year,
+        )
+        OperationDetail.objects.create(operation=operation, lot=cls.lot, volume=1000, emission_rate_per_mj=10)
+
+    def _check(self, target, teneur_to_add):
+        # Same request shape as OperationExcelImportService: a plain dict instead of a QueryDict.
+        request = SimpleNamespace(entity=self.entity, GET={})
+
+        with patch(
+            "tiruert.services.operation.ObjectiveService.calculate_target_for_specific_category",
+            return_value=target,
+        ):
+            OperationService._check_teneur_target(request, self.entity.id, "CONV", teneur_to_add, self.declaration_year)
+
+    def test_check_teneur_target_ignores_other_categories_and_entities(self):
+        """Should only count the entity's own pending teneur of the checked customs category."""
+        # Counting the two other teneurs would exceed this target by about 2 * teneur_mj.
+        try:
+            self._check(target=self.teneur_mj + 1000, teneur_to_add=500)
+        except ValidationError as exc:
+            self.fail(f"Teneur of other categories or entities was counted: {exc.detail}")
+
+    def test_check_teneur_target_counts_existing_teneur_of_the_entity(self):
+        """Should include the entity's pending teneur of the same category in the future teneur."""
+        with self.assertRaises(ValidationError) as context:
+            self._check(target=self.teneur_mj + 1000, teneur_to_add=self.teneur_mj + 1001)
+
+        self.assertIn("teneur", context.exception.detail)
 
 
 class OperationServiceProcessEP2LotsTest(TestCase):

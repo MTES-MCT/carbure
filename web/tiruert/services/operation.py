@@ -146,7 +146,11 @@ class OperationService:
 
         # 2. Calculate the balance for the requested customs category (all biofuels combined)
         request.GET = request.GET.copy()
-        request.GET["customs_category"] = customs_category
+        request.GET["entity_id"] = entity_id
+        if hasattr(request.GET, "setlist"):
+            request.GET.setlist("customs_category", [customs_category])
+        else:
+            request.GET["customs_category"] = [customs_category]
         operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
 
         balance = BalanceService.calculate_balance(
