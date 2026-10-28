@@ -63,7 +63,7 @@ class LotForm(forms.Form):
     vendor_certificate = forms.CharField(required=False)
     vendor_certificate_type = forms.CharField(required=False)
     carbure_dispatch_site_id = forms.ModelChoiceField(queryset=DISPATCH_SITES, required=False)
-    unknown_dispatch_site = forms.CharField(required=False)
+    unknown_dispatch_site = forms.CharField(required=False, max_length=64)
     dispatch_date = forms.DateField(required=False)
     dispatch_site_country_code = forms.ModelChoiceField(queryset=COUNTRIES, to_field_name="code_pays", required=False)
     delivery_type = forms.CharField(required=False)
