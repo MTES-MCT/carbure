@@ -1,12 +1,14 @@
 from unittest.mock import patch
 
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from rest_framework import status
 
 from core.models import Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
-from traceability.factories import ActionFactory
+from traceability.factories import ActionFactory, MaterialFactory
 from traceability.models import Action
 from traceability.services.parent_chain import annotate_parent_chain
 
@@ -137,6 +139,71 @@ class ActionViewsetQuerysetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(seen_pks, [self.own_action.id])
+
+    def test_list_annotates_the_page_once(self):
+        seen = []
+
+        def capture(queryset, **kwargs):
+            seen.append(list(queryset.values_list("pk", flat=True)))
+            return annotate_parent_chain(queryset, **kwargs)
+
+        with patch("traceability.views.action.annotate_parent_chain", side_effect=capture):
+            response = self.client.get(self.list_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(seen, [[self.own_action.id, self.child_of_own_action.id]])
+
+    def test_list_filters_by_origin_material(self):
+        other = MaterialFactory(code="CH4", name="Méthane")
+        child = ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=other,
+        )
+
+        response = self.client.get(
+            self.list_url,
+            {**self.base_params, "origin_material": self.own_action.material.code},
+        )
+        excluded = self.client.get(self.list_url, {**self.base_params, "origin_material": other.code})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [item["id"] for item in response.data["results"]]
+        self.assertCountEqual(ids, [self.own_action.id, self.child_of_own_action.id, child.id])
+        self.assertEqual(excluded.status_code, status.HTTP_200_OK)
+        self.assertEqual(excluded.data["results"], [])
+
+    def test_origin_material_filter_walks_once_then_annotates_the_page(self):
+        with CaptureQueriesContext(connection) as captured:
+            response = self.client.get(
+                self.list_url,
+                {**self.base_params, "origin_material": self.own_action.material.code},
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        recursive = [query["sql"] for query in captured.captured_queries if "with recursive" in query["sql"].lower()]
+        self.assertEqual(len(recursive), 2)
+        self.assertNotIn("ei_sum", recursive[0].lower())
+        self.assertNotIn("action_status", recursive[0].lower())
+        self.assertIn("ei_sum", recursive[1].lower())
+
+    def test_filters_lists_origin_material_codes(self):
+        other = MaterialFactory(code="CH4", name="Méthane")
+        ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=other,
+        )
+
+        response = self.client.get(
+            reverse("traceability-action-filters"),
+            {**self.base_params, "filter": "origin_material"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [self.own_action.material.code])
 
 
 class ActionViewsetAdminQuerysetTest(TestCase):

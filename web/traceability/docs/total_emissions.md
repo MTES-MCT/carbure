@@ -89,6 +89,6 @@ La CTE a **toutes** les étapes. On ne veut que celle arrivée à la racine (`ne
 
 ## Où c’est branché
 
-`ActionViewset` appelle `annotate_parent_chain` : **retrieve** après le filtre `pk` ; **list** pagine d’abord, puis annote les ids de la page (MySQL interdit `LIMIT` dans la sous-requête de la CTE). Le `COUNT` de pagination s’exécute donc sur le queryset **sans** CTE.
+La liste pagine d'abord, puis `annotate_parent_chain` sur les ids de la page. Le `COUNT` de la page ne lance pas le parcours. MySQL interdit un `LIMIT` dans la sous-requête de la CTE.
 
-Ne pas remettre cette annotation sur `Action.objects` (manager) : ça recalculerait le cumul pour toute la table, y compris `/years/` et `/filters/`.
+Ne pas remettre cette annotation sur `Action.objects` : la CTE lit `Action.unannotated`, et un manager déjà annoté s'imbriquerait dans la requête récursive.
