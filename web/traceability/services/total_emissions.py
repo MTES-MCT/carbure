@@ -56,4 +56,4 @@ def emission_annotation(cte) -> dict:
 def annotate_total_emissions(queryset: QuerySet[Action]) -> QuerySet[Action]:
     from traceability.services.parent_chain import annotate_parent_chain
 
-    return annotate_parent_chain(queryset, inherited_fields=False)
+    return annotate_parent_chain(queryset, climbers=("emissions",))

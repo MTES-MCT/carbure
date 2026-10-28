@@ -37,13 +37,13 @@ class ParentChainTest(TestCase):
         self.assertEqual(action.total_emissions["ei"], Decimal("11.000"))
 
     def test_emissions_only_omits_the_material_column(self):
-        sql = self._sql(inherited_fields=False)
+        sql = self._sql(climbers=("emissions",))
 
         self.assertNotIn("previous_material_id", sql)
         self.assertNotIn("origin_material_id", sql)
         self.assertIn("ei_sum", sql)
 
-    def test_neither_flag_leaves_the_queryset_unchanged(self):
+    def test_no_climber_leaves_the_queryset_unchanged(self):
         queryset = Action.objects.filter(pk=self.leaf.pk)
 
-        self.assertIs(annotate_parent_chain(queryset, emissions=False, inherited_fields=False), queryset)
+        self.assertIs(annotate_parent_chain(queryset, climbers=()), queryset)
