@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.http.response import JsonResponse
 
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
@@ -12,6 +13,8 @@ from core.models import (
     Entity,
     UserRights,
 )
+from core.serializers import GenericErrorSerializer
+from transactions.sanity_checks import sanity_checks
 from transactions.sanity_checks.helpers import get_prefetched_data
 
 
@@ -53,84 +56,101 @@ def accept_trading(request, *args, **kwargs):
 
     accepted_lot_ids = []
     transferred_lot_ids = []
+    child_lots = []
+    prefetched_data = get_prefetched_data(entity)
 
-    for lot in lots:
-        if int(entity_id) != lot.carbure_client_id:
+    with transaction.atomic():
+        for lot in lots:
+            if int(entity_id) != lot.carbure_client_id:
+                return JsonResponse(
+                    {
+                        "status": "forbidden",
+                        "message": "Only the client can accept the lot",
+                    },
+                    status=403,
+                )
+
+            if lot.lot_status == CarbureLot.DRAFT:
+                return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
+            elif lot.lot_status == CarbureLot.PENDING:
+                # ok no problem
+                pass
+            elif lot.lot_status == CarbureLot.REJECTED:
+                # the client changed his mind, ok
+                pass
+            elif lot.lot_status == CarbureLot.ACCEPTED:
+                return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
+            elif lot.lot_status == CarbureLot.FROZEN:
+                return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
+            elif lot.lot_status == CarbureLot.DELETED:
+                return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
+
+            lot.lot_status = CarbureLot.ACCEPTED
+            lot.delivery_type = CarbureLot.TRADING
+            lot.save()
+            accepted_lot_ids.append(lot.id)
+
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.ACCEPTED
+            event.lot = lot
+            event.user = request.user
+            event.entity = entity
+            event.save()
+
+            # create child lot
+            parent_lot_id = lot.id
+            child_lot = lot
+            child_lot.pk = None
+            child_lot.carbure_client = client_entity
+            child_lot.unknown_client = unknown_client
+            child_lot.delivery_type = CarbureLot.UNKNOWN
+            if child_lot.carbure_client is None:
+                # auto-accept when the client is not registered in carbure
+                child_lot.lot_status = CarbureLot.ACCEPTED
+                child_lot.declared_by_client = True
+            else:
+                child_lot.declared_by_client = False
+                child_lot.lot_status = CarbureLot.PENDING
+            child_lot.correction_status = CarbureLot.NO_PROBLEMO
+            child_lot.declared_by_supplier = False
+            child_lot.added_by = entity
+            child_lot.carbure_supplier = entity
+            child_lot.supplier_certificate = certificate
+            child_lot.unknown_supplier = None
+            child_lot.parent_lot_id = parent_lot_id
+            child_lot.parent_stock_id = None
+            child_lot.save()
+            transferred_lot_ids.append(child_lot.id)
+            child_lots.append(child_lot)
+
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.CREATED
+            event.lot = child_lot
+            event.user = request.user
+            event.entity = entity
+            event.save()
+            event = CarbureLotEvent()
+            event.event_type = CarbureLotEvent.ACCEPTED
+            event.lot = child_lot
+            event.user = request.user
+            event.entity = entity
+            event.save()
+
+        blocking_errors = [
+            error for child_lot in child_lots for error in sanity_checks(child_lot, prefetched_data) if error.is_blocking
+        ]
+        if blocking_errors:
+            transaction.set_rollback(True)
             return JsonResponse(
                 {
-                    "status": "forbidden",
-                    "message": "Only the client can accept the lot",
+                    "status": "error",
+                    "message": "Created lot has blocking errors",
+                    "errors": [{"lot_id": error.lot_id, **GenericErrorSerializer(error).data} for error in blocking_errors],
                 },
-                status=403,
+                status=400,
             )
 
-        if lot.lot_status == CarbureLot.DRAFT:
-            return JsonResponse({"status": "error", "message": "Cannot accept DRAFT"}, status=400)
-        elif lot.lot_status == CarbureLot.PENDING:
-            # ok no problem
-            pass
-        elif lot.lot_status == CarbureLot.REJECTED:
-            # the client changed his mind, ok
-            pass
-        elif lot.lot_status == CarbureLot.ACCEPTED:
-            return JsonResponse({"status": "error", "message": "Lot already accepted."}, status=400)
-        elif lot.lot_status == CarbureLot.FROZEN:
-            return JsonResponse({"status": "error", "message": "Lot is Frozen."}, status=400)
-        elif lot.lot_status == CarbureLot.DELETED:
-            return JsonResponse({"status": "error", "message": "Lot is deleted."}, status=400)
-
-        lot.lot_status = CarbureLot.ACCEPTED
-        lot.delivery_type = CarbureLot.TRADING
-        lot.save()
-        accepted_lot_ids.append(lot.id)
-
-        event = CarbureLotEvent()
-        event.event_type = CarbureLotEvent.ACCEPTED
-        event.lot = lot
-        event.user = request.user
-        event.entity = entity
-        event.save()
-
-        # create child lot
-        parent_lot_id = lot.id
-        child_lot = lot
-        child_lot.pk = None
-        child_lot.carbure_client = client_entity
-        child_lot.unknown_client = unknown_client
-        child_lot.delivery_type = CarbureLot.UNKNOWN
-        if child_lot.carbure_client is None:
-            # auto-accept when the client is not registered in carbure
-            child_lot.lot_status = CarbureLot.ACCEPTED
-            child_lot.declared_by_client = True
-        else:
-            child_lot.declared_by_client = False
-            child_lot.lot_status = CarbureLot.PENDING
-        child_lot.correction_status = CarbureLot.NO_PROBLEMO
-        child_lot.declared_by_supplier = False
-        child_lot.added_by = entity
-        child_lot.carbure_supplier = entity
-        child_lot.supplier_certificate = certificate
-        child_lot.unknown_supplier = None
-        child_lot.parent_lot_id = parent_lot_id
-        child_lot.parent_stock_id = None
-        child_lot.save()
-        transferred_lot_ids.append(child_lot.id)
-
-        event = CarbureLotEvent()
-        event.event_type = CarbureLotEvent.CREATED
-        event.lot = child_lot
-        event.user = request.user
-        event.entity = entity
-        event.save()
-        event = CarbureLotEvent()
-        event.event_type = CarbureLotEvent.ACCEPTED
-        event.lot = child_lot
-        event.user = request.user
-        event.entity = entity
-        event.save()
-
     updated_lots = CarbureLot.objects.filter(id__in=accepted_lot_ids + transferred_lot_ids)
-    prefetched_data = get_prefetched_data(entity)
     background_bulk_sanity_checks(updated_lots, prefetched_data)
     background_bulk_scoring(updated_lots, prefetched_data)
 
