@@ -13426,7 +13426,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: origin_material
+          name: nearest_site
           schema:
             type: array
             items:
@@ -13483,6 +13483,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -13497,6 +13505,22 @@ paths:
             type: integer
         - in: query
           name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: producer
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: root_pos
           schema:
             type: array
             items:
@@ -13690,9 +13714,12 @@ paths:
             enum:
               - holder
               - material
+              - nearest_site
               - order_by
               - origin_material
               - period
+              - producer
+              - root_pos
               - shipping_method
               - site
               - status
@@ -13726,7 +13753,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: origin_material
+          name: nearest_site
           schema:
             type: array
             items:
@@ -13784,7 +13811,31 @@ paths:
           schema:
             type: string
         - in: query
+          name: origin_material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: producer
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: root_pos
           schema:
             type: array
             items:
@@ -13885,9 +13936,9 @@ paths:
                   value:
                     - holder
                     - material
+                    - nearest_site
                     - order_by
-                    - period
-                    - shipping_method
+                    - origin_material
                   summary: Example of filters response.
           description: ""
   /api/traceability/actions/import/:
@@ -14020,7 +14071,7 @@ paths:
           explode: true
           style: form
         - in: query
-          name: origin_material
+          name: nearest_site
           schema:
             type: array
             items:
@@ -14078,7 +14129,31 @@ paths:
           schema:
             type: string
         - in: query
+          name: origin_material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: producer
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: root_pos
           schema:
             type: array
             items:
@@ -14459,7 +14534,7 @@ components:
     ActionInheritedFields:
       type: object
       description: >-
-        Materials resolved along the parent chain.
+        Every value the front receives from the parent-chain walk.
 
 
         previous_material is the nearest declared material above the action.
@@ -14468,6 +14543,11 @@ components:
         action's
 
         own material when nothing above declares one.
+
+        nearest_site is the first site above the action. The action's own site
+        is ignored.
+
+        producer and root_pos are the holder and the pos_id of the root.
       properties:
         previous_material:
           allOf:
@@ -14477,9 +14557,20 @@ components:
           allOf:
             - $ref: "#/components/schemas/Material"
           nullable: true
+        nearest_site:
+          allOf:
+            - $ref: "#/components/schemas/ActionSite"
+          nullable: true
+        producer:
+          $ref: "#/components/schemas/EntityPreview"
+        root_pos:
+          type: string
       required:
+        - nearest_site
         - origin_material
         - previous_material
+        - producer
+        - root_pos
     ActionParent:
       type: object
       description: Small representation used for the parent action relation.

@@ -11,6 +11,7 @@ from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory, MaterialFactory
 from traceability.models import Action
 from traceability.services.parent_chain import annotate_parent_chain
+from transactions.factories.production_site import ProductionSiteFactory
 
 
 class ActionViewsetQuerysetTest(TestCase):
@@ -90,6 +91,10 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertIsNone(by_id[child.id]["material"])
         self.assertEqual(by_id[child.id]["inherited_fields"]["previous_material"]["id"], self.own_action.material_id)
         self.assertEqual(by_id[child.id]["inherited_fields"]["origin_material"]["id"], self.own_action.material_id)
+        self.assertEqual(by_id[child.id]["inherited_fields"]["nearest_site"]["id"], self.own_action.site_id)
+        self.assertEqual(by_id[child.id]["inherited_fields"]["producer"]["id"], self.own_action.holder_id)
+        self.assertEqual(by_id[child.id]["inherited_fields"]["root_pos"], self.own_action.pos_id)
+        self.assertIsNone(by_id[self.own_action.id]["inherited_fields"]["nearest_site"])
         self.assertIsNone(by_id[self.own_action.id]["inherited_fields"]["previous_material"])
         self.assertEqual(
             by_id[self.own_action.id]["inherited_fields"]["origin_material"]["id"],
@@ -204,6 +209,63 @@ class ActionViewsetQuerysetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [self.own_action.material.code])
+
+    def test_list_filters_by_producer_and_root_pos(self):
+        foreign_root = ActionFactory.create(holder=self.other_entity, industry=Action.H2, parent=None)
+        child = ActionFactory.create(holder=self.entity, industry=Action.H2, parent=foreign_root)
+
+        by_producer = self.client.get(self.list_url, {**self.base_params, "producer": self.other_entity.name})
+        by_pos = self.client.get(self.list_url, {**self.base_params, "root_pos": foreign_root.pos_id})
+
+        self.assertEqual(by_producer.status_code, status.HTTP_200_OK)
+        producer_ids = [item["id"] for item in by_producer.data["results"]]
+        self.assertIn(child.id, producer_ids)
+        self.assertNotIn(self.own_action.id, producer_ids)
+
+        self.assertEqual(by_pos.status_code, status.HTTP_200_OK)
+        pos_ids = [item["id"] for item in by_pos.data["results"]]
+        self.assertIn(child.id, pos_ids)
+        self.assertNotIn(self.own_action.id, pos_ids)
+
+    def test_list_filters_by_the_first_site_above(self):
+        near = ProductionSiteFactory(name="Station proche")
+        far = ProductionSiteFactory(name="Station racine")
+        root = ActionFactory.create(holder=self.entity, industry=Action.H2, parent=None, site=far)
+        middle = ActionFactory.create(holder=self.entity, industry=Action.H2, parent=root, site=near)
+        leaf = ActionFactory.create(holder=self.entity, industry=Action.H2, parent=middle, site=None)
+
+        near_response = self.client.get(self.list_url, {**self.base_params, "nearest_site": near.name})
+        far_response = self.client.get(self.list_url, {**self.base_params, "nearest_site": far.name})
+
+        self.assertEqual(near_response.status_code, status.HTTP_200_OK)
+        near_ids = [item["id"] for item in near_response.data["results"]]
+        self.assertIn(leaf.id, near_ids)
+        self.assertNotIn(middle.id, near_ids)
+        self.assertNotIn(root.id, near_ids)
+
+        self.assertEqual(far_response.status_code, status.HTTP_200_OK)
+        far_ids = [item["id"] for item in far_response.data["results"]]
+        self.assertIn(middle.id, far_ids)
+        self.assertNotIn(leaf.id, far_ids)
+        self.assertNotIn(root.id, far_ids)
+
+    def test_root_filters_descend_before_the_remaining_walk(self):
+        with CaptureQueriesContext(connection) as captured:
+            response = self.client.get(
+                self.list_url,
+                {
+                    **self.base_params,
+                    "origin_material": self.own_action.material.code,
+                    "producer": self.entity.name,
+                    "root_pos": self.own_action.pos_id,
+                },
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        recursive = [query["sql"] for query in captured.captured_queries if "with recursive" in query["sql"].lower()]
+        self.assertEqual(len(recursive), 3)
+        self.assertEqual(sum("descendants" in sql.lower() for sql in recursive), 1)
+        self.assertEqual(sum("ei_sum" in sql.lower() for sql in recursive), 1)
 
 
 class ActionViewsetAdminQuerysetTest(TestCase):
