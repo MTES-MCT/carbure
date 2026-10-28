@@ -16,7 +16,6 @@ from .double_counting import (
 from .general import (
     check_declaration_already_validated,
     check_delivery_in_the_future,
-    check_depot_not_configured,
     check_mac_bc_wrong,
     check_mac_not_efpe,
     check_missing_delivery_type,
@@ -106,7 +105,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         check_delivery_in_the_future(lot),
         # check_mp_not_configured(lot, prefetched_data),
         # check_bc_not_configured(lot, prefetched_data),
-        check_depot_not_configured(lot, prefetched_data),
+        # check_depot_not_configured(lot, prefetched_data),
         # check_delivery_date_validity(lot),
         check_certificate_validity(lot, prefetched_data),
         check_missing_delivery_type(lot),
