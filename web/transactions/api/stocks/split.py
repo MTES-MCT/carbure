@@ -69,6 +69,18 @@ def stock_split(request, *args, **kwargs):
         except Exception:
             return JsonResponse({"status": "error", "message": "Could not parse volume"}, status=400)
 
+        try:
+            delivery_date = try_get_date(entry["delivery_date"])
+            if delivery_date is None:
+                raise ValueError("Missing delivery date")
+        except Exception:
+            return JsonResponse({"status": "error", "message": "Could not parse delivery date"}, status=400)
+
+        try:
+            dispatch_date = try_get_date(entry.get("dispatch_date", None))
+        except Exception:
+            return JsonResponse({"status": "error", "message": "Could not parse dispatch date"}, status=400)
+
         # create child lot
         rounded_volume = round(volume, 2)
         lot = stock.get_parent_lot()
@@ -88,7 +100,7 @@ def stock_split(request, *args, **kwargs):
         lot.parent_stock = stock
         lot.parent_lot = None
         # common, mandatory data
-        lot.delivery_date = try_get_date(entry["delivery_date"])
+        lot.delivery_date = delivery_date
         lot.year = lot.delivery_date.year
         lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
         lot.carbure_dispatch_site = stock.depot
@@ -97,7 +109,7 @@ def stock_split(request, *args, **kwargs):
         lot.carbure_supplier_id = entity_id
         lot.supplier_certificate = entry.get("supplier_certificate", entity.default_certificate)
         lot.added_by_id = entity_id
-        lot.dispatch_date = try_get_date(entry.get("dispatch_date", None))
+        lot.dispatch_date = dispatch_date
         lot.unknown_client = entry.get("unknown_client", None)
         lot.unknown_delivery_site = entry.get("unknown_delivery_site", None)
         country_code = entry.get("delivery_site_country_id", None)
