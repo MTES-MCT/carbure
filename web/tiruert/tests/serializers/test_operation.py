@@ -412,6 +412,8 @@ class OperationExcelRowSerializerTest(TestCase):
                 "volume": 125.5,
                 "operation_type": " transfert ",
                 "credited_entity": self.entity.id,
+                "biofuel": "ETH",
+                "customs_category": "CONV",
             }
         )
 
@@ -419,6 +421,53 @@ class OperationExcelRowSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["operation_type"], Operation.TRANSFERT)
         self.assertEqual(serializer.validated_data["credited_entity"], self.entity)
         self.assertEqual(serializer.validated_data["lot_id"], self.lot)
+
+    def test_serializer_resolves_biofuel_and_customs_category_from_row(self):
+        """Biofuel code and customs category of the template row should be exposed as validated data."""
+        serializer = OperationExcelRowSerializer(
+            data={
+                "lot_id": self.lot.id,
+                "volume": 10,
+                "operation_type": "TENEUR",
+                "biofuel": "EMAG",
+                "customs_category": "ANN-IX-B",
+            }
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(serializer.validated_data["biofuel"], Biocarburant.objects.get(code="EMAG"))
+        self.assertEqual(serializer.validated_data["customs_category"], "ANN-IX-B")
+
+    def test_serializer_requires_biofuel_and_customs_category(self):
+        """Missing, null or blank biofuel/customs category should be reported on the row."""
+        base = {"lot_id": self.lot.id, "volume": 10, "operation_type": "TENEUR"}
+        serializer = OperationExcelRowSerializer(
+            data=[
+                base,
+                {**base, "biofuel": None, "customs_category": None},
+                {**base, "biofuel": "", "customs_category": ""},
+            ],
+            many=True,
+        )
+
+        self.assertFalse(serializer.is_valid())
+        for row_errors in serializer.errors:
+            self.assertEqual(set(row_errors), {"biofuel", "customs_category"})
+
+    def test_serializer_rejects_unknown_biofuel_and_customs_category(self):
+        """Unknown biofuel code or customs category should be reported on the row."""
+        serializer = OperationExcelRowSerializer(
+            data={
+                "lot_id": self.lot.id,
+                "volume": 10,
+                "operation_type": "TENEUR",
+                "biofuel": "UNKNOWN",
+                "customs_category": "UNKNOWN",
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(set(serializer.errors), {"biofuel", "customs_category"})
 
 
 class OperationCorrectionSerializerUpdateTest(TestCase):
