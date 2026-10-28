@@ -14,7 +14,8 @@ gets a second site closer to the leaf, so the nearest site is not always the far
 The draw uses a fixed seed, so a second run builds the same trees.
 
 Every row uses a ``PERF-`` pos_id. ``--delete`` removes them, children first.
-The default build is 100000 actions.
+Inserts commit every 5000 actions, with their statuses. A stopped run leaves a partial
+forest; ``--delete`` removes it. The default build is 100000 actions.
 
     uv run python web/manage.py seed_parent_chain_perf --entity-id 9
     uv run python web/manage.py seed_parent_chain_perf --entity-id 9 --dry-run
@@ -46,6 +47,7 @@ MATERIAL_COUNT = 20
 HOLDER_COUNT = 100
 SITE_COUNT = 200
 ACTION_COUNT = 100_000
+COMMIT_BATCH = 5_000
 
 
 class Command(BaseCommand):
@@ -149,9 +151,8 @@ class Command(BaseCommand):
         material_ids = [material.pk for material in materials]
         producer_ids = self.producers(entity_id)
         site_ids = self.sites()
-        with transaction.atomic():
-            self.chains("D", deep_lengths, entity_id, material_ids, producer_ids, site_ids)
-            self.chains("S", varied_lengths, entity_id, material_ids, producer_ids, site_ids)
+        self.chains("D", deep_lengths, entity_id, material_ids, producer_ids, site_ids)
+        self.chains("S", varied_lengths, entity_id, material_ids, producer_ids, site_ids)
         self.stdout.write(self.style.SUCCESS(f"Created {deep_rows + varied_rows} actions."))
 
     def chains(self, kind, lengths, entity_id, material_ids, producer_ids, site_ids):
@@ -220,15 +221,20 @@ class Command(BaseCommand):
         return action
 
     def insert(self, actions):
-        Action.unannotated.bulk_create(actions, batch_size=1000)
-        if actions[0].pk is None:
-            by_pos_id = {action.pos_id: action for action in actions}
-            for row in Action.unannotated.filter(pos_id__in=by_pos_id).only("id", "pos_id"):
-                by_pos_id[row.pos_id].pk = row.id
-        ActionStatus.objects.bulk_create(
-            [ActionStatus(action_id=action.pk, status=ActionStatus.PENDING) for action in actions],
-            batch_size=1000,
-        )
+        # One commit per batch. Holding the whole forest open exhausts the undo log
+        # of a small MySQL when that single transaction commits.
+        for start in range(0, len(actions), COMMIT_BATCH):
+            chunk = actions[start : start + COMMIT_BATCH]
+            with transaction.atomic():
+                Action.unannotated.bulk_create(chunk, batch_size=COMMIT_BATCH)
+                if chunk[0].pk is None:
+                    by_pos_id = {action.pos_id: action for action in chunk}
+                    for row in Action.unannotated.filter(pos_id__in=by_pos_id).only("id", "pos_id"):
+                        by_pos_id[row.pos_id].pk = row.id
+                ActionStatus.objects.bulk_create(
+                    [ActionStatus(action_id=action.pk, status=ActionStatus.PENDING) for action in chunk],
+                    batch_size=COMMIT_BATCH,
+                )
 
     def materials(self, code):
         if code:
@@ -293,7 +299,7 @@ class Command(BaseCommand):
         deleted = 0
         while True:
             parent_ids = set(queryset.exclude(parent_id=None).values_list("parent_id", flat=True))
-            leaf_ids = list(queryset.exclude(pk__in=parent_ids).values_list("pk", flat=True)[:5000])
+            leaf_ids = list(queryset.exclude(pk__in=parent_ids).values_list("pk", flat=True)[:COMMIT_BATCH])
             if not leaf_ids:
                 break
             count, _ = Action.unannotated.filter(pk__in=leaf_ids).delete()
