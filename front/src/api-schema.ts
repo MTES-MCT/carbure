@@ -3635,15 +3635,20 @@ export interface components {
             file: File;
         };
         /**
-         * @description Materials resolved along the parent chain.
+         * @description Every value the front receives from the parent-chain walk.
          *
          *     previous_material is the nearest declared material above the action.
          *     origin_material is the first declared material from the root. It is the action's
          *     own material when nothing above declares one.
+         *     nearest_site is the first site above the action. The action's own site is ignored.
+         *     producer and root_pos are the holder and the pos_id of the root.
          */
         ActionInheritedFields: {
             previous_material: components["schemas"]["Material"] | null;
             origin_material: components["schemas"]["Material"] | null;
+            nearest_site: components["schemas"]["ActionSite"] | null;
+            producer: components["schemas"]["EntityPreview"];
+            root_pos: string;
         };
         /** @description Small representation used for the parent action relation. */
         ActionParent: {
@@ -3699,6 +3704,9 @@ export interface components {
         };
         /**
          * @description * `INIT` - INIT
+         *     * `TEST1` - TEST1
+         *     * `TEST2` - TEST2
+         *     * `TEST3` - TEST3
          *     * `VALORIZE` - VALORIZE
          * @enum {string}
          */
@@ -6488,7 +6496,6 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Action"][];
-            total_count?: number;
         };
         PaginatedAdminUserRowList: {
             /** @example 123 */
@@ -15928,6 +15935,7 @@ export interface operations {
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
+                nearest_site?: string[];
                 /**
                  * @description Ordre
                  *
@@ -15951,11 +15959,14 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_material?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                producer?: string[];
+                root_pos?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -15977,6 +15988,9 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
+                 *     * `TEST1` - TEST1
+                 *     * `TEST2` - TEST2
+                 *     * `TEST3` - TEST3
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16067,6 +16081,7 @@ export interface operations {
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
+                nearest_site?: string[];
                 /**
                  * @description Ordre
                  *
@@ -16090,7 +16105,10 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_material?: string[];
                 period?: string[];
+                producer?: string[];
+                root_pos?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16112,6 +16130,9 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
+                 *     * `TEST1` - TEST1
+                 *     * `TEST2` - TEST2
+                 *     * `TEST3` - TEST3
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16210,6 +16231,7 @@ export interface operations {
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
+                nearest_site?: string[];
                 /**
                  * @description Ordre
                  *
@@ -16233,7 +16255,10 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_material?: string[];
                 period?: string[];
+                producer?: string[];
+                root_pos?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16255,6 +16280,9 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
+                 *     * `TEST1` - TEST1
+                 *     * `TEST2` - TEST2
+                 *     * `TEST3` - TEST3
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16819,13 +16847,20 @@ export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
     INIT = "INIT",
+    TEST1 = "TEST1",
+    TEST2 = "TEST2",
+    TEST3 = "TEST3",
     VALORIZE = "VALORIZE"
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     holder = "holder",
     material = "material",
+    nearest_site = "nearest_site",
     order_by = "order_by",
+    origin_material = "origin_material",
     period = "period",
+    producer = "producer",
+    root_pos = "root_pos",
     shipping_method = "shipping_method",
     site = "site",
     status = "status",
