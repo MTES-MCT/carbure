@@ -7,7 +7,6 @@ import xlsxwriter
 
 from core.models import Biocarburant, CarbureStock, Entity, GenericCertificate, MatierePremiere, Pays
 from core.serializers import CarbureLotCSVSerializer, CarbureStockCSVSerializer
-from transactions.forms.lot_form import DISPATCH_SITE_TYPES
 from transactions.models import Depot, ProductionSite, Site
 from transactions.serializers.power_heat_lot_serializer import CarbureLotPowerOrHeatProducerCSVSerializer
 
@@ -553,7 +552,7 @@ def make_deliverysites_sheet(workbook):
 def make_dispatchsites_sheet(workbook):
     worksheet_sites = workbook.add_worksheet("SitesDExpedition")
     dispatch_sites = Site.objects.filter(
-        site_type__in=DISPATCH_SITE_TYPES,
+        site_type__in=Site.DISPATCH_TYPES,
         private=False,
         is_enabled=True,
     ).order_by("country", "id")

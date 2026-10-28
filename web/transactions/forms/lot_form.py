@@ -5,16 +5,6 @@ from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from transactions.models import Depot, ProductionSite
 from transactions.models.site import Site
 
-DISPATCH_SITE_TYPES = [
-    Site.OTHER,
-    Site.EFS,
-    Site.EFPE,
-    Site.OILDEPOT,
-    Site.BIOFUELDEPOT,
-    Site.PRODUCTION_BIOLIQUID,
-    Site.EFCA,
-]
-
 
 class LotForm(forms.Form):
     # choices
@@ -27,7 +17,7 @@ class LotForm(forms.Form):
     COUNTRIES = Pays.objects.all()
     PRODUCTION_SITES = ProductionSite.objects.all()
     DEPOTS = Depot.objects.all()
-    DISPATCH_SITES = Site.objects.filter(site_type__in=DISPATCH_SITE_TYPES, is_enabled=True)
+    DISPATCH_SITES = Site.objects.filter(site_type__in=Site.DISPATCH_TYPES, is_enabled=True)
 
     # lot fields
     transport_document_type = forms.CharField(required=False)
