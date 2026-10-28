@@ -7,7 +7,6 @@ from django.urls import reverse
 from certificates.models import DoubleCountingRegistration
 from core.models import CarbureLot, Entity, MatierePremiere, Pays, UserRights
 from core.tests_utils import setup_current_user
-from doublecount.errors import DoubleCountingError
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
 from doublecount.factories.production import DoubleCountingProductionFactory
@@ -171,51 +170,51 @@ class AdminDoubleCountAgreementsTest(TestCase):
         expired = get_lists(valid_agreement.valid_until.year + 1)["expired"]
         assert [a["id"] for a in expired] == [valid_agreement.id]
 
-    def test_bulk_update_single_agreement_status(self):
+    def test_update_agreement_status(self):
         agreement, *_ = self.create_agreement()
-        response = self.client.post(
-            reverse("double-counting-agreements-bulk-update-status"),
-            {"agreement_ids": [agreement.id], "status": DoubleCountingRegistration.SUSPENDED},
+        response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.SUSPENDED},
             content_type="application/json",
             QUERY_STRING=f"entity_id={self.admin.id}",
         )
 
         assert response.status_code == 200
-        assert response.json()["updated_count"] == 1
+        assert response.json()["status"] == DoubleCountingRegistration.SUSPENDED
         agreement.refresh_from_db()
         assert agreement.status == DoubleCountingRegistration.SUSPENDED
 
-    def test_bulk_update_single_inactive_agreement_status(self):
+    def test_update_inactive_agreement_status(self):
         agreement, *_ = self.create_agreement()
         agreement.status = DoubleCountingRegistration.WITHDRAWN
         agreement.save()
 
-        response = self.client.post(
-            reverse("double-counting-agreements-bulk-update-status"),
-            {"agreement_ids": [agreement.id], "status": DoubleCountingRegistration.TERMINATED},
+        response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.TERMINATED},
             content_type="application/json",
             QUERY_STRING=f"entity_id={self.admin.id}",
         )
 
         assert response.status_code == 200
-        assert response.json()["updated_count"] == 1
+        assert response.json()["status"] == DoubleCountingRegistration.TERMINATED
         agreement.refresh_from_db()
         assert agreement.status == DoubleCountingRegistration.TERMINATED
 
-    def test_bulk_update_single_agreement_status_to_valid(self):
+    def test_update_agreement_status_to_valid(self):
         agreement, *_ = self.create_agreement()
         agreement.status = DoubleCountingRegistration.SUSPENDED
         agreement.save()
 
-        response = self.client.post(
-            reverse("double-counting-agreements-bulk-update-status"),
-            {"agreement_ids": [agreement.id], "status": DoubleCountingRegistration.VALID},
+        response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.VALID},
             content_type="application/json",
             QUERY_STRING=f"entity_id={self.admin.id}",
         )
 
         assert response.status_code == 200
-        assert response.json()["updated_count"] == 1
+        assert response.json()["status"] == DoubleCountingRegistration.VALID
         agreement.refresh_from_db()
         assert agreement.status == DoubleCountingRegistration.VALID
 
@@ -223,77 +222,16 @@ class AdminDoubleCountAgreementsTest(TestCase):
         agreement, *_ = self.create_agreement()
         setup_current_user(self, "readonly@carbure.local", "Read Only", "gogogo", [(self.admin, UserRights.RO)], True)
 
-        bulk_response = self.client.post(
-            reverse("double-counting-agreements-bulk-update-status"),
-            {"agreement_ids": [agreement.id], "status": DoubleCountingRegistration.SUSPENDED},
+        response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.SUSPENDED},
             content_type="application/json",
             QUERY_STRING=f"entity_id={self.admin.id}",
         )
 
-        assert bulk_response.status_code == 403
+        assert response.status_code == 403
         agreement.refresh_from_db()
         assert agreement.status == DoubleCountingRegistration.VALID
-
-    def test_bulk_update_agreement_status(self):
-        agreements = [self.create_agreement()[0] for _ in range(2)]
-
-        response = self.client.post(
-            reverse("double-counting-agreements-bulk-update-status"),
-            {
-                "agreement_ids": [agreement.id for agreement in agreements],
-                "status": DoubleCountingRegistration.SUSPENDED,
-            },
-            content_type="application/json",
-            QUERY_STRING=f"entity_id={self.admin.id}",
-        )
-
-        assert response.status_code == 200
-        assert response.json()["updated_count"] == len(agreements)
-        for agreement in agreements:
-            agreement.refresh_from_db()
-            assert agreement.status == DoubleCountingRegistration.SUSPENDED
-
-    def test_bulk_update_multiple_agreements_cannot_set_status_to_valid(self):
-        agreements = [self.create_agreement()[0] for _ in range(2)]
-        for agreement in agreements:
-            agreement.status = DoubleCountingRegistration.SUSPENDED
-            agreement.save()
-
-        response = self.client.post(
-            reverse("double-counting-agreements-bulk-update-status"),
-            {
-                "agreement_ids": [agreement.id for agreement in agreements],
-                "status": DoubleCountingRegistration.VALID,
-            },
-            content_type="application/json",
-            QUERY_STRING=f"entity_id={self.admin.id}",
-        )
-
-        assert response.status_code == 400
-        for agreement in agreements:
-            agreement.refresh_from_db()
-            assert agreement.status == DoubleCountingRegistration.SUSPENDED
-
-    def test_bulk_update_agreement_status_rejects_inactive_selection(self):
-        valid_agreement, *_ = self.create_agreement()
-        inactive_agreement, *_ = self.create_agreement()
-        inactive_agreement.status = DoubleCountingRegistration.WITHDRAWN
-        inactive_agreement.save()
-
-        response = self.client.post(
-            reverse("double-counting-agreements-bulk-update-status"),
-            {
-                "agreement_ids": [valid_agreement.id, inactive_agreement.id],
-                "status": DoubleCountingRegistration.TERMINATED,
-            },
-            content_type="application/json",
-            QUERY_STRING=f"entity_id={self.admin.id}",
-        )
-
-        assert response.status_code == 400
-        assert response.json() == {"message": DoubleCountingError.AGREEMENTS_NOT_UPDATABLE}
-        valid_agreement.refresh_from_db()
-        assert valid_agreement.status == DoubleCountingRegistration.VALID
 
     def test_get_agreements_excel(self):
         self.create_agreement()

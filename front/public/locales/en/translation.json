@@ -1141,6 +1141,7 @@
   "À venir": "Upcoming",
   "Le statut a été changé avec succès.": "The status has been changed successfully.",
   "Changer le statut": "Change status",
+  "Impossible de modifier le statut de l'agrément.": "Unable to update the agreement status.",
   "Sélectionnez le nouveau statut pour cette demande d'agrément.": "Select the new status for this agreement application.",
   "Confirmer": "Confirm",
   "Les quotas ont bien été validés.": "Quotas have been validated.",

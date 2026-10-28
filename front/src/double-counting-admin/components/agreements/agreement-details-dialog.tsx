@@ -68,7 +68,7 @@ export const AgreementDetailsDialog = () => {
 
     portal((close) => (
       <AgreementDetailsDialogChangeStatus
-        agreementIds={[agreement.id]}
+        agreementId={agreement.id}
         initialStatus={agreement.status}
         onClose={close}
         onSuccess={() => navigate({ pathname: location.pathname })}

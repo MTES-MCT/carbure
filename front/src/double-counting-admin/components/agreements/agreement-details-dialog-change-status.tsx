@@ -13,8 +13,7 @@ import { useNotify, useNotifyError } from "common/components/notifications"
 import * as api from "../../api"
 
 type AgreementDetailsDialogChangeStatusProps = {
-  agreementIds: number[]
-  bulk?: boolean
+  agreementId: number
   initialStatus?: AgreementRegistrationStatus
   onClose: PortalInstance["close"]
   onSuccess: () => void
@@ -28,8 +27,7 @@ const availableStatuses: AgreementRegistrationStatus[] = [
 ]
 
 const AgreementDetailsDialogChangeStatus = ({
-  agreementIds,
-  bulk = false,
+  agreementId,
   initialStatus,
   onClose,
   onSuccess,
@@ -40,9 +38,9 @@ const AgreementDetailsDialogChangeStatus = ({
   const entity = useEntity()
   const [selectedStatus, setSelectedStatus] = useState<
     AgreementRegistrationStatus | undefined
-  >(bulk ? AgreementRegistrationStatus.VALID : initialStatus)
+  >(initialStatus)
 
-  const updateStatuses = useMutation(api.updateDoubleCountingAgreementsStatus, {
+  const updateStatus = useMutation(api.updateDoubleCountingAgreementStatus, {
     invalidates: ["dc-agreement", "dc-agreements", "dc-snapshot"],
     onSuccess: () => {
       notify(t("Le statut a été changé avec succès."), { variant: "success" })
@@ -50,26 +48,15 @@ const AgreementDetailsDialogChangeStatus = ({
       onSuccess()
     },
     onError: (error) =>
-      notifyError(
-        error,
-        t("Impossible de modifier le statut des agréments sélectionnés."),
-        {
-          AGREEMENTS_NOT_UPDATABLE: t(
-            "Un ou plusieurs agréments ne sont plus actifs. Actualisez la liste puis réessayez."
-          ),
-        }
-      ),
+      notifyError(error, t("Impossible de modifier le statut de l'agrément.")),
   })
 
   const handleConfirm = async () => {
-    if (!selectedStatus || agreementIds.length === 0) return
-    await updateStatuses.execute(entity.id, agreementIds, selectedStatus)
+    if (!selectedStatus) return
+    await updateStatus.execute(entity.id, agreementId, selectedStatus)
   }
 
-  const loading = updateStatuses.loading
-  const description = bulk
-    ? t("Sélectionnez le nouveau statut pour les agréments sélectionnés.")
-    : t("Sélectionnez le nouveau statut pour cet agrément.")
+  const loading = updateStatus.loading
 
   return (
     <Dialog
@@ -77,7 +64,9 @@ const AgreementDetailsDialogChangeStatus = ({
       header={
         <>
           <Dialog.Title>{t("Changer le statut")}</Dialog.Title>
-          <Dialog.Description>{description}</Dialog.Description>
+          <Dialog.Description>
+            {t("Sélectionnez le nouveau statut pour cet agrément.")}
+          </Dialog.Description>
         </>
       }
       footer={

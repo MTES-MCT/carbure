@@ -1,16 +1,13 @@
 from datetime import datetime
 
-from django.db import transaction
 from django.db.models.query_utils import Q
 from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationSerializer
-from doublecount.errors import DoubleCountingError
 
 from .utils import add_quotas_to_agreements
 
@@ -22,16 +19,10 @@ class AgreementListsSerializer(serializers.Serializer):
     inactive = DoubleCountingRegistrationSerializer(many=True)
 
 
-class AgreementStatusBulkUpdateSerializer(serializers.Serializer):
-    agreement_ids = serializers.ListField(child=serializers.IntegerField(), allow_empty=False, max_length=100)
+class AgreementStatusUpdateSerializer(serializers.Serializer):
     status = serializers.ChoiceField(
         choices=DoubleCountingRegistration.STATUS_CHOICES,
     )
-
-    def validate(self, attrs):
-        if len(attrs["agreement_ids"]) > 1 and attrs["status"] == DoubleCountingRegistration.VALID:
-            raise serializers.ValidationError({"status": "Un agrément valide ne peut être sélectionné qu'individuellement."})
-        return attrs
 
 
 class AgreementAdminListActionMixin:
@@ -45,37 +36,21 @@ class AgreementAdminListActionMixin:
                 required=True,
             ),
         ],
-        request=AgreementStatusBulkUpdateSerializer,
-        responses={
-            200: inline_serializer(
-                name="AgreementStatusBulkUpdateResponse",
-                fields={"updated_count": serializers.IntegerField()},
-            ),
-            400: inline_serializer(
-                name="AgreementStatusBulkUpdateErrorResponse",
-                fields={"message": serializers.CharField()},
-            ),
-        },
+        request=AgreementStatusUpdateSerializer,
+        responses=inline_serializer(
+            name="AgreementStatusUpdateResponse",
+            fields={"status": serializers.ChoiceField(choices=DoubleCountingRegistration.STATUS_CHOICES)},
+        ),
     )
-    @action(methods=["post"], detail=False, url_path="bulk-update-status")
-    def bulk_update_status(self, request, *args, **kwargs):
-        serializer = AgreementStatusBulkUpdateSerializer(data=request.data)
+    @action(methods=["patch"], detail=True, url_path="update-status")
+    def update_status(self, request, *args, **kwargs):
+        serializer = AgreementStatusUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        agreement_ids = set(serializer.validated_data["agreement_ids"])
-        with transaction.atomic():
-            agreements_queryset = self.get_queryset().select_related(None).filter(id__in=agreement_ids)
-            if len(agreement_ids) > 1:
-                agreements_queryset = agreements_queryset.filter(status=DoubleCountingRegistration.VALID)
-            agreements = list(agreements_queryset.select_for_update())
-            if {agreement.id for agreement in agreements} != agreement_ids:
-                raise ValidationError({"message": DoubleCountingError.AGREEMENTS_NOT_UPDATABLE})
-
-            for agreement in agreements:
-                agreement.status = serializer.validated_data["status"]
-            DoubleCountingRegistration.objects.bulk_update(agreements, ["status"])
-
-        return Response({"updated_count": len(agreement_ids)})
+        agreement = self.get_object()
+        agreement.status = serializer.validated_data["status"]
+        agreement.save(update_fields=["status"])
+        return Response({"status": agreement.status})
 
     @extend_schema(
         filters=True,

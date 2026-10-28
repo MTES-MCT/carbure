@@ -905,6 +905,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/double-counting/agreements/{id}/update-status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["double_counting_agreements_update_status_partial_update"];
+        trace?: never;
+    };
     "/api/double-counting/agreements/agreement-admin/": {
         parameters: {
             query?: never;
@@ -931,22 +947,6 @@ export interface paths {
         get: operations["double_counting_agreements_agreement_public_list"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/double-counting/agreements/bulk-update-status/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["double_counting_agreements_bulk_update_status_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3630,15 +3630,8 @@ export interface components {
             expired: components["schemas"]["DoubleCountingRegistration"][];
             inactive: components["schemas"]["DoubleCountingRegistration"][];
         };
-        AgreementStatusBulkUpdateErrorResponse: {
-            message: string;
-        };
-        AgreementStatusBulkUpdateRequest: {
-            agreement_ids: number[];
+        AgreementStatusUpdateResponse: {
             status: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
-        };
-        AgreementStatusBulkUpdateResponse: {
-            updated_count: number;
         };
         Airport: {
             readonly id: number;
@@ -6628,6 +6621,9 @@ export interface components {
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
         };
+        PatchedAgreementStatusUpdateRequest: {
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+        };
         PatchedBiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             producer?: number;
@@ -9439,6 +9435,37 @@ export interface operations {
             };
         };
     };
+    double_counting_agreements_update_status_partial_update: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Certificat Double Compte. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementStatusUpdateResponse"];
+                };
+            };
+        };
+    };
     double_counting_agreements_agreement_admin_retrieve: {
         parameters: {
             query: {
@@ -9519,42 +9546,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DoubleCountingRegistrationPublic"][];
-                };
-            };
-        };
-    };
-    double_counting_agreements_bulk_update_status_create: {
-        parameters: {
-            query: {
-                /** @description Entity ID */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AgreementStatusBulkUpdateRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["AgreementStatusBulkUpdateRequest"];
-                "multipart/form-data": components["schemas"]["AgreementStatusBulkUpdateRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgreementStatusBulkUpdateResponse"];
-                };
-            };
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgreementStatusBulkUpdateErrorResponse"];
                 };
             };
         };

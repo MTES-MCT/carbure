@@ -156,14 +156,14 @@ export function getDoubleCountingAgreementList(query: AgreementListQuery) {
   })
 }
 
-export function updateDoubleCountingAgreementsStatus(
+export function updateDoubleCountingAgreementStatus(
   entity_id: number,
-  agreement_ids: number[],
+  agreement_id: number,
   status: AgreementRegistrationStatus
 ) {
-  return apiFetch.POST("/double-counting/agreements/bulk-update-status/", {
-    params: { query: { entity_id } },
-    body: { agreement_ids, status },
+  return apiFetch.PATCH("/double-counting/agreements/{id}/update-status/", {
+    params: { query: { entity_id }, path: { id: agreement_id } },
+    body: { status },
   })
 }
 
