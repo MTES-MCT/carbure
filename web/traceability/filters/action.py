@@ -1,7 +1,7 @@
 from django_filters import FilterSet, MultipleChoiceFilter, NumberFilter, OrderingFilter
 
 from core.filters import MultiValueInFilter
-from traceability.filters.recursive import NearestSiteFilter, OriginMaterialFilter, ProducerFilter, RootPosFilter
+from traceability.filters.recursive import OriginMaterialFilter
 from traceability.models import Action, ActionStatus
 
 
@@ -16,13 +16,8 @@ class ActionFilter(FilterSet):
     holder = MultiValueInFilter(field_name="holder__name")
     material = MultiValueInFilter(field_name="material__code")
     site = MultiValueInFilter(field_name="site__name")
-    shipping_method = MultipleChoiceFilter(
-        field_name="shipping_method", choices=Action.SHIPPING_METHODS, distinct=False
-    )
+    shipping_method = MultipleChoiceFilter(field_name="shipping_method", choices=Action.SHIPPING_METHODS, distinct=False)
     origin_material = OriginMaterialFilter()
-    producer = ProducerFilter()
-    root_pos = RootPosFilter()
-    nearest_site = NearestSiteFilter()
 
     order_by = OrderingFilter(
         fields=(

@@ -1,30 +1,8 @@
-"""Values the front receives from the parent-chain walk.
+"""Raw ids carried by the ``inherited_fields`` column group.
 
-The walk lives in ``services/parent_chain.py`` and always reaches the root.
-This climber carries the raw ids. ``attach_inherited_fields`` loads the rows
-and sets ``action.inherited_fields``.
-
-``previous_material`` is the nearest declared material above the action.
-The climb keeps the first non-empty value. The action's own material is ignored.
-
-``origin_material`` is the first declared material from the root. A parent
-replaces the value so far. The action's own material is kept when nothing
-above declares one.
-
-``nearest_site`` is the first site above the action, same keep-first rule.
-The action's own site is ignored.
-
-``producer`` and ``root_pos`` are the holder and the ``pos_id`` of the root.
-Each step replaces them with the parent's, so the last row is the root.
-``ROOT_COLUMNS`` maps those columns to the field stored on the root action.
-A filter on one of them selects the roots directly, then walks down to their
-children. A new root filter adds one entry there.
-
-A new value returned to the front is declared in ``inherited_start``,
-``inherited_climb``, ``inherited_annotation``, ``attach_inherited_fields``,
-and on ``ActionInheritedFieldsSerializer``.
-
-Walkthrough: ``traceability/docs/inherited_fields.md``.
+``attach_inherited_fields`` loads the rows and sets ``action.inherited_fields``.
+Field rules: ``traceability/docs/inherited_fields.md``.
+The walk and ``ROOT_COLUMNS``: ``traceability/docs/parent_chain.md``.
 """
 
 from django.db.models import BigIntegerField, F, QuerySet, Value
@@ -37,11 +15,10 @@ from transactions.models import Site
 
 _ID = BigIntegerField()
 
-# Filter columns that are copied from the root action. The value is the field on that action.
-ROOT_COLUMNS = {
-    "root_holder_id": "holder_id",
-    "root_pos_id": "pos_id",
-}
+# Vide : aucun filtre ne lit encore une valeur stockée sur la racine.
+# Tout champ qui vient de la racine se déclare ici.
+# La clé est la colonne portée par le parcours, la valeur est le champ sur l'action racine.
+ROOT_COLUMNS = {}
 
 
 def _empty_id():
@@ -108,4 +85,4 @@ def attach_inherited_fields(actions: list[Action]) -> list[Action]:
 def annotate_inherited_fields(queryset: QuerySet[Action]) -> QuerySet[Action]:
     from traceability.services.parent_chain import annotate_parent_chain
 
-    return annotate_parent_chain(queryset, climbers=("inherited_fields",))
+    return annotate_parent_chain(queryset, groups=("inherited_fields",))

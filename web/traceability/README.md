@@ -2,6 +2,13 @@
 
 Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : elle branche un **handler**.
 
+| Doc | Sujet |
+|---|---|
+| [`docs/parent_chain.md`](docs/parent_chain.md) | Parcours récursif, filtres, ajout d'une colonne |
+| [`docs/inherited_fields.md`](docs/inherited_fields.md) | Règles des champs hérités |
+| [`docs/total_emissions.md`](docs/total_emissions.md) | Formule du cumul GES |
+| [`docs/excel.md`](docs/excel.md) | Colonnes et import Excel |
+
 ## Choix de conception
 
 - **Les facteurs vivent sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont lus sur `Material` à chaque calcul. Un changement de PCI au catalogue s’applique aux actions déjà créées. À l’import Excel, une matière sans `lhv` **et** sans `density` lève une erreur interne (oubli catalogue, pas une erreur de cellule).
@@ -31,7 +38,7 @@ Fichier : [`fixtures/materials.csv`](fixtures/materials.csv), le catalogue édit
 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 
-`inherited_fields` et `total_emissions` sont calculés à la lecture par le même parcours de parents (`services/parent_chain.py`), sur la page ou l'action du détail. Les matières résolues sont `previous_material` (la plus proche au-dessus) et `origin_material` (la première depuis la racine). Voir [`docs/inherited_fields.md`](docs/inherited_fields.md).
+`inherited_fields` et `total_emissions` sont calculés à la lecture par le même parcours de parents ([`docs/parent_chain.md`](docs/parent_chain.md)).
 
 ## Ce que la filière personnalise
 

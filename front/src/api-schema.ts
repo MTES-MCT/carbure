@@ -3704,9 +3704,6 @@ export interface components {
         };
         /**
          * @description * `INIT` - INIT
-         *     * `TEST1` - TEST1
-         *     * `TEST2` - TEST2
-         *     * `TEST3` - TEST3
          *     * `VALORIZE` - VALORIZE
          * @enum {string}
          */
@@ -15935,7 +15932,6 @@ export interface operations {
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
-                nearest_site?: string[];
                 /**
                  * @description Ordre
                  *
@@ -15965,8 +15961,6 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
-                producer?: string[];
-                root_pos?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -15988,9 +15982,6 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
-                 *     * `TEST1` - TEST1
-                 *     * `TEST2` - TEST2
-                 *     * `TEST3` - TEST3
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16081,7 +16072,6 @@ export interface operations {
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
-                nearest_site?: string[];
                 /**
                  * @description Ordre
                  *
@@ -16107,8 +16097,6 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
-                producer?: string[];
-                root_pos?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16130,9 +16118,6 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
-                 *     * `TEST1` - TEST1
-                 *     * `TEST2` - TEST2
-                 *     * `TEST3` - TEST3
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16231,7 +16216,6 @@ export interface operations {
                 /** @description * `H2` - Hydrogène */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
-                nearest_site?: string[];
                 /**
                  * @description Ordre
                  *
@@ -16257,8 +16241,6 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
-                producer?: string[];
-                root_pos?: string[];
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16280,9 +16262,6 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
-                 *     * `TEST1` - TEST1
-                 *     * `TEST2` - TEST2
-                 *     * `TEST3` - TEST3
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16847,20 +16826,14 @@ export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
     INIT = "INIT",
-    TEST1 = "TEST1",
-    TEST2 = "TEST2",
-    TEST3 = "TEST3",
     VALORIZE = "VALORIZE"
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     holder = "holder",
     material = "material",
-    nearest_site = "nearest_site",
     order_by = "order_by",
     origin_material = "origin_material",
     period = "period",
-    producer = "producer",
-    root_pos = "root_pos",
     shipping_method = "shipping_method",
     site = "site",
     status = "status",
