@@ -7,18 +7,6 @@ from core.models import CarbureLot
 from .helpers import generic_error
 
 
-def check_volume_faible(lot: CarbureLot):
-    if lot.volume < 2000 and lot.delivery_type not in [
-        CarbureLot.RFC,
-        CarbureLot.FLUSHED,
-    ]:
-        return generic_error(
-            error=CarbureSanityCheckErrors.VOLUME_FAIBLE,
-            lot=lot,
-            field="volume",
-        )
-
-
 def check_delivery_date_validity(lot: CarbureLot):
     if not lot.parent_stock:
         return
@@ -128,24 +116,6 @@ def check_bc_not_configured(lot: CarbureLot, prefetched_data):
                     display_to_auditor=True,
                     field="biofuel_code",
                 )
-
-
-def check_depot_not_configured(lot: CarbureLot, prefetched_data):
-    if lot.carbure_client and lot.delivery_type != CarbureLot.TRADING:  # ignore delivery issues for trading
-        depots_by_entity = prefetched_data["depotsbyentity"]
-        depots = depots_by_entity.get(lot.carbure_client.pk, [])
-
-        if lot.carbure_delivery_site is not None and lot.carbure_delivery_site.depot_id not in depots:
-            # not a single delivery sites linked to entity
-            return generic_error(
-                error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED,
-                lot=lot,
-                display_to_recipient=True,
-                display_to_creator=False,
-                display_to_admin=False,
-                display_to_auditor=False,
-                field="delivery_site",
-            )
 
 
 def check_declaration_already_validated(lot: CarbureLot, prefetched_data):

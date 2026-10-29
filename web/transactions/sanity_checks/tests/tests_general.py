@@ -7,7 +7,7 @@ from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Susta
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from resources.factories import ProductionSiteFactory
 from transactions.factories import CarbureLotFactory
-from transactions.models import Depot, EntitySite, YearConfig
+from transactions.models import Depot, YearConfig
 from transactions.sanity_checks.general import check_missing_delivery_type
 
 from ..helpers import enrich_lot, get_prefetched_data, has_blocking_errors, has_error
@@ -88,19 +88,6 @@ class GeneralSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
 
-    def x_test_volume_faible(self):
-        error = CarbureSanityCheckErrors.VOLUME_FAIBLE
-
-        lot = self.create_lot(volume=2001)
-
-        error_list = self.run_checks(lot)
-        assert not has_error(error, error_list)
-
-        lot.volume = 1999
-
-        error_list = self.run_checks(lot)
-        assert has_error(error, error_list)
-
     def test_year_locked(self):
         error = CarbureSanityCheckErrors.YEAR_LOCKED
 
@@ -130,33 +117,6 @@ class GeneralSanityChecksTest(TestCase):
 
         error_list = self.run_checks(lot)
         assert has_error(error, error_list)
-
-    def x_test_depot_not_configured(self):
-        error = CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED
-
-        depot = Depot.objects.first()
-        other_depot = Depot.objects.last()
-
-        EntitySite.objects.filter(entity=self.producer).delete()
-
-        lot = self.create_lot(
-            added_by=self.producer,
-            carbure_client=self.producer,
-            carbure_delivery_site=other_depot,
-            delivery_type=CarbureLot.BLENDING,
-        )
-
-        EntitySite.objects.create(entity=self.producer, site=depot)
-
-        prefetched_data = get_prefetched_data(self.producer)
-
-        error_list = self.run_checks(lot, prefetched_data)
-        assert has_error(error, error_list)
-
-        lot.carbure_delivery_site = depot
-
-        error_list = self.run_checks(lot, prefetched_data)
-        assert not has_error(error, error_list)
 
     def x_test_mp_not_configured(self):
         error = CarbureSanityCheckErrors.MP_NOT_CONFIGURED
