@@ -1,0 +1,12 @@
+.tree,
+.branch {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.branch {
+  margin-left: 1rem;
+  padding-left: 0.75rem;
+  border-left: 1px solid var(--border-default-grey);
+}

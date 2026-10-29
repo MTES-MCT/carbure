@@ -3,6 +3,7 @@ from django.contrib import admin, messages
 from core.models import StoredFile
 from traceability.exceptions import NoEligibleActionError
 from traceability.models import Action, ActionStatus, Material
+from traceability.models.action import annotate_latest_status
 from traceability.services.refuse import refuse
 from traceability.services.valorize import valorize
 
@@ -110,6 +111,9 @@ class ActionAdmin(admin.ModelAdmin):
     date_hierarchy = "working_date"
     inlines = (ActionStatusInline,)
     actions = [valorize_actions_into_certificates, refuse_selected_actions]
+
+    def get_queryset(self, request):
+        return annotate_latest_status(super().get_queryset(request))
 
     @admin.display(description="Statut", ordering="status")
     def latest_status(self, obj):

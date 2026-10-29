@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from core.serializer_fields import LabelChoiceField
@@ -13,6 +14,7 @@ from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
 from traceability.serializers.total_emissions import ActionTotalEmissionsSerializer
 from traceability.services.action_import_file import store_action_import_file
+from traceability.services.parent_chain import load_action_tree
 
 
 class ActionParentSerializer(serializers.ModelSerializer):
@@ -40,6 +42,27 @@ class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         exclude = ["file"]
+
+
+class ActionTreePartySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
+class ActionTreeNodeSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    parent_id = serializers.IntegerField(allow_null=True)
+    type = serializers.ChoiceField(choices=Action.TYPES)
+    holder = ActionTreePartySerializer()
+    site = ActionTreePartySerializer(allow_null=True)
+
+
+class ActionDetailSerializer(ActionSerializer):
+    tree = serializers.SerializerMethodField()
+
+    @extend_schema_field(ActionTreeNodeSerializer(many=True))
+    def get_tree(self, action):
+        return ActionTreeNodeSerializer(load_action_tree(action.pk), many=True).data
 
 
 class ActionInputSerializer(serializers.ModelSerializer):

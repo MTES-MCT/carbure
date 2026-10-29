@@ -29,7 +29,7 @@ class ValorizeTest(TestCase):
         self.assertEqual(child.holder_id, action.holder_id)
         self.assertIsNone(child.material_id)
         self.assertEqual(child.quantity, action.quantity)
-        self.assertEqual(Action.objects.get(pk=action.pk).status, ActionStatus.ACCEPTED)
+        self.assertEqual(Action.objects.with_status().get(pk=action.pk).status, ActionStatus.ACCEPTED)
 
     def test_displayed_unit_is_the_parent_material(self):
         action = self._pending_init(

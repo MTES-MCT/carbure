@@ -10,8 +10,9 @@ import useEntity from "common/hooks/entity"
 
 import { getActionDetail } from "traceability/api"
 import { ActionForm } from "traceability/components/action-form"
+import { ActionTree } from "traceability/components/action-tree/action-tree"
 import { ActionFieldset } from "traceability/hooks/action-fields"
-import { Action, ActionIndustry } from "traceability/types"
+import { Action, ActionDetail, ActionIndustry } from "traceability/types"
 
 export type ActionModalProps = {
   title: string
@@ -36,7 +37,7 @@ export const ActionModal = ({
     params: [entity.id, parseInt(match?.params.id ?? "", 10), industry],
   })
 
-  const action = actionResponse.result?.data
+  const action: ActionDetail | undefined = actionResponse.result?.data
 
   const closeDialog = () => {
     navigate({ search: location.search, hash: "#" })
@@ -59,6 +60,9 @@ export const ActionModal = ({
         }
       >
         <ActionForm action={action} fieldsets={fieldsets} />
+        {action?.tree && (
+          <ActionTree nodes={action.tree} currentId={action.id} />
+        )}
 
         {actionResponse.loading && <LoaderOverlay />}
       </Dialog>

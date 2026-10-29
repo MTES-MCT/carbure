@@ -28,9 +28,9 @@ def _names(groups: Iterable[str]) -> list[str]:
 
 def _chain_cte(queryset: QuerySet[Action], groups: Iterable[str]) -> CTE:
     actions = _plain_actions()
-    # Mysql refuse les sous-requetes et order by dans une requete récursive
-    # Ici "queryset" a les sous-requetes status, created_at, updated_at etc... + l'order by par défaut définit sur la table
-    # Donc on réinitialise l'order by et on ne prend que les ids
+    # MySQL rejects ORDER BY and a status subquery inside a recursive CTE.
+    # The caller queryset may carry both when the list filters by status.
+    # The walk stays on plain actions and receives only ids.
     listed = actions.filter(pk__in=queryset.order_by().values("pk"))
     parts = [COLUMN_GROUPS[name] for name in _names(groups)]
 
@@ -109,6 +109,47 @@ def _matching_roots(columns: dict[str, list]) -> list[int] | None:
     for field, values in selected.items():
         roots = roots.filter(**{f"{field}__in": values})
     return list(roots.values_list("pk", flat=True))
+
+
+def load_action_tree(action_id: int) -> list[dict]:
+    """Every node of the action's tree: the root and all of its descendants.
+
+    Two short walks, then one query for id, type, holder and site.
+    """
+    root_id = _root_id(action_id)
+    ids = _descendant_ids([root_id]) or [action_id]
+    rows = (
+        _plain_actions()
+        .filter(pk__in=ids)
+        .order_by("id")
+        .values("id", "parent_id", "type", "holder_id", "holder__name", "site_id", "site__name")
+    )
+    return [
+        {
+            "id": row["id"],
+            "parent_id": row["parent_id"],
+            "type": row["type"],
+            "holder": {"id": row["holder_id"], "name": row["holder__name"]},
+            "site": {"id": row["site_id"], "name": row["site__name"]} if row["site_id"] else None,
+        }
+        for row in rows
+    ]
+
+
+def _root_id(action_id: int) -> int:
+    actions = _plain_actions()
+    listed = actions.filter(pk=action_id)
+
+    def walk(cte):
+        start = listed.values(node_id=F("id"), next_parent_id=F("parent_id"))
+        climb = cte.join(actions, id=cte.col.next_parent_id).values(node_id=F("id"), next_parent_id=F("parent_id"))
+        return start.union(climb, all=True)
+
+    cte = CTE.recursive(walk, name="ancestors")
+    # `.first()` orders by the model pk (`id`), which this CTE does not have.
+    rows = cte.queryset().filter(next_parent_id__isnull=True).order_by("node_id")
+    root = with_cte(cte, select=rows).values_list("node_id", flat=True).first()
+    return root or action_id
 
 
 def _descendant_ids(root_ids: list[int]) -> list[int]:

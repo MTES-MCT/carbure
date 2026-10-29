@@ -10,6 +10,8 @@ import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export type Action = apiTypes["Action"]
+export type ActionDetail = apiTypes["ActionDetail"]
+export type ActionTreeNode = apiTypes["ActionTreeNode"]
 export type ActionTotalEmissions = NonNullable<Action["total_emissions"]>
 export type ActionHolder = NonNullable<Action["holder"]>
 export type ActionMaterial = NonNullable<Action["material"]>

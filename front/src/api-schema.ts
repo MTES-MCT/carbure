@@ -3614,6 +3614,9 @@ export interface components {
             certificate_type: components["schemas"]["CertificateTypeEnum"];
             certificate_holder: string;
         };
+        ActionDetail: components["schemas"]["Action"] & {
+            readonly tree: components["schemas"]["ActionTreeNode"][];
+        };
         ActionExcelUploadRequest: {
             /** Format: binary */
             file: File;
@@ -3685,6 +3688,17 @@ export interface components {
             readonly eccr: string;
             /** Format: decimal */
             readonly total: string;
+        };
+        ActionTreeNode: {
+            id: number;
+            parent_id: number | null;
+            type: components["schemas"]["ActionTypeEnum"];
+            holder: components["schemas"]["ActionTreeParty"];
+            site: components["schemas"]["ActionTreeParty"] | null;
+        };
+        ActionTreeParty: {
+            id: number;
+            name: string;
         };
         /**
          * @description * `INIT` - INIT
@@ -15967,7 +15981,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Action"];
+                    "application/json": components["schemas"]["ActionDetail"];
                 };
             };
         };

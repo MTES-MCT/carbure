@@ -13601,7 +13601,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Action"
+                $ref: "#/components/schemas/ActionDetail"
           description: ""
     delete:
       operationId: traceability_actions_destroy
@@ -14437,6 +14437,18 @@ components:
         - certificate_id
         - certificate_type
         - id
+    ActionDetail:
+      allOf:
+        - $ref: "#/components/schemas/Action"
+        - type: object
+          required:
+            - tree
+          properties:
+            tree:
+              type: array
+              readOnly: true
+              items:
+                $ref: "#/components/schemas/ActionTreeNode"
     ActionExcelUploadRequest:
       type: object
       properties:
@@ -14606,6 +14618,38 @@ components:
         - etd
         - eu
         - total
+    ActionTreeNode:
+      type: object
+      properties:
+        id:
+          type: integer
+        parent_id:
+          type: integer
+          nullable: true
+        type:
+          $ref: "#/components/schemas/ActionTypeEnum"
+        holder:
+          $ref: "#/components/schemas/ActionTreeParty"
+        site:
+          allOf:
+            - $ref: "#/components/schemas/ActionTreeParty"
+          nullable: true
+      required:
+        - holder
+        - id
+        - parent_id
+        - site
+        - type
+    ActionTreeParty:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
     ActionTypeEnum:
       enum:
         - CONSUME

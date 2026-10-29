@@ -8,18 +8,21 @@ from django.utils.translation import gettext_lazy as _
 from .action_status import ActionStatus
 
 
-class ActionManager(models.Manager):
-    def get_queryset(self):
-        first_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("created_at", "id")
-        latest_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("-created_at", "-id")
+class ActionQuerySet(QuerySet):
+    def with_status(self) -> "ActionQuerySet":
+        """Annotate the current status, the latest ActionStatus row."""
+        return annotate_latest_status(self)
 
+
+class ActionManager(models.Manager.from_queryset(ActionQuerySet)):
+    def get_queryset(self):
+        # status stays off this queryset. A correlated subquery here runs once per
+        # action before LIMIT. Callers add it with with_status() when they filter,
+        # order, or read the current status.
         return (
             super()
             .get_queryset()
             .select_related("holder", "material", "site", "parent", "certificate")
-            .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
-            .annotate(created_at=Subquery(first_status_subquery.values("created_at")[:1]))
-            .annotate(updated_at=Subquery(latest_status_subquery.values("created_at")[:1]))
             .annotate(
                 period=Concat(
                     ExtractYear("working_date"),
@@ -29,6 +32,14 @@ class ActionManager(models.Manager):
                 )
             )
         )
+
+
+def annotate_latest_status(queryset: QuerySet) -> QuerySet:
+    """Annotate the current status without stacking the subquery twice."""
+    if "status" in queryset.query.annotations:
+        return queryset
+    latest_status = ActionStatus.objects.filter(action=OuterRef("id")).order_by("-created_at", "-id")
+    return queryset.annotate(status=Subquery(latest_status.values("status")[:1]))
 
 
 class Action(models.Model):

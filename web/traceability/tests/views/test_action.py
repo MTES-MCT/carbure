@@ -1,3 +1,4 @@
+import re
 from unittest.mock import patch
 
 from django.db import connection
@@ -10,6 +11,7 @@ from core.models import Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory, MaterialFactory
 from traceability.models import Action
+from traceability.models.action_status import ActionStatus
 from traceability.services.parent_chain import annotate_parent_chain
 
 
@@ -118,6 +120,37 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertEqual(response.data["inherited_fields"]["previous_material"]["code"], self.own_action.material.code)
         self.assertEqual(response.data["inherited_fields"]["origin_material"]["name"], self.own_action.material.name)
 
+    def test_retrieve_returns_the_whole_tree(self):
+        grandchild = ActionFactory.create(
+            holder=self.entity,
+            industry=Action.H2,
+            parent=self.child_of_own_action,
+            site=None,
+        )
+
+        response = self.client.get(
+            reverse("traceability-action-detail", args=[self.child_of_own_action.id]),
+            self.base_params,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        by_id = {node["id"]: node for node in response.data["tree"]}
+        self.assertEqual(
+            set(by_id),
+            {self.own_action.id, self.child_of_own_action.id, grandchild.id},
+        )
+        self.assertIsNone(by_id[self.own_action.id]["parent_id"])
+        self.assertEqual(by_id[self.own_action.id]["holder"]["name"], self.entity.name)
+        self.assertEqual(by_id[self.own_action.id]["site"]["id"], self.own_action.site_id)
+        self.assertEqual(by_id[grandchild.id]["parent_id"], self.child_of_own_action.id)
+        self.assertIsNone(by_id[grandchild.id]["site"])
+
+    def test_list_does_not_include_the_tree(self):
+        response = self.client.get(self.list_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotIn("tree", response.data["results"][0])
+
     def test_retrieve_includes_total_emissions(self):
         response = self.client.get(
             reverse("traceability-action-detail", args=[self.own_action.id]),
@@ -143,6 +176,42 @@ class ActionViewsetQuerysetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(seen_pks, [self.own_action.id])
+
+    def test_list_keeps_status_off_the_page_query_until_it_is_filtered_or_ordered(self):
+        accepted = ActionFactory.create(
+            holder=self.entity,
+            industry=Action.H2,
+            status=ActionStatus.ACCEPTED,
+        )
+
+        plain = self.client.get(self.list_url, self.base_params)
+        self.assertEqual(plain.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            {item["id"]: item["status"] for item in plain.data["results"]}[self.own_action.id],
+            ActionStatus.PENDING,
+        )
+        self.assertNotIn("action_status", self._page_sql(self.base_params))
+
+        filtered = self.client.get(self.list_url, {**self.base_params, "status": ActionStatus.ACCEPTED})
+        self.assertEqual(filtered.status_code, status.HTTP_200_OK)
+        self.assertEqual([item["id"] for item in filtered.data["results"]], [accepted.id])
+        self.assertIn("action_status", self._page_sql({**self.base_params, "status": ActionStatus.ACCEPTED}))
+
+        ordered = self.client.get(self.list_url, {**self.base_params, "order_by": "status"})
+        self.assertEqual(ordered.status_code, status.HTTP_200_OK)
+        self.assertIn("action_status", self._page_sql({**self.base_params, "order_by": "-status"}))
+
+    def _page_sql(self, params):
+        with CaptureQueriesContext(connection) as captured:
+            response = self.client.get(self.list_url, params)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        pages = [
+            query["sql"].lower()
+            for query in captured.captured_queries
+            if "from `action`" in query["sql"].lower() and re.search(r"limit \d+\s*$", query["sql"].lower())
+        ]
+        self.assertEqual(len(pages), 1)
+        return pages[0]
 
     def test_list_annotates_the_page_once(self):
         seen = []

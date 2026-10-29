@@ -17,7 +17,7 @@ class RefuseTest(TestCase):
 
         self.assertEqual(len(refused), 1)
         self.assertEqual(refused[0].pk, action.pk)
-        self.assertEqual(Action.objects.get(pk=action.pk).status, ActionStatus.REJECTED)
+        self.assertEqual(Action.objects.with_status().get(pk=action.pk).status, ActionStatus.REJECTED)
 
     def test_skips_ineligible_actions(self):
         pending = ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None)
@@ -29,7 +29,7 @@ class RefuseTest(TestCase):
 
         self.assertEqual(len(refused), 1)
         self.assertEqual(refused[0].pk, pending.pk)
-        self.assertEqual(Action.objects.get(pk=pending.pk).status, ActionStatus.REJECTED)
+        self.assertEqual(Action.objects.with_status().get(pk=pending.pk).status, ActionStatus.REJECTED)
 
     def test_raises_when_nothing_is_eligible(self):
         ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, status=ActionStatus.CREATED)

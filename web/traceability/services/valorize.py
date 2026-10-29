@@ -5,6 +5,7 @@ from django.db.models import QuerySet
 
 from traceability.exceptions import NoEligibleActionError
 from traceability.models import Action, ActionStatus
+from traceability.models.action import annotate_latest_status
 
 
 @transaction.atomic
@@ -16,7 +17,7 @@ def valorize(actions: QuerySet[Action]) -> list[Action]:
     Ineligible rows in `actions` are skipped.
     Raises NoEligibleActionError if none remain.
     """
-    pending_inits = list(actions.filter(type=Action.INIT, status=ActionStatus.PENDING))
+    pending_inits = list(annotate_latest_status(actions).filter(type=Action.INIT, status=ActionStatus.PENDING))
     if not pending_inits:
         raise NoEligibleActionError()
 
