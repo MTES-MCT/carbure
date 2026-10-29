@@ -45,17 +45,8 @@ class Action(models.Model):
     industry = models.CharField(verbose_name="Filière", choices=INDUSTRIES, max_length=16)
 
     INIT = "INIT"
-    TEST1 = "TEST1"
-    TEST2 = "TEST2"
-    TEST3 = "TEST3"
     VALORIZE = "VALORIZE"
-    TYPES = [
-        (INIT, "INIT"),
-        (TEST1, "TEST1"),
-        (TEST2, "TEST2"),
-        (TEST3, "TEST3"),
-        (VALORIZE, "VALORIZE"),
-    ]
+    TYPES = [(INIT, "INIT"), (VALORIZE, "VALORIZE")]
     type = models.CharField(verbose_name="Type d'action", choices=TYPES, max_length=16)
 
     parent = models.ForeignKey(

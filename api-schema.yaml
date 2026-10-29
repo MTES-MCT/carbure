@@ -13385,14 +13385,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: nearest_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: order_by
           schema:
             type: array
@@ -13470,22 +13462,6 @@ paths:
               type: string
           explode: true
           style: form
-        - in: query
-          name: producer
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
-          name: root_pos
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
         - name: search
           required: false
           in: query
@@ -13551,15 +13527,9 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-                - TEST1
-                - TEST2
-                - TEST3
                 - VALORIZE
           description: |-
             * `INIT` - INIT
-            * `TEST1` - TEST1
-            * `TEST2` - TEST2
-            * `TEST3` - TEST3
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -13679,12 +13649,9 @@ paths:
             enum:
               - holder
               - material
-              - nearest_site
               - order_by
               - origin_material
               - period
-              - producer
-              - root_pos
               - shipping_method
               - site
               - status
@@ -13711,14 +13678,6 @@ paths:
           required: true
         - in: query
           name: material
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
-          name: nearest_site
           schema:
             type: array
             items:
@@ -13791,22 +13750,6 @@ paths:
               type: string
           explode: true
           style: form
-        - in: query
-          name: producer
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
-          name: root_pos
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
         - name: search
           required: false
           in: query
@@ -13872,15 +13815,9 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-                - TEST1
-                - TEST2
-                - TEST3
                 - VALORIZE
           description: |-
             * `INIT` - INIT
-            * `TEST1` - TEST1
-            * `TEST2` - TEST2
-            * `TEST3` - TEST3
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -14042,14 +13979,6 @@ paths:
           explode: true
           style: form
         - in: query
-          name: nearest_site
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
           name: order_by
           schema:
             type: array
@@ -14109,22 +14038,6 @@ paths:
           style: form
         - in: query
           name: period
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
-          name: producer
-          schema:
-            type: array
-            items:
-              type: string
-          explode: true
-          style: form
-        - in: query
-          name: root_pos
           schema:
             type: array
             items:
@@ -14196,15 +14109,9 @@ paths:
               title: Type d'action
               enum:
                 - INIT
-                - TEST1
-                - TEST2
-                - TEST3
                 - VALORIZE
           description: |-
             * `INIT` - INIT
-            * `TEST1` - TEST1
-            * `TEST2` - TEST2
-            * `TEST3` - TEST3
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -14672,16 +14579,10 @@ components:
     ActionTypeEnum:
       enum:
         - INIT
-        - TEST1
-        - TEST2
-        - TEST3
         - VALORIZE
       type: string
       description: |-
         * `INIT` - INIT
-        * `TEST1` - TEST1
-        * `TEST2` - TEST2
-        * `TEST3` - TEST3
         * `VALORIZE` - VALORIZE
     ActivateAccountRequest:
       type: object

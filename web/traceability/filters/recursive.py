@@ -1,36 +1,35 @@
 from django_filters.constants import EMPTY_VALUES
 
 from core.filters import MultiValueInFilter
-from core.models import Entity
 from traceability.models.material import Material
-from traceability.services.climbers import CLIMBERS
+from traceability.services.column_groups import COLUMN_GROUPS
 from traceability.services.parent_chain import chain_column, filter_by_chain
-from transactions.models.site import Site
 
 
 class RecursiveColumnFilter(MultiValueInFilter):
-    """One column of a climber declared in ``services/climbers.py``.
+    """One column of a group declared in ``services/column_groups.py``.
 
     Does not query by itself. When its query param is set, it calls ``RecursiveFilter``,
     which applies every active column in one walk.
-    Subclass, set ``climber`` and ``column``, and declare the subclass on ``ActionFilter``.
+    Subclass, set ``group`` and ``column``, and declare the subclass on ``ActionFilter``.
+    Walkthrough: ``traceability/docs/parent_chain.md``.
     """
 
     column: str
-    climber: str
+    group: str
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if "climber" not in cls.__dict__ and "column" not in cls.__dict__:
+        if "group" not in cls.__dict__ and "column" not in cls.__dict__:
             return
-        climber = cls.__dict__.get("climber")
+        group = cls.__dict__.get("group")
         column = cls.__dict__.get("column")
-        if not isinstance(climber, str) or not isinstance(column, str):
-            raise ValueError(f"{cls.__name__} must set climber and column")
-        if climber not in CLIMBERS:
-            raise ValueError(f"{cls.__name__}.climber {climber!r} is not in CLIMBERS")
-        if column not in CLIMBERS[climber].start():
-            raise ValueError(f"{cls.__name__}.column {column!r} is not produced by climber {climber!r}")
+        if not isinstance(group, str) or not isinstance(column, str):
+            raise ValueError(f"{cls.__name__} must set group and column")
+        if group not in COLUMN_GROUPS:
+            raise ValueError(f"{cls.__name__}.group {group!r} is not in COLUMN_GROUPS")
+        if column not in COLUMN_GROUPS[group].start():
+            raise ValueError(f"{cls.__name__}.column {column!r} is not produced by group {group!r}")
 
     def filter(self, qs, value):
         if value in EMPTY_VALUES:
@@ -47,7 +46,7 @@ class RecursiveColumnFilter(MultiValueInFilter):
     def distinct_values(self, queryset):
         stored = [
             stored_value
-            for _action_id, stored_value in chain_column(queryset, self.column, [self.climber])
+            for _action_id, stored_value in chain_column(queryset, self.column, [self.group])
             if stored_value is not None
         ]
         return self.to_labels(stored)
@@ -82,7 +81,7 @@ class RecursiveFilter:
         self.filterset._recursive_applied = True
 
         columns = {}
-        climbers = []
+        groups = []
         for filter_obj in self.filterset.filters.values():
             if not isinstance(filter_obj, RecursiveColumnFilter):
                 continue
@@ -92,15 +91,15 @@ class RecursiveFilter:
             if not values:
                 return queryset.none()
             columns[filter_obj.column] = values
-            climbers.append(filter_obj.climber)
-        return filter_by_chain(queryset, columns, climbers)
+            groups.append(filter_obj.group)
+        return filter_by_chain(queryset, columns, groups)
 
 
 class OriginMaterialFilter(RecursiveColumnFilter):
     """First declared material from the root. The query param is a material code."""
 
     column = "origin_material_id"
-    climber = "inherited_fields"
+    group = "inherited_fields"
 
     def to_values(self, codes):
         return list(Material.objects.filter(code__in=codes).values_list("pk", flat=True))
@@ -108,38 +107,3 @@ class OriginMaterialFilter(RecursiveColumnFilter):
     def to_labels(self, material_ids):
         codes = Material.objects.filter(pk__in=material_ids).order_by("code")
         return codes.values_list("code", flat=True)
-
-
-class ProducerFilter(RecursiveColumnFilter):
-    """Holder of the root action. The query param is the entity name."""
-
-    column = "root_holder_id"
-    climber = "inherited_fields"
-
-    def to_values(self, names):
-        return list(Entity.objects.filter(name__in=names).values_list("pk", flat=True))
-
-    def to_labels(self, holder_ids):
-        names = Entity.objects.filter(pk__in=holder_ids).order_by("name")
-        return names.values_list("name", flat=True)
-
-
-class RootPosFilter(RecursiveColumnFilter):
-    """pos_id of the root action. The query param is that pos_id."""
-
-    column = "root_pos_id"
-    climber = "inherited_fields"
-
-
-class NearestSiteFilter(RecursiveColumnFilter):
-    """First site set above the action. The action's own site is ignored."""
-
-    column = "nearest_site_id"
-    climber = "inherited_fields"
-
-    def to_values(self, names):
-        return list(Site.objects.filter(name__in=names).values_list("pk", flat=True))
-
-    def to_labels(self, site_ids):
-        names = Site.objects.filter(pk__in=site_ids).order_by("name")
-        return names.values_list("name", flat=True)

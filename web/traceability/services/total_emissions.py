@@ -1,9 +1,9 @@
 """GES columns carried by the shared parent-chain CTE.
 
-The recursive walk itself lives in ``services/parent_chain.py``.
-Walkthrough: ``traceability/docs/total_emissions.md``.
-
     total = eec + el + ei + ep + etd + eu - eccs - esca - eccr
+
+Formula and example: ``traceability/docs/total_emissions.md``.
+The walk: ``traceability/docs/parent_chain.md``.
 """
 
 from django.db.models import F, QuerySet
@@ -56,4 +56,4 @@ def emission_annotation(cte) -> dict:
 def annotate_total_emissions(queryset: QuerySet[Action]) -> QuerySet[Action]:
     from traceability.services.parent_chain import annotate_parent_chain
 
-    return annotate_parent_chain(queryset, climbers=("emissions",))
+    return annotate_parent_chain(queryset, groups=("emissions",))

@@ -1,10 +1,10 @@
 """Climb each action's parent chain once, up to the root.
 
-The columns it carries are declared in ``services/climbers.py``. Callers pass
-the climber names they need. MySQL rejects a recursive CTE nested inside
-another, so every requested column is produced here, in one WITH clause.
+Callers pass group names from ``services/column_groups.py``. MySQL rejects a
+recursive CTE nested inside another, so every requested column is produced
+here, in one WITH clause.
 
-The related rows are loaded afterwards by ``attach_inherited_fields``.
+Walkthrough: ``traceability/docs/parent_chain.md``.
 """
 
 from collections.abc import Iterable
@@ -13,7 +13,7 @@ from django.db.models import F, QuerySet
 from django_cte import CTE, with_cte
 
 from traceability.models.action import Action
-from traceability.services.climbers import CLIMBERS, PAGE_CLIMBERS
+from traceability.services.column_groups import COLUMN_GROUPS, PAGE_COLUMN_GROUPS
 from traceability.services.inherited_fields import ROOT_COLUMNS
 
 
@@ -22,29 +22,29 @@ def _plain_actions():
     return Action.unannotated.all().order_by()
 
 
-def _names(climbers: Iterable[str]) -> list[str]:
-    return list(dict.fromkeys(climbers))
+def _names(groups: Iterable[str]) -> list[str]:
+    return list(dict.fromkeys(groups))
 
 
-def _chain_cte(queryset: QuerySet[Action], climbers: Iterable[str]) -> CTE:
+def _chain_cte(queryset: QuerySet[Action], groups: Iterable[str]) -> CTE:
     actions = _plain_actions()
     # Mysql refuse les sous-requetes et order by dans une requete récursive
     # Ici "queryset" a les sous-requetes status, created_at, updated_at etc... + l'order by par défaut définit sur la table
     # Donc on réinitialise l'order by et on ne prend que les ids
     listed = actions.filter(pk__in=queryset.order_by().values("pk"))
-    parts = [CLIMBERS[name] for name in _names(climbers)]
+    parts = [COLUMN_GROUPS[name] for name in _names(groups)]
 
     def columns(cte=None):
         # UNION lines up columns by position. start and climb must share keys, in the same order.
         merged = {}
-        for climber in parts:
-            started = climber.start()
-            step = started if cte is None else climber.climb(cte)
+        for group in parts:
+            started = group.start()
+            step = started if cte is None else group.climb(cte)
             if list(step) != list(started):
                 raise ValueError(f"climb columns {list(step)} must match start columns {list(started)}")
             shared = set(merged).intersection(step)
             if shared:
-                raise ValueError(f"climbers share columns: {sorted(shared)}")
+                raise ValueError(f"column groups share columns: {sorted(shared)}")
             merged.update(step)
         return merged
 
@@ -65,23 +65,23 @@ def _chain_cte(queryset: QuerySet[Action], climbers: Iterable[str]) -> CTE:
     return CTE.recursive(walk, name="parent_chain")
 
 
-def _at_root(queryset: QuerySet[Action], climbers: Iterable[str]):
-    cte = _chain_cte(queryset, climbers)
+def _at_root(queryset: QuerySet[Action], groups: Iterable[str]):
+    cte = _chain_cte(queryset, groups)
     # Meta.ordering is `id`, which is not a column of this CTE.
     rows = cte.queryset().filter(next_parent_id__isnull=True).order_by()
     return cte, rows
 
 
-def annotate_parent_chain(queryset: QuerySet[Action], *, climbers: Iterable[str] = PAGE_CLIMBERS) -> QuerySet[Action]:
-    """Annotate the actions with the columns of the named climbers."""
-    names = _names(climbers)
+def annotate_parent_chain(queryset: QuerySet[Action], *, groups: Iterable[str] = PAGE_COLUMN_GROUPS) -> QuerySet[Action]:
+    """Annotate the actions with the columns of the named groups."""
+    names = _names(groups)
     if not names:
         return queryset
 
     cte = _chain_cte(queryset, names)
     annotations = {"_next_parent_id": cte.col.next_parent_id}
     for name in names:
-        annotate = CLIMBERS[name].annotate
+        annotate = COLUMN_GROUPS[name].annotate
         if annotate is not None:
             annotations.update(annotate(cte))
 
@@ -91,9 +91,9 @@ def annotate_parent_chain(queryset: QuerySet[Action], *, climbers: Iterable[str]
     return with_cte(cte, select=at_root.order_by(*ordering))
 
 
-def chain_column(queryset: QuerySet[Action], column: str, climbers: Iterable[str]):
+def chain_column(queryset: QuerySet[Action], column: str, groups: Iterable[str]):
     """Walk to the root and return ``(action id, column)``. No emissions, no action row."""
-    cte, rows = _at_root(queryset, climbers)
+    cte, rows = _at_root(queryset, groups)
     return with_cte(cte, select=rows).values_list("origin_id", column)
 
 
@@ -111,7 +111,6 @@ def _matching_roots(columns: dict[str, list]) -> list[int] | None:
     return list(roots.values_list("pk", flat=True))
 
 
-# Voir commentaire ci-dessous
 def _descendant_ids(root_ids: list[int]) -> list[int]:
     """The roots and every action below them."""
     actions = _plain_actions()
@@ -128,7 +127,7 @@ def _descendant_ids(root_ids: list[int]) -> list[int]:
     return list(with_cte(cte, select=rows).values_list("action_id", flat=True))
 
 
-def filter_by_chain(queryset: QuerySet[Action], columns: dict[str, list], climbers: Iterable[str]) -> QuerySet[Action]:
+def filter_by_chain(queryset: QuerySet[Action], columns: dict[str, list], groups: Iterable[str]) -> QuerySet[Action]:
     """Keep actions whose chain columns match every entry of ``columns``.
 
     The returned queryset is the caller's, restricted to the matching ids.
@@ -136,13 +135,11 @@ def filter_by_chain(queryset: QuerySet[Action], columns: dict[str, list], climbe
     if not columns:
         return queryset
 
-    # producer et root_pos (ROOT_COLUMNS) sont des valeurs stockées sur l'action racine.
-    # Une requête normale trouve ces racines. On ne descend vers leurs enfants que si elles
-    # sont moins nombreuses que la liste déjà filtrée (type, année, périmètre) : un pos_id
-    # vise souvent une seule chaîne, la descente ne parcourt qu'elle.
-    # Si le filtre vise presque toutes les racines (producer = le titulaire de toute la
-    # forêt), descendre recalculerait chaque action. On remonte alors depuis la liste, qui
-    # est déjà plus petite. origin_material et nearest_site remontent de la même façon.
+    # Une colonne de ROOT_COLUMNS est stockée sur l'action racine. Une requête normale
+    # trouve ces racines. On ne descend vers leurs enfants que si elles sont moins
+    # nombreuses que la liste déjà filtrée : un pos_id vise souvent une seule chaîne.
+    # Si le filtre vise presque toutes les racines, descendre recalculerait chaque action.
+    # On remonte alors depuis la liste, qui est déjà plus petite.
     root_ids = _matching_roots(columns)
     if root_ids is not None:
         if not root_ids:
@@ -153,9 +150,9 @@ def filter_by_chain(queryset: QuerySet[Action], columns: dict[str, list], climbe
     if not columns:
         return queryset
 
-    cte, rows = _at_root(queryset, climbers)
+    cte, rows = _at_root(queryset, groups)
     for column, values in columns.items():
         rows = rows.filter(**{f"{column}__in": values})
-    # Materialize once. A subquery would rerun the walk for the page count and the page.
+    # Une sous-requête relancerait le parcours pour le COUNT de la page, puis pour la page.
     matching_ids = list(with_cte(cte, select=rows).values_list("origin_id", flat=True))
     return queryset.filter(pk__in=matching_ids)
