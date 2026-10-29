@@ -47,7 +47,7 @@ DEFAULT_IF_PARAMS = {
     "contamination": 0.01,
     "max_features": 1.0,
     "max_samples": "auto",
-    "n_estimators": 300,
+    "n_estimators": 100,
     "n_jobs": None,
     "random_state": 42,
     "verbose": 0,
