@@ -16,6 +16,8 @@ DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540)  # approx 18 m
 
 def calc_ml_score(year=None, period=None):
     data = get_prefetched_data()
+    # {s.feedstock: s.default_value for s in ETDStats.objects.select_related('feedstock').all()}
+    data["etd"]
     # {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}
     eec = data["eec"]
     # {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.select_related('feedstock', 'biofuel').all()}
@@ -41,23 +43,32 @@ def calc_ml_score(year=None, period=None):
                     score += (
                         (min(entry.default_value, entry.average) - lot.eec) / min(entry.default_value, entry.average)
                     ) ** 2
+                if lot.eec > 1.2 * max(entry.default_value, entry.average):
+                    score += (
+                        (lot.eec - max(entry.default_value, entry.average)) / max(entry.default_value, entry.average)
+                    ) ** 2
         # ep penalisation
         key = lot.feedstock.code + lot.biofuel.code
         if key in ep:
             entry = ep[key]
             if lot.ep < 0.8 * entry.average:
                 score += ((entry.average - lot.ep) / entry.average) ** 2
+            if entry.default_value_max_ep > 0 and lot.ep > 1.2 * entry.default_value_max_ep:
+                score += ((lot.ep - entry.default_value_max_ep) / entry.default_value_max_ep) ** 2
 
         # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check  # noqa: E501
         # if lot.feedstock in etd:
         #    default_value = etd[lot.feedstock]
+        #    if lot.etd > 2 * default_value and lot.etd > 5:
+        #        score += 1 # louche - ETD trop gros
         #    if lot.country_of_origin:
         #        if not lot.country_of_origin.is_in_europe and lot.etd <= default_value:
         #            score += 1 # valeur ETD par defaut sur un lot qui vient de loin
         #        if lot.country_of_origin.is_in_europe and lot.etd == default_value:
         #            score += 0.5 # lot ne vient pas de loin, pas d'effort de calcul
         lot.ml_scoring = score
-        lot.ml_control_requested = score > 0
+        if score > 0:
+            lot.ml_control_requested = True
         lot.save()
 
 
