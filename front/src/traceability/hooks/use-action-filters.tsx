@@ -31,21 +31,6 @@ export function useActionFilters() {
       label: t("Matière d'origine"),
     },
 
-    producer: {
-      key: ActionFilter.producer,
-      label: t("Producteur"),
-    },
-
-    root_pos: {
-      key: ActionFilter.root_pos,
-      label: t("N° de POS d'origine"),
-    },
-
-    nearest_site: {
-      key: ActionFilter.nearest_site,
-      label: t("Site le plus proche"),
-    },
-
     order_by: {
       key: ActionFilter.order_by,
       label: t("Tri"),
