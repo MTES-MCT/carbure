@@ -11,27 +11,18 @@ django.setup()
 from core.models import CarbureLot  # noqa: E402
 from transactions.sanity_checks.helpers import get_prefetched_data  # noqa: E402
 
-DEFAULT_ML_SCORE_CONFIG = {
-    "eec_threshold": 0.8,
-    "eec_exponent": 2,
-    "ep_threshold": 0.8,
-    "ep_exponent": 2,
-    "lookback_days": 540,  # approx 18 months, based on transaction creation date
-    "control_threshold": 0.0,
-}
+DATE_BEGIN = datetime.date.today() - datetime.timedelta(days=540)  # approx 18 months
 
 
-def calc_ml_score(year=None, period=None, *, config=None):
-    config = {**DEFAULT_ML_SCORE_CONFIG, **(config or {})}
+def calc_ml_score(year=None, period=None):
     data = get_prefetched_data()
     # {s.feedstock.code + s.origin.code_pays: s for s in EECStats.objects.select_related('feedstock', 'origin').all()}
     eec = data["eec"]
     # {s.feedstock.code + s.biofuel.code: s for s in EPStats.objects.select_related('feedstock', 'biofuel').all()}
     ep = data["ep"]
 
-    date_begin = datetime.date.today() - datetime.timedelta(days=config["lookback_days"])
     lots = CarbureLot.objects.select_related("feedstock", "country_of_origin").filter(
-        created_at__gt=date_begin,
+        created_at__gt=DATE_BEGIN,
         lot_status__in=[CarbureLot.ACCEPTED, CarbureLot.FROZEN],
     )
     if year:
@@ -46,19 +37,27 @@ def calc_ml_score(year=None, period=None, *, config=None):
             key = lot.feedstock.code + lot.country_of_origin.code_pays
             if key in eec:
                 entry = eec[key]
-                if lot.eec < config["eec_threshold"] * min(entry.default_value, entry.average):
+                if lot.eec < 0.8 * min(entry.default_value, entry.average):
                     score += (
                         (min(entry.default_value, entry.average) - lot.eec) / min(entry.default_value, entry.average)
-                    ) ** config["eec_exponent"]
+                    ) ** 2
         # ep penalisation
         key = lot.feedstock.code + lot.biofuel.code
         if key in ep:
             entry = ep[key]
-            if lot.ep < config["ep_threshold"] * entry.average:
-                score += ((entry.average - lot.ep) / entry.average) ** config["ep_exponent"]
+            if lot.ep < 0.8 * entry.average:
+                score += ((entry.average - lot.ep) / entry.average) ** 2
 
+        # etd penalisation ###### NOT INCLUDED FOR NOW - fausse les resultats - trop de faux positifs, trop different du premier check  # noqa: E501
+        # if lot.feedstock in etd:
+        #    default_value = etd[lot.feedstock]
+        #    if lot.country_of_origin:
+        #        if not lot.country_of_origin.is_in_europe and lot.etd <= default_value:
+        #            score += 1 # valeur ETD par defaut sur un lot qui vient de loin
+        #        if lot.country_of_origin.is_in_europe and lot.etd == default_value:
+        #            score += 0.5 # lot ne vient pas de loin, pas d'effort de calcul
         lot.ml_scoring = score
-        lot.ml_control_requested = score > config["control_threshold"]
+        lot.ml_control_requested = score > 0
         lot.save()
 
 

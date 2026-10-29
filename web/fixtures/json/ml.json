@@ -84,5 +84,15 @@
       "stddev": 4.71,
       "average": 9.7
     }
+  },
+  {
+    "model": "ml.etdstats",
+    "pk": 9,
+    "fields": { "feedstock": 32, "default_value": 2.3 }
+  },
+  {
+    "model": "ml.etdstats",
+    "pk": 15,
+    "fields": { "feedstock": 35, "default_value": 1.8 }
   }
 ]

@@ -8,7 +8,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.models import CarbureLot, MatierePremiere  # noqa: E402
-from ml.models import EECStats, EPStats  # noqa: E402
+from ml.models import EECStats, EPStats, ETDStats  # noqa: E402
 
 
 def load_eec_data():
@@ -110,9 +110,28 @@ def load_ep_data():
         EPStats.objects.update_or_create(biofuel_id=entry["biofuel"], feedstock_id=entry["feedstock"], defaults=d)
 
 
+def load_etd_data():
+    data = {
+        "BETTERAVE": 2.3,
+        "BLE": 2.2,
+        "MAIS": 2.2,
+        "CANNE_A_SUCRE": 9.7,
+        "SOJA": 8.9,
+        "TOURNESOL": 2.1,
+        "COLZA": 1.8,
+        "HUILE_ALIMENTAIRE_USAGEE": 1.7,
+        "HUILES_OU_GRAISSES_ANIMALES_CAT1_CAT2": 1.5,
+        "HUILES_OU_GRAISSES_ANIMALES_CAT3": 1.5,
+    }
+    for k, v in data.items():
+        feedstock = MatierePremiere.biofuel.get(code=k)
+        ETDStats.objects.update_or_create(feedstock=feedstock, default_value=v)
+
+
 def load_ml_data():
     load_eec_data()
     load_ep_data()
+    load_etd_data()
 
 
 if __name__ == "__main__":
