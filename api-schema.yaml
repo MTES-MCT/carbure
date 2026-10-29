@@ -17032,7 +17032,7 @@ components:
       description: |-
         * `PRIVATE` - Issus de collecteurs privés
         * `LOCAL` - Issus de collectivités locales
-        * `IAA` - Issus de résidus d'IAA
+        * `IAA` - Issus de résidus d'industries agro-alimentaires
     CommentRequest:
       type: object
       properties:
@@ -19971,7 +19971,7 @@ components:
           readOnly: true
         code:
           type: string
-          maxLength: 8
+          maxLength: 16
         name:
           type: string
           maxLength: 64

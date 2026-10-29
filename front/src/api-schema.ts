@@ -4917,7 +4917,7 @@ export interface components {
         /**
          * @description * `PRIVATE` - Issus de collecteurs privés
          *     * `LOCAL` - Issus de collectivités locales
-         *     * `IAA` - Issus de résidus d'IAA
+         *     * `IAA` - Issus de résidus d'industries agro-alimentaires
          * @enum {string}
          */
         CollectionTypeEnum: CollectionTypeEnum;
