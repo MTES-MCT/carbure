@@ -27,6 +27,15 @@ fi
 backup_source=$1
 backup_location=$2
 database_url=${3:-${DATABASE_URL:-}}
+production_app=carbure-prod
+
+if [[ "${APP:-}" == "$production_app" ]]; then
+  read -r -p 'Vous êtes en production ! Voulez vous vraiment importer le dump en PROD ?? Si oui tapez "production" pour confirmer : ' confirmation || true
+  if [[ "$confirmation" != "production" ]]; then
+    echo "Import annulé." >&2
+    exit 1
+  fi
+fi
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 project_root=$(cd -- "$script_dir/../.." && pwd)
