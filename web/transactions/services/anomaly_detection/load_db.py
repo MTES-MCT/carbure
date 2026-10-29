@@ -52,7 +52,14 @@ def load_db(
 
     all_tables: dict[str, pd.DataFrame] = {}
     for table in tables_names:
-        query = f"SELECT * FROM {table}"
+        columns = (
+            "id, eec, ep, etd, eccr, biofuel_id, feedstock_id, "
+            "carbure_producer_id, carbure_production_site_id, country_of_origin_id, "
+            "unknown_production_site, unknown_producer, production_site_double_counting_certificate"
+            if table == "carbure_lots"
+            else "*"
+        )
+        query = f"SELECT {columns} FROM {table}"
         if table == "carbure_lots":
             query = " ".join([query] + lots_query_filters)
         query += ";"
