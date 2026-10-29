@@ -8,7 +8,7 @@
 # Example:
 #   ./anonymize.sh mysql://user:password@host:3306/database
 #
-# The database URL defaults to $DATABASE_URL.
+# The database URL defaults to $DATABASE_URL. If it has no password, one is requested interactively.
 
 set -euo pipefail
 
@@ -20,11 +20,11 @@ if [[ -z "$DATABASE_URL" ]]; then
 fi
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-project_root=$(cd -- "$script_dir/../.." && pwd)
+
+# shellcheck source=mysql_url.sh
+source "$script_dir/mysql_url.sh"
+parse_mysql_url
 
 echo "> Anonymizing personal data..."
-(
-  cd -- "$project_root"
-  DATABASE_URL="$DATABASE_URL" python web/manage.py dbshell -- --batch < "$script_dir/anonymize.sql"
-)
+"${MYSQL[@]}" "$MYSQL_DATABASE" --batch < "$script_dir/anonymize.sql"
 echo "> Anonymization complete"
