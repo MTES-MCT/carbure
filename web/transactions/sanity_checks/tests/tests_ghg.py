@@ -229,9 +229,3 @@ class GhgSanityChecksTest(TestCase):
 
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
-
-    def x_test_eec_anormal_low(self):
-        pass
-
-    def x_test_ep_anormal_low(self):
-        pass

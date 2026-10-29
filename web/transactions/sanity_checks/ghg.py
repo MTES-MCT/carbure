@@ -1,40 +1,12 @@
 import datetime
 
-from core.carburetypes import CarbureMLGHGErrors, CarbureSanityCheckErrors
+from core.carburetypes import CarbureSanityCheckErrors
 from core.models import CarbureLot
 
 from .helpers import generic_error, is_red_ii
 
 oct2015 = datetime.date(year=2015, month=10, day=5)
 jan2021 = datetime.date(year=2021, month=1, day=1)
-
-
-def check_eec_anormal_low(lot: CarbureLot, prefetched_data):
-    eec = get_eec(lot, prefetched_data)
-    if eec is None:
-        return
-
-    if lot.eec < 0.7 * min(eec.default_value, eec.average):
-        return generic_error(
-            error=CarbureMLGHGErrors.EEC_ANORMAL_LOW,
-            lot=lot,
-            display_to_creator=False,
-            field="eec",
-        )
-
-
-def check_ep_anormal_low(lot: CarbureLot, prefetched_data):
-    ep = get_ep(lot, prefetched_data)
-    if ep is None:
-        return
-
-    if lot.ep < 0.5 * min(ep.average, ep.default_value_min_ep):
-        return generic_error(
-            error=CarbureMLGHGErrors.EP_ANORMAL_LOW,
-            lot=lot,
-            display_to_creator=False,
-            field="ep",
-        )
 
 
 def check_ghg_etd_0(lot: CarbureLot):
@@ -135,24 +107,6 @@ def check_ghg_reduc_for_production_site(lot: CarbureLot):
                 lot=lot,
                 is_blocking=True,
             )
-
-
-def get_eec(lot: CarbureLot, prefetched_data):
-    if not lot.feedstock or not lot.country_of_origin:
-        return None
-
-    eec = prefetched_data["eec"]
-    key = lot.feedstock.code + lot.country_of_origin.code_pays
-    return eec.get(key)
-
-
-def get_ep(lot: CarbureLot, prefetched_data):
-    if not lot.feedstock or not lot.biofuel:
-        return None
-
-    ep = prefetched_data["ep"]
-    key = lot.feedstock.code + lot.biofuel.code
-    return ep.get(key)
 
 
 def get_commissioning_date(lot: CarbureLot):

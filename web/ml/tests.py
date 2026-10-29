@@ -104,13 +104,11 @@ class RemoveETDReferenceErrorsTest(TestCase):
     def test_cleanup_preserves_other_errors_including_etd_model_detections(self):
         retired_errors = ["ETD_NO_EU_TOO_LOW", "ETD_EU_DEFAULT_VALUE", "ETD_ANORMAL_HIGH", "ETD_HIGHER_THAN_DEFAULT"]
         preserved_errors = [
-            "EEC_ANORMAL_LOW",
-            "EP_ANORMAL_LOW",
             "GHG_ETD_0",
-            "IF_OUTLIER",
-            "LOF_OUTLIER",
             "IF_OUTLIER_ETD",
             "LOF_OUTLIER_ETD",
+            "OUTLIER_EEC",
+            "OUTLIER_EP",
             "OUTLIER_ETD",
         ]
         GenericError.objects.bulk_create([GenericError(error=error) for error in retired_errors + preserved_errors])
