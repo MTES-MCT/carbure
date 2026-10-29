@@ -24,7 +24,7 @@ energy = mass × lhv
 
 | Concept | Rôle |
 |---|---|
-| `Action` | POS, détenteur, matière, quantité, site, logistique, GES. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
+| `Action` | POS, détenteur, matière, quantité, site, logistique, GES. Types : `INIT`, puis la chaîne `PRODUCE` → `MOVE` (autant que nécessaire) → `CONSUME` → `VALORIZE`. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
 | `Material` | Catalogue (`code`, `name`, `unit`, `lhv`, `density`). L’unité native de `quantity` vit ici. Facteurs optionnels, ou strictement > 0 |
 

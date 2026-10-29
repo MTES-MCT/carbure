@@ -8,6 +8,7 @@ const currentYear = new Date().getFullYear()
 const StationsPage = lazy(() => import("h2/pages/stations"))
 const LotsPage = lazy(() => import("h2/pages/lots"))
 const CertificatesPage = lazy(() => import("h2/pages/certificates"))
+const AdminActionsPage = lazy(() => import("h2/pages/admin/actions"))
 const AdminLotsPage = lazy(() => import("h2/pages/admin/lots"))
 const AdminCertificatesPage = lazy(() => import("h2/pages/admin/certificates"))
 
@@ -20,6 +21,11 @@ const H2AdminRoutes = () => {
           element={<Navigate replace to={`${currentYear}`} />}
         />
         <Route path="lots/:year" element={<AdminLotsPage />} />
+        <Route
+          path="actions"
+          element={<Navigate replace to={`${currentYear}`} />}
+        />
+        <Route path="actions/:year" element={<AdminActionsPage />} />
         <Route path="stations" element={<StationsPage />} />
         <Route
           path="certificates"

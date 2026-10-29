@@ -8,6 +8,7 @@ import { Action } from "traceability/types"
 import {
   ACTION_EMISSIONS_UNIT,
   formatActionDecimal,
+  getActionTypeLabel,
 } from "traceability/utils/formatters"
 import { quantityColumn } from "./quantity-column"
 
@@ -29,6 +30,11 @@ export function useActionColumns() {
       key: "status",
       header: t("Statut"),
       cell: (action) => <ActionStatusBadge status={action.status} />,
+    },
+    type: {
+      key: "type",
+      header: t("Type"),
+      cell: (action) => <Cell text={getActionTypeLabel(action.type)} />,
     },
     holder: {
       key: "holder",

@@ -2,7 +2,11 @@ import i18next from "i18next"
 
 import { formatNumber, formatUnit } from "common/utils/formatters"
 
-import { ActionStatus, ActionTotalEmissions } from "traceability/types"
+import {
+  ActionStatus,
+  ActionTotalEmissions,
+  ActionType,
+} from "traceability/types"
 import { ExtendedUnit, ExtendedUnitType } from "common/types"
 
 export const ACTION_EMISSIONS_UNIT = ExtendedUnit.gCO2eqMJ
@@ -26,6 +30,17 @@ export function formatActionTotalEmissions(
   totalEmissions: ActionTotalEmissions | null | undefined
 ) {
   return formatActionDecimal(totalEmissions?.total)
+}
+
+export function getActionTypeLabel(type: ActionType) {
+  const labelMapping: Record<ActionType, string> = {
+    [ActionType.INIT]: i18next.t("Initialisation"),
+    [ActionType.PRODUCE]: i18next.t("Production"),
+    [ActionType.MOVE]: i18next.t("Transport"),
+    [ActionType.CONSUME]: i18next.t("Consommation"),
+    [ActionType.VALORIZE]: i18next.t("Valorisation"),
+  }
+  return labelMapping[type]
 }
 
 export function getActionStatusLabel(status: ActionStatus) {

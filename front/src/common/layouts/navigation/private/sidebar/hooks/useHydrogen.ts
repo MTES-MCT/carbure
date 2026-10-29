@@ -55,6 +55,12 @@ export const useHydrogen = () => {
           title: t("Stations"),
         },
         {
+          path: h2Routes.ADMIN.ACTIONS,
+          title: t("Actions"),
+          icon: "ri-file-list-3-line",
+          iconActive: "ri-file-list-3-fill",
+        },
+        {
           ...baseMenu.lot,
           path: h2Routes.ADMIN.LOTS,
         },

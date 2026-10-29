@@ -28,6 +28,7 @@ class ActionFilter(FilterSet):
             ("site__name", "site"),
             ("shipping_distance", "shipping_distance"),
             ("status", "status"),
+            ("type", "type"),
             ("working_date", "working_date"),
         )
     )

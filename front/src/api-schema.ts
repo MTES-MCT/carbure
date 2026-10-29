@@ -3688,6 +3688,9 @@ export interface components {
         };
         /**
          * @description * `INIT` - INIT
+         *     * `PRODUCE` - PRODUCE
+         *     * `MOVE` - MOVE
+         *     * `CONSUME` - CONSUME
          *     * `VALORIZE` - VALORIZE
          * @enum {string}
          */
@@ -15880,6 +15883,8 @@ export interface operations {
                  *     * `-shipping_distance` - Shipping distance (décroissant)
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
+                 *     * `type` - Type
+                 *     * `-type` - Type (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -15913,6 +15918,9 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
+                 *     * `PRODUCE` - PRODUCE
+                 *     * `MOVE` - MOVE
+                 *     * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16020,6 +16028,8 @@ export interface operations {
                  *     * `-shipping_distance` - Shipping distance (décroissant)
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
+                 *     * `type` - Type
+                 *     * `-type` - Type (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -16049,6 +16059,9 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
+                 *     * `PRODUCE` - PRODUCE
+                 *     * `MOVE` - MOVE
+                 *     * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16164,6 +16177,8 @@ export interface operations {
                  *     * `-shipping_distance` - Shipping distance (décroissant)
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
+                 *     * `type` - Type
+                 *     * `-type` - Type (décroissant)
                  *     * `working_date` - Working date
                  *     * `-working_date` - Working date (décroissant)
                  */
@@ -16193,6 +16208,9 @@ export interface operations {
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
                  * @description * `INIT` - INIT
+                 *     * `PRODUCE` - PRODUCE
+                 *     * `MOVE` - MOVE
+                 *     * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16731,6 +16749,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinusshipping_distance = "-shipping_distance",
     ValueMinussite = "-site",
     ValueMinusstatus = "-status",
+    ValueMinustype = "-type",
     ValueMinusworking_date = "-working_date",
     holder = "holder",
     material = "material",
@@ -16739,6 +16758,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     shipping_distance = "shipping_distance",
     site = "site",
     status = "status",
+    type = "type",
     working_date = "working_date"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryShipping_method {
@@ -16756,7 +16776,10 @@ export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
     REJECTED = "REJECTED"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
+    CONSUME = "CONSUME",
     INIT = "INIT",
+    MOVE = "MOVE",
+    PRODUCE = "PRODUCE",
     VALORIZE = "VALORIZE"
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {

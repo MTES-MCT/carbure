@@ -13398,6 +13398,7 @@ paths:
                 - -shipping_distance
                 - -site
                 - -status
+                - -type
                 - -working_date
                 - holder
                 - material
@@ -13406,6 +13407,7 @@ paths:
                 - shipping_distance
                 - site
                 - status
+                - type
                 - working_date
           description: |-
             Ordre
@@ -13424,6 +13426,8 @@ paths:
             * `-shipping_distance` - Shipping distance (décroissant)
             * `status` - Status
             * `-status` - Status (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
             * `working_date` - Working date
             * `-working_date` - Working date (décroissant)
           explode: false
@@ -13526,10 +13530,16 @@ paths:
               type: string
               title: Type d'action
               enum:
+                - CONSUME
                 - INIT
+                - MOVE
+                - PRODUCE
                 - VALORIZE
           description: |-
             * `INIT` - INIT
+            * `PRODUCE` - PRODUCE
+            * `MOVE` - MOVE
+            * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -13698,6 +13708,7 @@ paths:
                 - -shipping_distance
                 - -site
                 - -status
+                - -type
                 - -working_date
                 - holder
                 - material
@@ -13706,6 +13717,7 @@ paths:
                 - shipping_distance
                 - site
                 - status
+                - type
                 - working_date
           description: |-
             Ordre
@@ -13724,6 +13736,8 @@ paths:
             * `-shipping_distance` - Shipping distance (décroissant)
             * `status` - Status
             * `-status` - Status (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
             * `working_date` - Working date
             * `-working_date` - Working date (décroissant)
           explode: false
@@ -13814,10 +13828,16 @@ paths:
               type: string
               title: Type d'action
               enum:
+                - CONSUME
                 - INIT
+                - MOVE
+                - PRODUCE
                 - VALORIZE
           description: |-
             * `INIT` - INIT
+            * `PRODUCE` - PRODUCE
+            * `MOVE` - MOVE
+            * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -13992,6 +14012,7 @@ paths:
                 - -shipping_distance
                 - -site
                 - -status
+                - -type
                 - -working_date
                 - holder
                 - material
@@ -14000,6 +14021,7 @@ paths:
                 - shipping_distance
                 - site
                 - status
+                - type
                 - working_date
           description: |-
             Ordre
@@ -14018,6 +14040,8 @@ paths:
             * `-shipping_distance` - Shipping distance (décroissant)
             * `status` - Status
             * `-status` - Status (décroissant)
+            * `type` - Type
+            * `-type` - Type (décroissant)
             * `working_date` - Working date
             * `-working_date` - Working date (décroissant)
           explode: false
@@ -14108,10 +14132,16 @@ paths:
               type: string
               title: Type d'action
               enum:
+                - CONSUME
                 - INIT
+                - MOVE
+                - PRODUCE
                 - VALORIZE
           description: |-
             * `INIT` - INIT
+            * `PRODUCE` - PRODUCE
+            * `MOVE` - MOVE
+            * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -14578,11 +14608,17 @@ components:
         - total
     ActionTypeEnum:
       enum:
+        - CONSUME
         - INIT
+        - MOVE
+        - PRODUCE
         - VALORIZE
       type: string
       description: |-
         * `INIT` - INIT
+        * `PRODUCE` - PRODUCE
+        * `MOVE` - MOVE
+        * `CONSUME` - CONSUME
         * `VALORIZE` - VALORIZE
     ActivateAccountRequest:
       type: object

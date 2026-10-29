@@ -170,6 +170,7 @@ export const ROUTE_URLS = {
       CERTIFICATES: `${baseUrl}/certificates`,
       ADMIN: {
         STATIONS: `${baseUrl}/admin/stations`,
+        ACTIONS: `${baseUrl}/admin/actions/${year}`,
         LOTS: `${baseUrl}/admin/lots/${year}`,
         CERTIFICATES: `${baseUrl}/admin/certificates/${year}`,
       },
