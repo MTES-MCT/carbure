@@ -93,8 +93,7 @@ export const SupplierField = (
       disabled={
         props.disabled ||
         bound.disabled ||
-        isLotProducer(entity, value) ||
-        isDirect
+        (isLotProducer(entity, value) && !isDirect)
       }
     />
   )

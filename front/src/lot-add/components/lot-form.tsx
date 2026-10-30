@@ -77,8 +77,6 @@ export function useLotForm(
       value.delivery_type === DeliveryType.Direct &&
       (!value.lot || value.lot.added_by.id === entity.id)
     ) {
-      value.supplier = entity
-
       value.delivery_site_country = {
         code_pays: "FR",
         name: "France",
@@ -582,7 +580,6 @@ const errorsToFields: Record<string, (keyof LotFormValue)[]> = {
   INCORRECT_FORMAT_DISPATCH_DATE: ['dispatch_date'],
   INVALID_DISPATCH_SITE: ['dispatch_site'],
   INVALID_DIRECT_DELIVERY_COUNTRY: ['delivery_site_country'],
-  INVALID_DIRECT_DELIVERY_SUPPLIER: ['supplier'],
   MAC_BC_WRONG: ['biofuel'],
   MISSING_BIOFUEL: ['biofuel'],
   MISSING_CARBURE_CLIENT: ['client'],
