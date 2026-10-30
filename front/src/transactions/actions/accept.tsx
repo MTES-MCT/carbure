@@ -494,10 +494,16 @@ const DirectDeliveryDialog = ({
   const notify = useNotify()
   const matomo = useMatomo()
   const entity = useEntity()
+  const [client, setClient] = useState("")
+  const [deliverySite, setDeliverySite] = useState("")
+  const [certificate, setCertificate] = useState<string | undefined>()
+  const defaultCertificate = entity.default_certificate?.trim() ?? ""
+  const effectiveCertificate = certificate?.trim() || defaultCertificate
   const [usage, setUsage] = useState<FuelUsage | undefined>()
   const [usagePrecision, setUsagePrecision] = useState<string | undefined>()
   const requiresPrecision = usage === FuelUsage.Other
   const canSubmit =
+    Boolean(effectiveCertificate) &&
     usage !== undefined &&
     (!requiresPrecision || Boolean(usagePrecision?.trim()))
 
@@ -549,17 +555,33 @@ const DirectDeliveryDialog = ({
       <main>
         <section>
           {t(
-            "En acceptant ces lots pour livraison directe, vous indiquez qu'ils seront utilisés dans le cadre d'incorporations de biocarburant faites à l'étranger mais destinées au marché français"
+            "En acceptant ces lots pour livraison directe, vous les transférez à un client pour une utilisation en France."
           )}
         </section>
         <section>
           <Form id="direct-delivery">
-            <FuelUsageSelect
+            <TextInput
               autoFocus
-              required
-              value={usage}
-              onChange={setUsage}
+              label={t("Client")}
+              value={client}
+              onChange={(value) => setClient(value ?? "")}
             />
+            <TextInput
+              label={t("Site de livraison")}
+              value={deliverySite}
+              onChange={(value) => setDeliverySite(value ?? "")}
+            />
+            <Autocomplete
+              required={!defaultCertificate}
+              label={t("Votre certificat de négoce")}
+              placeholder={defaultCertificate}
+              value={certificate}
+              onChange={setCertificate}
+              getOptions={(query) =>
+                findMyCertificates(query, { entity_id: entity.id })
+              }
+            />
+            <FuelUsageSelect required value={usage} onChange={setUsage} />
             {requiresPrecision && (
               <TextInput
                 required
@@ -584,7 +606,7 @@ const DirectDeliveryDialog = ({
           icon={Check}
           label={t("Livraison directe")}
           action={() => {
-            if (!usage || (requiresPrecision && !usagePrecision?.trim())) return
+            if (!canSubmit || !usage) return
             matomo.push([
               "trackEvent",
               "lots-accept",
@@ -592,7 +614,13 @@ const DirectDeliveryDialog = ({
               "",
               selection.length,
             ])
-            acceptLots.execute(query, selection, usage, usagePrecision?.trim())
+            acceptLots.execute(query, selection, {
+              usage,
+              usage_precision: usagePrecision?.trim(),
+              unknown_client: client.trim(),
+              unknown_delivery_site: deliverySite.trim(),
+              certificate: effectiveCertificate,
+            })
           }}
         />
         <Button

@@ -7,7 +7,7 @@ from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
 
 from core.carburetypes import CarbureError
-from core.models import CarbureLot, CarbureStock, Entity, Pays, UserRights
+from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, Pays, UserRights
 from transactions.api.lots.tests.tests_utils import get_lot
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models import Depot, ProductionSite, YearConfig
@@ -176,7 +176,8 @@ class LotsFlowTest(TestCase):
                     delivery_site_country_code="FR",
                     unknown_dispatch_site="Dispatch site",
                     dispatch_site_country_code="FR",
-                    usage=CarbureLot.USAGE_ROAD,
+                    usage=CarbureLot.USAGE_OTHER,
+                    usage_precision="Details",
                 )
                 self.assertEqual(lot.carbure_vendor, self.producer)
                 self.assertEqual(lot.delivery_type, delivery_type)
@@ -186,11 +187,15 @@ class LotsFlowTest(TestCase):
 
                 self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
                 self.assertEqual(lot.delivery_type, CarbureLot.TRADING)
+                self.assertEqual(lot.usage, "")
+                self.assertEqual(lot.usage_precision, "")
                 self.assertEqual(lot.carbure_client, self.producer)
                 self.assertEqual(child.lot_status, CarbureLot.PENDING)
                 self.assertEqual(child.delivery_type, delivery_type)
                 self.assertEqual(child.carbure_supplier, self.producer)
                 self.assertEqual(child.carbure_client, self.operator)
+                self.assertEqual(child.usage, CarbureLot.USAGE_OTHER if delivery_type == CarbureLot.DIRECT else "")
+                self.assertEqual(child.usage_precision, "Details" if delivery_type == CarbureLot.DIRECT else "")
 
     def test_send_trading_parent_delivery_site(self):
         dispatch_depot = Depot.objects.create(
@@ -254,7 +259,8 @@ class LotsFlowTest(TestCase):
                     carbure_delivery_site_depot_id=efpe.depot_id,
                     unknown_dispatch_site="Dispatch site",
                     dispatch_site_country_code="FR",
-                    usage=CarbureLot.USAGE_ROAD,
+                    usage=CarbureLot.USAGE_OTHER,
+                    usage_precision="Details",
                 )
                 self.assertEqual(lot.carbure_vendor, self.producer)
                 response = self.client.post(
@@ -268,10 +274,15 @@ class LotsFlowTest(TestCase):
 
                 self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
                 self.assertEqual(lot.delivery_type, CarbureLot.TRADING)
+                self.assertEqual(lot.usage, "")
+                self.assertEqual(lot.usage_precision, "")
                 self.assertEqual(child.lot_status, CarbureLot.ACCEPTED)
                 self.assertEqual(child.delivery_type, delivery_type)
                 self.assertIsNone(child.carbure_client)
                 self.assertEqual(child.unknown_client, "External client")
+                has_usage = delivery_type in (CarbureLot.RFC, CarbureLot.DIRECT)
+                self.assertEqual(child.usage, CarbureLot.USAGE_OTHER if has_usage else "")
+                self.assertEqual(child.usage_precision, "Details" if has_usage else "")
 
     def test_accept_in_stock(self):
         lot = self.create_draft(carbure_client_id=self.trader.id)
@@ -479,23 +490,59 @@ class LotsFlowTest(TestCase):
     def test_accept_direct_delivery(self):
         for usage, expected_precision in ((CarbureLot.USAGE_ROAD, ""), (CarbureLot.USAGE_OTHER, "Details")):
             with self.subTest(usage=usage):
-                lot = self.create_draft(carbure_client_id=self.operator.id)
-                lot = self.send_lot(lot)
-                response = self.client.post(
-                    reverse("transactions-lots-accept-direct-delivery"),
-                    {
-                        "entity_id": self.operator.id,
-                        "selection": [lot.id],
-                        "usage": usage,
-                        "usage_precision": "Details",
-                    },
+                lot = self.create_draft(
+                    carbure_client_id=self.operator.id,
+                    delivery_type=CarbureLot.DIRECT,
+                    usage=CarbureLot.USAGE_OTHER,
+                    usage_precision="Original usage details",
+                    unknown_dispatch_site="Dispatch site",
+                    dispatch_site_country_code="FR",
                 )
+                lot = self.send_lot(lot)
+                delivery_site = lot.carbure_delivery_site
+                with self.captureOnCommitCallbacks(execute=True):
+                    response = self.client.post(
+                        reverse("transactions-lots-accept-direct-delivery"),
+                        {
+                            "entity_id": self.operator.id,
+                            "selection": [lot.id],
+                            "usage": usage,
+                            "usage_precision": "Details",
+                            "unknown_client": "External client",
+                            "unknown_delivery_site": "Final delivery site",
+                            "certificate": "VALID",
+                        },
+                    )
                 assert response.status_code == 200
                 lot.refresh_from_db()
                 assert lot.lot_status == CarbureLot.ACCEPTED
-                assert lot.delivery_type == CarbureLot.DIRECT
-                assert lot.usage == usage
-                assert lot.usage_precision == expected_precision
+                assert lot.delivery_type == CarbureLot.TRADING
+                assert lot.usage == ""
+                assert lot.usage_precision == ""
+                assert lot.carbure_client == self.operator
+                assert lot.carbure_delivery_site == delivery_site
+                assert lot.unknown_delivery_site is None
+                child = CarbureLot.objects.get(parent_lot=lot)
+                assert child.lot_status == CarbureLot.ACCEPTED
+                assert child.delivery_type == CarbureLot.DIRECT
+                assert child.carbure_client is None
+                assert child.unknown_client == "External client"
+                assert child.carbure_supplier == self.operator
+                assert child.added_by == self.operator
+                assert child.supplier_certificate == "VALID"
+                assert child.carbure_dispatch_site_id == delivery_site.pk
+                assert child.dispatch_site_country == delivery_site.country
+                assert child.carbure_delivery_site is None
+                assert child.unknown_delivery_site == "Final delivery site"
+                assert child.delivery_site_country.code_pays == "FR"
+                assert child.usage == usage
+                assert child.usage_precision == expected_precision
+                assert not child.declared_by_supplier
+                assert child.declared_by_client
+                self.assertCountEqual(
+                    CarbureLotEvent.objects.filter(lot=child).values_list("event_type", flat=True),
+                    [CarbureLotEvent.CREATED, CarbureLotEvent.ACCEPTED],
+                )
 
     def test_accept_direct_delivery_requires_usage_fields(self):
         lot = self.create_draft(carbure_client_id=self.operator.id)
@@ -510,3 +557,128 @@ class LotsFlowTest(TestCase):
                 lot.refresh_from_db()
                 assert lot.lot_status == CarbureLot.PENDING
                 assert lot.delivery_type == CarbureLot.UNKNOWN
+
+    def test_accept_direct_delivery_uses_dispatch_site_for_parent(self):
+        dispatch_site = Depot.objects.create(
+            name="Dispatch depot", customs_id="DETEST", country=Pays.objects.get(code_pays="DE")
+        )
+        lot = self.send_lot(
+            self.create_draft(
+                carbure_client_id=self.operator.id,
+                carbure_delivery_site_depot_id="UNKNOWN_DEPOT",
+                unknown_delivery_site="Unknown receipt site",
+                delivery_site_country_code="DE",
+                carbure_dispatch_site_id=dispatch_site.pk,
+            )
+        )
+        response = self.client.post(
+            reverse("transactions-lots-accept-direct-delivery"),
+            {
+                "entity_id": self.operator.id,
+                "selection": [lot.id],
+                "usage": CarbureLot.USAGE_ROAD,
+                "unknown_client": "External client",
+                "unknown_delivery_site": "Final delivery site",
+                "certificate": "VALID",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        lot.refresh_from_db()
+        child = CarbureLot.objects.get(parent_lot=lot)
+        self.assertEqual(lot.carbure_delivery_site, dispatch_site)
+        self.assertEqual(lot.delivery_site_country, dispatch_site.country)
+        self.assertIsNone(lot.unknown_delivery_site)
+        self.assertEqual(child.carbure_dispatch_site_id, dispatch_site.pk)
+        self.assertEqual(child.dispatch_site_country, dispatch_site.country)
+        self.assertEqual(child.unknown_delivery_site, "Final delivery site")
+        self.assertEqual(child.delivery_site_country.code_pays, "FR")
+
+    def test_accept_direct_delivery_allows_missing_client(self):
+        for fields in ({}, {"unknown_client": ""}, {"unknown_client": " "}):
+            with self.subTest(fields=fields):
+                lot = self.send_lot(self.create_draft(carbure_client_id=self.operator.id))
+                response = self.client.post(
+                    reverse("transactions-lots-accept-direct-delivery"),
+                    {
+                        "entity_id": self.operator.id,
+                        "selection": [lot.id],
+                        "usage": CarbureLot.USAGE_ROAD,
+                        "certificate": "VALID",
+                        **fields,
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                lot.refresh_from_db()
+                child = CarbureLot.objects.get(parent_lot=lot)
+                self.assertEqual(lot.delivery_type, CarbureLot.TRADING)
+                self.assertEqual(child.lot_status, CarbureLot.ACCEPTED)
+                self.assertEqual(child.delivery_type, CarbureLot.DIRECT)
+                self.assertIsNone(child.carbure_client)
+                self.assertEqual(child.unknown_client, "")
+
+    def test_accept_direct_delivery_requires_certificate(self):
+        lot = self.send_lot(self.create_draft(carbure_client_id=self.operator.id))
+        self.operator.default_certificate = ""
+        self.operator.save()
+        for fields in ({}, {"certificate": " "}):
+            with self.subTest(fields=fields):
+                response = self.client.post(
+                    reverse("transactions-lots-accept-direct-delivery"),
+                    {
+                        "entity_id": self.operator.id,
+                        "selection": [lot.id],
+                        "usage": CarbureLot.USAGE_ROAD,
+                        **fields,
+                    },
+                )
+                self.assertEqual(response.status_code, 400)
+                lot.refresh_from_db()
+                self.assertEqual(lot.lot_status, CarbureLot.PENDING)
+                self.assertFalse(CarbureLot.objects.filter(parent_lot=lot).exists())
+
+    def test_accept_direct_delivery_from_unknown_site_uses_default_certificate(self):
+        self.operator.default_certificate = "VALID"
+        self.operator.save()
+        lot = self.send_lot(
+            self.create_draft(
+                carbure_client_id=self.operator.id,
+                carbure_delivery_site_depot_id="UNKNOWN_DEPOT",
+                unknown_delivery_site="Unknown receipt site",
+                delivery_site_country_code="DE",
+            )
+        )
+        response = self.client.post(
+            reverse("transactions-lots-accept-direct-delivery"),
+            {
+                "entity_id": self.operator.id,
+                "selection": [lot.id],
+                "usage": CarbureLot.USAGE_ROAD,
+                "unknown_client": "External client",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        lot.refresh_from_db()
+        child = CarbureLot.objects.get(parent_lot=lot)
+        self.assertIsNone(lot.unknown_delivery_site)
+        self.assertIsNone(child.carbure_dispatch_site)
+        self.assertEqual(child.unknown_dispatch_site, "Unknown receipt site")
+        self.assertEqual(child.dispatch_site_country.code_pays, "DE")
+        self.assertEqual(child.supplier_certificate, "VALID")
+
+    def test_accept_direct_delivery_validates_entire_selection_before_splitting(self):
+        pending = self.send_lot(self.create_draft(carbure_client_id=self.operator.id))
+        draft = self.create_draft(carbure_client_id=self.operator.id)
+        response = self.client.post(
+            reverse("transactions-lots-accept-direct-delivery"),
+            {
+                "entity_id": self.operator.id,
+                "selection": [pending.id, draft.id],
+                "usage": CarbureLot.USAGE_ROAD,
+                "unknown_client": "External client",
+                "certificate": "VALID",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        pending.refresh_from_db()
+        self.assertEqual(pending.lot_status, CarbureLot.PENDING)
+        self.assertFalse(CarbureLot.objects.filter(parent_lot__in=[pending, draft]).exists())
