@@ -537,6 +537,13 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
     return errors
 
 
+def set_trading_delivery_site(lot):
+    if lot.carbure_delivery_site is None and lot.carbure_dispatch_site is not None:
+        lot.carbure_delivery_site = getattr(lot.carbure_dispatch_site, "depot", None)
+        lot.delivery_site_country = lot.dispatch_site_country
+    lot.unknown_delivery_site = None
+
+
 def fill_dispatch_data(lot, data, prefetched_data):
     dispatch_site = None
     dispatch_site_id = data.get("carbure_dispatch_site_id", None)

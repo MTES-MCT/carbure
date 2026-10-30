@@ -11,6 +11,7 @@ from core.models import (
     UserRights,
 )
 from core.notifications import notify_lots_received
+from transactions.helpers import fill_usage_data, set_trading_delivery_site
 from transactions.sanity_checks import get_prefetched_data, has_blocking_errors, sanity_checks
 
 
@@ -71,14 +72,13 @@ def lots_send(request, *args, **kwargs):
             final_delivery_site = lot.carbure_delivery_site
             final_unknown_delivery_site = lot.unknown_delivery_site
             final_delivery_site_country = lot.delivery_site_country
+            final_usage_data = {"usage": lot.usage, "usage_precision": lot.usage_precision}
             nb_auto_accepted += 1
             lot.lot_status = CarbureLot.ACCEPTED
             lot.delivery_type = CarbureLot.TRADING
             lot.carbure_client = entity
-            if lot.carbure_delivery_site is None and lot.carbure_dispatch_site is not None:
-                lot.carbure_delivery_site = getattr(lot.carbure_dispatch_site, "depot", None)
-                lot.delivery_site_country = lot.dispatch_site_country
-            lot.unknown_delivery_site = None
+            set_trading_delivery_site(lot)
+            fill_usage_data(lot, {})
             lot.save()
             first_lot_id = lot.id
             event = CarbureLotEvent()
@@ -106,6 +106,7 @@ def lots_send(request, *args, **kwargs):
             lot.carbure_delivery_site = final_delivery_site
             lot.unknown_delivery_site = final_unknown_delivery_site
             lot.delivery_site_country = final_delivery_site_country
+            fill_usage_data(lot, final_usage_data)
             lot.save()
             created_lot_ids.append(lot.id)
             event = CarbureLotEvent()

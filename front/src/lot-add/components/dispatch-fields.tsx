@@ -131,7 +131,7 @@ export const MyCertificateField = (props: AutocompleteProps<string>) => {
   const { value, bind } = useFormContext<LotFormValue>()
   const bound = bind("vendor_certificate")
 
-  if (!isLotVendor(entity, value) || !entity.canTrade) {
+  if (!isLotVendor(entity, value)) {
     return null
   }
 
