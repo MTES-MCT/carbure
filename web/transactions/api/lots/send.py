@@ -67,10 +67,18 @@ def lots_send(request, *args, **kwargs):
         if lot.carbure_supplier != entity and lot.carbure_client != entity:
             # AUTO ACCEPT FIRST TRANSACTION
             final_client = lot.carbure_client
+            final_delivery_type = lot.delivery_type
+            final_delivery_site = lot.carbure_delivery_site
+            final_unknown_delivery_site = lot.unknown_delivery_site
+            final_delivery_site_country = lot.delivery_site_country
             nb_auto_accepted += 1
             lot.lot_status = CarbureLot.ACCEPTED
             lot.delivery_type = CarbureLot.TRADING
             lot.carbure_client = entity
+            if lot.carbure_delivery_site is None and lot.carbure_dispatch_site is not None:
+                lot.carbure_delivery_site = getattr(lot.carbure_dispatch_site, "depot", None)
+                lot.delivery_site_country = lot.dispatch_site_country
+            lot.unknown_delivery_site = None
             lot.save()
             first_lot_id = lot.id
             event = CarbureLotEvent()
@@ -91,7 +99,13 @@ def lots_send(request, *args, **kwargs):
             lot.vendor_certificate = None
             lot.vendor_certificate_type = ""
             lot.lot_status = CarbureLot.PENDING
-            lot.delivery_type = CarbureLot.UNKNOWN
+            if final_client is None:
+                lot.lot_status = CarbureLot.ACCEPTED
+                nb_auto_accepted += 1
+            lot.delivery_type = final_delivery_type
+            lot.carbure_delivery_site = final_delivery_site
+            lot.unknown_delivery_site = final_unknown_delivery_site
+            lot.delivery_site_country = final_delivery_site_country
             lot.save()
             created_lot_ids.append(lot.id)
             event = CarbureLotEvent()

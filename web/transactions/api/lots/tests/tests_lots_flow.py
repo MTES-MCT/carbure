@@ -7,10 +7,10 @@ from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
 
 from core.carburetypes import CarbureError
-from core.models import CarbureLot, CarbureStock, Entity, UserRights
+from core.models import CarbureLot, CarbureStock, Entity, Pays, UserRights
 from transactions.api.lots.tests.tests_utils import get_lot
 from transactions.factories.certificate import GenericCertificateFactory
-from transactions.models import Depot, YearConfig
+from transactions.models import Depot, ProductionSite, YearConfig
 
 
 class LotsFlowTest(TestCase):
@@ -161,6 +161,117 @@ class LotsFlowTest(TestCase):
         lot = self.create_draft()
         lot = self.send_lot(lot)
         assert lot.lot_status == CarbureLot.PENDING
+
+    def test_send_trading_preserves_delivery_type_on_child(self):
+        for delivery_type in (CarbureLot.UNKNOWN, CarbureLot.DIRECT):
+            with self.subTest(delivery_type=delivery_type):
+                lot = self.create_draft(
+                    production_site_commissioning_date="12/12/2012",
+                    vendor_certificate="VALID",
+                    carbure_producer="",
+                    carbure_production_site="",
+                    unknown_producer="BIOFUEL GMBH",
+                    carbure_client_id=self.operator.id,
+                    delivery_type=delivery_type,
+                    delivery_site_country_code="FR",
+                    unknown_dispatch_site="Dispatch site",
+                    dispatch_site_country_code="FR",
+                    usage=CarbureLot.USAGE_ROAD,
+                )
+                self.assertEqual(lot.carbure_vendor, self.producer)
+                self.assertEqual(lot.delivery_type, delivery_type)
+
+                lot = self.send_lot(lot)
+                child = CarbureLot.objects.get(parent_lot=lot)
+
+                self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+                self.assertEqual(lot.delivery_type, CarbureLot.TRADING)
+                self.assertEqual(lot.carbure_client, self.producer)
+                self.assertEqual(child.lot_status, CarbureLot.PENDING)
+                self.assertEqual(child.delivery_type, delivery_type)
+                self.assertEqual(child.carbure_supplier, self.producer)
+                self.assertEqual(child.carbure_client, self.operator)
+
+    def test_send_trading_parent_delivery_site(self):
+        dispatch_depot = Depot.objects.create(
+            name="Dispatch depot", customs_id="DETEST", country=Pays.objects.get(code_pays="DE")
+        )
+        production_site = ProductionSite.objects.filter(created_by=self.producer).first()
+        delivery_depot = Depot.objects.filter(country__code_pays="FR").first()
+
+        for dispatch_site, delivery_site in (
+            (dispatch_depot, None),
+            (production_site, None),
+            (dispatch_depot, delivery_depot),
+            (None, None),
+        ):
+            with self.subTest(dispatch_site=dispatch_site, delivery_site=delivery_site):
+                lot = self.create_draft(
+                    production_site_commissioning_date="12/12/2012",
+                    vendor_certificate="VALID",
+                    carbure_producer="",
+                    carbure_production_site="",
+                    unknown_producer="BIOFUEL GMBH",
+                    carbure_client_id=self.operator.id,
+                    delivery_type=CarbureLot.DIRECT,
+                    carbure_delivery_site_depot_id=delivery_site.depot_id if delivery_site else "UNKNOWN_DEPOT",
+                    unknown_delivery_site="Final delivery site",
+                    carbure_dispatch_site_id=dispatch_site.pk if dispatch_site else "",
+                    unknown_dispatch_site="Dispatch site",
+                    dispatch_site_country_code="DE",
+                    usage=CarbureLot.USAGE_ROAD,
+                )
+                original_delivery_country = lot.delivery_site_country
+                original_unknown_delivery_site = lot.unknown_delivery_site
+                expected_delivery_site = delivery_site or getattr(dispatch_site, "depot", None)
+                expected_delivery_country = (
+                    lot.dispatch_site_country if delivery_site is None and dispatch_site else original_delivery_country
+                )
+
+                lot = self.send_lot(lot)
+                child = CarbureLot.objects.get(parent_lot=lot)
+
+                self.assertEqual(lot.carbure_delivery_site, expected_delivery_site)
+                self.assertEqual(lot.delivery_site_country, expected_delivery_country)
+                self.assertIsNone(lot.unknown_delivery_site)
+                self.assertEqual(child.carbure_delivery_site, delivery_site)
+                self.assertEqual(child.delivery_site_country, original_delivery_country)
+                self.assertEqual(child.unknown_delivery_site, original_unknown_delivery_site)
+
+    def test_send_trading_auto_accepts_child_with_unknown_client(self):
+        efpe = Depot.objects.filter(site_type=Depot.EFPE).first()
+        for delivery_type in (CarbureLot.RFC, CarbureLot.DIRECT, CarbureLot.EXPORT):
+            with self.subTest(delivery_type=delivery_type):
+                lot = self.create_draft(
+                    production_site_commissioning_date="12/12/2012",
+                    vendor_certificate="VALID",
+                    carbure_producer="",
+                    carbure_production_site="",
+                    unknown_producer="BIOFUEL GMBH",
+                    carbure_client_id="",
+                    unknown_client="External client",
+                    delivery_type=delivery_type,
+                    carbure_delivery_site_depot_id=efpe.depot_id,
+                    unknown_dispatch_site="Dispatch site",
+                    dispatch_site_country_code="FR",
+                    usage=CarbureLot.USAGE_ROAD,
+                )
+                self.assertEqual(lot.carbure_vendor, self.producer)
+                response = self.client.post(
+                    reverse("transactions-lots-send"),
+                    {"entity_id": self.producer.id, "selection": [lot.id]},
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json()["data"]["auto-accepted"], 2)
+                lot.refresh_from_db()
+                child = CarbureLot.objects.get(parent_lot=lot)
+
+                self.assertEqual(lot.lot_status, CarbureLot.ACCEPTED)
+                self.assertEqual(lot.delivery_type, CarbureLot.TRADING)
+                self.assertEqual(child.lot_status, CarbureLot.ACCEPTED)
+                self.assertEqual(child.delivery_type, delivery_type)
+                self.assertIsNone(child.carbure_client)
+                self.assertEqual(child.unknown_client, "External client")
 
     def test_accept_in_stock(self):
         lot = self.create_draft(carbure_client_id=self.trader.id)
