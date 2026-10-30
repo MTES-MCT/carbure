@@ -158,6 +158,8 @@ export function getDeliveryTypes(
     isIndustry,
   } = entity
   const isSupplierEntity = supplier instanceof Object ? supplier.id === entity.id : false // prettier-ignore
+  const isSupplierUnknown =
+    supplier === undefined || typeof supplier === "string"
   const isClientEntity = client instanceof Object ? client.id === entity.id : false // prettier-ignore
   const isClientUnknown = client === undefined || typeof client === "string"
 
@@ -165,7 +167,7 @@ export function getDeliveryTypes(
     isClientEntity && isOperator && DeliveryType.Blending,
     isClientEntity && has_stocks && DeliveryType.Stock,
     (isClientUnknown || isClientEntity) && has_mac && DeliveryType.RFC,
-    (isClientUnknown || isSupplierEntity) && has_direct_deliveries && DeliveryType.Direct, // prettier-ignore
+    (isClientUnknown || isSupplierEntity || isSupplierUnknown) && has_direct_deliveries && DeliveryType.Direct, // prettier-ignore
     isIndustry && (isClientUnknown || isClientEntity) && DeliveryType.Exportation, // prettier-ignore
     status !== LotStatus.Draft && has_trading && DeliveryType.Trading,
     isClientEntity && isPowerOrHeatProducer && DeliveryType.Consumption,

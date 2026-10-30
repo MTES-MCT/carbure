@@ -4,13 +4,19 @@ import {
   fireEvent,
   render,
   renderHook,
+  waitFor,
 } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import Form from "common/components/form"
 import useEntity, { EntityManager } from "common/hooks/entity"
 import { Depot } from "common/types"
 import { DeliveryType, FuelUsage, Lot, LotStatus } from "transactions/types"
-import { ClientField, DeliverySiteField } from "./delivery-fields"
+import {
+  ClientField,
+  DeliverySiteField,
+  getDeliveryTypes,
+} from "./delivery-fields"
+import { SupplierField } from "./dispatch-fields"
 import { lotFormToPayload, useLotForm } from "./lot-form"
 
 vi.mock("common/hooks/entity", () => ({ default: vi.fn() }))
@@ -49,7 +55,7 @@ function directLot(overrides: Partial<Lot> = {}): Lot {
 beforeEach(() => vi.mocked(useEntity).mockReturnValue(operator))
 afterEach(cleanup)
 
-describe("DIRECT supplier defaults", () => {
+describe("DIRECT supplier field", () => {
   it.each([
     { status: LotStatus.Accepted, viewer: operator, owner: supplier },
     { status: LotStatus.Frozen, viewer: operator, owner: supplier },
@@ -69,20 +75,93 @@ describe("DIRECT supplier defaults", () => {
     }
   )
 
-  it("defaults to the current entity when selecting DIRECT on a new lot", () => {
+  it("keeps the supplier empty when selecting DIRECT on a new lot", () => {
     const { result } = renderHook(() => useLotForm())
     act(() => result.current.setField("delivery_type", DeliveryType.Direct))
 
-    expect(result.current.value.supplier).toEqual(operator)
+    expect(result.current.value.supplier).toBeUndefined()
     expect(result.current.value.delivery_site_country?.code_pays).toBe("FR")
   })
 
-  it("defaults to the owner when editing their DIRECT draft", () => {
+  it("preserves the recorded supplier when editing an owned DIRECT draft", () => {
     const lot = directLot({ lot_status: LotStatus.Draft, added_by: operator })
     const { result } = renderHook(() => useLotForm(lot))
 
-    expect(result.current.value.supplier).toEqual(operator)
+    expect(result.current.value.supplier).toEqual(supplier)
   })
+
+  it("preserves an unknown supplier when opening and updating a DIRECT draft", () => {
+    const lot = directLot({
+      lot_status: LotStatus.Draft,
+      added_by: operator,
+      carbure_supplier: null,
+      unknown_supplier: "External supplier",
+    })
+    const { result } = renderHook(() => useLotForm(lot))
+
+    expect(result.current.value.supplier).toBe("External supplier")
+    act(() => result.current.setField("free_field", "Updated draft"))
+
+    expect(lotFormToPayload(result.current.value)).toMatchObject({
+      carbure_supplier_id: undefined,
+      unknown_supplier: "External supplier",
+    })
+    expect(
+      getDeliveryTypes(operator, operator, result.current.value.supplier)
+    ).toContain(DeliveryType.Direct)
+  })
+
+  it.each([false, true])(
+    "allows entering an unknown supplier and selecting the current entity (producer: %s)",
+    async (isProducer) => {
+      const entity = { ...operator, isProducer }
+      vi.mocked(useEntity).mockReturnValue(entity)
+      const lot = directLot({
+        lot_status: LotStatus.Draft,
+        added_by: entity,
+        carbure_supplier: entity,
+        carbure_producer: isProducer ? entity : null,
+      })
+      const { result } = renderHook(() => useLotForm(lot))
+      const { getByRole, rerender } = render(
+        <Form form={result.current}>
+          <SupplierField />
+        </Form>
+      )
+
+      expect((getByRole("textbox") as HTMLInputElement).disabled).toBe(false)
+      await act(async () => {
+        fireEvent.change(getByRole("textbox"), {
+          target: { value: "External supplier" },
+        })
+      })
+
+      expect(lotFormToPayload(result.current.value)).toMatchObject({
+        carbure_supplier_id: undefined,
+        unknown_supplier: "External supplier",
+      })
+      rerender(
+        <Form form={result.current}>
+          <SupplierField />
+        </Form>
+      )
+      await waitFor(() =>
+        expect((getByRole("textbox") as HTMLInputElement).value).toBe(
+          "External supplier"
+        )
+      )
+      await act(async () => {
+        fireEvent.change(getByRole("textbox"), {
+          target: { value: entity.name },
+        })
+      })
+
+      expect(lotFormToPayload(result.current.value)).toMatchObject({
+        carbure_supplier_id: entity.id,
+        unknown_supplier: undefined,
+      })
+    }
+  )
 })
 
 describe("DIRECT delivery text fields", () => {
