@@ -27,7 +27,7 @@ def get_snapshot(request):
     auditor_lots = TransactionsAuditLotsRepository.get_auditor_lots(request).filter(year=year)
     lots = auditor_lots.filter(year=year).exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])
     alerts = lots.exclude(audit_status=CarbureLot.CONFORM).filter(
-        Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True)
+        Q(highlighted_by_auditor=True) | Q(random_control_requested=True)
     )
 
     auditor_stock = get_auditor_stock(request.user)

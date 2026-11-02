@@ -5,7 +5,6 @@ import {
   CorrectionStatus,
   DeliveryType,
   LotStatus,
-  ML,
 } from "transactions/types"
 import {
   Entity,
@@ -213,12 +212,6 @@ export const normalizeCorrectionFilter: Normalizer<CorrectionStatus> = (correcti
 export const normalizeConformityFilter: Normalizer<Conformity> = (conformity) => ({
   value: conformity,
   label: getConformityLabel(conformity)
-})
-
-// prettier-ignore
-export const normalizeMLFilter: Normalizer<ML> = (ml) => ({
-  value: ml,
-  label: ml,
 })
 
 export const normalizeMonth: Normalizer<string> = (m) => ({

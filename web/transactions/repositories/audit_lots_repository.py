@@ -50,7 +50,7 @@ class TransactionsAuditLotsRepository:
         lots = TransactionsAuditLotsRepository.get_auditor_lots(request)
         if status == "ALERTS":
             lots = lots.exclude(audit_status=CarbureLot.CONFORM).filter(
-                Q(highlighted_by_auditor=True) | Q(random_control_requested=True) | Q(ml_control_requested=True)
+                Q(highlighted_by_auditor=True) | Q(random_control_requested=True)
             )
         elif status == "LOTS":
             lots = lots.exclude(lot_status__in=[CarbureLot.DRAFT, CarbureLot.DELETED])

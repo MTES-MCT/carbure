@@ -302,7 +302,6 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=None):
     scores = query.getlist("scores", [])
     added_by = query.getlist("added_by", [])
     conformity = query.getlist("conformity", [])
-    ml = query.getlist("ml_scoring", False)
     certificate_id = query.getlist("certificate_id", [])
     supplier_certificate = query.getlist("supplier_certificate", [])
 
@@ -393,14 +392,6 @@ def filter_lots(lots, query, entity=None, will_aggregate=False, blacklist=None):
 
     if len(conformity) > 0 and "conformity" not in blacklist:
         lots = lots.filter(audit_status__in=conformity)
-
-    if ml and "ml_scoring" not in blacklist:
-        ml_filter = Q()
-        if "OK" in ml:
-            ml_filter = ml_filter | Q(ml_control_requested=False)
-        if "KO" in ml:
-            ml_filter = ml_filter | Q(ml_control_requested=True)
-        lots = lots.filter(ml_filter)
 
     if len(certificate_id) > 0 and "certificate_id" not in blacklist:
         lots = lots.filter(production_site_double_counting_certificate__in=certificate_id)
@@ -569,9 +560,6 @@ def get_lots_filters_data(lots, query, entity, field):
     if field == "conformity":
         conformities = lots.values_list("audit_status", flat=True).distinct()
         return prepare_filters(conformities)
-
-    if field == "ml_scoring":
-        return prepare_filters(["KO", "OK"])
 
     if field == "certificate_id":
         certificate_ids = (
