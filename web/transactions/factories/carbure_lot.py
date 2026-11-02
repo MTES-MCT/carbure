@@ -120,8 +120,6 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     highlighted_by_admin = factory.Faker("boolean")
     highlighted_by_auditor = factory.Faker("boolean")
     random_control_requested = factory.Faker("boolean")
-    ml_control_requested = factory.Faker("boolean")
-    ml_scoring = 0.0
 
     audit_status = CarbureLot.UNKNOWN
 
