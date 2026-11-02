@@ -1,4 +1,4 @@
-from django_filters.constants import EMPTY_VALUES
+from django_filters import FilterSet
 
 from core.filters import MultiValueInFilter
 from traceability.models.material import Material
@@ -9,9 +9,9 @@ from traceability.services.parent_chain import chain_column, filter_by_chain
 class RecursiveColumnFilter(MultiValueInFilter):
     """One column of a group declared in ``services/column_groups.py``.
 
-    Does not query by itself. When its query param is set, it calls ``RecursiveFilter``,
-    which applies every active column in one walk.
-    Subclass, set ``group`` and ``column``, and declare the subclass on ``ActionFilter``.
+    Does not query by itself. ``RecursiveFilterSet`` reads ``selected_values``
+    and applies every active column in one walk.
+    Subclass, set ``group`` and ``column``, and declare the subclass on a ``RecursiveFilterSet``.
     Walkthrough: ``traceability/docs/parent_chain.md``.
     """
 
@@ -30,11 +30,6 @@ class RecursiveColumnFilter(MultiValueInFilter):
             raise ValueError(f"{cls.__name__}.group {group!r} is not in COLUMN_GROUPS")
         if column not in COLUMN_GROUPS[group].start():
             raise ValueError(f"{cls.__name__}.column {column!r} is not produced by group {group!r}")
-
-    def filter(self, qs, value):
-        if value in EMPTY_VALUES:
-            return qs
-        return RecursiveFilter(self.parent).filter(qs)
 
     def selected_values(self):
         """None when the query param is absent. Empty when no stored id matches."""
@@ -65,24 +60,24 @@ class RecursiveColumnFilter(MultiValueInFilter):
         return [item for item in data.getlist(key) if item not in (None, "")]
 
 
-class RecursiveFilter:
+class RecursiveFilterSet(FilterSet):
     """One walk for every recursive column present on the request.
 
-    A column filter calls it only when that column's query param is set.
-    The first call applies every selected column. Later calls return the queryset unchanged.
+    Ordinary filters run first. A ``RecursiveColumnFilter`` is skipped there and
+    only exposes its selected values. The walk runs once afterwards.
     """
 
-    def __init__(self, filterset):
-        self.filterset = filterset
+    def filter_queryset(self, queryset):
+        for name, value in self.form.cleaned_data.items():
+            if isinstance(self.filters[name], RecursiveColumnFilter):
+                continue
+            queryset = self.filters[name].filter(queryset, value)
+        return self.filter_by_parent_chain(queryset)
 
-    def filter(self, queryset):
-        if getattr(self.filterset, "_recursive_applied", False):
-            return queryset
-        self.filterset._recursive_applied = True
-
+    def filter_by_parent_chain(self, queryset):
         columns = {}
         groups = []
-        for filter_obj in self.filterset.filters.values():
+        for filter_obj in self.filters.values():
             if not isinstance(filter_obj, RecursiveColumnFilter):
                 continue
             values = filter_obj.selected_values()
@@ -92,6 +87,8 @@ class RecursiveFilter:
                 return queryset.none()
             columns[filter_obj.column] = values
             groups.append(filter_obj.group)
+        if not columns:
+            return queryset
         return filter_by_chain(queryset, columns, groups)
 
 

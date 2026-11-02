@@ -1,14 +1,15 @@
-from django_filters import FilterSet, MultipleChoiceFilter, NumberFilter, OrderingFilter
+from django_filters import MultipleChoiceFilter, NumberFilter, OrderingFilter
 
 from core.filters import MultiValueInFilter
-from traceability.filters.recursive import OriginMaterialFilter
+from traceability.filters.recursive import OriginMaterialFilter, RecursiveFilterSet
 from traceability.models import Action, ActionStatus
 
 
-class ActionFilter(FilterSet):
-    # MultipleChoiceFilter met distinct=True par défaut, pour les relations qui dupliquent
-    # les lignes. Ces champs sont des colonnes de l'action : le DISTINCT transformait le
-    # COUNT de pagination en dédoublonnage de toutes les colonnes, sans changer le total.
+class ActionFilter(RecursiveFilterSet):
+    # MultipleChoiceFilter defaults to distinct=True to collapse rows duplicated by
+    # relation joins. These fields are plain Action columns, so the filter never
+    # duplicates rows: DISTINCT only forced the pagination COUNT to deduplicate
+    # every selected column, for the same total.
     year = NumberFilter(field_name="working_date__year")
     period = MultiValueInFilter(field_name="period")
     type = MultipleChoiceFilter(field_name="type", choices=Action.TYPES, distinct=False)

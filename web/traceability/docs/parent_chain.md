@@ -39,7 +39,7 @@ Pour une action, la requête produit une ligne par cran. On garde celle dont le 
 |---|---|
 | Liste | Filtres ordinaires, puis pagination. Le `COUNT` ne lance pas la CTE. `annotate_parent_chain` ne voit que les ids de la page, avec les deux groupes. MySQL interdit un `LIMIT` dans la sous-requête de la CTE. |
 | Détail | `annotate_parent_chain` sur l'action demandée, avec les deux groupes. |
-| `origin_material` | Avant la pagination, sur le queryset déjà filtré. `RecursiveFilter` ne part qu'une fois, pour tous les filtres récursifs de l'URL. Il ne charge que les groupes nommés : ici `inherited_fields`, pas les GES. Les ids sont figés dans une liste Python, pour que le `COUNT` ne relance pas la CTE. La page refait ensuite le parcours complet, GES compris. |
+| `origin_material` | Avant la pagination, sur le queryset déjà filtré. `RecursiveFilterSet` ne part qu'une fois, après les filtres ordinaires, pour tous les filtres récursifs de l'URL. Il ne charge que les groupes nommés : ici `inherited_fields`, pas les GES. Les ids sont figés dans une liste Python, pour que le `COUNT` ne relance pas la CTE. La page refait ensuite le parcours complet, GES compris. |
 | `GET /filters/?filter=origin_material` | `chain_column` sur le queryset déjà filtré par les autres paramètres. Une ligne par action, puis les libellés sont dédoublonnés. Tant que `origin_material` est dans l'URL, les options d'un autre filtre rejouent aussi cette remontée. |
 | `/years/` | Pas de parcours. |
 
@@ -91,10 +91,10 @@ Modèle : `OriginMaterialFilter`. C'est aujourd'hui le seul filtre de ce parcour
 
 1. Sous-classer `RecursiveColumnFilter`. Poser `column` (une clé de `start()`) et `group`. À l'import, la classe vérifie que le groupe existe et que `start()` produit cette colonne.
 2. `to_values` traduit le paramètre d'URL vers la valeur stockée. `to_labels` fait l'inverse pour `GET /filters/`. Sans ces deux méthodes, l'URL et le menu parlent la valeur brute.
-3. Déclarer le filtre sur `ActionFilter`.
+3. Déclarer le filtre sur `ActionFilter`, qui hérite de `RecursiveFilterSet`.
 4. Côté front : la clé dans `ActionFilter`, une entrée dans `useActionFilters`, et `use-combined-query.tsx` si la page l'envoie avec les autres filtres.
 
-`RecursiveFilter` rassemble tous les filtres récursifs présents dans l'URL et ne lance qu'une remontée. Un paramètre dont aucune ligne stockée ne correspond renvoie un queryset vide.
+`RecursiveFilterSet` laisse passer les filtres ordinaires, puis rassemble les filtres récursifs présents dans l'URL et ne lance qu'une remontée. Un paramètre dont aucune ligne stockée ne correspond renvoie un queryset vide.
 
 ## Ajouter un groupe de colonnes
 
