@@ -51,7 +51,10 @@ export const useBiomethanePermissions = (): BiomethanePermissionsManager => {
     ])
 
     return {
-      canAccessModule: entity.isBiomethaneProducer || canAccessAdmin,
+      canAccessModule:
+        entity.isBiomethaneProducer ||
+        entity.isBiomethaneProvider ||
+        canAccessAdmin,
       canEditDeclaration: entity.canWrite() && isDreal,
       adminPermissions: {
         canAccessAdmin: canAccessAdmin,

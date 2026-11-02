@@ -12,8 +12,8 @@ from tiruert.services.operation import OperationService
 
 class Command(BaseCommand):
     help = """
-    For all entities ("is_tiruert_liable=True"), create TiruertOperation records for all past durability periods,
-    for a specific year, if they don't already exist.
+    For all entities ("is_tiruert_liable=True" or operators), create TiruertOperation records for all
+    past durability periods, for a specific year, if they don't already exist.
 
     Usage:
         python web/manage.py backfill_operations_for_past_periods --year=2025
@@ -25,7 +25,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         year = options.get("year")
 
-        entities = Entity.objects.filter(is_tiruert_liable=True, is_enabled=True, closed_at__isnull=True)
+        entities = Entity.objects.filter(
+            Q(is_tiruert_liable=True) | Q(entity_type=Entity.OPERATOR),
+            is_enabled=True,
+            closed_at__isnull=True,
+        )
         for entity in entities:
             self.stdout.write(f"Initializing operations for entity {entity.id} - {entity.name}...")
             self.init_operations_for_past_periods(year, entity.id)

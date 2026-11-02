@@ -701,6 +701,7 @@
   "Hiver": "Hiver",
   "Issus de collecteurs privés": "From private collectors",
   "Issus de collectivités locales": "From local authorities",
+  "Issus de résidus d'industries agro-alimentaires": "Derived from food processing industry waste",
   "Déclaration en cours": "Declaration in progress",
   "Déclaration transmise": "Declaration sent",
   "Déclaration en retard": "Late declaration",
@@ -2285,5 +2286,6 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> must be declared by <b>{{date}}</b>.",
   "{{count}} options sélectionnées_many": "{{count}} options selected",
   "Report 2026": "Report 2026",
-  "Energie renouvelable": "Renewable energy"
+  "Energie renouvelable": "Renewable energy",
+  "Siret": "SIRET"
 }

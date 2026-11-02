@@ -97,7 +97,13 @@ class BiomethaneEntityConfigAmendmentFactory(factory.django.DjangoModelFactory):
 
 
 def create_contract_with_amendments(entity):
-    contract = BiomethaneSignedContractFactory(producer=entity, conditions_file=None)
+    buyer = EntityFactory(name="Acheteur de biométhane Test", entity_type=Entity.BIOMETHANE_PROVIDER)
+    contract = BiomethaneSignedContractFactory(
+        producer=entity,
+        buyer=buyer,
+        installation_category=BiomethaneContract.INSTALLATION_CATEGORY_1,
+        conditions_file="biomethane/contracts/sample-conditions.pdf",
+    )
 
     signature_date = contract.signature_date or date(2024, 1, 1)
     effective_date = contract.effective_date or date(2024, 1, 2)
@@ -107,14 +113,14 @@ def create_contract_with_amendments(entity):
         signature_date=signature_date + timedelta(days=1),
         effective_date=effective_date + timedelta(days=1),
         amendment_object=[BiomethaneContractAmendment.CMAX_PAP_UPDATE],
-        amendment_file="",
+        amendment_file="biomethane/contracts/sample-amendment-cmax.pdf",
     )
     BiomethaneEntityConfigAmendmentFactory.create(
         contract=contract,
         signature_date=signature_date + timedelta(days=2),
         effective_date=effective_date + timedelta(days=2),
         amendment_object=[BiomethaneContractAmendment.EFFECTIVE_DATE],
-        amendment_file="",
+        amendment_file="biomethane/contracts/sample-amendment-effective-date.pdf",
     )
 
     return contract

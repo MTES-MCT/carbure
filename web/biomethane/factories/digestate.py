@@ -44,6 +44,14 @@ class BiomethaneDigestateFactory(factory.django.DjangoModelFactory):
     sold_volume = None
 
 
+def create_digestate(producer: Entity, year: int, **kwargs):
+    from biomethane.factories.digestate_spreading import create_spreading_for_digestate
+
+    digestate, _ = BiomethaneDigestate.objects.update_or_create(producer=producer, year=year, defaults=kwargs)
+    create_spreading_for_digestate(digestate, spreading_department="75")
+    return digestate
+
+
 def create_digestate_with_composting(producer: Entity, **kwargs):
     """Factory helper pour créer un digestat avec compostage."""
     return BiomethaneDigestateFactory.create(

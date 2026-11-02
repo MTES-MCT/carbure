@@ -14,9 +14,13 @@ class H2ActionLookupsTest(TestCase):
 
     def test_materials_are_limited_to_hydrogen(self):
         hydrogen = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux")
-        MaterialFactory(code="BIO-WOOD", name="Bois")
+        wood = MaterialFactory(code="BIO-WOOD", name="Bois")
 
-        self.assertEqual(list(lookups.material(None)), [hydrogen])
+        materials = list(lookups.material(None))
+
+        self.assertIn(hydrogen, materials)
+        self.assertNotIn(wood, materials)
+        self.assertTrue(all(material.code.startswith("H2-") for material in materials))
 
     def test_sites_are_limited_to_entity_refueling_stations(self):
         entity = EntityFactory.create()

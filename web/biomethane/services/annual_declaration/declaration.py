@@ -1,5 +1,6 @@
 from datetime import date
 
+from django.db import transaction
 from django.db.models import BooleanField, Case, CharField, DateField, ExpressionWrapper, F, Q, Value, When
 from django.db.models.expressions import CombinedExpression
 from django.db.models.functions import Cast, Concat
@@ -15,6 +16,7 @@ from biomethane.models import (
 )
 from biomethane.models.biomethane_injection_site import BiomethaneInjectionSite
 from biomethane.services.admin.ademe import AdemeService
+from biomethane.services.annual_declaration.notification import notify_declaration_reopened
 from biomethane.services.digestate import BiomethaneDigestateService
 from core.models.entity import ExternalAdminRights
 
@@ -281,6 +283,18 @@ class BiomethaneAnnualDeclarationService:
                 declaration.save(update_fields=["status"])
         except BiomethaneAnnualDeclaration.DoesNotExist:
             pass
+
+    @staticmethod
+    def reopen_declaration(declaration, request=None):
+        """
+        Reopen a declaration and notify the producer.
+        The status change is rolled back if the notification fails.
+        """
+        with transaction.atomic():
+            declaration.is_open = True
+            declaration.status = BiomethaneAnnualDeclaration.IN_PROGRESS
+            declaration.save(update_fields=["is_open", "status"])
+            return notify_declaration_reopened(declaration, request=request)
 
     # ADEME only sees the declarations for the first five years of the installation
     # Ex : effective_date is 02/04/2023, ADEME will see the declarations for the years 2023 to 2027

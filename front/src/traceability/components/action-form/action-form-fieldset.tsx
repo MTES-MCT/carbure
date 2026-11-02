@@ -2,7 +2,7 @@ import { Dialog } from "common/components/dialog2"
 import { FormManager } from "common/components/form2"
 import useEntity from "common/hooks/entity"
 import { Fragment } from "react/jsx-runtime"
-import { ActionFieldset as ActionFieldsetConfig } from "traceability/hooks/use-action-fields"
+import { ActionFieldset as ActionFieldsetConfig } from "traceability/hooks/action-fields"
 import { Action } from "traceability/types"
 
 type ActionFieldsetProps = {

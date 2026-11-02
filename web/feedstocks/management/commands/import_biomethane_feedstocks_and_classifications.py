@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 from django.core.management.base import BaseCommand
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.utils.text import slugify
 
 from core.models import MatierePremiere
@@ -149,14 +149,16 @@ class Command(BaseCommand):
                     # Create new MatierePremiere
 
                     try:
-                        matiere_premiere = MatierePremiere.biofuel.create(
-                            name=intrant[:256],
-                            name_en=intrant[:256],
-                            code=f"{slugify(intrant[:64]).upper()}",
-                            is_methanogenic=True,
-                            classification=classification,
-                            description="",
-                        )
+                        # Savepoint so a duplicate code does not abort the seed transaction.
+                        with transaction.atomic():
+                            matiere_premiere = MatierePremiere.biofuel.create(
+                                name=intrant[:256],
+                                name_en=intrant[:256],
+                                code=f"{slugify(intrant[:64]).upper()}",
+                                is_methanogenic=True,
+                                classification=classification,
+                                description="",
+                            )
                     except IntegrityError:
                         matiere_premiere = MatierePremiere.biofuel.create(
                             name=intrant[:256],

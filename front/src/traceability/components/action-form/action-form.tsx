@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import { Form, useForm } from "common/components/form2"
 
 import { Action } from "traceability/types"
-import { ActionFieldset } from "traceability/hooks/use-action-fields"
+import { ActionFieldset } from "traceability/hooks/action-fields"
 import { ActionFormFieldset } from "./action-form-fieldset"
 
 export type ActionFormProps = {

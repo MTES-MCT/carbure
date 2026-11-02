@@ -3,6 +3,7 @@ from django.test import TestCase
 from biomethane.permissions import (
     CanAccessAdminModule,
     CanAccessInjection,
+    CanAccessProviderApi,
     CanDownloadDeclaration,
     HasBiomethaneProducerRights,
     HasBiomethaneProducerWriteRights,
@@ -22,6 +23,7 @@ from biomethane.views import (
     BiomethaneInjectionSiteViewSet,
     BiomethaneProducersViewSet,
     BiomethaneProductionUnitViewSet,
+    BiomethaneProviderDeclarationViewSet,
     BiomethaneSupplyInputViewSet,
     BiomethaneSupplyPlanViewSet,
 )
@@ -192,6 +194,15 @@ class BiomethanePermissions(TestCase, PermissionTestMixin):
             BiomethaneAdminAnnualDeclarationViewSet,
             [
                 (["list", "filters"], [CanAccessAdminModule()]),
+            ],
+        )
+
+    def test_provider_declaration_permissions(self):
+        """Test BiomethaneProviderDeclarationViewSet permissions: API key + JWT + provider rights."""
+        self.assertViewPermissions(
+            BiomethaneProviderDeclarationViewSet,
+            [
+                (["list"], [CanAccessProviderApi()]),
             ],
         )
 

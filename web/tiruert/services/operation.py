@@ -10,6 +10,7 @@ from rest_framework import serializers
 from core.models import CarbureLot, MatierePremiere
 from core.models.feedstock import Biocarburant
 from core.utils import truncate
+from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
@@ -145,7 +146,11 @@ class OperationService:
 
         # 2. Calculate the balance for the requested customs category (all biofuels combined)
         request.GET = request.GET.copy()
-        request.GET["customs_category"] = customs_category
+        request.GET["entity_id"] = entity_id
+        if hasattr(request.GET, "setlist"):
+            request.GET.setlist("customs_category", [customs_category])
+        else:
+            request.GET["customs_category"] = [customs_category]
         operations = OperationFilterForBalance(request.GET, queryset=Operation.objects.all(), request=request).qs
 
         balance = BalanceService.calculate_balance(
@@ -294,6 +299,7 @@ class OperationService:
         # Filter lots to keep only those that are valid for TIRUERT operations
         valid_lots = OperationService.filter_valid_lots(lots)
         valid_lots = OperationService.filter_fr_delivery_site(valid_lots)
+        valid_lots = OperationService.exclude_saf_biofuel(valid_lots)
         valid_lots = OperationService.remove_existing_lots(valid_lots)
 
         if not valid_lots:
@@ -368,6 +374,13 @@ class OperationService:
             | Q(delivery_type=CarbureLot.RFC, usage="")
             | Q(delivery_type__in=DELIVERY_TYPES_ACCEPTED)
         )
+
+    @staticmethod
+    def exclude_saf_biofuel(lots: list[CarbureLot]):
+        """
+        Exclude only lots with SAF biofuel.
+        """
+        return lots.exclude(biofuel__code__in=SAF_BIOFUEL_TYPES)
 
     @staticmethod
     def filter_fr_delivery_site(lots: list[CarbureLot]):

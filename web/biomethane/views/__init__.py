@@ -9,4 +9,5 @@ from .energy import BiomethaneEnergyMonthlyReportViewSet, BiomethaneEnergyViewSe
 from .injection_site import BiomethaneInjectionSiteViewSet
 from .mixins import OptionalFieldsActionMixin, WatchedFieldsActionMixin, YearsActionMixin
 from .production_unit import BiomethaneDigestateStorageViewSet, BiomethaneProductionUnitViewSet
+from .provider.provider_declaration import BiomethaneProviderDeclarationViewSet
 from .supply_plan import BiomethaneSupplyInputViewSet, BiomethaneSupplyPlanViewSet, download_template

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { Normalizer } from "common/utils/normalize"
 import { EntityManager } from "common/hooks/entity"
 import { ActionFilter, ActionStatus } from "traceability/types"
-import { getActionStatusLabel } from "traceability/utils"
+import { getActionStatusLabel } from "traceability/utils/formatters"
 
 export type ActionFilterDisplay = {
   key: ActionFilter

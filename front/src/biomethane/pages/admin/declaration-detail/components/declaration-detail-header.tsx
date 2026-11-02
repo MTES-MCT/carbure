@@ -8,7 +8,7 @@ import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { ToggleDeclarationButton } from "./toggle-declaration-button"
 import { AnnualDeclarationStatusBadge } from "biomethane/components/annual-declaration-status-badge"
 import { useBiomethanePermissions } from "biomethane/hooks/use-biomethane-permissions"
-import { SelectYearsAdmin } from "../../components/select-years-admin"
+import { SelectYears } from "../../../../components/select-years"
 
 interface DeclarationDetailHeaderProps {
   producers: BiomethaneProducer[]
@@ -43,7 +43,7 @@ export const DeclarationDetailHeader = ({
         }}
       />
 
-      <SelectYearsAdmin
+      <SelectYears
         key={selectedEntityId}
         urlRoot={`biomethane/admin/declarations/${selectedEntityId}`}
       />

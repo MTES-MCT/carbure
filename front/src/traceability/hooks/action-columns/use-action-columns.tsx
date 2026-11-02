@@ -5,7 +5,11 @@ import { EntityManager } from "common/hooks/entity"
 import { formatDate } from "common/utils/formatters"
 import { ActionStatusBadge } from "traceability/components/action-status-badge"
 import { Action } from "traceability/types"
-import { ACTION_EMISSIONS_UNIT, formatActionDecimal } from "traceability/utils"
+import {
+  ACTION_EMISSIONS_UNIT,
+  formatActionDecimal,
+} from "traceability/utils/formatters"
+import { quantityColumn } from "./quantity-column"
 
 export type ActionColumn = Column<Action> & {
   condition?: (entity: EntityManager) => boolean
@@ -48,13 +52,10 @@ export function useActionColumns() {
       ),
     },
 
-    quantity: {
-      key: "quantity",
-      header: t("Quantité"),
-      cell: (action) => (
-        <Cell text={formatActionDecimal(action.quantity)} sub="kg" />
-      ),
-    },
+    quantity: quantityColumn(),
+    mass: quantityColumn("mass"),
+    volume: quantityColumn("volume"),
+    energy: quantityColumn("energy"),
 
     site: {
       key: "site",

@@ -700,6 +700,7 @@
   "Hiver": "Hiver",
   "Issus de collecteurs privés": "Issus de collecteurs privés",
   "Issus de collectivités locales": "Issus de collectivités locales",
+  "Issus de résidus d'industries agro-alimentaires": "Issus de résidus d'industries agro-alimentaires",
   "Déclaration en cours": "Déclaration en cours",
   "Déclaration transmise": "Déclaration transmise",
   "Déclaration en retard": "Déclaration en retard",
@@ -2367,5 +2368,6 @@
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_many": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>_other": "<b>{{count}} lots</b> doivent être déclarés avant le <b>{{date}}</b>",
   "Report 2026": "Report 2026",
-  "Energie renouvelable": "Energie renouvelable"
+  "Energie renouvelable": "Energie renouvelable",
+  "Siret": "SIRET"
 }
