@@ -18,3 +18,14 @@ SET
   manager_name = CONCAT('Manager ', site_ptr_id),
   manager_email = CONCAT('manager', site_ptr_id, '@anonymized.local'),
   manager_phone = '';
+
+UPDATE otp_email_emaildevice
+SET
+  email = CONCAT('user', user_id, '@anonymized.local'),
+  name = IF(
+    name LIKE 'email_change_%',
+    CONCAT('email_change_user', user_id, '@anonymized.local'),
+    name
+  );
+
+TRUNCATE TABLE django_admin_log;
