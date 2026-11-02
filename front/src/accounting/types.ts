@@ -35,6 +35,7 @@ export type OperationExcelImportRequest =
   apiTypes["OperationExcelImportRequestRequest"]
 
 export type Balance = apiTypes["Balance"]
+export type Debt = apiTypes["DebtSummary"]
 
 export type OperationsQueryBuilder = QueryBuilder<
   OperationsStatus[],

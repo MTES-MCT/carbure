@@ -24,6 +24,9 @@ import {
   DEFAULT_UNIT_OPERATION,
   FRACTION_DIGITS_LITERS,
 } from "accounting/config"
+import { useDebts } from "accounting/hooks/use-debts"
+import { BalanceDebitButton } from "./balance-debit-button"
+import { DebtRepaymentDialog } from "./debt-repayment-dialog"
 
 export const useBalancesBiofuelsColumns = () => {
   const { t } = useTranslation()
@@ -32,6 +35,7 @@ export const useBalancesBiofuelsColumns = () => {
   const portal = usePortal()
   const { canTransferBalance } = useAccountingPermissions()
   const { unit } = useUnit(DEFAULT_UNIT_OPERATION)
+  const { getDebt } = useDebts()
 
   const columns: Column<apiTypes["Balance"]>[] = compact([
     {
@@ -91,17 +95,23 @@ export const useBalancesBiofuelsColumns = () => {
     {
       header: t("Céder"),
       cell: (balance) => (
-        <Button
-          iconId="fr-icon-send-plane-line"
-          priority="tertiary"
-          title={t("Céder")}
-          size="small"
-          onClick={() =>
+        <BalanceDebitButton
+          debt={getDebt(balance)}
+          disabled={!canTransferBalance}
+          onDebit={() =>
             portal((close) => (
               <DebitOperationDialog onClose={close} balance={balance} />
             ))
           }
-          disabled={!canTransferBalance}
+          onRepayDebt={(debt) =>
+            portal((close) => (
+              <DebtRepaymentDialog
+                onClose={close}
+                balance={balance}
+                debt={debt}
+              />
+            ))
+          }
         />
       ),
     },
