@@ -12,7 +12,6 @@ DB_TABLE_NAMES = [
     "biocarburants",
     "double_counting_registrations",
     "entities",
-    "entity_depot",
     "entity_site",
     "matieres_premieres",
     "pays",
@@ -48,16 +47,16 @@ DEFAULT_IF_PARAMS = {
     "contamination": 0.01,
     "max_features": 1.0,
     "max_samples": "auto",
-    "n_estimators": 300,
+    "n_estimators": 100,
     "n_jobs": None,
-    "random_state": None,
+    "random_state": 42,
     "verbose": 0,
     "warm_start": False,
 }
 
 DEFAULT_LOF_PARAMS = {
     "algorithm": "auto",
-    "contamination": 0.01,
+    "contamination": 0.004,
     "leaf_size": 40,
     "metric": "minkowski",
     "metric_params": None,
