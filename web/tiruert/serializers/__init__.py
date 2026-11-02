@@ -1,25 +1,24 @@
-from .balance import BalanceByLotSerializer
-from .balance import BalanceBySectorSerializer
-from .balance import BalanceSerializer
-from .debt import DebtRepaymentInputSerializer
+from .balance import BalanceByLotSerializer, BalanceBySectorSerializer, BalanceSerializer
 from .debt import DebtSummarySerializer
 from .elec_balance import ElecBalanceSerializer
-from .elec_operation import ElecOperationInputSerializer
-from .elec_operation import ElecOperationListSerializer
-from .elec_operation import ElecOperationSerializer
-from .elec_operation import ElecOperationUpdateSerializer
-from .mac_fossil_fuel import MacFossilFuelInputSerializer
-from .mac_fossil_fuel import MacFossilFuelSerializer
-from .objective import ObjectiveInputSerializer
-from .objective import ObjectiveOutputSerializer
-from .operation import OperationCorrectionSerializer
-from .operation import OperationExcelImportRequestSerializer
-from .operation import OperationImportGroupSerializer
-from .operation import OperationImportResponseSerializer
-from .operation import OperationInputSerializer
-from .operation import OperationListSerializer
-from .operation import OperationLotSerializer
-from .operation import OperationSerializer
-from .operation import OperationUpdateSerializer
+from .elec_operation import (
+    ElecOperationInputSerializer,
+    ElecOperationListSerializer,
+    ElecOperationSerializer,
+    ElecOperationUpdateSerializer,
+)
+from .mac_fossil_fuel import MacFossilFuelInputSerializer, MacFossilFuelSerializer
+from .objective import ObjectiveInputSerializer, ObjectiveOutputSerializer
+from .operation import (
+    OperationCorrectionSerializer,
+    OperationExcelImportRequestSerializer,
+    OperationImportGroupSerializer,
+    OperationImportResponseSerializer,
+    OperationInputSerializer,
+    OperationListSerializer,
+    OperationLotSerializer,
+    OperationSerializer,
+    OperationUpdateSerializer,
+)
 from .operation_detail import OperationDetailSerializer
 from .teneur import SimulationInputSerializer
