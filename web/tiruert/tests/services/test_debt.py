@@ -25,7 +25,7 @@ class DebtServiceGetOpenDebtsTest(DebtTestMixin, TestCase):
         )
         self.assertEqual([debt.id for debt in DebtService.get_open_debts(self.entity.id)], [first.id, second.id])
 
-        DebtService.repay(self.entity, self.biofuel, MatierePremiere.CONV, [{"id": lot.id, "volume": 100}])
+        self.repay([{"id": lot.id, "volume": 100}])
 
         self.assertEqual([debt.id for debt in DebtService.get_open_debts(self.entity.id)], [second.id])
 
@@ -47,7 +47,7 @@ class DebtServiceSummarizeTest(DebtTestMixin, TestCase):
         self.create_debt(lot, 300)
         self.create_debt(lot, 200)
         self.create_debt(other_lot, 999, entity=self.other_entity)
-        DebtService.repay(self.entity, self.biofuel, MatierePremiere.CONV, [{"id": lot.id, "volume": 120.5}])
+        self.repay([{"id": lot.id, "volume": 120.5}])
 
         with self.assertNumQueries(2):
             summary = DebtService.summarize_open_debts(self.entity.id)
@@ -99,10 +99,7 @@ class DebtServiceSplitLotsBetweenDebtsTest(SimpleTestCase):
         self.assertEqual(self.split({1: 0.1, 2: 0.2}, {10: 0.3}), {10: {1: 0.1, 2: 0.2}})
 
 
-class DebtServiceRepayTest(DebtTestMixin, TestCase):
-    def repay(self, lots, entity=None):
-        return DebtService.repay(entity or self.entity, self.biofuel, MatierePremiere.CONV, lots)
-
+class DebtRepaymentCreationTest(DebtTestMixin, TestCase):
     def test_repay_spreads_volumes_oldest_debt_first_and_splits_a_lot(self):
         """Lots are consumed in order over the debts, a lot can be split between two debts."""
         lot_a = self.create_lot(1000)
@@ -270,9 +267,7 @@ class DebtServiceRepayTest(DebtTestMixin, TestCase):
         lot = self.create_lot(1000)
         debt = self.create_debt(lot, 300)
 
-        operations = DebtService.repay(
-            self.entity, self.biofuel, MatierePremiere.CONV, [{"id": lot.id, "volume": 120}], status=Operation.DRAFT
-        )
+        operations = self.repay([{"id": lot.id, "volume": 120}], status=Operation.DRAFT)
 
         self.assertEqual([operation.status for operation in operations], [Operation.DRAFT])
         self.assertEqual(self.remaining(debt), 180)
@@ -285,11 +280,5 @@ class DebtServiceRepayTest(DebtTestMixin, TestCase):
 
         for volume in (600, 1100):
             with self.subTest(volume=volume), self.assertRaises(ValidationError):
-                DebtService.repay(
-                    self.entity,
-                    self.biofuel,
-                    MatierePremiere.CONV,
-                    [{"id": lot.id, "volume": volume}],
-                    status=Operation.DRAFT,
-                )
+                self.repay([{"id": lot.id, "volume": volume}], status=Operation.DRAFT)
         self.assertEqual(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).count(), 0)

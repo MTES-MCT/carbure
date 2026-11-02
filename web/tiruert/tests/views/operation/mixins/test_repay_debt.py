@@ -14,8 +14,15 @@ class DebtViewTestCase(DebtTestMixin, TestCase):
         self.user = setup_current_user(self, "tester@carbure.local", "Tester", "gogogo", [(self.entity, UserRights.ADMIN)])
 
     def post_repay(self, lots, entity=None, **extra):
-        body = {"biofuel": self.biofuel.id, "customs_category": MatierePremiere.CONV, "lots": lots, **extra}
-        url = f"{reverse('operations-repay-debt')}?entity_id={(entity or self.entity).id}"
+        body = {
+            "type": Operation.DEBT_REPAYMENT,
+            "biofuel": self.biofuel.id,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": self.entity.id,
+            "lots": lots,
+            **extra,
+        }
+        url = f"{reverse('operations-list')}?entity_id={(entity or self.entity).id}"
         return self.client.post(url, body, content_type="application/json")
 
     def get_debts(self):
@@ -23,6 +30,27 @@ class DebtViewTestCase(DebtTestMixin, TestCase):
 
 
 class RepayDebtViewTest(DebtViewTestCase):
+    def test_create_endpoint_repay_debt(self):
+        lot = self.create_lot(1000)
+        self.create_debt(lot, 100)
+        url = f"{reverse('operations-list')}?entity_id={self.entity.id}"
+        body = {
+            "type": Operation.DEBT_REPAYMENT,
+            "biofuel": self.biofuel.id,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": self.entity.id,
+            "lots": [{"id": lot.id, "volume": 50}],
+        }
+
+        response = self.client.post(url, body, content_type="application/json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["type"], Operation.DEBT_REPAYMENT)
+        self.assertEqual(data[0]["status"], Operation.VALIDATED)
+        self.assertEqual(data[0]["volume"], -50)
+
     def test_repay_debt_creates_one_operation_per_repaid_debt(self):
         """201 with the created operations serialized as negative debits without recipient, validated by default."""
         lot_a = self.create_lot(1000)
@@ -52,19 +80,30 @@ class RepayDebtViewTest(DebtViewTestCase):
         self.assertIn("volume", response.json())
         self.assertEqual(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).count(), 0)
 
-    def test_repay_debt_ignores_the_entity_sent_in_the_body(self):
-        """The repaying entity is the current one: a debited_entity in the body changes nothing."""
+    def test_repay_debt_requires_the_current_entity_as_debited_entity(self):
+        """The debited entity is required and must match the current entity."""
         lot = self.create_lot(1000)
         other_lot = self.create_lot(1000, entity=self.other_entity)
         self.create_debt(lot, 100)
 
         response = self.post_repay([{"id": lot.id, "volume": 100}], debited_entity=self.other_entity.id)
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Operation.objects.get(type=Operation.DEBT_REPAYMENT).debited_entity, self.entity)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("debited_entity", response.json())
 
         response = self.post_repay([{"id": other_lot.id, "volume": 10}], debited_entity=self.other_entity.id)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        body = {
+            "type": Operation.DEBT_REPAYMENT,
+            "biofuel": self.biofuel.id,
+            "customs_category": MatierePremiere.CONV,
+            "lots": [{"id": lot.id, "volume": 10}],
+        }
+        response = self.client.post(
+            f"{reverse('operations-list')}?entity_id={self.entity.id}", body, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("debited_entity", response.json())
 
     def test_repay_debt_validates_the_payload(self):
         """An empty lot list or an unknown biofuel is a 400."""
@@ -73,10 +112,38 @@ class RepayDebtViewTest(DebtViewTestCase):
 
         self.assertEqual(self.post_repay([]).status_code, status.HTTP_400_BAD_REQUEST)
 
-        url = f"{reverse('operations-repay-debt')}?entity_id={self.entity.id}"
-        body = {"biofuel": 999999, "customs_category": MatierePremiere.CONV, "lots": [{"id": lot.id, "volume": 10}]}
+        url = f"{reverse('operations-list')}?entity_id={self.entity.id}"
+        body = {
+            "type": Operation.DEBT_REPAYMENT,
+            "biofuel": 999999,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": self.entity.id,
+            "lots": [{"id": lot.id, "volume": 10}],
+        }
         response = self.client.post(url, body, content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_repay_debt_refuses_a_recipient(self):
+        """A repayment cannot credit another entity: nothing is created."""
+        lot = self.create_lot(1000)
+        self.create_debt(lot, 100)
+
+        response = self.post_repay([{"id": lot.id, "volume": 10}], credited_entity=self.other_entity.id)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("credited_entity", response.json())
+        self.assertEqual(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).count(), 0)
+
+    def test_repay_debt_refuses_a_null_debited_entity(self):
+        """A null debited entity is a 400, not a server error."""
+        lot = self.create_lot(1000)
+        self.create_debt(lot, 100)
+
+        response = self.post_repay([{"id": lot.id, "volume": 10}], debited_entity=None)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("debited_entity", response.json())
+        self.assertEqual(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).count(), 0)
 
     def test_repay_debt_requires_write_rights(self):
         """A read-only user cannot repay a debt."""
@@ -99,17 +166,16 @@ class RepayDebtViewTest(DebtViewTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual([operation["status"] for operation in response.json()], [Operation.DRAFT])
 
-    def test_repay_debt_refuses_a_status_other_than_validated_or_draft(self):
-        """Any other status is a 400 on status and nothing is created."""
+    def test_repay_debt_normalizes_non_draft_status_to_validated(self):
+        """A repayment is VALIDATED unless explicitly requested as a DRAFT."""
         lot = self.create_lot(1000)
         self.create_debt(lot, 100)
 
-        for invalid in (Operation.PENDING, Operation.CANCELED, "UNKNOWN"):
-            with self.subTest(status=invalid):
-                response = self.post_repay([{"id": lot.id, "volume": 10}], status=invalid)
-                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-                self.assertIn("status", response.json())
-        self.assertEqual(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).count(), 0)
+        for requested_status in (Operation.PENDING, Operation.CANCELED):
+            with self.subTest(status=requested_status):
+                response = self.post_repay([{"id": lot.id, "volume": 10}], status=requested_status)
+                self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+                self.assertEqual(response.json()[0]["status"], Operation.VALIDATED)
 
 
 class DebtsViewTest(DebtViewTestCase):
