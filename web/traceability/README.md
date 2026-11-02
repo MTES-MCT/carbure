@@ -25,7 +25,7 @@ energy = mass × lhv
 | Concept | Rôle |
 |---|---|
 | `Action` | POS, détenteur, matière, quantité, site, logistique, GES. Types : `INIT`, puis la chaîne `PRODUCE` → `MOVE` (autant que nécessaire) → `CONSUME` → `VALORIZE`. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
-| `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est le dernier enregistrement. La liste l'annote sur la page renvoyée. Elle ne l'annote sur toute la requête que pour filtrer ou trier par statut |
+| `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est le dernier enregistrement. La liste l'annote sur la page renvoyée. Le filtre, le tri et les valeurs proposées ne lancent la sous-requête que si les autres filtres laissent au plus 100 000 actions. En dessous, les options sont les statuts présents sur ce queryset. Au-delà, le filtre et le tri sont ignorés et les options sont les six statuts possibles, sans parcours de la base |
 | `Material` | Catalogue (`code`, `name`, `unit`, `lhv`, `density`). L’unité native de `quantity` vit ici. Facteurs optionnels, ou strictement > 0 |
 
 Import des matières :

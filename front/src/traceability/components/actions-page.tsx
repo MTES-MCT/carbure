@@ -1,4 +1,4 @@
-import { ReactNode, useCallback } from "react"
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { isEmpty } from "ramda"
 
@@ -20,6 +20,7 @@ import {
   ActionIndustry,
   ActionQuery,
   ActionQueryBuilder,
+  ActionStatus,
 } from "traceability/types"
 import { ActionFilterDisplay } from "traceability/hooks/use-action-filters"
 import { ActionColumn } from "traceability/hooks/action-columns"
@@ -33,6 +34,18 @@ import { SearchInput } from "common/components/inputs2"
 import { Pagination } from "common/components/pagination2"
 
 export const QUERY_KEY = "traceability-actions"
+
+// Same ceiling as STATUS_FILTER_MAX_ROWS on the action view.
+const STATUS_FILTER_MAX_ROWS = 100_000
+
+function withoutStatusFilter(query: ActionQuery): ActionQuery {
+  const { status: _status, order_by, ...rest } = query
+  const orders = order_by?.filter((item) => item.replace(/^-/, "") !== "status")
+  return {
+    ...rest,
+    order_by: orders?.length ? orders : undefined,
+  }
+}
 
 export type MainAction = {
   icon: FrIconClassName
@@ -90,7 +103,6 @@ export const ActionsPage = ({
   const visibleFilters = filters.filter(
     (filter) => filter.condition?.(entity) ?? true
   )
-
   const filterLabels = Object.fromEntries(
     visibleFilters.map((filter) => [filter.key, filter.label])
   ) as Partial<Record<ActionFilter, string>>
@@ -119,15 +131,41 @@ export const ActionsPage = ({
   >({ year: years.selected })
 
   const combinedQuery = useCombinedQuery(fixedQuery, query)
+  const [knownCount, setKnownCount] = useState<number>()
+  const statusFilterEnabled =
+    knownCount !== undefined && knownCount <= STATUS_FILTER_MAX_ROWS
+  const listQuery = useMemo(() => {
+    const hasStatus = Boolean(combinedQuery.status?.length)
+    const ordersByStatus = combinedQuery.order_by?.some(
+      (item) => item.replace(/^-/, "") === "status"
+    )
+    if (statusFilterEnabled || (!hasStatus && !ordersByStatus))
+      return combinedQuery
+    return withoutStatusFilter(combinedQuery)
+  }, [combinedQuery, statusFilterEnabled])
 
   const { result, loading } = useQuery(getActions, {
     key: QUERY_KEY,
-    params: [industry, combinedQuery],
+    params: [industry, listQuery],
   })
+  const count = result?.data?.count
+
+  useEffect(() => {
+    if (count !== undefined) setKnownCount(count)
+  }, [count])
 
   const getFilterOptions = useCallback(
-    (filter: ActionFilter) => getActionFilters(filter, industry, combinedQuery),
-    [industry, combinedQuery]
+    (filter: ActionFilter) => {
+      if (
+        filter === ActionFilter.status &&
+        count !== undefined &&
+        count > STATUS_FILTER_MAX_ROWS
+      ) {
+        return Promise.resolve(Object.values(ActionStatus))
+      }
+      return getActionFilters(filter, industry, combinedQuery)
+    },
+    [industry, combinedQuery, count]
   )
 
   const showEmptyState =

@@ -37,7 +37,7 @@ Pour une action, la requête produit une ligne par cran. On garde celle dont le 
 
 | Appel | Parcours |
 |---|---|
-| Liste | Filtres ordinaires, puis pagination. Le `COUNT` ne lance pas la CTE. `annotate_parent_chain` ne voit que les ids de la page, avec les deux groupes. MySQL interdit un `LIMIT` dans la sous-requête de la CTE. |
+| Liste | Filtres ordinaires, puis pagination. Le `COUNT` ne lance pas la CTE. La requête de page ne lit que les ids : les `select_related` du manager feraient jointurer toutes les lignes avant le `LIMIT`. `annotate_parent_chain` ne voit que ces ids, avec les deux groupes. MySQL interdit un `LIMIT` dans la sous-requête de la CTE. |
 | Détail | `annotate_parent_chain` sur l'action demandée, avec les deux groupes. |
 | `origin_material` | Avant la pagination, sur le queryset déjà filtré. `RecursiveFilter` ne part qu'une fois, pour tous les filtres récursifs de l'URL. Il ne charge que les groupes nommés : ici `inherited_fields`, pas les GES. Les ids sont figés dans une liste Python, pour que le `COUNT` ne relance pas la CTE. La page refait ensuite le parcours complet, GES compris. |
 | `GET /filters/?filter=origin_material` | `chain_column` sur le queryset déjà filtré par les autres paramètres. Une ligne par action, puis les libellés sont dédoublonnés. Tant que `origin_material` est dans l'URL, les options d'un autre filtre rejouent aussi cette remontée. |

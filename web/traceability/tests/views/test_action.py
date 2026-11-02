@@ -201,6 +201,47 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertEqual(ordered.status_code, status.HTTP_200_OK)
         self.assertIn("action_status", self._page_sql({**self.base_params, "order_by": "-status"}))
 
+    @patch("traceability.views.action.STATUS_FILTER_MAX_ROWS", 0)
+    def test_list_ignores_status_filter_when_the_queryset_exceeds_the_ceiling(self):
+        accepted = ActionFactory.create(holder=self.entity, industry=Action.H2, status=ActionStatus.ACCEPTED)
+
+        response = self.client.get(self.list_url, {**self.base_params, "status": ActionStatus.ACCEPTED})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [item["id"] for item in response.data["results"]]
+        self.assertIn(self.own_action.id, ids)
+        self.assertIn(accepted.id, ids)
+        self.assertNotIn("action_status", self._page_sql({**self.base_params, "status": ActionStatus.ACCEPTED}))
+
+    def _filter_options(self, params):
+        # request_started clears the log, so what remains is this call.
+        # CaptureQueriesContext slices a log that this clear has already reset.
+        connection.force_debug_cursor = True
+        response = self.client.get(reverse("traceability-action-filters"), params)
+        return response, list(connection.queries)
+
+    def test_status_filter_options_follow_the_limited_queryset(self):
+        ActionFactory.create(holder=self.entity, industry=Action.H2, status=ActionStatus.ACCEPTED)
+
+        response, queries = self._filter_options({**self.base_params, "filter": "status"})
+        limited, _limited_queries = self._filter_options(
+            {**self.base_params, "filter": "status", "holder": self.other_entity.name}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(response.data, [ActionStatus.PENDING, ActionStatus.ACCEPTED])
+        self.assertTrue(any("action_status" in query["sql"].lower() for query in queries))
+        self.assertEqual(limited.status_code, status.HTTP_200_OK)
+        self.assertEqual(limited.data, [ActionStatus.PENDING])
+
+    @patch("traceability.views.action.STATUS_FILTER_MAX_ROWS", 0)
+    def test_status_filter_options_are_the_known_statuses_above_the_ceiling(self):
+        response, queries = self._filter_options({**self.base_params, "filter": "status"})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(response.data, [value for value, _label in ActionStatus.STATUSES])
+        self.assertFalse(any("action_status" in query["sql"].lower() for query in queries))
+
     def _page_sql(self, params):
         with CaptureQueriesContext(connection) as captured:
             response = self.client.get(self.list_url, params)
@@ -261,6 +302,15 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertNotIn("action_status", recursive[0].lower())
         self.assertIn("ei_sum", recursive[1].lower())
 
+    def test_filter_options_are_available_for_plain_columns(self):
+        response = self.client.get(
+            reverse("traceability-action-filters"),
+            {**self.base_params, "filter": "holder"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(self.entity.name, response.data)
+
     def test_filters_lists_origin_material_codes(self):
         other = MaterialFactory(code="CH4", name="Méthane")
         ActionFactory.create(
@@ -299,6 +349,21 @@ class ActionViewsetAdminQuerysetTest(TestCase):
         self.hrs_action = ActionFactory.create(holder=self.hrs, industry=Action.H2)
         self.other_hrs_action = ActionFactory.create(holder=self.other_hrs, industry=Action.H2)
         self.other_industry_action = ActionFactory.create(holder=self.hrs, industry="BIOMASS")
+
+    def test_admin_page_query_does_not_join_related_tables(self):
+        with CaptureQueriesContext(connection) as captured:
+            response = self.client.get(self.list_url, self.admin_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["results"][0]["holder"]["name"], self.hrs.name)
+        pages = [
+            query["sql"].lower()
+            for query in captured.captured_queries
+            if "from `action`" in query["sql"].lower() and re.search(r"limit \d+\s*$", query["sql"].lower())
+        ]
+        self.assertEqual(len(pages), 1)
+        for table in ("entities", "material", "sites", "carbure_certificates"):
+            self.assertNotIn(f"join `{table}`", pages[0])
 
     def test_admin_lists_every_action_of_the_industry(self):
         response = self.client.get(self.list_url, self.admin_params)

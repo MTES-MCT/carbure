@@ -145,3 +145,6 @@ class Action(models.Model):
         verbose_name = "Action"
         verbose_name_plural = "Actions"
         ordering = ["id"]
+        indexes = [
+            models.Index(fields=["industry", "working_date"], name="action_industry_working_date"),
+        ]
