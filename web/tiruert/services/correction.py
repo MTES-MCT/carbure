@@ -21,7 +21,7 @@ class CorrectionService:
         For each (lot, customs_category, biofuel) credited by an initial operation, the gap between
         the expected volume and the net volume already credited (initial operation + previous
         corrections) is turned into a CORRECTION operation:
-        - volume added: reduce the open debts of the lot first, then credit the rest whatever the lot balance is
+        - volume added: credit it whatever the lot balance is, existing debts are left untouched
         - volume removed: debit when the lot balance of the credited entity covers it, otherwise record a
           TiruertDebt of the whole volume (no debit)
         """
@@ -66,50 +66,8 @@ class CorrectionService:
                         lot_id=lot.id,
                     )
                     continue
-            else:
-                volume_delta = CorrectionService._reduce_open_debts(lot, volume_delta)
-                if volume_delta == 0:
-                    continue
 
             CorrectionService._create_volume_correction(lot, credit_data, volume_delta)
-
-    @staticmethod
-    def _reduce_open_debts(converted_lot, volume: float) -> float:
-        """
-        Reduce the open VOLUME debts of (lot, customs_category, biofuel), oldest first, by `volume`.
-        A debt never goes below its repaid part: it is deleted when nothing was repaid, kept otherwise.
-        Returns the volume left to credit.
-        """
-        debts = (
-            TiruertDebt.objects.with_remaining()
-            .filter(
-                lot_id=converted_lot.id,
-                type=TiruertDebt.VOLUME,
-                customs_category=converted_lot.feedstock.category,
-                biofuel_id=converted_lot.biofuel_id,
-                remaining__gt=0,
-            )
-            .order_by("created_at", "id")
-        )
-
-        left = volume
-        for debt in debts:
-            if left <= 0:
-                break
-            if left >= debt.remaining:
-                left -= debt.remaining
-                debt.value = debt.repaid
-            else:
-                debt.value -= left
-                left = 0
-
-            # Cancelled repayments still reference the debt (PROTECT), so it can only be deleted without any
-            if debt.value <= 0 and not debt.repayments.exists():
-                debt.delete()
-            else:
-                debt.save(update_fields=["value"])
-
-        return truncate(left)
 
     @staticmethod
     def _get_current_credited_volume_by_lot_category_biofuel(lot_ids: list[int]) -> dict[tuple, dict]:
