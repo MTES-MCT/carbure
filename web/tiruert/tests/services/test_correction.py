@@ -146,64 +146,18 @@ class CorrectionServiceVolumeTest(TestCase):
         self.assertEqual(list(TiruertDebt.objects.values_list("id", "value")), [(debt.id, 300)])
         self.assertFalse(self.corrections().exists())
 
-    def test_volume_increase_below_debt_only_reduces_the_debt(self):
-        """Reduce the open debt without crediting anything when the increase is lower than the debt."""
+    def test_volume_increase_leaves_existing_debts_untouched(self):
+        """Credit the whole increase and keep the open debt unchanged."""
         lot, debt = self.create_debt_of_300()
 
         self.update_volume(lot, 800)
         self.update_volume(lot, 800)
 
         debt.refresh_from_db()
-        self.assertEqual(debt.value, 200)
-        self.assertFalse(self.corrections().exists())
-
-    def test_volume_increase_above_debt_deletes_the_debt_and_credits_the_rest(self):
-        """Delete a debt cleared by the increase, then credit only the remaining volume."""
-        lot, _ = self.create_debt_of_300()
-
-        self.update_volume(lot, 1100)
-        self.update_volume(lot, 1100)
-
-        self.assertFalse(TiruertDebt.objects.exists())
+        self.assertEqual(debt.value, 300)
         correction = self.corrections().get()
         self.assertEqual(correction.credited_entity, self.entity)
         self.assertEqual(correction.details.get().volume, 100)
-
-    def test_volume_increase_clears_oldest_debt_first(self):
-        """Reduce the debts in creation order."""
-        lot, first = self.create_debt_of_300()
-        self.consume(lot, 150)
-        self.update_volume(lot, 600)
-        second = TiruertDebt.objects.exclude(id=first.id).get()
-        self.assertEqual(second.value, 100)
-
-        self.update_volume(lot, 950)
-
-        self.assertEqual(list(TiruertDebt.objects.values_list("id", "value")), [(second.id, 50)])
-        self.assertFalse(self.corrections().exists())
-
-    def test_partially_repaid_debt_is_not_reduced_below_the_repaid_volume(self):
-        """Keep the repaid part of a debt and credit the volume that exceeds the remaining debt."""
-        lot, debt = self.create_debt_of_300()
-        self.repay(debt, 100)
-
-        self.update_volume(lot, 1100)
-        self.update_volume(lot, 1100)
-
-        debt.refresh_from_db()
-        self.assertEqual(debt.value, 100)
-        self.assertEqual(self.corrections().get().details.get().volume, 200)
-
-    def test_debt_with_only_a_canceled_repayment_is_kept_at_zero(self):
-        """Do not delete a cleared debt still referenced by a canceled repayment."""
-        lot, debt = self.create_debt_of_300()
-        self.repay(debt, 100, status=Operation.CANCELED)
-
-        self.update_volume(lot, 1000)
-
-        debt.refresh_from_db()
-        self.assertEqual(debt.value, 0)
-        self.assertFalse(self.corrections().exists())
 
     def test_debt_remaining_ignores_inactive_repayments(self):
         """Compute the remaining volume from the active repayments only."""
