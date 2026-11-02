@@ -27,6 +27,7 @@ type DebitOperationStepperDialogProps<T> = {
   form: FormManager<T>
   formId: string
   mutation: DebitOperationMutation
+  notice?: ReactNode
 
   // Summaries displayed in the recap grid, based on the current step index
   renderSummaries: (currentStepIndex: number) => ReactNode
@@ -45,6 +46,7 @@ export const DebitOperationStepperDialog = <T,>({
   form,
   formId,
   mutation,
+  notice,
   renderSummaries,
   renderStepContent,
 }: DebitOperationStepperDialogProps<T>) => {
@@ -84,6 +86,7 @@ export const DebitOperationStepperDialog = <T,>({
       }
     >
       <Main>
+        {notice}
         <Stepper />
         <Box>
           <RecapOperationGrid>
