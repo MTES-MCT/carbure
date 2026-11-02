@@ -24,6 +24,7 @@ import { Button } from "common/components/button2"
 import { useLocation, useNavigate } from "react-router-dom"
 import { OperationsExcelImportDialog } from "./pages/operations-excel-import-dialog"
 import { OperationTable } from "./components/operations-table"
+import { DebtNotice } from "./components/debt-notice"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
@@ -56,6 +57,7 @@ const OperationsBiofuels = () => {
 
   return (
     <>
+      <DebtNotice />
       <ActionBar>
         <ExportButton query={query} download={api.downloadOperations} />
         <Button
