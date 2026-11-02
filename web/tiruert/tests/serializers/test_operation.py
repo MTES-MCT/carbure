@@ -162,67 +162,39 @@ class OperationInputSerializerCreateTest(TestCase):
         self.mock_request.unit = "l"
 
     @patch("tiruert.serializers.operation.OperationService")
-    def test_create_calls_service_perform_checks(self, mock_service):
-        """Should call OperationService.perform_checks_before_create()."""
-        # Create real CarbureLot for FK constraint
-        lot = CarbureLotFactory(
-            volume=500,
-            added_by=self.entity,
-            carbure_producer=self.producer,
-            carbure_production_site=self.production_site,
-        )
+    def test_create_delegates_to_the_service_and_returns_the_operation(self, mock_service):
+        """Should hand the request, the lots and the declaration year to OperationService.create_operations()."""
+        lots = [{"id": 1, "volume": 500}]
+        validated_data = {"type": Operation.TRANSFERT, "lots": lots}
+        mock_service.create_operations.return_value = ["operation"]
+        serializer = OperationInputSerializer(context={"request": self.mock_request, "declaration_year": 2026})
 
-        serializer = OperationInputSerializer(context={"request": self.mock_request})
-        validated_data = {
-            "type": Operation.CESSION,
-            "customs_category": MatierePremiere.CONV,
-            "biofuel": self.biofuel_eth,
-            "debited_entity": self.entity,
-            "credited_entity": self.entity,
-            "to_depot": self.depot,
-            "lots": [{"id": lot.id, "volume": 500}],
-        }
+        result = serializer.create(validated_data)
 
-        mock_service.perform_checks_before_create.return_value = None
-        mock_service.define_operation_status.return_value = None
-        mock_service.get_emission_rates_by_lot.return_value = {lot.id: 9.8}
-
-        serializer.create(validated_data)
-
-        mock_service.perform_checks_before_create.assert_called_once()
-        call_args = mock_service.perform_checks_before_create.call_args[0]
-        self.assertEqual(call_args[0], self.mock_request)
-        self.assertEqual(call_args[1], self.entity.id)
+        mock_service.create_operations.assert_called_once_with(self.mock_request, validated_data, lots, 2026)
+        self.assertEqual(result, "operation")
 
     @patch("tiruert.serializers.operation.OperationService")
-    def test_create_calls_service_define_status(self, mock_service):
-        """Should call OperationService.define_operation_status()."""
-        # Create real CarbureLot for FK constraint
-        lot = CarbureLotFactory(
-            volume=500,
-            added_by=self.entity,
-            carbure_producer=self.producer,
-            carbure_production_site=self.production_site,
-        )
-
+    def test_create_returns_every_operation_of_a_debt_repayment(self, mock_service):
+        """A repayment creates one operation per repaid debt: all of them are returned."""
+        validated_data = {"type": Operation.DEBT_REPAYMENT, "lots": [{"id": 1, "volume": 500}]}
+        mock_service.create_operations.return_value = ["first", "second"]
         serializer = OperationInputSerializer(context={"request": self.mock_request})
-        validated_data = {
-            "type": Operation.CESSION,
-            "customs_category": MatierePremiere.CONV,
-            "biofuel": self.biofuel_eth,
-            "debited_entity": self.entity,
-            "credited_entity": self.entity,
-            "to_depot": self.depot,
-            "lots": [{"id": lot.id, "volume": 500}],
-        }
 
-        mock_service.perform_checks_before_create.return_value = None
-        mock_service.define_operation_status.return_value = None
-        mock_service.get_emission_rates_by_lot.return_value = {lot.id: 9.8}
+        self.assertEqual(serializer.create(validated_data), ["first", "second"])
 
-        serializer.create(validated_data)
+    def test_validate_limits_credited_entity_to_cession_and_transfert(self):
+        """Only CESSION and TRANSFERT operations can have a credited entity."""
+        serializer = OperationInputSerializer()
+        for operation_type in (Operation.CESSION, Operation.TRANSFERT):
+            data = {"type": operation_type, "credited_entity": self.entity}
+            with self.subTest(operation_type=operation_type):
+                self.assertEqual(serializer.validate(data), data)
 
-        mock_service.define_operation_status.assert_called_once_with(validated_data)
+        for operation_type in (Operation.TENEUR, Operation.DEBT_REPAYMENT):
+            with self.subTest(operation_type=operation_type), self.assertRaises(serializers.ValidationError) as error:
+                serializer.validate({"type": operation_type, "credited_entity": self.entity})
+            self.assertIn("credited_entity", error.exception.detail)
 
     @patch("tiruert.serializers.operation.OperationService.get_emission_rates_by_lot")
     @patch("tiruert.serializers.operation.OperationService.define_operation_status")
