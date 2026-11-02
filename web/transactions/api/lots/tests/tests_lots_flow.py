@@ -6,8 +6,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django_otp.plugins.otp_email.models import EmailDevice
 
-from core.carburetypes import CarbureError
-from core.models import CarbureLot, CarbureStock, Entity, UserRights
+from core.carburetypes import CarbureCertificatesErrors, CarbureError, CarbureSanityCheckErrors
+from core.models import CarbureLot, CarbureLotEvent, CarbureStock, Entity, GenericError, UserRights
 from transactions.api.lots.tests.tests_utils import get_lot
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models import Depot, YearConfig
@@ -283,6 +283,7 @@ class LotsFlowTest(TestCase):
                 "entity_id": self.trader.id,
                 "selection": [lot.id],
                 "client_entity_id": self.operator.id,
+                "certificate": "VALID",
             },
         )
         assert response.status_code == 200
@@ -293,11 +294,41 @@ class LotsFlowTest(TestCase):
         assert child.lot_status == CarbureLot.PENDING
         assert child.delivery_type == CarbureLot.UNKNOWN
 
-    def test_accept_trading_to_unknown_client(self):
+    def test_accept_trading_with_invalid_certificate_rolls_back(self):
+        lot = self.send_lot(self.create_draft(carbure_client_id=self.trader.id))
+        lots_before = list(CarbureLot.objects.order_by("pk").values())
+        events_before = list(CarbureLotEvent.objects.order_by("pk").values())
+        errors_before = list(GenericError.objects.order_by("pk").values())
+
+        response = self.client.post(
+            reverse("transactions-lots-accept-trading"),
+            {
+                "entity_id": self.trader.id,
+                "selection": [lot.id],
+                "client_entity_id": self.operator.id,
+                "certificate": "INVALID",
+            },
+        )
+
+        assert response.status_code == 400
+        data = response.json()
+        assert data["status"] == "error"
+        assert len(data["errors"]) == 1
+        assert data["errors"][0]["error"] == CarbureSanityCheckErrors.INVALID_CERTIFICATE
+        assert data["errors"][0]["field"] == "supplier_certificate"
+        assert data["errors"][0]["is_blocking"] is True
+        assert list(CarbureLot.objects.order_by("pk").values()) == lots_before
+        assert list(CarbureLotEvent.objects.order_by("pk").values()) == events_before
+        assert list(GenericError.objects.order_by("pk").values()) == errors_before
+
+    def test_accept_trading_to_unknown_client_rolls_back(self):
         lot = self.create_draft(carbure_client_id=self.trader.id)
         lot = self.send_lot(lot)
         assert lot.lot_status == CarbureLot.PENDING
         assert lot.delivery_type == CarbureLot.UNKNOWN
+        lots_before = list(CarbureLot.objects.order_by("pk").values())
+        events_before = list(CarbureLotEvent.objects.order_by("pk").values())
+        errors_before = list(GenericError.objects.order_by("pk").values())
 
         response = self.client.post(
             reverse("transactions-lots-accept-trading"),
@@ -305,15 +336,20 @@ class LotsFlowTest(TestCase):
                 "entity_id": self.trader.id,
                 "selection": [lot.id],
                 "unknown_client": "TRADER CLIENT",
+                "certificate": "VALID",
             },
         )
-        assert response.status_code == 200
-        lot = CarbureLot.objects.get(id=lot.id)
-        assert lot.lot_status == CarbureLot.ACCEPTED
-        assert lot.delivery_type == CarbureLot.TRADING
-        child = CarbureLot.objects.get(parent_lot=lot)
-        assert child.lot_status == CarbureLot.ACCEPTED
-        assert child.delivery_type == CarbureLot.UNKNOWN
+        assert response.status_code == 400
+        data = response.json()
+        assert data["status"] == "error"
+        assert {error["error"] for error in data["errors"]} == {
+            CarbureSanityCheckErrors.MISSING_CARBURE_CLIENT,
+            CarbureSanityCheckErrors.MISSING_DELIVERY_TYPE,
+        }
+        assert all(error["is_blocking"] for error in data["errors"])
+        assert list(CarbureLot.objects.order_by("pk").values()) == lots_before
+        assert list(CarbureLotEvent.objects.order_by("pk").values()) == events_before
+        assert list(GenericError.objects.order_by("pk").values()) == errors_before
 
     def test_accept_processing(self):
         lot = self.create_draft(carbure_client_id=self.trader.id)
@@ -336,6 +372,60 @@ class LotsFlowTest(TestCase):
         child = CarbureLot.objects.get(parent_lot=lot)
         assert child.lot_status == CarbureLot.PENDING
         assert child.delivery_type == CarbureLot.UNKNOWN
+
+    def test_accept_processing_with_blocking_child_rolls_back_all_lots(self):
+        valid_lot = self.send_lot(self.create_draft(carbure_client_id=self.trader.id))
+        invalid_lot = self.send_lot(self.create_draft(carbure_client_id=self.trader.id))
+        # Simulate a change that the background sanity checks have not picked up yet.
+        CarbureLot.objects.filter(pk=invalid_lot.pk).update(supplier_certificate="")
+        assert valid_lot.lot_status == invalid_lot.lot_status == CarbureLot.PENDING
+        assert not GenericError.objects.filter(lot__in=[valid_lot, invalid_lot], is_blocking=True).exists()
+        lots_before = list(CarbureLot.objects.order_by("pk").values())
+        events_before = list(CarbureLotEvent.objects.order_by("pk").values())
+        errors_before = list(GenericError.objects.order_by("pk").values())
+
+        response = self.client.post(
+            reverse("transactions-lots-accept-processing"),
+            {
+                "entity_id": self.trader.id,
+                "selection": [valid_lot.id, invalid_lot.id],
+                "processing_entity_id": self.operator.id,
+            },
+        )
+
+        assert response.status_code == 400
+        data = response.json()
+        assert data["status"] == "error"
+        assert len(data["errors"]) == 1
+        assert data["errors"][0]["error"] == CarbureCertificatesErrors.MISSING_SUPPLIER_CERTIFICATE
+        assert data["errors"][0]["field"] == "supplier_certificate"
+        assert data["errors"][0]["is_blocking"] is True
+        assert list(CarbureLot.objects.order_by("pk").values()) == lots_before
+        assert list(CarbureLotEvent.objects.order_by("pk").values()) == events_before
+        assert list(GenericError.objects.order_by("pk").values()) == errors_before
+
+    def test_accept_trading_and_processing_allow_non_blocking_errors(self):
+        for action, params in [
+            ("trading", {"client_entity_id": self.operator.id, "certificate": "VALID"}),
+            ("processing", {"processing_entity_id": self.operator.id}),
+        ]:
+            with self.subTest(action=action):
+                lot = self.send_lot(self.create_draft(carbure_client_id=self.trader.id, el=-1))
+
+                response = self.client.post(
+                    reverse(f"transactions-lots-accept-{action}"),
+                    {"entity_id": self.trader.id, "selection": [lot.id], **params},
+                )
+
+                assert response.status_code == 200
+                lot.refresh_from_db()
+                assert lot.lot_status == CarbureLot.ACCEPTED
+                child = CarbureLot.objects.get(parent_lot=lot)
+                assert child.lot_status == CarbureLot.PENDING
+                assert GenericError.objects.filter(
+                    lot=child, error=CarbureSanityCheckErrors.GHG_EL_NEG, is_blocking=False
+                ).exists()
+                assert not GenericError.objects.filter(lot=child, is_blocking=True).exists()
 
     def test_accept_blending(self):
         lot = self.create_draft(carbure_client_id=self.operator.id)
