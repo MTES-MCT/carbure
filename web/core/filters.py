@@ -114,8 +114,9 @@ def FiltersActionFactory():
             # Get DB field from FilterSet programmatically
             filter_obj = filterset.filters.get(filter_param)
 
-            # A filter that walks a chain exposes its own distinct values.
-            # values_list cannot read that annotation.
+            # This action reads a column of the queryset. Some filters are not a column
+            # and compute their options another way.
+            # See traceability/filters/recursive.py (RecursiveColumnFilter.distinct_values).
             if hasattr(filter_obj, "distinct_values"):
                 values = filter_obj.distinct_values(filterset.qs)
             else:
