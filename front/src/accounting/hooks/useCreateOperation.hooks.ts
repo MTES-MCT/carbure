@@ -13,16 +13,18 @@ import { CreateOperationType, OperationsStatus } from "accounting/types"
 import { formatAccountingUnit } from "accounting/utils/formatters"
 
 export type UseCreateOperationProps = {
-  onOperationCreated: () => void
+  onOperationCreated?: () => void
   data: CreateOperationProps
   quantity: number
   onClose: () => void
+  invalidates?: string[]
 }
 export const useCreateOperation = ({
   onOperationCreated,
   data,
   quantity,
   onClose,
+  invalidates = ["balances"],
 }: UseCreateOperationProps) => {
   const entity = useEntity()
   const notify = useNotify()
@@ -45,6 +47,9 @@ export const useCreateOperation = ({
           "La dévalorisation d'une quantité de {{quantity}} a été réalisée avec succès",
           { quantity: quantityFormatted }
         ),
+        [CreateOperationType.DEBT_REPAYMENT]: t(
+          "L'acquittement de dette a été réalisé avec succès"
+        ),
       }
 
       if (!messages[operationType]) {
@@ -62,9 +67,10 @@ export const useCreateOperation = ({
         status: draft ? OperationsStatus.DRAFT : undefined,
       }),
     {
-      invalidates: ["balances"],
-      onSuccess: ({ data: operation }) => {
-        onOperationCreated()
+      invalidates,
+      onSuccess: ({ data: response }) => {
+        onOperationCreated?.()
+        const operation = Array.isArray(response) ? response[0] : response
         const message =
           operation?.status === OperationsStatus.DRAFT
             ? t("L'opération a été enregistrée en tant que brouillon.")
