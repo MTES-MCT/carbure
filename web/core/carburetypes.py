@@ -21,16 +21,6 @@ class CarbureError:
     INVALID_FILTER = "No filter was specified"
 
 
-class CarbureMLGHGErrors:
-    EEC_ANORMAL_LOW = "EEC_ANORMAL_LOW"
-    EEC_ANORMAL_HIGH = "EEC_ANORMAL_HIGH"
-    EP_ANORMAL_LOW = "EP_ANORMAL_LOW"
-    EP_ANORMAL_HIGH = "EP_ANORMAL_HIGH"
-    ETD_ANORMAL_HIGH = "ETD_ANORMAL_HIGH"
-    ETD_NO_EU_TOO_LOW = "ETD_NO_EU_TOO_LOW"
-    ETD_EU_DEFAULT_VALUE = "ETD_EU_DEFAULT_VALUE"
-
-
 class CarbureCertificatesErrors:
     REJECTED_SUPPLIER_CERTIFICATE = "Your supplier certificate has been rejected by the DGEC"
     UNKNOWN_PRODSITE_CERT = "UNKNOWN_PRODSITE_CERT"
