@@ -121,7 +121,6 @@ INSTALLED_APPS = [
     "producers",
     "certificates",
     "doublecount",
-    "ml",
     "saf",
     "transactions",
     "elec",

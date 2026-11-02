@@ -16,7 +16,6 @@ class BiofuelFeedstockSanityChecksTest(TestCase):
         "json/countries.json",
         "json/entities.json",
         "json/depots.json",
-        "json/ml.json",
         "json/entities_sites.json",
     ]
 

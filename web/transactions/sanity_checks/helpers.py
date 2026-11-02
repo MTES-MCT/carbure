@@ -14,7 +14,6 @@ from core.models import (
     Pays,
     SustainabilityDeclaration,
 )
-from ml.models import EECStats, EPStats, ETDStats
 from producers.models import ProductionSiteInput, ProductionSiteOutput
 from transactions.models import Depot, EntitySite, ProductionSite
 from transactions.models.year_config import YearConfig
@@ -113,9 +112,6 @@ class PrefetchedData(TypedDict):
     clientsbyname: dict[str, Entity]
     certificates: dict[str, GenericCertificate]
     double_counting_certificates: dict[str, list[DoubleCountingRegistration]]
-    etd: dict[str, float]
-    eec: dict[str, float]
-    ep: dict[str, float]
     checked_certificates: dict
 
 
@@ -135,9 +131,6 @@ def get_prefetched_data(entity=None):
         "clientsbyname": {},
         "certificates": {},
         "double_counting_certificates": {},
-        "etd": {},
-        "eec": {},
-        "ep": {},
         "checked_certificates": {},
     }
 
@@ -235,16 +228,6 @@ def get_prefetched_data(entity=None):
         if dc_cert_id not in data["double_counting_certificates"]:
             data["double_counting_certificates"][dc_cert_id] = []
         data["double_counting_certificates"][dc_cert_id].append(dc_cert)
-
-    # ML STATS
-    etds = ETDStats.objects.select_related("feedstock").all()
-    data["etd"] = {s.feedstock: s.default_value for s in etds}
-
-    eecs = EECStats.objects.select_related("feedstock", "origin").all()
-    data["eec"] = {s.feedstock.code + s.origin.code_pays: s for s in eecs}
-
-    eps = EPStats.objects.select_related("feedstock", "biofuel").all()
-    data["ep"] = {s.feedstock.code + s.biofuel.code: s for s in eps}
 
     # used as cache in CarbureLot model - recalc reliability score
     data["checked_certificates"] = {}
