@@ -29,7 +29,6 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
                         "declare_teneur",
                         "download_import_template",
                         "import_operations_from_excel",
-                        "repay_debt",
                     ],
                     [HasTiruertWriteRights()],
                 ),

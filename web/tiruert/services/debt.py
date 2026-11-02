@@ -1,15 +1,12 @@
 from collections import defaultdict
 
-from django.db import transaction
 from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from core.models import Biocarburant
 from core.utils import truncate
-from tiruert.models import Operation, TiruertDebt
-from tiruert.services.declaration_period import DeclarationPeriodService
-from tiruert.services.operation import OperationService
+from tiruert.models import TiruertDebt
 
 # Volumes carry 2 decimals: anything below is float residue of `value - repaid`
 MIN_OPEN_VOLUME = 0.005
@@ -69,17 +66,15 @@ class DebtService:
         return requested
 
     @staticmethod
-    @transaction.atomic
-    def repay(entity, biofuel, customs_category, lots, status=Operation.VALIDATED) -> list[Operation]:
+    def plan_repayment(entity, biofuel, customs_category, lots) -> list[tuple[TiruertDebt, dict[int, float]]]:
         """
-        Repay the open debts of (entity, biofuel, customs_category) by debiting the given lots.
+        Spread the requested lots over the open debts of (entity, biofuel, customs_category), oldest debt first.
 
         - lots: list of {"id", "volume"} (L) picked among the entity lots of the same biofuel and category.
-        - status: VALIDATED, or DRAFT to only reserve the volume (a draft counts in `remaining` and in the lot balance).
-        Volumes are spread over the debts oldest first, so a lot can be split between two debts.
-        One DEBT_REPAYMENT operation is created per repaid debt. Returns the created operations.
+        Returns [(debt, {lot_id: volume})], one entry per repaid debt: a lot can be split between two debts.
+        Must run inside a transaction: the debts are locked first so that two concurrent repayments cannot
+        spend the same remaining volume.
         """
-        # Lock the debts before reading them so two concurrent repayments cannot spend the same remaining volume
         list(
             TiruertDebt.objects.select_for_update()
             .filter(entity=entity, biofuel=biofuel, customs_category=customs_category, type=TiruertDebt.VOLUME)
@@ -108,34 +103,9 @@ class DebtService:
                 }
             )
 
-        OperationService.check_volumes(
-            [{"id": lot_id, "volume": volume} for lot_id, volume in requested.items()],
-            {"biofuel": biofuel, "customs_category": customs_category, "debited_entity": entity},
-        )
-        emissions_by_lot = OperationService.get_emission_rates_by_lot(list(requested))
-
-        operation_data = {
-            "type": Operation.DEBT_REPAYMENT,
-            "status": status,
-            "customs_category": customs_category,
-            "biofuel": biofuel,
-            "debited_entity": entity,
-            "credited_entity": None,
-            "renewable_energy_share": biofuel.renewable_energy_share,
-        }
-        OperationService.check_declaration_year(DeclarationPeriodService.get_current_declaration_year(), operation_data)
-
         debts_by_id = {debt.id: debt for debt in debts}
-        operations = []
-        for debt_id, lot_volumes in DebtService._split_lots_between_debts(requested, remaining_by_debt).items():
-            details_data = OperationService.build_details_data(lot_volumes, emissions_by_lot)
-            operations.append(
-                OperationService.create_operation_with_details(
-                    {**operation_data, "debt": debts_by_id[debt_id]}, details_data
-                )
-            )
-
-        return operations
+        split = DebtService._split_lots_between_debts(requested, remaining_by_debt)
+        return [(debts_by_id[debt_id], lot_volumes) for debt_id, lot_volumes in split.items()]
 
     @staticmethod
     def _split_lots_between_debts(lots: dict[int, float], debts: dict[int, float]) -> dict[int, dict[int, float]]:

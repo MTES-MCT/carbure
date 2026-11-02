@@ -1,10 +1,12 @@
 from datetime import date
+from types import SimpleNamespace
 
 from django.db.models import Q
 
 from core.models import Biocarburant, CarbureLot, DeclarationPeriod, Entity, MatierePremiere
 from tiruert.models import Operation, TiruertDebt
 from tiruert.services.balance import BalanceService
+from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation import OperationService
 from transactions.factories import CarbureLotFactory
 from transactions.models import Depot
@@ -62,6 +64,21 @@ class DebtTestMixin:
             customs_category=MatierePremiere.CONV,
             lot=lot,
         )
+
+    def repay(self, lots, entity=None, status=None):
+        """Repay the CONV debts of `entity` (default: self.entity) through the creation pipeline."""
+        entity = entity or self.entity
+        data = {
+            "type": Operation.DEBT_REPAYMENT,
+            "biofuel": self.biofuel,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": entity,
+        }
+        if status:
+            data["status"] = status
+        request = SimpleNamespace(entity=entity, GET={})
+        declaration_year = DeclarationPeriodService.get_current_declaration_year()
+        return OperationService.create_operations(request, data, lots, declaration_year)
 
     def lot_balance(self, lot, entity=None):
         entity = entity or self.entity

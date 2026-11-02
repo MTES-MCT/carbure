@@ -2,7 +2,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.http import QueryDict
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from rest_framework.exceptions import ValidationError
 
 from certificates.models import DoubleCountingRegistration
@@ -1266,3 +1266,50 @@ class OperationServiceBuildDetailsDataTest(TestCase):
                 {"lot_id": 4, "volume": 20.00, "emission_rate_per_mj": 8.8},
             ],
         )
+
+
+class OperationServiceDefineOperationStatusTest(SimpleTestCase):
+    def define(self, operation_type, status=None):
+        data = {"type": operation_type, **({"status": status} if status else {})}
+        OperationService.define_operation_status(data)
+        return data["status"]
+
+    def test_auto_accepted_types_are_accepted_even_as_a_draft(self):
+        """Types that need no validation are ACCEPTED whatever the requested status."""
+        self.assertEqual(self.define(Operation.DEVALUATION), Operation.ACCEPTED)
+        self.assertEqual(self.define(Operation.DEVALUATION, Operation.DRAFT), Operation.ACCEPTED)
+
+    def test_other_types_are_pending_unless_saved_as_a_draft(self):
+        """A draft is kept, any other requested status is replaced by PENDING."""
+        self.assertEqual(self.define(Operation.TRANSFERT), Operation.PENDING)
+        self.assertEqual(self.define(Operation.TRANSFERT, Operation.CANCELED), Operation.PENDING)
+        self.assertEqual(self.define(Operation.TRANSFERT, Operation.DRAFT), Operation.DRAFT)
+
+    def test_debt_repayment_is_validated_unless_saved_as_a_draft(self):
+        """A repayment skips the validation step: VALIDATED, or DRAFT to only reserve the volume."""
+        self.assertEqual(self.define(Operation.DEBT_REPAYMENT), Operation.VALIDATED)
+        self.assertEqual(self.define(Operation.DEBT_REPAYMENT, Operation.DRAFT), Operation.DRAFT)
+        for requested in (Operation.PENDING, Operation.CANCELED, Operation.ACCEPTED):
+            with self.subTest(status=requested):
+                self.assertEqual(self.define(Operation.DEBT_REPAYMENT, requested), Operation.VALIDATED)
+
+
+class OperationServiceCreationPipelineTest(TestCase):
+    @patch.object(OperationService, "create_operation_with_details")
+    @patch.object(OperationService, "get_emission_rates_by_lot")
+    @patch.object(OperationService, "perform_checks_before_create")
+    def test_everything_is_checked_before_anything_is_created(self, checks, emission_rates, create):
+        """The checks, the emission rates and the status come first, then one operation is created."""
+        calls = []
+        checks.side_effect = lambda *args: calls.append("checks")
+        emission_rates.side_effect = lambda lot_ids: calls.append("emission_rates") or {1: 9.8}
+        create.side_effect = lambda data, details: calls.append("create") or "operation"
+        data = {"type": Operation.TRANSFERT, "biofuel": Biocarburant(renewable_energy_share=0.5)}
+
+        operations = OperationService.create_operations(Mock(), data, [{"id": 1, "volume": 10}], 2026)
+
+        self.assertEqual(operations, ["operation"])
+        self.assertEqual(calls, ["checks", "emission_rates", "create"])
+        self.assertEqual(data["renewable_energy_share"], 0.5)
+        self.assertEqual(data["status"], Operation.PENDING)
+        self.assertNotIn("debt", create.call_args[0][0])

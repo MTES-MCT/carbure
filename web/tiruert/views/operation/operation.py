@@ -13,7 +13,7 @@ from django.db.models import (
     When,
 )
 from django.db.models.functions import Coalesce, Round
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -101,7 +101,6 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "download_import_template",
             "import_operations_from_excel",
             "declare_teneur",
-            "repay_debt",
         ]:
             return [HasTiruertWriteRights()]
         elif self.action == "correct":
@@ -232,11 +231,32 @@ class OperationViewSet(ModelViewSet, ActionMixin):
 
         return queryset
 
+    @extend_schema(
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(
+                response={
+                    "oneOf": [
+                        {"$ref": "#/components/schemas/Operation"},
+                        {
+                            "type": "array",
+                            "items": {"$ref": "#/components/schemas/OperationList"},
+                        },
+                    ]
+                }
+            )
+        }
+    )
     def create(self, request):
         entity_id = request.entity.id
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             operation = serializer.save()
+            if isinstance(operation, list):
+                operations = self.get_queryset().filter(id__in=[item.id for item in operation]).order_by("id")
+                return Response(
+                    OperationListSerializer(operations, many=True, context={"details": 1, "entity_id": entity_id}).data,
+                    status=status.HTTP_201_CREATED,
+                )
             return Response(
                 OperationSerializer(operation, context={"details": 1, "entity_id": entity_id}).data,
                 status=status.HTTP_201_CREATED,

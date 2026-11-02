@@ -1,13 +1,14 @@
 from .accept import AcceptActionMixin
 from .balance import BalanceActionMixin
 from .correct import CorrectActionMixin
+from .debts import DebtActionMixin
 from .excel_export import ExcelExportActionMixin
+from .excel_import import ExcelImportActionMixin
 from .filter import FilterActionMixin
 from .operation_detail_excel_export import OperationDetailExcelExportActionMixin
 from .reject import RejectActionMixin
-from .repay_debt import RepayDebtActionMixin
 from .simulate import SimulateActionMixin
-from .excel_import import ExcelImportActionMixin
+
 
 class ActionMixin(
     AcceptActionMixin,
@@ -19,6 +20,6 @@ class ActionMixin(
     ExcelExportActionMixin,
     OperationDetailExcelExportActionMixin,
     ExcelImportActionMixin,
-    RepayDebtActionMixin,
+    DebtActionMixin,
 ):
     pass

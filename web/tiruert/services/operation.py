@@ -15,6 +15,7 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
+from tiruert.services.debt import DebtService
 from tiruert.services.energy import energy_mj
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import TeneurService
@@ -26,6 +27,40 @@ class OperationServiceErrors:
 
 
 class OperationService:
+    @staticmethod
+    @transaction.atomic
+    def create_operations(request, validated_data, selected_lots, declaration_year) -> list[Operation]:
+        """
+        Check then create the operation requested through the API.
+
+        One operation, or one per repaid debt for a DEBT_REPAYMENT (the lots are spread over the debts).
+        """
+        entity_id = request.entity.id
+        validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
+
+        if validated_data["type"] == Operation.DEBT_REPAYMENT:
+            # Planned before the checks: it locks the debts, so everything read afterwards is up to date
+            repayments = DebtService.plan_repayment(
+                request.entity, validated_data["biofuel"], validated_data["customs_category"], selected_lots
+            )
+        else:
+            repayments = [(None, selected_lots)]
+
+        OperationService.perform_checks_before_create(request, entity_id, selected_lots, validated_data, declaration_year)
+
+        # Fetch emission rates from the oldest OperationDetail for each lot
+        emissions_by_lot = OperationService.get_emission_rates_by_lot([lot["id"] for lot in selected_lots])
+
+        OperationService.define_operation_status(validated_data)
+
+        return [
+            OperationService.create_operation_with_details(
+                {**validated_data, **({"debt": debt} if debt else {})},
+                OperationService.build_details_data(lots, emissions_by_lot),
+            )
+            for debt, lots in repayments
+        ]
+
     @staticmethod
     def get_emission_rates_by_lot(lot_ids):
         """
@@ -245,7 +280,9 @@ class OperationService:
         if validated_data["type"] in auto_accepted_types:
             validated_data["status"] = Operation.ACCEPTED
         elif validated_data.get("status") != Operation.DRAFT:
-            validated_data["status"] = Operation.PENDING
+            # A repayment is not submitted to any validation
+            is_repayment = validated_data["type"] == Operation.DEBT_REPAYMENT
+            validated_data["status"] = Operation.VALIDATED if is_repayment else Operation.PENDING
 
     @staticmethod
     def create_operation_with_details(operation_data, details_data):

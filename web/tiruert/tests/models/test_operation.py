@@ -10,13 +10,14 @@ class OperationConstantsTest(TestCase):
     """Tests for Operation constants."""
 
     def test_api_creatable_types_contains_expected_values(self):
-        """Should contain only TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION."""
+        """Should contain all operation types available through the API."""
         expected = [
             Operation.TRANSFERT,
             Operation.EXPORTATION,
             Operation.EXPEDITION,
             Operation.TENEUR,
             Operation.DEVALUATION,
+            Operation.DEBT_REPAYMENT,
         ]
         self.assertCountEqual(Operation.API_CREATABLE_TYPES, expected)
 
