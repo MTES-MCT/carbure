@@ -235,15 +235,15 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "devaluation_type",
         ]
         extra_kwargs = {
-            "biofuel": {"required": True},
-            "customs_category": {"required": True},
-            "debited_entity": {"required": True},
+            "biofuel": {"required": True, "allow_null": False},
+            "customs_category": {"required": True, "allow_null": False},
+            "debited_entity": {"required": True, "allow_null": False},
         }
 
     export_country = serializers.SlugRelatedField(
         slug_field="code_pays", queryset=Pays.objects.all(), required=False, allow_null=True
     )
-    lots = OperationLotSerializer(many=True, required=True)
+    lots = OperationLotSerializer(many=True, required=True, allow_empty=False)
 
     def validate_type(self, value):
         if value not in Operation.API_CREATABLE_TYPES:
@@ -251,6 +251,10 @@ class OperationInputSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
+        if data.get("credited_entity") and data.get("type") not in (Operation.CESSION, Operation.TRANSFERT):
+            raise serializers.ValidationError(
+                {"credited_entity": _("Ce champ est autorisé uniquement pour les opérations de type CESSION ou TRANSFERT.")}
+            )
         if data.get("objective_sector") and data.get("type") != Operation.TENEUR:
             raise serializers.ValidationError(
                 {"declared_sector": "objective_sector ne peut être défini que pour les opérations de type TENEUR"}
@@ -258,28 +262,12 @@ class OperationInputSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        with transaction.atomic():
-            request = self.context.get("request")
-            entity_id = request.entity.id
-            selected_lots = validated_data.pop("lots")
-            declaration_year = self.context.get("declaration_year")
-            validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
-
-            OperationService.perform_checks_before_create(
-                request, entity_id, selected_lots, validated_data, declaration_year
-            )
-
-            # Fetch emission rates from the oldest OperationDetail for each lot
-            lot_ids = [lot["id"] for lot in selected_lots]
-            emissions_by_lot = OperationService.get_emission_rates_by_lot(lot_ids)
-
-            OperationService.define_operation_status(validated_data)
-
-            detail_operations_data = OperationService.build_details_data(selected_lots, emissions_by_lot)
-
-            operation = OperationService.create_operation_with_details(validated_data, detail_operations_data)
-
-            return operation
+        request = self.context.get("request")
+        selected_lots = validated_data.pop("lots")
+        operations = OperationService.create_operations(
+            request, validated_data, selected_lots, self.context.get("declaration_year")
+        )
+        return operations if validated_data["type"] == Operation.DEBT_REPAYMENT else operations[0]
 
 
 class OperationUpdateSerializer(serializers.ModelSerializer):
