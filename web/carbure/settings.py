@@ -15,6 +15,7 @@ import os
 
 import environ
 import sentry_sdk
+from csp.constants import SELF
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
@@ -103,6 +104,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
+    "csp",
     "django_otp",
     "django_otp.plugins.otp_email",
     "django_admin_listfilter_dropdown",
@@ -366,8 +368,8 @@ if env("TEST"):
 
 
 # CSP header configuration
-CSP_DEFAULT_SRC = (
-    "'self'",
+_CSP_SOURCES = (
+    SELF,
     "stats.beta.gouv.fr",
     "metabase.carbure.beta.gouv.fr",
     "www.data.gouv.fr",
@@ -377,23 +379,22 @@ CSP_DEFAULT_SRC = (
     "contact.carbure.beta.gouv.fr",
 )
 
-CSP_SCRIPT_SRC = CSP_DEFAULT_SRC + (
-    "'sha256-xVQ4mcypV0CvOtZpQgVcKpcoNvdUkR9BrwZBrtBbU+w='",
-    "'sha256-l0hQskZAA39ZNB1SAbclU+zKPtFeMvhhkjKEgiL2HI0='",
-    "'sha256-/kXZODfqoc2myS1eI6wr0HH8lUt+vRhW8H/oL+YJcMg='",
-)
-
-CSP_FRAME_SRC = CSP_DEFAULT_SRC
-
-# data: autorise les SVG inline (ex. icônes checkbox/radio de @codegouvfr/react-dsfr)
-CSP_IMG_SRC = CSP_DEFAULT_SRC + (
-    "https://*.tile.openstreetmap.org/",
-    "data:",
-)
-
-CSP_STYLE_SRC = ("'self'",)
-
-CSP_EXCLUDE_URL_PREFIXES = "/admin"
+CONTENT_SECURITY_POLICY = {
+    "EXCLUDE_URL_PREFIXES": ["/admin"],
+    "DIRECTIVES": {
+        "default-src": _CSP_SOURCES,
+        "script-src": _CSP_SOURCES
+        + (
+            "'sha256-xVQ4mcypV0CvOtZpQgVcKpcoNvdUkR9BrwZBrtBbU+w='",
+            "'sha256-l0hQskZAA39ZNB1SAbclU+zKPtFeMvhhkjKEgiL2HI0='",
+            "'sha256-/kXZODfqoc2myS1eI6wr0HH8lUt+vRhW8H/oL+YJcMg='",
+        ),
+        "frame-src": _CSP_SOURCES,
+        # data: autorise les SVG inline (ex. icônes checkbox/radio de @codegouvfr/react-dsfr)
+        "img-src": _CSP_SOURCES + ("https://*.tile.openstreetmap.org/", "data:"),
+        "style-src": (SELF,),
+    },
+}
 
 # Metabase
 METABASE_SECRET_KEY = env("METABASE_SECRET_KEY")

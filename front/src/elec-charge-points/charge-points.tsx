@@ -63,7 +63,7 @@ const ChargePoints = () => {
           </>
         )}
 
-        <Route path="*" element={<Navigate replace to="applications" />} />
+        <Route path="*" element={<Navigate replace to="../applications" />} />
       </Routes>
     </Main>
   )

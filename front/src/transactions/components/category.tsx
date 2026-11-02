@@ -1,3 +1,4 @@
+import { useRouteBase } from "common/hooks/route-base"
 import { useTranslation } from "react-i18next"
 import { Snapshot, Status } from "../types"
 import { formatNumber } from "common/utils/formatters"
@@ -147,16 +148,16 @@ export function useAutoCategory(
   snapshot: Snapshot | undefined
 ) {
   const navigate = useNavigate()
+  const basePath = useRouteBase("/org/:entity/transactions/:year/*")
   const match = useMatch("/org/:entity/transactions/:year/:status/:category/*") // prettier-ignore
   const category = match?.params.category
 
   useEffect(() => {
     const defaultCategory = getDefaultCategory(status, snapshot)
     if (!isStatusCategory(status, category)) {
-      if (status === "stocks") navigate(defaultCategory, { replace: true })
-      else navigate(`${status}/${defaultCategory}`, { replace: true })
+      navigate(`${basePath}/${status}/${defaultCategory}`, { replace: true })
     }
-  }, [category, status, snapshot, navigate])
+  }, [category, status, snapshot, navigate, basePath])
 
   return category ?? getDefaultCategory(status, snapshot)
 }

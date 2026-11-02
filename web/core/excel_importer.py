@@ -58,11 +58,11 @@ class ExcelImporter:
         else:
             validation_errors = []
 
-            # serializer.errors is a list where each index corresponds to a data row
+            # DRF 3.18 returns only invalid rows, keyed by their original index.
             starting_excel_row = 2 + config["header_row"]
-            for row_index, row_errors in enumerate(serializer.errors, start=starting_excel_row):
+            for row_index, row_errors in serializer.errors.items():
                 if row_errors:  # Only include rows with errors
-                    excel_row_number = row_index
+                    excel_row_number = starting_excel_row + row_index
                     validation_errors.append(
                         {
                             "row": excel_row_number,

@@ -169,6 +169,7 @@ class TransportDataGouv:
         transport_data["operating_unit"] = transport_data["charge_point_id"].str[:5]
 
         # convert nominal power to always be in megawatts
+        transport_data["nominal_power"] = transport_data["nominal_power"].astype(float)
         transport_data.loc[transport_data.nominal_power > 1000, "nominal_power"] = (
             transport_data.loc[transport_data.nominal_power > 1000, "nominal_power"] / 1000
         )

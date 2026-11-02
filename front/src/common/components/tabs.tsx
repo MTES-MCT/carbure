@@ -1,11 +1,13 @@
 import { ReactNode, useEffect, useState } from "react"
 import cl from "clsx"
 import {
+  createPath,
   NavLink,
   resolvePath,
   useLocation,
   useResolvedPath,
 } from "react-router-dom"
+import { useRouteBase } from "common/hooks/route-base"
 import css from "./tabs.module.css"
 import { Layout, layout } from "./scaffold"
 import { Loader } from "./icons"
@@ -40,7 +42,8 @@ export const Tabs = ({
   children,
   ...props
 }: TabsProps) => {
-  const matcher = useMatcher()
+  const basePath = useRouteBase()
+  const matcher = useMatcher(basePath)
   const location = useLocation()
   const tabs = tabsConfig.filter(Boolean)
   const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]!
@@ -85,10 +88,15 @@ export const Tabs = ({
             )
           }
 
+          // Keep parent-relative and absolute links under the router's control.
+          const path = /^(\.\.(\/|$)|\/|[a-z][a-z0-9+.-]*:)/i.test(tab.path)
+            ? tab.path
+            : createPath(resolvePath(tab.path, basePath))
+
           return (
             <NavLink
               {...props}
-              to={keepSearch ? tab.path + location.search : tab.path}
+              to={keepSearch ? path + location.search : path}
               key={props.key}
             >
               {tab.label}
@@ -102,9 +110,10 @@ export const Tabs = ({
   )
 }
 
-export function useMatcher() {
+export function useMatcher(basePath?: string) {
   const location = useLocation()
-  const parentPath = useResolvedPath(".").pathname.trim()
+  const resolvedPath = useResolvedPath(".")
+  const parentPath = (basePath ?? resolvedPath.pathname).trim()
   const currentPath = location.pathname.trim()
 
   return (path: string | undefined) => {
@@ -113,7 +122,10 @@ export function useMatcher() {
     } else if (path.startsWith("#")) {
       return path === location.hash
     } else {
-      const tabPath = resolvePath(path, parentPath).pathname.trim()
+      const fromPath = /^\.\.(\/|$)/.test(path)
+        ? resolvedPath.pathname
+        : parentPath
+      const tabPath = resolvePath(path, fromPath).pathname.trim()
       const startsWithPath =
         currentPath.startsWith(tabPath) &&
         currentPath.charAt(tabPath.length) === "/"

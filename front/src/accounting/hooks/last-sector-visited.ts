@@ -1,4 +1,4 @@
-import { matchPath, useLocation, useResolvedPath } from "react-router-dom"
+import { useMatch } from "react-router-dom"
 import { useRef } from "react"
 import { SectorTabs } from "accounting/types"
 
@@ -9,11 +9,9 @@ const sectors: string[] = [SectorTabs.BIOFUELS, SectorTabs.ELEC]
 // For example, if you were on the ELEC tabs of balances/
 // and switched to operations/, you'd automatically go to operations/elec
 export function useLastSectorVisited() {
-  const location = useLocation()
   const lastSector = useRef<string>(SectorTabs.BIOFUELS)
 
-  const pattern = useResolvedPath(":category/:sector")
-  const match = matchPath(pattern.pathname, location.pathname)
+  const match = useMatch("/org/:entity/accounting/:category/:sector")
 
   if (match?.params.sector && sectors.includes(match.params.sector)) {
     lastSector.current = match?.params.sector

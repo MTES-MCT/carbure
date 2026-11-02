@@ -79,7 +79,7 @@ export const ElecAdminAudit = () => {
           element={
             <Navigate
               replace
-              to={`charge-points/${ElecAdminAuditStatus.Pending.toLocaleLowerCase()}`}
+              to={`../charge-points/${ElecAdminAuditStatus.Pending.toLocaleLowerCase()}`}
             />
           }
         />
