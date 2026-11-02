@@ -1,5 +1,9 @@
 import { useTranslation } from "react-i18next"
-import { AgreementStatus } from "../../../double-counting/types"
+import {
+  AgreementRegistrationStatus,
+  AgreementStatus,
+} from "../../../double-counting/types"
+import { getAgreementRegistrationStatusLabel } from "double-counting/formatters"
 import { BadgeProps, Badge } from "@codegouvfr/react-dsfr/Badge"
 
 const statusToVariant: Record<AgreementStatus, BadgeProps["severity"]> = {
@@ -7,6 +11,16 @@ const statusToVariant: Record<AgreementStatus, BadgeProps["severity"]> = {
   [AgreementStatus.EXPIRES_SOON]: "warning",
   [AgreementStatus.EXPIRED]: "warning",
   [AgreementStatus.INCOMING]: "info",
+}
+
+const registrationStatusToVariant: Record<
+  AgreementRegistrationStatus,
+  BadgeProps["severity"]
+> = {
+  [AgreementRegistrationStatus.VALID]: "success",
+  [AgreementRegistrationStatus.SUSPENDED]: "warning",
+  [AgreementRegistrationStatus.WITHDRAWN]: "error",
+  [AgreementRegistrationStatus.TERMINATED]: "error",
 }
 
 const AgreementStatusTag = ({ status }: { status?: AgreementStatus }) => {
@@ -26,3 +40,19 @@ const AgreementStatusTag = ({ status }: { status?: AgreementStatus }) => {
   )
 }
 export default AgreementStatusTag
+
+export const AgreementRegistrationStatusTag = ({
+  status,
+}: {
+  status?: AgreementRegistrationStatus
+}) => {
+  const { t } = useTranslation()
+
+  if (!status) return null
+
+  return (
+    <Badge severity={registrationStatusToVariant[status]}>
+      {getAgreementRegistrationStatusLabel(status, t)}
+    </Badge>
+  )
+}

@@ -158,3 +158,5 @@ class DoubleCountAgreementsTest(TestCase):
 
         assert len(data) == 3
         assert {a.certificate_id for a in agreements} == {a["certificate_id"] for a in data}
+        statuses_by_certificate = {a["certificate_id"]: a["status"] for a in data}
+        assert statuses_by_certificate == {a.certificate_id: a.status for a in agreements}

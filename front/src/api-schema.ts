@@ -922,6 +922,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/double-counting/agreements/{id}/update-status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["double_counting_agreements_update_status_partial_update"];
+        trace?: never;
+    };
     "/api/double-counting/agreements/agreement-admin/": {
         parameters: {
             query?: never;
@@ -3711,6 +3727,10 @@ export interface components {
             active: components["schemas"]["DoubleCountingRegistration"][];
             incoming: components["schemas"]["DoubleCountingRegistration"][];
             expired: components["schemas"]["DoubleCountingRegistration"][];
+            inactive: components["schemas"]["DoubleCountingRegistration"][];
+        };
+        AgreementStatusUpdateResponse: {
+            status: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
         };
         Airport: {
             readonly id: number;
@@ -3753,6 +3773,7 @@ export interface components {
             agreements_incoming: number;
             agreements_active: number;
             agreements_expired: number;
+            agreements_inactive: number;
         };
         ApproveDoubleCountingRequest: {
             dca_id: number;
@@ -5321,7 +5342,8 @@ export interface components {
             readonly production_site: string;
             /** Format: date */
             valid_until: string;
-            readonly status: components["schemas"]["DoubleCountingAgreementStatus"];
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+            readonly computed_status: components["schemas"]["DoubleCountingAgreementStatus"];
             /** Format: double */
             readonly quotas_progression: number;
         };
@@ -5332,7 +5354,8 @@ export interface components {
             valid_from: string;
             /** Format: date */
             valid_until: string;
-            readonly status: components["schemas"]["DoubleCountingAgreementStatus"];
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
+            readonly computed_status: components["schemas"]["DoubleCountingAgreementStatus"];
             readonly producer: string;
             readonly production_site: string;
             application: components["schemas"]["DoubleCountingApplication"];
@@ -5345,8 +5368,17 @@ export interface components {
             valid_from: string;
             /** Format: date */
             valid_until: string;
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
             readonly biofuel_list: string;
         };
+        /**
+         * @description * `VALID` - Valide
+         *     * `SUSPENDED` - Suspendu
+         *     * `WITHDRAWN` - Retiré
+         *     * `TERMINATED` - Interrompu
+         * @enum {string}
+         */
+        DoubleCountingRegistrationStatusEnum: DoubleCountingRegistrationStatusEnum;
         DoubleCountingSourcing: {
             readonly id: number;
             readonly year: number;
@@ -6727,6 +6759,9 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["SafTicketSourcePreview"][];
             total_available_volume?: number;
+        };
+        PatchedAgreementStatusUpdateRequest: {
+            status?: components["schemas"]["DoubleCountingRegistrationStatusEnum"];
         };
         PatchedBiomethaneAnnualDeclarationRequest: {
             status?: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
@@ -9566,6 +9601,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DoubleCountingRegistrationDetails"];
+                };
+            };
+        };
+    };
+    double_counting_agreements_update_status_partial_update: {
+        parameters: {
+            query: {
+                /** @description Entity ID */
+                entity_id: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Certificat Double Compte. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedAgreementStatusUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgreementStatusUpdateResponse"];
                 };
             };
         };
@@ -16853,6 +16919,12 @@ export enum DoubleCountingAgreementStatus {
     EXPIRED = "EXPIRED",
     EXPIRES_SOON = "EXPIRES_SOON",
     INCOMING = "INCOMING"
+}
+export enum DoubleCountingRegistrationStatusEnum {
+    VALID = "VALID",
+    SUSPENDED = "SUSPENDED",
+    WITHDRAWN = "WITHDRAWN",
+    TERMINATED = "TERMINATED"
 }
 export enum DoubleCountingStatus {
     PENDING = "PENDING",
