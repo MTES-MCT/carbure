@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
@@ -106,6 +107,8 @@ class EntityUserTest(TestCase):
         assert res.status_code == 200
         new_user = User.objects.get(email="newuser@carbure.local")
         assert new_user is not None
+        assert not new_user.has_usable_password()
+        assert "invite=1" in mail.outbox[0].body
         assert (
             UserRightsRequests.objects.filter(
                 user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN, status="ACCEPTED"

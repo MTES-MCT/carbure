@@ -9,9 +9,32 @@ from django_otp.plugins.otp_email.models import EmailDevice
 
 from auth.tokens import account_activation_token
 from core.helpers import send_mail
+from core.models import UserRights
+
+
+def rotate_invited_activation_secret(user):
+    """Replace the unusable password so previously issued activation links no longer match.
+
+    Accounts that already chose a password are left untouched.
+    """
+    if user.has_usable_password():
+        return
+    user.set_unusable_password()
+    user.save(update_fields=["password"])
+
+
+def activation_email_context(user, entity_name=None):
+    """Mark the activation mail as an invitation when the account still has no password."""
+    if user.has_usable_password():
+        return {}
+    if not entity_name:
+        rights = UserRights.objects.filter(user=user).select_related("entity").order_by("-date_added").first()
+        entity_name = rights.entity.name if rights else ""
+    return {"invitation": True, "entity_name": entity_name}
 
 
 def send_email(user, request, subject, email_type, extra_context):
+    rotate_invited_activation_secret(user)
     email_subject = subject
     email_context = {
         "user": user,
@@ -39,10 +62,20 @@ def send_email(user, request, subject, email_type, extra_context):
 
 
 def send_account_activation_email(user, request):
-    send_email(user, request, "Carbure - Activation de compte", "account_activation_email", {})
+    send_email(
+        user,
+        request,
+        "Carbure - Activation de compte",
+        "account_activation_email",
+        activation_email_context(user),
+    )
 
 
 def send_registration_email(user, entity_name, request, user_already_exists):
-    email_context = {"invitation": True, "entity_name": entity_name}
-    email_type = "invite_user_email" if user_already_exists else "account_activation_email"
+    if user_already_exists:
+        email_type = "invite_user_email"
+        email_context = {"entity_name": entity_name}
+    else:
+        email_type = "account_activation_email"
+        email_context = activation_email_context(user, entity_name)
     send_email(user, request, "Carbure - Invitation à rejoindre une entité", email_type, email_context)

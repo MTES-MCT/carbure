@@ -70,9 +70,8 @@ class ActivateAccountAction:
 
         data = {}
 
-        # Invited users are created without a profile name and must set a password after activation.
-        if not user.name:
-            passtoken = password_reset_token.make_token(user)
-            data = {"token": passtoken}
+        # Invited users have no usable password and must choose one after activation.
+        if not user.has_usable_password():
+            data = {"token": password_reset_token.make_token(user)}
 
         return Response(data=data)

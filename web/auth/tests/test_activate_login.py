@@ -123,11 +123,11 @@ class ActivateLoginAccountTest(APITestCase):
         assert "_auth_user_id" not in self.client.session
 
     def test_activate_issues_reset_token_for_invited_user_profile(self):
-        """Issue a password-reset token for invited profiles based on server-side account state."""
+        """Issue a password-reset token when the account has no usable password."""
         invited_user = User.objects.create_user(
-            name="",
+            name="Invité",
             email="invited@example.com",
-            password="temporary-password",
+            password=None,
             is_active=False,
         )
         invited_uidb64 = urlsafe_base64_encode(force_bytes(invited_user.pk))

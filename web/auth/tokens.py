@@ -3,8 +3,9 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
-        # Include activation state so the token becomes invalid right after first successful activation.
-        return str(user.pk) + str(timestamp) + str(user.email) + str(user.is_active)
+        # is_active invalidates the link once the account is activated.
+        # password invalidates previously issued links when an invited user's secret is rotated.
+        return "".join([str(user.pk), str(timestamp), str(user.email), str(user.is_active), str(user.password)])
 
 
 class PasswordResetOneTimeTokenGenerator(PasswordResetTokenGenerator):
