@@ -12,10 +12,7 @@ import {
 } from "./operation-detail-actions.hooks"
 import { useMemo } from "react"
 import { getOperationValidationButtonText } from "./operation-detail-actions.utils"
-import {
-  isReceivingOperation,
-  isSendingOperation,
-} from "../../../operations.utils"
+import { isCreditOperation } from "../../../operations.utils"
 import * as api from "accounting/api/biofuels/operations"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
@@ -80,7 +77,7 @@ export const OperationDetailActions = ({
     if (!canUpdateBiofuelOperation || entity.isAdmin) return buttons
 
     if (
-      isReceivingOperation(operation.volume) &&
+      isCreditOperation(operation.transaction) &&
       operation.type === OperationType.TRANSFERT &&
       operation?.status === OperationsStatus.PENDING
     ) {
@@ -110,7 +107,7 @@ export const OperationDetailActions = ({
     }
 
     if (
-      isSendingOperation(operation.volume) &&
+      !isCreditOperation(operation.transaction) &&
       [OperationsStatus.PENDING, OperationsStatus.DRAFT].includes(
         operation.status!
       )
