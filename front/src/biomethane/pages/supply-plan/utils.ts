@@ -61,7 +61,7 @@ export const getSupplyPlanInputCollectionTypeOptions = () => {
     },
     {
       value: BiomethaneSupplyInputCollectionType.IAA,
-      label: i18next.t("Issus de résidus d'IAA"),
+      label: i18next.t("Issus de résidus d'industries agro-alimentaires"),
     },
   ]
 }

@@ -42,7 +42,7 @@ class BiomethaneSupplyInput(models.Model):
     COLLECTION_TYPE_CHOICES = [
         (PRIVATE, "Issus de collecteurs privés"),
         (LOCAL, "Issus de collectivités locales"),
-        (IAA, "Issus de résidus d'IAA"),
+        (IAA, "Issus de résidus d'industries agro-alimentaires"),
     ]
     collection_type = models.CharField(
         verbose_name="Type de collecte", max_length=10, choices=COLLECTION_TYPE_CHOICES, blank=True, default=""
