@@ -93,6 +93,7 @@ class OperationService:
     def perform_checks_before_create(request, entity_id, selected_lots, data, declaration_year):
         OperationService.check_declaration_year(declaration_year, data)
         OperationService.check_debited_entity(entity_id, data)
+        OperationService.check_open_debt(entity_id, data)
         OperationService.check_volumes(selected_lots, data)
         OperationService.check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year)
 
@@ -103,6 +104,28 @@ class OperationService:
         """
         if data["debited_entity"].id != entity_id:
             raise serializers.ValidationError({"debited_entity": OperationServiceErrors.ENTITY_ID_DO_NOT_MATCH_DEBITED_ID})
+
+    @staticmethod
+    def check_open_debt(entity_id, data):
+        if data["type"] == Operation.DEBT_REPAYMENT:
+            return
+
+        open_debts = DebtService.get_open_debts(
+            entity_id,
+            biofuel_id=data["biofuel"].id,
+            customs_category=data["customs_category"],
+        )
+        if open_debts.exists():
+            raise serializers.ValidationError(
+                {
+                    "debt": [
+                        _(
+                            "Une dette est ouverte pour ce biocarburant et cette catégorie. "
+                            "Acquittez-la avant de créer une opération de débit."
+                        )
+                    ]
+                }
+            )
 
     @staticmethod
     def check_volumes(selected_lots, data):
