@@ -20,7 +20,7 @@ import { Text } from "common/components/text"
 import { useTranslation } from "react-i18next"
 import cl from "clsx"
 import styles from "./operations-table.module.css"
-import { isSendingOperation } from "../../operations.utils"
+import { isCreditOperation } from "../../operations.utils"
 
 export type UseOperationsColumnsProps = {
   onClickSector: (sector: string) => void
@@ -139,7 +139,7 @@ export const useOperationsBiofuelsColumns = ({
         })
         return displayValueDebitOrCredit(
           formattedQuantity,
-          isSendingOperation(item.volume),
+          !isCreditOperation(item.transaction),
           item.status === OperationsStatus.REJECTED
         )
       },
@@ -153,7 +153,7 @@ export const useOperationsBiofuelsColumns = ({
         )
         return displayValueDebitOrCredit(
           formattedAvoidedEmissions,
-          isSendingOperation(item.volume),
+          !isCreditOperation(item.transaction),
           item.status === OperationsStatus.REJECTED
         )
       },
