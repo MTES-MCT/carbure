@@ -63,17 +63,17 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     def get_avoided_emissions(self, instance) -> float:
         return instance.avoided_emissions
 
-    def get_fields(self):
-        fields = super().get_fields()
-        if not self.context.get("details"):
-            fields.pop("details", None)
-        return fields
-
 
 class OperationListSerializer(BaseOperationSerializer):
     volume = TruncatedFloatField(source="_volume", read_only=True)
     energy = TruncatedFloatField(source="_energy", read_only=True, decimal_places=0)
     avoided_emissions = TruncatedFloatField(source="_avoided_emissions", read_only=True)
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if not self.context.get("details"):
+            fields.pop("details", None)
+        return fields
 
     class Meta:
         model = Operation

@@ -258,7 +258,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                     status=status.HTTP_201_CREATED,
                 )
             return Response(
-                OperationSerializer(operation, context={"details": 1, "entity_id": entity_id}).data,
+                OperationSerializer(operation, context={"entity_id": entity_id}).data,
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -270,7 +270,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         if serializer.is_valid():
             operation = serializer.save()
             return Response(
-                OperationSerializer(operation, context={"details": 1, "entity_id": entity_id}).data,
+                OperationSerializer(operation, context={"entity_id": entity_id}).data,
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
