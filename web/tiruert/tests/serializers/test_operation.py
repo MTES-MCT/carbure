@@ -451,7 +451,7 @@ class OperationExcelRowSerializerTest(TestCase):
         )
 
         self.assertFalse(serializer.is_valid())
-        for row_errors in serializer.errors:
+        for row_errors in serializer.errors.values():
             self.assertEqual(set(row_errors), {"biofuel", "customs_category"})
 
     def test_serializer_rejects_unknown_biofuel_and_customs_category(self):
