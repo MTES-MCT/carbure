@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from saf.models.constants import SAF_BIOFUEL_TYPES
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation, OperationDetail, TiruertDebt
 from tiruert.services.energy import energy_mj
 from tiruert.services.operation import OperationService, OperationServiceErrors
 from transactions.factories import CarbureLotFactory
@@ -467,6 +467,36 @@ class OperationServiceCheckDebitedEntityTest(TestCase):
             OperationServiceErrors.ENTITY_ID_DO_NOT_MATCH_DEBITED_ID,
             str(context.exception.detail["debited_entity"]),
         )
+
+
+class OperationServiceOpenDebtTest(OperationServiceTestCase):
+    def test_create_operations_rejects_debit_when_matching_open_debt_exists(self):
+        TiruertDebt.objects.create(
+            type=TiruertDebt.VOLUME,
+            value=100,
+            entity=self.entity,
+            biofuel=self.biofuel_eth,
+            customs_category=self.feedstock_conv.category,
+            lot=self.lot_blending_accepted,
+        )
+        request = Mock(entity=self.entity, GET=QueryDict(""))
+        data = {
+            "type": Operation.TRANSFERT,
+            "biofuel": self.biofuel_eth,
+            "customs_category": self.feedstock_conv.category,
+            "debited_entity": self.entity,
+        }
+
+        with self.assertRaises(ValidationError) as context:
+            OperationService.create_operations(
+                request,
+                data,
+                [{"id": self.lot_blending_accepted.id, "volume": 10}],
+                declaration_year=2026,
+            )
+
+        self.assertIn("debt", context.exception.detail)
+        self.assertEqual(Operation.objects.count(), 0)
 
 
 class OperationServiceCheckVolumesTest(TestCase):
