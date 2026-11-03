@@ -59,7 +59,6 @@ const OperationsBiofuels = () => {
 
   return (
     <>
-      <DebtNotice />
       <ActionBar>
         <ExportButton query={query} download={api.downloadOperations} />
         <Button
@@ -81,6 +80,7 @@ const OperationsBiofuels = () => {
         onSelect={actions.setFilters}
         getFilterOptions={getFilterOptions}
       />
+      <DebtNotice />
       {!loading &&
       result?.data?.results &&
       result?.data?.results?.length === 0 ? (
