@@ -1,5 +1,6 @@
 import { useDebts } from "accounting/hooks/use-debts"
-import { Notice } from "common/components/notice"
+import { Alert } from "common/components/alert2"
+import { Button } from "common/components/button2"
 import { useRoutes } from "common/hooks/routes"
 import { useTranslation } from "react-i18next"
 
@@ -12,16 +13,24 @@ export const DebtNotice = () => {
   if (debts.length === 0) return null
 
   return (
-    <Notice
-      variant="alert"
-      isClosable
-      title={
-        debts.length === 1
-          ? t("Vous avez une dette en cours")
-          : t("Vous avez des dettes en cours")
+    <Alert
+      severity="error"
+      closable
+      small
+      description={
+        <p>
+          {t("Vous avez {{count}} dette en cours", {
+            count: debts.length,
+          })}
+          <Button
+            style={{ marginLeft: "var(--spacing-1w)" }}
+            customPriority="link"
+            linkProps={{ to: routes.ACCOUNTING.BALANCES.BIOFUELS }}
+          >
+            {t("Régulariser ma situation")}
+          </Button>
+        </p>
       }
-      linkText={t("Régulariser ma situation")}
-      linkHref={routes.ACCOUNTING.BALANCES.BIOFUELS}
     />
   )
 }
