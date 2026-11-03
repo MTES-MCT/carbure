@@ -814,6 +814,8 @@
   "La période de declaration des relevés trimestriels T{{quarter}} {{year}} a débuté, vous avez jusqu'au {{deadline}} pour transmettre votre relevé dans votre espace.": "The reporting period for T{{quarter}} {{year}} quarterly statements has begun. You have until {{deadline}} to submit your declaration.",
   "La période de declaration des relevés trimestriels T{{quarter}} {{year}} se termine bientôt, pensez à transmettre votre relevé rapidement.": "The reporting period for T{{quarter}} {{year}} quarterly statements is coming to an end, remember to submit your declaration as soon as possible.",
   "Vous avez reçu un ticket CAD de {{supplier}}.": "You have received a SAF ticket from {{supplier}}.",
+  "Vous avez {{count}} dette en cours_one": "You have {{count}} outstanding debt.",
+  "Vous avez {{count}} dette en cours_other": "You have {{count}} outstanding debts.",
   "Votre ticket a été accepté par {{client}}.": "Your ticket has been accepted by {{client}}.",
   "Votre ticket a été refusé par {{client}}.": "Your ticket has been rejected by {{client}}.",
   "{{count}} lots que vous avez déclarés ont été corrigés par l'administration avec le commentaire “{{comment}}”._one": "{{count}} lot you have declared have been corrected by the administration with the comment \"{{comment}}\".",
