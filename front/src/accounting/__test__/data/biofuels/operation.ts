@@ -36,6 +36,7 @@ export const operationCredit: Operation = {
   energy: 27000,
   avoided_emissions: 100,
   debt: null,
+  transaction: "CREDIT",
 }
 
 export const operationDebit: Operation = {
@@ -43,4 +44,5 @@ export const operationDebit: Operation = {
   volume: -1000,
   quantity_renewable: -1000,
   energy: -27000,
+  transaction: "DEBIT",
 }
