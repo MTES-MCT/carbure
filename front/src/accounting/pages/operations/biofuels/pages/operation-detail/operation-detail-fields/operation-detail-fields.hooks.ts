@@ -8,9 +8,12 @@ import {
 } from "./operation-detail-fields.utils"
 import { formatDate, formatPeriod } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
+import useEntity from "common/hooks/entity"
+import { ROUTE_URLS } from "common/utils/routes"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const exportationOrExpeditionFields =
     useExportationOrExpeditionFields(operation)
 
@@ -22,6 +25,16 @@ export const useOperationDetailFields = (operation?: Operation) => {
     const isSender = (operation?.volume ?? 0) < 0
 
     const applyRenewableShare = operation.renewable_energy_share !== 1
+    const lotDetails = operation.details?.find((detail) => detail.lot !== null)
+
+    const lotHref = (lotId: number) => {
+      const year = operation.year ?? new Date().getFullYear()
+      const lotsUrl =
+        entity.isAdmin || entity.isExternal || entity.isAuditor
+          ? ROUTE_URLS.BIOFUELS_CONTROLS(entity.id, year).LOTS
+          : ROUTE_URLS.BIOFUELS(entity.id, year).RECEIVED
+      return `${lotsUrl}/history#lot/${lotId}`
+    }
 
     // Define all possible conditional fields
     const fields = compact([
@@ -73,10 +86,23 @@ export const useOperationDetailFields = (operation?: Operation) => {
         label: t("Objectif de filière IRICC"),
         value: formatSector(operation.objective_sector ?? operation.sector),
       },
+      operation.type === OperationType.CORRECTION && lotDetails?.lot
+        ? {
+            label: "Lot modifié n°",
+            value: t("{{id}}", { id: lotDetails.lot }),
+            href: lotHref(lotDetails.lot),
+          }
+        : null,
+      operation.type === OperationType.DEBT_REPAYMENT &&
+        operation.debt && {
+          label: t("Remboursement pour le lot n°"),
+          value: operation.debt.lot.id,
+          href: lotHref(operation.debt.lot.id),
+        },
     ])
 
     return fields
-  }, [operation, t, exportationOrExpeditionFields])
+  }, [entity, operation, t, exportationOrExpeditionFields])
 }
 
 const useExportationOrExpeditionFields = (operation?: Operation) => {
