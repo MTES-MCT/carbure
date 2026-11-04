@@ -12,6 +12,9 @@ import { addQueryParams, ROUTE_URLS } from "common/utils/routes"
 import * as api from "../../api"
 import { useToken } from "./use-token"
 
+const ACCOUNT_ALREADY_ACTIVE = "ACCOUNT_ALREADY_ACTIVE"
+const ACTIVATION_LINK_ERROR = "Could not send activation link"
+
 type ActivationContent = {
   success: boolean
   loading: boolean
@@ -33,9 +36,18 @@ export function useActivate(): ActivationContent {
     params: [uidb64, token],
   })
   const [linkResent, setLinkResent] = useState(false)
+  const [resendFailure, setResendFailure] = useState<string | null>(null)
   const resendActivationLink = useMutation(api.resendActivationLink, {
     onSuccess: () => setLinkResent(true),
-    onError: () => {
+    onError: (error) => {
+      const message = resendErrorCode(error)
+      if (
+        message === ACCOUNT_ALREADY_ACTIVE ||
+        message === ACTIVATION_LINK_ERROR
+      ) {
+        setResendFailure(message)
+        return
+      }
       notify(t("Le lien n'a pas pu être envoyé !"), { variant: "danger" })
     },
   })
@@ -91,6 +103,38 @@ export function useActivate(): ActivationContent {
     }
   }
 
+  if (resendFailure === ACCOUNT_ALREADY_ACTIVE) {
+    return {
+      success: false,
+      loading: false,
+      title: t("Votre compte est déjà activé"),
+      message: t(
+        "Si vous n'avez pas encore choisi de mot de passe, allez sur la page de réinitialisation de mot de passe."
+      ),
+      action: (
+        <Button linkProps={{ to: ROUTE_URLS.AUTH.RESET_PASSWORD_REQUEST }}>
+          {t("Mot de passe oublié")}
+        </Button>
+      ),
+    }
+  }
+
+  if (resendFailure === ACTIVATION_LINK_ERROR) {
+    return {
+      success: false,
+      loading: false,
+      title: t("Ce lien ne permet pas de renvoyer le mail"),
+      message: t(
+        "Indiquez l'adresse email du compte pour recevoir un nouveau lien d'activation."
+      ),
+      action: (
+        <Button linkProps={{ to: ROUTE_URLS.AUTH.ACTIVATE_REQUEST }}>
+          {t("Indiquer mon adresse email")}
+        </Button>
+      ),
+    }
+  }
+
   if (activate.status === "error") {
     return {
       success: false,
@@ -114,4 +158,12 @@ export function useActivate(): ActivationContent {
   }
 
   return { success: false, loading: false, title: errorTitle }
+}
+
+function resendErrorCode(error: unknown): string | undefined {
+  if (typeof error !== "object" || error === null || !("data" in error)) {
+    return undefined
+  }
+  const data = (error as { data?: { message?: string } }).data
+  return data?.message
 }

@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from auth.tokens import account_activation_token
+from core.carburetypes import CarbureError
 from core.models import Entity, UserRights
 
 User = get_user_model()
@@ -79,7 +80,8 @@ class RequestActivationLinkTest(TestCase):
 
         response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": "not-issued"})
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["message"] == CarbureError.ACTIVATION_LINK_ERROR
         assert len(mail.outbox) == 0
 
     def test_unknown_account_id_sends_nothing(self):
@@ -88,7 +90,31 @@ class RequestActivationLinkTest(TestCase):
             {"uidb64": "not-an-account", "token": "not-issued"},
         )
 
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["message"] == CarbureError.ACTIVATION_LINK_ERROR
+        assert len(mail.outbox) == 0
+
+    def test_link_of_an_activated_account_reports_already_active(self):
+        token = account_activation_token.make_token(self.user)
+        self.user.is_active = True
+        self.user.save(update_fields=["is_active"])
+        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
+
+        response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": token})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["message"] == CarbureError.ACCOUNT_ALREADY_ACTIVE
+        assert len(mail.outbox) == 0
+
+    def test_unrelated_token_of_an_activated_account_is_rejected(self):
+        self.user.is_active = True
+        self.user.save(update_fields=["is_active"])
+        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
+
+        response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": "not-issued"})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["message"] == CarbureError.ACTIVATION_LINK_ERROR
         assert len(mail.outbox) == 0
 
     def test_responds_with_http_200_on_request_with_unknown_email(self):
