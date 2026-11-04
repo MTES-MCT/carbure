@@ -69,12 +69,22 @@ class CreateAnomalyErrorsTest(SimpleTestCase):
                 created = self.errors.bulk_create.call_args.args[0]
                 self.assertEqual([(item.error, item.field, item.lot_id) for item in created], [("OUTLIER_EP", "ep", 123)])
 
-    def test_returned_lot_ids_are_unique_across_models_and_emissions(self):
+    def test_errors_are_unique_per_lot_and_emission_across_models(self):
         outliers = pd.DataFrame({"ep": [1.0], "is_lof_outlier": [True], "is_if_outlier": [True]})
 
         lot_ids = create_errors({"ep": outliers, "eec": outliers.rename(columns={"ep": "eec"})})
 
         self.assertEqual(lot_ids, [123])
         created = self.errors.bulk_create.call_args.args[0]
-        self.assertEqual(len(created), 4)
-        self.assertEqual({item.error for item in created}, {"OUTLIER_EEC", "OUTLIER_EP"})
+        self.assertEqual(
+            [(item.error, item.field, item.lot_id) for item in created],
+            [("OUTLIER_EP", "ep", 123), ("OUTLIER_EEC", "eec", 123)],
+        )
+
+    def test_overlapping_filters_from_different_models_create_one_error_per_lot(self):
+        outliers = pd.DataFrame({"ep": [1.0, 1.0], "is_lof_outlier": [True, False], "is_if_outlier": [False, True]})
+
+        self.assertEqual(create_errors({"ep": outliers}), [123])
+
+        created = self.errors.bulk_create.call_args.args[0]
+        self.assertEqual([(item.error, item.field, item.lot_id) for item in created], [("OUTLIER_EP", "ep", 123)])
