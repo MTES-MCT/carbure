@@ -83,7 +83,7 @@ class DebtService:
 
         requested = DebtService._merge_lots(lots)
 
-        debts = list(DebtService.get_open_debts(entity.id, biofuel.id, customs_category))
+        debts = list(DebtService.get_open_debts(entity.id, biofuel.id, customs_category).select_related("lot"))
         if not debts:
             raise serializers.ValidationError(
                 {"debt": [_("Aucune dette à acquitter pour ce biocarburant et cette catégorie.")]}
