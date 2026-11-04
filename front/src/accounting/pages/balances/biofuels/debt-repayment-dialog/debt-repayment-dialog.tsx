@@ -10,7 +10,7 @@ import { Balance, CreateOperationType, Debt } from "accounting/types"
 import { formatAccountingUnit } from "accounting/utils/formatters"
 import { getDebtRepaymentMaxQuantity } from "accounting/utils/debts"
 import { FormManager, useForm } from "common/components/form2"
-import { Notice } from "common/components/notice"
+import { Alert } from "common/components/alert2"
 import { Box } from "common/components/scaffold"
 import { StepperProvider } from "common/components/stepper"
 import { Unit } from "common/types"
@@ -34,16 +34,22 @@ const DebtRemainingNotice = ({ debt }: { debt: Debt }) => {
   const { t } = useTranslation()
 
   return (
-    <Notice noColor variant="info">
-      <Trans
-        components={{ b: <b /> }}
-        t={t}
-        values={{
-          volume: formatAccountingUnit(debt.remaining_volume, Unit.l),
-        }}
-        defaults="Vous devez <b>{{volume}}</b>"
-      />
-    </Notice>
+    <Alert
+      severity="info"
+      small
+      description={
+        <p>
+          <Trans
+            components={{ b: <b /> }}
+            t={t}
+            values={{
+              volume: formatAccountingUnit(debt.remaining_volume, Unit.l),
+            }}
+            defaults="Vous devez <b>{{volume}}</b>"
+          />
+        </p>
+      }
+    />
   )
 }
 
