@@ -74,6 +74,37 @@ export function resendActivationLink(uidb64: string, token: string) {
   })
 }
 
+export function checkActivateProfile(
+  uidb64: string | undefined,
+  token: string | undefined
+) {
+  if (uidb64 === undefined || token === undefined) {
+    throw new Error("Missing token for account activation")
+  }
+
+  return apiFetch.POST("/auth/activate-profile/check/", {
+    body: { uidb64, token },
+  })
+}
+
+export function activateProfile(
+  uidb64: string,
+  token: string,
+  name: string,
+  password1: string,
+  password2: string
+) {
+  return apiFetch.POST("/auth/activate-profile/", {
+    body: {
+      uidb64,
+      token,
+      name,
+      password1,
+      password2,
+    },
+  })
+}
+
 export function activateAccount(
   uidb64: string | undefined,
   token: string | undefined

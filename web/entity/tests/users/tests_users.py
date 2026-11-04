@@ -111,7 +111,8 @@ class EntityUserTest(TestCase):
         new_user = User.objects.get(email="newuser@carbure.local")
         self.assertIsNotNone(new_user)
         self.assertFalse(new_user.has_usable_password())
-        self.assertIn("invite=1", mail.outbox[0].body)
+        self.assertIn("/auth/join?", mail.outbox[0].body)
+        self.assertIn("Le Super Producteur 1", mail.outbox[0].body)
         self.assertEqual(
             UserRightsRequests.objects.filter(
                 user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN, status="ACCEPTED"

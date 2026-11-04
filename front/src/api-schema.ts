@@ -1,4 +1,36 @@
 export interface paths {
+    "/api/auth/activate-profile/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["auth_activate_profile_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/activate-profile/check/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["auth_check_activate_profile_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/activate/": {
         parameters: {
             query?: never;
@@ -3695,10 +3727,14 @@ export interface components {
             uidb64: string;
             token: string;
         };
-        ActivateResponse: {
-            message: string;
-            token?: string;
+        ActivateProfileRequest: {
+            uidb64: string;
+            token: string;
+            name: string;
+            password1: string;
+            password2: string;
         };
+        ActivateResponse: Record<string, never>;
         AddCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -7636,6 +7672,71 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    auth_check_activate_profile_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivateAccountRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActivateAccountRequest"];
+                "multipart/form-data": components["schemas"]["ActivateAccountRequest"];
+            };
+        };
+        responses: {
+            /** @description The invitation link is still valid. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The link is expired, already used, or does not belong to an invited account. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    auth_activate_profile_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivateProfileRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActivateProfileRequest"];
+                "multipart/form-data": components["schemas"]["ActivateProfileRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The link is no longer valid, or the account already has a password. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
     auth_activate_create: {
         parameters: {
             query?: never;

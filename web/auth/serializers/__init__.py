@@ -1,4 +1,4 @@
-from .activate import ActivateAccountSerializer
+from .activate import ActivateAccountSerializer, ActivateProfileSerializer
 from .change_email import RequestEmailChangeSerializer, ConfirmEmailChangeSerializer, ChangeEmailErrors
 from .change_password import ChangePasswordSerializer, ChangePasswordErrors
 from .login import UserLoginSerializer

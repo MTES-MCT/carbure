@@ -140,7 +140,7 @@ class RequestActivationLinkTest(TestCase):
         self.user.refresh_from_db()
         assert self.user.password == password
         assert account_activation_token.check_token(self.user, previous)
-        assert "invite=1" not in mail.outbox[0].body
+        assert "/auth/activate?" in mail.outbox[0].body
 
     def test_resend_invalidates_previous_link_for_invited_user(self):
         invited = User.objects.create_user(email="invited@example.com", password=None, is_active=False)
@@ -159,7 +159,7 @@ class RequestActivationLinkTest(TestCase):
         assert not invited.has_usable_password()
         assert not account_activation_token.check_token(invited, previous)
         body = mail.outbox[0].body
-        assert "invite=1" in body
+        assert "/auth/join?" in body
         assert "Entité invitante" in body
         token = re.search(r"token=([^&\s]+)", body).group(1)
         assert account_activation_token.check_token(invited, token)

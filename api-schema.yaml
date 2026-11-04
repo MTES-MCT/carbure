@@ -32,8 +32,7 @@ paths:
                 $ref: "#/components/schemas/ActivateResponse"
               examples:
                 SuccessExample:
-                  value:
-                    status: success
+                  value: {}
                   summary: A successful activation
                   description: The account was successfully activated.
           description: ""
@@ -48,6 +47,64 @@ paths:
                     message: Could not activate user account
                   summary: Activation failed
           description: Bad request - missing fields.
+  /api/auth/activate-profile/:
+    post:
+      operationId: auth_activate_profile_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivateProfileRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActivateProfileRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActivateProfileRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: The account was activated and the password was set.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: Could not activate user account
+          description: The link is no longer valid, or the account already has a password.
+  /api/auth/activate-profile/check/:
+    post:
+      operationId: auth_check_activate_profile_create
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivateAccountRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActivateAccountRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActivateAccountRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          description: The invitation link is still valid.
+        "400":
+          content:
+            application/json:
+              schema:
+                message: Could not activate user account
+          description: The link is expired, already used, or does not belong to an invited account.
   /api/auth/confirm-email-change/:
     post:
       operationId: auth_confirm_email_change_create
@@ -14567,15 +14624,36 @@ components:
       required:
         - token
         - uidb64
-    ActivateResponse:
+    ActivateProfileRequest:
       type: object
       properties:
-        message:
+        uidb64:
           type: string
+          minLength: 1
         token:
           type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        password1:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password2:
+          type: string
+          writeOnly: true
+          minLength: 1
       required:
-        - message
+        - name
+        - password1
+        - password2
+        - token
+        - uidb64
+    ActivateResponse:
+      type: object
+      additionalProperties: false
     AddCertificateRequest:
       type: object
       properties:
