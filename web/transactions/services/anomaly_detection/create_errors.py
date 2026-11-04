@@ -32,23 +32,17 @@ def create_errors(outliers_by_emission_category: dict[str, pd.DataFrame]):
     for emission_category, outliers in outliers_by_emission_category.items():
         ERROR = f"OUTLIER_{emission_category.upper()}"
 
-        lof_outlier_filters = Q(pk__in=[])
-        lof_outliers = outliers.loc[outliers["is_lof_outlier"].eq(True)].drop(columns=["is_lof_outlier", "is_if_outlier"])
-        for _, row in lof_outliers.iterrows():
+        detected_outliers = outliers.loc[outliers["is_lof_outlier"].eq(True) | outliers["is_if_outlier"].eq(True)].drop(
+            columns=["is_lof_outlier", "is_if_outlier"]
+        )
+
+        outlier_filters = Q(pk__in=[])
+        for _, row in detected_outliers.iterrows():
             filters = row.to_dict()
-            lof_outlier_filters |= Q(**filters)
+            outlier_filters |= Q(**filters)
 
-        lof_outlier_lot_ids = processed_lots.filter(lof_outlier_filters).distinct().values_list("id", flat=True)
-        errors += [create_error(ERROR, emission_category, lot_id) for lot_id in lof_outlier_lot_ids]
-
-        if_outlier_filters = Q(pk__in=[])
-        if_outliers = outliers.loc[outliers["is_if_outlier"].eq(True)].drop(columns=["is_lof_outlier", "is_if_outlier"])
-        for _, row in if_outliers.iterrows():
-            filters = row.to_dict()
-            if_outlier_filters |= Q(**filters)
-
-        if_outlier_lot_ids = processed_lots.filter(if_outlier_filters).distinct().values_list("id", flat=True)
-        errors += [create_error(ERROR, emission_category, lot_id) for lot_id in if_outlier_lot_ids]
+        outlier_lot_ids = processed_lots.filter(outlier_filters).distinct().values_list("id", flat=True)
+        errors += [create_error(ERROR, emission_category, lot_id) for lot_id in outlier_lot_ids]
 
     lot_ids: list[int] = list(dict.fromkeys(e.lot_id for e in errors))
     # Replace all previous detections, including errors for lots no longer in scope.
