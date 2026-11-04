@@ -20607,11 +20607,16 @@ components:
           type: array
           items:
             type: integer
+        debt:
+          allOf:
+            - $ref: "#/components/schemas/OperationDebt"
+          nullable: true
       required:
         - biofuel
         - credited_entity
         - customs_category
         - debited_entity
+        - debt
         - lot_count
         - operation_id
         - rows
