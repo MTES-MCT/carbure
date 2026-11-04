@@ -101,6 +101,7 @@
   "L'opération a été réalisée avec succès": "The operation has been successfully completed",
   "L'opération a été enregistrée en tant que brouillon.": "The operation has been saved as a draft.",
   "Une erreur est survenue lors de la création de l'opération": "An error occurred during the creation of the operation",
+  "Dette du lot {{carbure_id}}": "Debt of lot {{carbure_id}}",
   "Objectifs annuels": "Annual targets",
   "Rechercher un redevable": "Search for an entity",
   "Vous consultez les objectifs du redevable sélectionné.": "View the objectives of the selected taxpayer.",

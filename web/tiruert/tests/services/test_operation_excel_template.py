@@ -8,6 +8,7 @@ from core.models import Biocarburant, Entity
 from entity.factories import EntityFactory
 from tiruert.services.operation_excel_template import (
     BIOFUELS_SHEET_NAME,
+    DEBTS_SHEET_NAME,
     ENTITIES_SHEET_NAME,
     FIRST_DATA_ROW,
     KEY_ROW,
@@ -95,10 +96,16 @@ class OperationExcelTemplateServiceTest(TestCase):
         mock_calculate_balance.assert_called_once()
         mock_lot_filter.assert_called_once_with(id__in=[1, 2, 3])
 
+    @patch("tiruert.services.operation_excel_template.DebtService.summarize_open_debts")
     @patch("tiruert.services.operation_excel_template._get_operator_lots")
     @patch("tiruert.services.operation_excel_template.get_tiruert_operator_queryset")
-    def test_create_operation_import_template_builds_expected_workbook(self, mock_get_entities, mock_get_lots):
-        """Should generate a workbook with the main and entities sheets wired as expected."""
+    def test_create_operation_import_template_builds_expected_workbook(
+        self, mock_get_entities, mock_get_lots, mock_summarize_open_debts
+    ):
+        """Should generate a workbook with the main, entities, biofuels and debts sheets wired as expected."""
+        mock_summarize_open_debts.return_value = [
+            {"biofuel": Mock(code="ETH"), "customs_category": "CONV", "remaining_volume": 150.5},
+        ]
         mock_get_entities.return_value = [self.allowed_entity_1, self.allowed_entity_2]
         mock_get_lots.return_value = [
             {
@@ -138,7 +145,15 @@ class OperationExcelTemplateServiceTest(TestCase):
         entities_sheet = workbook[ENTITIES_SHEET_NAME]
         biofuels_sheet = workbook[BIOFUELS_SHEET_NAME]
 
-        self.assertEqual(workbook.sheetnames, [MAIN_SHEET_NAME, ENTITIES_SHEET_NAME, BIOFUELS_SHEET_NAME])
+        self.assertEqual(workbook.sheetnames, [MAIN_SHEET_NAME, ENTITIES_SHEET_NAME, BIOFUELS_SHEET_NAME, DEBTS_SHEET_NAME])
+        debts_sheet = workbook[DEBTS_SHEET_NAME]
+        self.assertEqual([cell.value for cell in debts_sheet[2]], ["ETH", "CONV", 150.5])
+        operation_types = [
+            validation.formula1
+            for validation in main_sheet.data_validations.dataValidation
+            if validation.type == "list" and "DEBT_REPAYMENT" in (validation.formula1 or "")
+        ]
+        self.assertEqual(len(operation_types), 1)
         self.assertEqual(main_sheet[1][0].value, TABLE_HEADERS[0][0])
         self.assertEqual(main_sheet[1][len(TABLE_HEADERS) - 1].value, TABLE_HEADERS[-1][0])
         self.assertEqual(main_sheet[2][0].value, TABLE_HEADERS[0][1])
