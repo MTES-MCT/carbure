@@ -23218,16 +23218,20 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: A serializer for re-sending the user activation email. Includes
-        email field only.
+      description: Resend the activation email from an email address, or from the
+        account id carried by an expired link.
       properties:
         email:
           type: string
           format: email
           minLength: 1
           title: Courriel
-      required:
-        - email
+        uidb64:
+          type: string
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
     UserRights:
       type: object
       properties:

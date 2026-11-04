@@ -3,8 +3,10 @@ from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -59,6 +61,35 @@ class RequestActivationLinkTest(TestCase):
         sent_mail = mail.outbox[0]
         html_content, _ = sent_mail.alternatives[0]
         assert not re.search("https://http://", html_content)
+
+    @override_settings(PASSWORD_RESET_TIMEOUT=-1)
+    def test_expired_signed_token_resends_to_the_account(self):
+        token = account_activation_token.make_token(self.user)
+        assert not account_activation_token.check_token(self.user, token)
+        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
+
+        response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": token})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(mail.outbox) == 1
+        assert mail.outbox[0].to == [self.user.email]
+
+    def test_account_id_without_issued_token_sends_nothing(self):
+        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
+
+        response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": "not-issued"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(mail.outbox) == 0
+
+    def test_unknown_account_id_sends_nothing(self):
+        response = self.client.post(
+            self.request_activation_link_url,
+            {"uidb64": "not-an-account", "token": "not-issued"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(mail.outbox) == 0
 
     def test_responds_with_http_200_on_request_with_unknown_email(self):
         response = self.client.post(self.request_activation_link_url, {"email": "unknown@example.com"})

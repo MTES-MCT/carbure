@@ -7554,13 +7554,15 @@ export interface components {
             username: string;
             password: string;
         };
-        /** @description A serializer for re-sending the user activation email. Includes email field only. */
+        /** @description Resend the activation email from an email address, or from the account id carried by an expired link. */
         UserResendActivationLinkRequest: {
             /**
              * Courriel
              * Format: email
              */
-            email: string;
+            email?: string;
+            uidb64?: string;
+            token?: string;
         };
         UserRights: {
             readonly name: string;
