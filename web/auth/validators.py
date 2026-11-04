@@ -4,6 +4,14 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
+def clean_name(value):
+    value = value.strip()
+    validate_name(value)
+    if not value:
+        raise ValidationError(_("Le nom doit contenir au moins une lettre."), code="name_no_letters")
+    return value
+
+
 def validate_name(value):
     if not value:
         return
