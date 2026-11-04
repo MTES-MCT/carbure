@@ -165,6 +165,7 @@ class OperationImportGroupSerializer(serializers.Serializer):
     lot_count = serializers.IntegerField()
     total_volume = serializers.FloatField()
     rows = serializers.ListField(child=serializers.IntegerField())
+    debt = OperationDebtSerializer(allow_null=True)
 
 
 class OperationImportResponseSerializer(serializers.Serializer):
@@ -207,14 +208,19 @@ class OperationExcelRowSerializer(serializers.Serializer):
 
     def validate_operation_type(self, value):
         normalized = str(value or "").strip().upper()
-        if normalized not in [Operation.TRANSFERT, Operation.TENEUR]:
-            raise serializers.ValidationError(_("Le type d'opération doit être 'TRANSFERT' ou 'TENEUR'."))
+        if normalized not in [Operation.TRANSFERT, Operation.TENEUR, Operation.DEBT_REPAYMENT]:
+            raise serializers.ValidationError(_("Le type d'opération doit être 'TRANSFERT', 'TENEUR' ou 'DEBT_REPAYMENT'."))
         return normalized
 
     def validate(self, attrs):
         if attrs.get("operation_type") == Operation.TRANSFERT and not attrs.get("credited_entity"):
             raise serializers.ValidationError(
                 {"credited_entity": _("Destinataire requis pour les opérations de type TRANSFERT.")}
+            )
+        # A recipient would split the repayment rows into several groups, each checked against the same debts
+        if attrs.get("operation_type") == Operation.DEBT_REPAYMENT and attrs.get("credited_entity"):
+            raise serializers.ValidationError(
+                {"credited_entity": _("Le destinataire doit rester vide pour les opérations de type DEBT_REPAYMENT.")}
             )
         return attrs
 

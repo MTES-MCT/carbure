@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from types import SimpleNamespace
 
 from django.db import transaction
@@ -10,8 +10,9 @@ from rest_framework import serializers
 from core.excel_importer import ExcelImporter, ExcelValidationError
 from core.models import CarbureLot, Entity
 from core.models.feedstock import Biocarburant
-from tiruert.models import Operation
+from tiruert.models import Operation, TiruertDebt
 from tiruert.serializers.operation import OperationExcelRowSerializer, OperationImportResponseSerializer
+from tiruert.services.debt import DebtService
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation import OperationService
 from tiruert.services.operation_excel_template import get_tiruert_operator_queryset
@@ -39,6 +40,7 @@ def _default_status(operation_type: str) -> str:
     default_status = {
         Operation.TENEUR: Operation.PENDING,
         Operation.TRANSFERT: Operation.DRAFT,
+        Operation.DEBT_REPAYMENT: Operation.DRAFT,
     }
     return default_status.get(operation_type, Operation.DRAFT)
 
@@ -55,6 +57,13 @@ class OperationGroup:
     debited_entity: Entity
     row_numbers: list[int]
     lot_volumes: dict[int, float]
+    # DEBT_REPAYMENT only: the lots spread over the repaid debts, one operation per debt
+    debt_splits: list[tuple[TiruertDebt, dict[int, float]]] = field(default_factory=list)
+
+    @property
+    def splits(self) -> list[tuple[TiruertDebt | None, dict[int, float]]]:
+        """The operations to create for this group: (debt, lot volumes)."""
+        return self.debt_splits or [(None, self.lot_volumes)]
 
 
 class OperationExcelImportService:
@@ -114,7 +123,7 @@ class OperationExcelImportService:
 
     @staticmethod
     def _group_key(row: dict) -> tuple:
-        credited_entity = row["credited_entity"]
+        credited_entity = row.get("credited_entity")
         return (
             row["operation_type"],
             row["customs_category"],
@@ -146,7 +155,7 @@ class OperationExcelImportService:
             biofuel_code=biofuel.code,
             biofuel=biofuel,
             sector=_get_sector(biofuel),
-            credited_entity=first_row["credited_entity"],
+            credited_entity=first_row.get("credited_entity"),
             debited_entity=debited_entity,
             row_numbers=row_numbers,
             lot_volumes=dict(lot_volumes),
@@ -284,8 +293,30 @@ class OperationExcelImportService:
         return messages
 
     @staticmethod
-    def _validate_groups(groups: list[OperationGroup], total_rows: int, declaration_year: int | None) -> None:
+    def _plan_debt_repayments(groups: list[OperationGroup]) -> list[str]:
+        """
+        Spread each DEBT_REPAYMENT group over the open debts of its biofuel and category.
+
+        Must run first, inside the import transaction: it locks the debts, so the balances read afterwards are fresh.
+        """
         messages = []
+        for group in groups:
+            if group.operation_type != Operation.DEBT_REPAYMENT:
+                continue
+
+            lots = [{"id": lot_id, "volume": volume} for lot_id, volume in group.lot_volumes.items()]
+            try:
+                group.debt_splits = DebtService.plan_repayment(
+                    group.debited_entity, group.biofuel, group.customs_category, lots
+                )
+            except serializers.ValidationError as exc:
+                messages.extend(OperationExcelImportService._flatten_error_messages(exc))
+
+        return messages
+
+    @staticmethod
+    def _validate_groups(groups: list[OperationGroup], total_rows: int, declaration_year: int | None) -> None:
+        messages = OperationExcelImportService._plan_debt_repayments(groups)
         for group in groups:
             if not group.lot_volumes:
                 continue
@@ -299,8 +330,9 @@ class OperationExcelImportService:
             raise ExcelValidationError([{"errors": {"validation": [message]}} for message in messages], total_rows)
 
     @staticmethod
-    def _build_operation_data(group: OperationGroup, declaration_year: int) -> dict:
+    def _build_operation_data(group: OperationGroup, declaration_year: int, debt: TiruertDebt | None = None) -> dict:
         return {
+            "debt": debt,
             "type": group.operation_type,
             "status": _default_status(group.operation_type),
             "customs_category": group.customs_category,
@@ -313,10 +345,16 @@ class OperationExcelImportService:
 
     @staticmethod
     def _create_operation_for_group(
-        group: OperationGroup, declaration_year: int, emissions_by_lot: dict[int, float]
+        group: OperationGroup,
+        declaration_year: int,
+        emissions_by_lot: dict[int, float],
+        debt: TiruertDebt | None = None,
+        lot_volumes: dict[int, float] | None = None,
     ) -> Operation:
-        operation_data = OperationExcelImportService._build_operation_data(group, declaration_year)
-        details_data = OperationService.build_details_data(group.lot_volumes, emissions_by_lot)
+        operation_data = OperationExcelImportService._build_operation_data(group, declaration_year, debt)
+        details_data = OperationService.build_details_data(
+            group.lot_volumes if lot_volumes is None else lot_volumes, emissions_by_lot
+        )
         return OperationService.create_operation_with_details(operation_data, details_data)
 
     @staticmethod
@@ -327,12 +365,21 @@ class OperationExcelImportService:
 
         with transaction.atomic():
             return [
-                OperationExcelImportService._create_operation_for_group(group, declaration_year, emissions_by_lot)
+                OperationExcelImportService._create_operation_for_group(
+                    group, declaration_year, emissions_by_lot, debt, lot_volumes
+                )
                 for group in groups
+                for debt, lot_volumes in group.splits
             ]
 
     @staticmethod
-    def _group_to_dict(group: OperationGroup, operation: Operation | None = None) -> dict:
+    def _group_to_dict(
+        group: OperationGroup,
+        operation: Operation | None = None,
+        debt: TiruertDebt | None = None,
+        lot_volumes: dict[int, float] | None = None,
+    ) -> dict:
+        lot_volumes = group.lot_volumes if lot_volumes is None else lot_volumes
         return {
             "operation_id": operation.id if operation else None,
             "status": operation.status if operation else _default_status(group.operation_type),
@@ -344,30 +391,22 @@ class OperationExcelImportService:
             "credited_entity": (
                 {"id": group.credited_entity.id, "name": group.credited_entity.name} if group.credited_entity else None
             ),
-            "lot_count": len(group.lot_volumes),
-            "total_volume": round(sum(group.lot_volumes.values()), 4),
+            "lot_count": len(lot_volumes),
+            "total_volume": round(sum(lot_volumes.values()), 4),
             "rows": group.row_numbers,
+            "debt": {"id": debt.id, "lot": {"id": debt.lot_id, "carbure_id": debt.lot.carbure_id}} if debt else None,
         }
 
     @staticmethod
-    def _map_operations_by_group_key(operations: list[Operation]) -> dict[tuple, Operation]:
-        return {(op.type, op.customs_category, op.biofuel_id, op.credited_entity_id): op for op in operations}
-
-    @staticmethod
     def _build_groups_data(groups: list[OperationGroup], operations: list[Operation] | None) -> list[dict]:
-        operation_by_key = OperationExcelImportService._map_operations_by_group_key(operations) if operations else {}
+        """One entry per operation to create: `operations` follows the order of the groups and of their splits."""
+        created = iter(operations or [])
 
-        groups_data = []
-        for group in groups:
-            key = (
-                group.operation_type,
-                group.customs_category,
-                group.biofuel_id,
-                group.credited_entity.id if group.credited_entity else None,
-            )
-            groups_data.append(OperationExcelImportService._group_to_dict(group, operation_by_key.get(key)))
-
-        return groups_data
+        return [
+            OperationExcelImportService._group_to_dict(group, next(created) if operations else None, debt, lot_volumes)
+            for group in groups
+            for debt, lot_volumes in group.splits
+        ]
 
     @staticmethod
     def execute(file, mode: str, debited_entity: Entity) -> dict:
@@ -384,9 +423,13 @@ class OperationExcelImportService:
 
         groups = OperationExcelImportService._build_groups(row_serializer.validated_data, debited_entity)
 
-        OperationExcelImportService._validate_groups(groups, len(data), declaration_year)
+        # One transaction from the debt locks to the creation: the validated repayment plan is the one persisted
+        with transaction.atomic():
+            OperationExcelImportService._validate_groups(groups, len(data), declaration_year)
 
-        operations = OperationExcelImportService._create_operations(groups, declaration_year) if mode == "create" else None
+            operations = (
+                OperationExcelImportService._create_operations(groups, declaration_year) if mode == "create" else None
+            )
         groups_data = OperationExcelImportService._build_groups_data(groups, operations)
 
         return OperationImportResponseSerializer({"mode": mode, "operations": groups_data}).data
