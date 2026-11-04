@@ -47,12 +47,12 @@ class CorrectionServiceVolumeTest(TestCase):
         lot.save(update_fields=["volume"])
         CorrectionService.create_correction_operations_for_lot_volume_update([lot.id])
 
-    def consume(self, lot, volume):
+    def consume(self, lot, volume, customs_category=None, biofuel=None):
         operation = Operation.objects.create(
             type=Operation.TENEUR,
             status=Operation.ACCEPTED,
-            customs_category=lot.feedstock.category,
-            biofuel=lot.biofuel,
+            customs_category=customs_category or lot.feedstock.category,
+            biofuel=biofuel or lot.biofuel,
             debited_entity=self.entity,
         )
         OperationDetail.objects.create(operation=operation, lot=lot, volume=volume, emission_rate_per_mj=lot.ghg_total)
@@ -205,21 +205,101 @@ class CorrectionServiceVolumeTest(TestCase):
 
     def test_ethanol_volume_conversion_is_applied_to_the_correction(self):
         """Apply the ethanol 15-degree conversion when calculating the volume delta."""
-        lot = self.create_lot(biofuel=Biocarburant.objects.get(code="ETH"), volume=1000)
+        ethanol = Biocarburant.objects.get(code="ETH")
+        lot = self.create_lot(biofuel=ethanol, volume=1000)
 
         self.update_volume(lot, 2000)
 
-        self.assertEqual(self.corrections().get().details.get().volume, 995)
+        correction = self.corrections().get()
+        self.assertEqual(correction.biofuel, ethanol)
+        self.assertEqual(correction.customs_category, self.feedstock_conv.category)
+        self.assertEqual(correction.details.get().volume, 995)
+
+    def test_ethanol_volume_decrease_with_insufficient_balance_creates_debt(self):
+        """Use ethanol 15-degree volume when recording a debt after a decrease."""
+        ethanol = Biocarburant.objects.get(code="ETH")
+        lot = self.create_lot(biofuel=ethanol, volume=1000)
+        self.consume(lot, 995)
+
+        self.update_volume(lot, 800)
+
+        self.assertFalse(self.corrections().exists())
+        debt = TiruertDebt.objects.get()
+        self.assertEqual(debt.value, 199)
+        self.assertEqual(debt.biofuel, ethanol)
+        self.assertEqual(debt.customs_category, self.feedstock_conv.category)
+        self.assertEqual(debt.lot_id, lot.id)
 
     def test_ep2_lot_is_corrected_on_each_category(self):
         """Create separate corrections for both categories produced by an EP2 split."""
+        ethanol = Biocarburant.objects.get(code="ETH")
         lot = self.create_lot(
             feedstock=MatierePremiere.biofuel.get(code="EP2"),
-            biofuel=Biocarburant.objects.get(code="ETH"),
+            biofuel=ethanol,
             volume=1000,
         )
 
         self.update_volume(lot, 2000)
 
-        deltas = {c.customs_category: c.details.get().volume for c in self.corrections()}
-        self.assertEqual(deltas, {MatierePremiere.CONV: 398, MatierePremiere.EP2AM: 597})
+        # 1000*0.995 = 995
+        # 995 * 0.4 = 398 for CONV
+        # 995 * 0.6 = 597 for EP2AM
+        deltas = {(c.customs_category, c.biofuel): c.details.get().volume for c in self.corrections()}
+        self.assertEqual(deltas, {(MatierePremiere.CONV, ethanol): 398, (MatierePremiere.EP2AM, ethanol): 597})
+
+    def test_ep2_ethanol_decrease_with_insufficient_balance_creates_category_debts(self):
+        """Record an insufficient-balance debt for each category after EP2 and ethanol conversion."""
+        ethanol = Biocarburant.objects.get(code="ETH")
+        lot = self.create_lot(
+            feedstock=MatierePremiere.biofuel.get(code="EP2"),
+            biofuel=ethanol,
+            volume=1000,
+        )
+        self.consume(lot, 398, customs_category=MatierePremiere.CONV)
+        self.consume(lot, 597, customs_category=MatierePremiere.EP2AM)
+
+        self.update_volume(lot, 500)
+
+        self.assertFalse(self.corrections().exists())
+        debts = TiruertDebt.objects.order_by("customs_category")
+
+        # 500*0.995 = 497.5
+        # 497.5 * 0.4 = 199 for CONV
+        # 497.5 * 0.6 = 298.5 for EP2AM
+        self.assertEqual(
+            [(debt.customs_category, debt.value, debt.biofuel) for debt in debts],
+            [(MatierePremiere.CONV, 199, ethanol), (MatierePremiere.EP2AM, 298.5, ethanol)],
+        )
+
+    def test_emhv_volume_increase_creates_emag_correction(self):
+        """Convert EMHV to EMAG without changing volume before computing the correction."""
+        emhv = Biocarburant.objects.get(code="EMHV")
+        emag = Biocarburant.objects.get(code="EMAG")
+        lot = self.create_lot(biofuel=emhv, volume=1000)
+
+        self.update_volume(lot, 1200)
+
+        correction = self.corrections().get()
+        self.assertEqual(correction.biofuel, emag)
+        self.assertEqual(correction.customs_category, self.feedstock_conv.category)
+        self.assertEqual(correction.details.get().volume, 200)
+        lot.refresh_from_db()
+        self.assertEqual(lot.biofuel, emhv)
+
+    def test_emhv_volume_decrease_with_insufficient_balance_creates_emag_debt(self):
+        """Record the debt under EMAG while leaving the source EMHV lot unchanged."""
+        emhv = Biocarburant.objects.get(code="EMHV")
+        emag = Biocarburant.objects.get(code="EMAG")
+        lot = self.create_lot(biofuel=emhv, volume=1000)
+        self.consume(lot, 1000, customs_category=self.feedstock_conv.category, biofuel=emag)
+
+        self.update_volume(lot, 800)
+
+        self.assertFalse(self.corrections().exists())
+        debt = TiruertDebt.objects.get()
+        self.assertEqual(debt.value, 200)
+        self.assertEqual(debt.biofuel, emag)
+        self.assertEqual(debt.customs_category, self.feedstock_conv.category)
+        self.assertEqual(debt.lot_id, lot.id)
+        lot.refresh_from_db()
+        self.assertEqual(lot.biofuel, emhv)
