@@ -6,6 +6,7 @@ from django.db.models import Q
 from core.models import Biocarburant, CarbureLot, Entity
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
+from tiruert.services.debt import DebtService
 
 
 def get_tiruert_operator_queryset():
@@ -38,6 +39,7 @@ TABLE_HEADERS = [
 MAIN_SHEET_NAME = "Import d'opérations"
 ENTITIES_SHEET_NAME = "Entités"
 BIOFUELS_SHEET_NAME = "Biocarburants"
+DEBTS_SHEET_NAME = "Dettes"
 HEADER_ROW = 0
 KEY_ROW = 1
 FIRST_DATA_ROW = 2
@@ -121,6 +123,7 @@ def create_operation_import_template(entity_id: int) -> BufferedReader:
     )
     _create_entities_sheet(workbook, entities)
     _create_biofuels_sheet(workbook)
+    _create_debts_sheet(workbook, entity_id)
 
     workbook.close()
     return open(location, "rb")
@@ -216,9 +219,9 @@ def _add_validations(sheet, entities):
         f"{operation_type_col}{start_row}:{operation_type_col}{end_row}",
         {
             "validate": "list",
-            "source": ["TRANSFERT", "TENEUR"],
+            "source": ["TRANSFERT", "TENEUR", "DEBT_REPAYMENT"],
             "error_title": "Valeur invalide",
-            "error_message": "Type d'operation doit etre TRANSFERT ou TENEUR.",
+            "error_message": "Type d'operation doit etre TRANSFERT, TENEUR ou DEBT_REPAYMENT.",
         },
     )
 
@@ -232,7 +235,7 @@ def _add_validations(sheet, entities):
                 "source": source,
                 "ignore_blank": True,
                 "input_title": "Destinataire",
-                "input_message": "Renseigner uniquement pour TRANSFERT. Laisser vide pour TENEUR.",
+                "input_message": "Renseigner uniquement pour TRANSFERT. Laisser vide pour TENEUR et DEBT_REPAYMENT.",
                 "error_title": "Valeur invalide",
                 "error_message": "Destinataire doit etre un opérateur autorisé.",
             },
@@ -260,6 +263,24 @@ def _create_entities_sheet(workbook, entities):
 
     sheet.set_column(0, 0, 25)
     sheet.set_column(1, 1, None, None, {"hidden": True})
+
+    sheet.protect()
+
+
+def _create_debts_sheet(workbook, entity_id):
+    sheet = workbook.add_worksheet(DEBTS_SHEET_NAME)
+
+    sheet.write(0, 0, "Biocarburant")
+    sheet.write(0, 1, "Catégorie")
+    sheet.write(0, 2, "Dette restante (L)")
+
+    for row, debt in enumerate(DebtService.summarize_open_debts(entity_id), start=1):
+        sheet.write(row, 0, debt["biofuel"].code or "")
+        sheet.write(row, 1, debt["customs_category"])
+        sheet.write_number(row, 2, debt["remaining_volume"])
+
+    sheet.set_column(0, 1, 16)
+    sheet.set_column(2, 2, 20)
 
     sheet.protect()
 

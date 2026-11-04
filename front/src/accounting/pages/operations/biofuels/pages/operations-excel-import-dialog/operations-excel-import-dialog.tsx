@@ -146,6 +146,10 @@ export const OperationsExcelImportDialog = ({
                         op.biofuel,
                         op.customs_category,
                         op.credited_entity?.name,
+                        op.debt &&
+                          t("Dette du lot {{carbure_id}}", {
+                            carbure_id: op.debt.lot.carbure_id,
+                          }),
                         t("{{count}} lot(s)", { count: op.lot_count }),
                       ]
                         .filter(Boolean)
