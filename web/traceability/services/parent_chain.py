@@ -29,7 +29,7 @@ def _names(groups: Iterable[str]) -> list[str]:
 def _chain_cte(queryset: QuerySet[Action], groups: Iterable[str]) -> CTE:
     actions = _plain_actions()
     # Mysql refuse les sous-requetes et order by dans une requete récursive
-    # Ici "queryset" a les sous-requetes status, created_at, updated_at etc... + l'order by par défaut définit sur la table
+    # Ici "queryset" a la sous-requete status + l'order by par défaut définit sur la table
     # Donc on réinitialise l'order by et on ne prend que les ids
     listed = actions.filter(pk__in=queryset.order_by().values("pk"))
     parts = [COLUMN_GROUPS[name] for name in _names(groups)]

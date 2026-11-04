@@ -10,7 +10,6 @@ from .action_status import ActionStatus
 
 class ActionManager(models.Manager):
     def get_queryset(self):
-        first_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("created_at", "id")
         latest_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("-created_at", "-id")
 
         return (
@@ -18,8 +17,6 @@ class ActionManager(models.Manager):
             .get_queryset()
             .select_related("holder", "material", "site", "parent", "certificate")
             .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
-            .annotate(created_at=Subquery(first_status_subquery.values("created_at")[:1]))
-            .annotate(updated_at=Subquery(latest_status_subquery.values("created_at")[:1]))
             .annotate(
                 period=Concat(
                     ExtractYear("working_date"),
