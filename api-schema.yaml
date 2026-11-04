@@ -14468,11 +14468,6 @@ components:
         action's
 
         own material when nothing above declares one.
-
-        nearest_site is the first site above the action. The action's own site
-        is ignored.
-
-        producer and root_pos are the holder and the pos_id of the root.
       properties:
         previous_material:
           allOf:
@@ -14482,20 +14477,9 @@ components:
           allOf:
             - $ref: "#/components/schemas/Material"
           nullable: true
-        nearest_site:
-          allOf:
-            - $ref: "#/components/schemas/ActionSite"
-          nullable: true
-        producer:
-          $ref: "#/components/schemas/EntityPreview"
-        root_pos:
-          type: string
       required:
-        - nearest_site
         - origin_material
         - previous_material
-        - producer
-        - root_pos
     ActionParent:
       type: object
       description: Small representation used for the parent action relation.

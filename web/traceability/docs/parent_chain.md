@@ -23,9 +23,9 @@ Le `UNION ALL` aligne les colonnes par position. `start` et `climb` rendent les 
 `PAGE_COLUMN_GROUPS` charge ces deux groupes sur la liste et sur le détail :
 
 - `emissions` — sommes GES
-- `inherited_fields` — ids bruts. `attach_inherited_fields` charge ensuite les matières, les sites et les sociétés
+- `inherited_fields` — `previous_material_id` et `origin_material_id`. `attach_inherited_fields` charge ensuite les matières
 
-Pour une action, la requête produit une ligne par cran. On garde celle dont le parent suivant est vide : les sommes sont complètes, et le détenteur est celui de la racine.
+Pour une action, la requête produit une ligne par cran. On garde celle dont le parent suivant est vide : les sommes sont complètes et les deux matières héritées sont résolues.
 
 ```
 étape 0 (leaf)   origin=leaf  next_parent=middle  ei_sum=100
@@ -60,7 +60,7 @@ Ne pas poser cette annotation sur `Action.objects`. La CTE lit `Action.unannotat
 
 ## Valeur stockée sur la racine
 
-`ROOT_COLUMNS` est vide. Aucun filtre ne lit une valeur écrite sur la ligne racine. `producer` et `root_pos` viennent de la racine et sont renvoyés, mais aucun filtre ne les lit. `origin_material` n'y entre pas : la première matière non vide peut être sous la racine. `nearest_site` non plus : c'est le premier site au-dessus, pas le site de la racine.
+`ROOT_COLUMNS` est vide. Aucun filtre ne lit une valeur écrite sur la ligne racine. Le parcours ne porte pour l'instant que `previous_material_id` et `origin_material_id`. `origin_material` n'y entre pas : la première matière non vide peut être sous la racine.
 
 Le jour où une clé y entre, `filter_by_chain` trouve les racines avec un `WHERE` ordinaire :
 
@@ -117,4 +117,4 @@ ROOT_COLUMNS = {
 }
 ```
 
-La clé est la colonne portée par la remontée. La valeur est le champ sur l'action racine.
+La clé est une colonne déjà portée par la remontée. La valeur est le champ sur l'action racine.
