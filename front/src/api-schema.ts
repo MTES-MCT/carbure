@@ -6430,6 +6430,7 @@ export interface components {
             /** Format: double */
             total_volume: number;
             rows: number[];
+            debt: components["schemas"]["OperationDebt"] | null;
         };
         OperationImportResponse: {
             mode: components["schemas"]["ModeEnum"];
