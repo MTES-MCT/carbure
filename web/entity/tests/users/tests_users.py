@@ -1,8 +1,11 @@
+import re
+
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from auth.tokens import account_activation_token
 from core.models import Entity, UserRights, UserRightsRequests
 from core.tests_utils import setup_current_user
 
@@ -52,16 +55,16 @@ class EntityUserTest(TestCase):
         response = self.client.post(
             f"{url}?entity_id={self.entity1.id}", {"entity_id": self.entity1.id, "email": self.user2.email}
         )
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
     def test_change_user_role_missing_params(self):
         res = self.client.post(
             f"{Endpoint.change_user_role}?entity_id={self.trader.id}",
             {"email": self.user.email, "entity_id": self.trader.id},
         )
-        assert res.status_code == 400
+        self.assertEqual(res.status_code, 400)
         data = res.json()
-        assert data["role"] is not None
+        self.assertIsNotNone(data["role"])
 
     def test_change_user_role_missing_user(self):
         res = self.client.post(
@@ -72,9 +75,9 @@ class EntityUserTest(TestCase):
                 "role": "RW",
             },
         )
-        assert res.status_code == 400
+        self.assertEqual(res.status_code, 400)
         data = res.json()
-        assert data["email"] is not None
+        self.assertIsNotNone(data["email"])
 
     def test_change_user_role_no_prior_rights(self):
         other_user = User.objects.create(email="other@carbure.test", name="Other", password="other")
@@ -82,20 +85,20 @@ class EntityUserTest(TestCase):
             f"{Endpoint.change_user_role}?entity_id={self.trader.id}",
             {"email": other_user.email, "entity_id": self.trader.id, "role": "RW"},
         )
-        assert res.status_code == 400
+        self.assertEqual(res.status_code, 400)
         data = res.json()
-        assert data["message"] == "NO_PRIOR_RIGHTS"
+        self.assertEqual(data["message"], "NO_PRIOR_RIGHTS")
 
     def test_change_user_role_ok(self):
         user_right = UserRights.objects.get(user=self.user, entity=self.trader)
-        assert user_right.role == "ADMIN"
+        self.assertEqual(user_right.role, "ADMIN")
         res = self.client.post(
             f"{Endpoint.change_user_role}?entity_id={self.trader.id}",
             {"email": self.user.email, "entity_id": self.trader.id, "role": "RW"},
         )
-        assert res.status_code == 200
+        self.assertEqual(res.status_code, 200)
         user_right = UserRights.objects.get(user=self.user, entity=self.trader)
-        assert user_right.role == "RW"
+        self.assertEqual(user_right.role, "RW")
 
     def test_invite_user_new_user_success(self):
         params = {
@@ -104,18 +107,21 @@ class EntityUserTest(TestCase):
             "role": UserRights.ADMIN,
         }
         res = self.client.post(f"{Endpoint.invite_user}?entity_id={self.entity1.id}", params)
-        assert res.status_code == 200
+        self.assertEqual(res.status_code, 200)
         new_user = User.objects.get(email="newuser@carbure.local")
-        assert new_user is not None
-        assert not new_user.has_usable_password()
-        assert "invite=1" in mail.outbox[0].body
-        assert (
+        self.assertIsNotNone(new_user)
+        self.assertFalse(new_user.has_usable_password())
+        self.assertIn("invite=1", mail.outbox[0].body)
+        self.assertEqual(
             UserRightsRequests.objects.filter(
                 user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN, status="ACCEPTED"
-            ).count()
-            == 1
+            ).count(),
+            1,
         )
-        assert UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count() == 1
+        self.assertEqual(
+            UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count(),
+            1,
+        )
 
     def test_invite_user_missing_params(self):
         params = {
@@ -123,9 +129,9 @@ class EntityUserTest(TestCase):
             "email": "newuser@carbure.local",
         }
         res = self.client.post(f"{Endpoint.invite_user}?entity_id={self.entity1.id}", params)
-        assert res.status_code == 400
+        self.assertEqual(res.status_code, 400)
         data = res.json()
-        assert data["role"] is not None
+        self.assertIsNotNone(data["role"])
 
     def test_invite_user_bad_email(self):
         params = {
@@ -134,9 +140,9 @@ class EntityUserTest(TestCase):
             "role": UserRights.ADMIN,
         }
         res = self.client.post(f"{Endpoint.invite_user}?entity_id={self.entity1.id}", params)
-        assert res.status_code == 400
+        self.assertEqual(res.status_code, 400)
         data = res.json()
-        assert data["email"] is not None
+        self.assertIsNotNone(data["email"])
 
     def test_invite_user_already_granted(self):
         params = {
@@ -145,9 +151,9 @@ class EntityUserTest(TestCase):
             "role": UserRights.RW,
         }
         res = self.client.post(f"{Endpoint.invite_user}?entity_id={self.entity1.id}", params)
-        assert res.status_code == 400
+        self.assertEqual(res.status_code, 400)
         data = res.json()
-        assert data["message"] == "ACCESS_ALREADY_GIVEN"
+        self.assertEqual(data["message"], "ACCESS_ALREADY_GIVEN")
 
     def test_invite_user_existing_user_success(self):
         params = {
@@ -156,22 +162,45 @@ class EntityUserTest(TestCase):
             "role": UserRights.ADMIN,
         }
         res = self.client.post(f"{Endpoint.invite_user}?entity_id={self.entity1.id}", params)
-        assert res.status_code == 200
+        self.assertEqual(res.status_code, 200)
         new_user = User.objects.get(email=self.user2.email)
-        assert new_user is not None
-        assert (
+        self.assertIsNotNone(new_user)
+        self.assertEqual(
             UserRightsRequests.objects.filter(
                 user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN, status="ACCEPTED"
-            ).count()
-            == 1
+            ).count(),
+            1,
         )
-        assert UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count() == 1
+        self.assertEqual(
+            UserRights.objects.filter(user_id=new_user.id, entity_id=self.entity1.id, role=UserRights.ADMIN).count(),
+            1,
+        )
+
+    def test_second_invite_of_pending_user_keeps_the_first_link(self):
+        res = self.client.post(
+            f"{Endpoint.invite_user}?entity_id={self.entity1.id}",
+            {"email": "pending@carbure.local", "role": UserRights.RO},
+        )
+        self.assertEqual(res.status_code, 200)
+        pending = User.objects.get(email="pending@carbure.local")
+        token = re.search(r"token=([^&\s]+)", mail.outbox[0].body).group(1)
+
+        res = self.client.post(
+            f"{Endpoint.invite_user}?entity_id={self.trader.id}",
+            {"email": "pending@carbure.local", "role": UserRights.RW},
+        )
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+        pending.refresh_from_db()
+        self.assertTrue(account_activation_token.check_token(pending, token))
+        self.assertTrue(UserRights.objects.filter(user=pending, entity=self.trader, role=UserRights.RW).exists())
 
     def test_grant_access(self):
         right_request = UserRightsRequests.objects.create(user=self.user2, entity=self.trader, role=UserRights.ADMIN)
 
         response = self.client.post(f"{Endpoint.accept_user}?entity_id={self.admin.pk}", {"request_id": right_request.id})
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
         response = self.client.post(f"{Endpoint.accept_user}?entity_id={self.trader.pk}", {"request_id": right_request.id})
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)

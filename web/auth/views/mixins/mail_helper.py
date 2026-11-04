@@ -33,8 +33,9 @@ def activation_email_context(user, entity_name=None):
     return {"invitation": True, "entity_name": entity_name}
 
 
-def send_email(user, request, subject, email_type, extra_context):
-    rotate_invited_activation_secret(user)
+def send_email(user, request, subject, email_type, extra_context, rotate=False):
+    if rotate:
+        rotate_invited_activation_secret(user)
     email_subject = subject
     email_context = {
         "user": user,
@@ -68,14 +69,32 @@ def send_account_activation_email(user, request):
         "Carbure - Activation de compte",
         "account_activation_email",
         activation_email_context(user),
+        rotate=True,
     )
 
 
 def send_registration_email(user, entity_name, request, user_already_exists):
+    """One activation mail when the account is created.
+
+    A pending invite already has a link, so a later invitation only grants rights.
+    An account that already has a password is told to sign in.
+    """
+    if user_already_exists and not user.has_usable_password():
+        return
     if user_already_exists:
-        email_type = "invite_user_email"
-        email_context = {"entity_name": entity_name}
-    else:
-        email_type = "account_activation_email"
-        email_context = activation_email_context(user, entity_name)
-    send_email(user, request, "Carbure - Invitation à rejoindre une entité", email_type, email_context)
+        send_email(
+            user,
+            request,
+            "Carbure - Invitation à rejoindre une entité",
+            "invite_user_email",
+            {"entity_name": entity_name},
+        )
+        return
+    send_email(
+        user,
+        request,
+        "Carbure - Invitation à rejoindre une entité",
+        "account_activation_email",
+        activation_email_context(user, entity_name),
+        rotate=True,
+    )
