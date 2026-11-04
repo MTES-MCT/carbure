@@ -79,5 +79,7 @@ class UserResendActivationLinkAction:
         if user.is_active or not account_activation_token.was_issued_for(user, token):
             return Response({"message": CarbureError.ACTIVATION_LINK_ERROR}, status=status.HTTP_400_BAD_REQUEST)
 
-        send_account_activation_email(user, request)
+        # Nothing was written if the account was activated since it was loaded.
+        if not send_account_activation_email(user, request):
+            return Response({"message": CarbureError.ACTIVATION_LINK_ERROR}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"status": "success"})

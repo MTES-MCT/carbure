@@ -142,6 +142,25 @@ class RequestActivationLinkTest(TestCase):
         assert account_activation_token.check_token(self.user, previous)
         assert "/auth/activate?" in mail.outbox[0].body
 
+    def test_link_resend_does_not_overwrite_a_password_chosen_in_between(self):
+        invited = User.objects.create_user(email="invited@example.com", password=None, is_active=False)
+        stale = User.objects.get(pk=invited.pk)
+        uidb64 = urlsafe_base64_encode(force_bytes(invited.pk))
+        token = account_activation_token.make_token(invited)
+        invited.set_password("UnePhraseAssezLongue")
+        invited.is_active = True
+        invited.save(update_fields=["password", "is_active"])
+
+        with patch("auth.views.mixins.request_activation_link.user_from_uid", return_value=stale):
+            response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": token})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.data["message"] == CarbureError.ACTIVATION_LINK_ERROR
+        assert len(mail.outbox) == 0
+        invited.refresh_from_db()
+        assert invited.is_active
+        assert invited.check_password("UnePhraseAssezLongue")
+
     def test_resend_invalidates_previous_link_for_invited_user(self):
         invited = User.objects.create_user(email="invited@example.com", password=None, is_active=False)
         Entity.objects.create(name="Entité invitante")

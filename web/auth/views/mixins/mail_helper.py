@@ -1,6 +1,8 @@
 from os import environ
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -15,12 +17,26 @@ from core.models import UserRights
 def rotate_invited_activation_secret(user):
     """Replace the unusable password so previously issued activation links no longer match.
 
-    Accounts that already chose a password are left untouched.
+    Returns False when the account was activated, or its password changed, since it was loaded.
+    The caller must not send a mail in that case. An account that already chose a password is
+    left untouched and can still receive its mail.
     """
     if user.has_usable_password():
-        return
-    user.set_unusable_password()
-    user.save(update_fields=["password"])
+        return True
+    new_password = make_password(None)
+    updated = (
+        get_user_model()
+        .objects.filter(
+            pk=user.pk,
+            is_active=False,
+            password=user.password,
+        )
+        .update(password=new_password)
+    )
+    if not updated:
+        return False
+    user.password = new_password
+    return True
 
 
 def activation_email_context(user, entity_name=None):
@@ -34,8 +50,8 @@ def activation_email_context(user, entity_name=None):
 
 
 def send_email(user, request, subject, email_type, extra_context, rotate=False):
-    if rotate:
-        rotate_invited_activation_secret(user)
+    if rotate and not rotate_invited_activation_secret(user):
+        return False
     email_subject = subject
     email_context = {
         "user": user,
@@ -60,10 +76,11 @@ def send_email(user, request, subject, email_type, extra_context, rotate=False):
         email_otp.confirmed = True
         email_otp.email = user.email
         email_otp.save()
+    return True
 
 
 def send_account_activation_email(user, request):
-    send_email(
+    return send_email(
         user,
         request,
         "Carbure - Activation de compte",
