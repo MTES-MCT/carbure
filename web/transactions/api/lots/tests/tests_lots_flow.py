@@ -315,6 +315,7 @@ class LotsFlowTest(TestCase):
         assert data["status"] == "error"
         assert len(data["errors"]) == 1
         assert data["errors"][0]["error"] == CarbureSanityCheckErrors.INVALID_CERTIFICATE
+        assert data["errors"][0]["lot_id"] == lot.id
         assert data["errors"][0]["field"] == "supplier_certificate"
         assert data["errors"][0]["is_blocking"] is True
         assert list(CarbureLot.objects.order_by("pk").values()) == lots_before
@@ -347,6 +348,7 @@ class LotsFlowTest(TestCase):
             CarbureSanityCheckErrors.MISSING_DELIVERY_TYPE,
         }
         assert all(error["is_blocking"] for error in data["errors"])
+        assert {error["lot_id"] for error in data["errors"]} == {lot.id}
         assert list(CarbureLot.objects.order_by("pk").values()) == lots_before
         assert list(CarbureLotEvent.objects.order_by("pk").values()) == events_before
         assert list(GenericError.objects.order_by("pk").values()) == errors_before
@@ -398,6 +400,7 @@ class LotsFlowTest(TestCase):
         assert data["status"] == "error"
         assert len(data["errors"]) == 1
         assert data["errors"][0]["error"] == CarbureCertificatesErrors.MISSING_SUPPLIER_CERTIFICATE
+        assert data["errors"][0]["lot_id"] == invalid_lot.id
         assert data["errors"][0]["field"] == "supplier_certificate"
         assert data["errors"][0]["is_blocking"] is True
         assert list(CarbureLot.objects.order_by("pk").values()) == lots_before

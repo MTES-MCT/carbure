@@ -137,7 +137,10 @@ def accept_trading(request, *args, **kwargs):
             event.save()
 
         blocking_errors = [
-            error for child_lot in child_lots for error in sanity_checks(child_lot, prefetched_data) if error.is_blocking
+            {"lot_id": child_lot.parent_lot_id, **GenericErrorSerializer(error).data}
+            for child_lot in child_lots
+            for error in sanity_checks(child_lot, prefetched_data)
+            if error.is_blocking
         ]
         if blocking_errors:
             transaction.set_rollback(True)
@@ -145,7 +148,7 @@ def accept_trading(request, *args, **kwargs):
                 {
                     "status": "error",
                     "message": "Created lot has blocking errors",
-                    "errors": [{"lot_id": error.lot_id, **GenericErrorSerializer(error).data} for error in blocking_errors],
+                    "errors": blocking_errors,
                 },
                 status=400,
             )
