@@ -2897,7 +2897,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -2976,6 +2976,45 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
+  /api/double-counting/agreements/{id}/update-status/:
+    patch:
+      operationId: double_counting_agreements_update_status_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementStatusUpdateResponse"
+          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -3006,7 +3045,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3079,7 +3118,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3125,46 +3164,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/DoubleCountingRegistrationPublic"
           description: ""
-  /api/double-counting/agreements/bulk-update-status/:
-    post:
-      operationId: double_counting_agreements_bulk_update_status_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - double-counting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AgreementStatusBulkUpdateResponse"
-          description: ""
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AgreementStatusBulkUpdateErrorResponse"
-          description: ""
   /api/double-counting/agreements/export/:
     get:
       operationId: double_counting_agreements_export_retrieve
@@ -3195,7 +3194,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3277,7 +3276,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3783,7 +3782,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3917,7 +3916,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -4186,7 +4185,7 @@ paths:
                 - quarter
                 - source
           description: |-
-            Ordre
+            Ordering
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
@@ -4846,7 +4845,7 @@ paths:
                 - quarter
                 - source
           description: |-
-            Ordre
+            Ordering
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
@@ -5088,7 +5087,7 @@ paths:
                 - status
                 - transfer_date
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -5408,7 +5407,7 @@ paths:
                 - status
                 - transfer_date
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -5730,13 +5729,13 @@ paths:
             type: array
             items:
               type: boolean
-              title: Actif
+              title: Active
               enum:
                 - "false"
                 - "true"
           description: >-
-            Précise si l’utilisateur doit être considéré comme actif. Décochez
-            ceci plutôt que de supprimer le compte.
+            Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
 
 
             * `true` - True
@@ -5762,13 +5761,13 @@ paths:
                 - role
                 - user
           description: |-
-            Ordre
+            Ordering
 
             * `entity_name` - Entity name
             * `-entity_name` - Entity name (décroissant)
             * `entity_id` - Entity id
             * `-entity_id` - Entity id (décroissant)
-            * `user` - Utilisateur
+            * `user` - User
             * `-user` - Utilisateur (décroissant)
             * `role` - Role
             * `-role` - Role (décroissant)
@@ -5884,13 +5883,13 @@ paths:
             type: array
             items:
               type: boolean
-              title: Actif
+              title: Active
               enum:
                 - "false"
                 - "true"
           description: >-
-            Précise si l’utilisateur doit être considéré comme actif. Décochez
-            ceci plutôt que de supprimer le compte.
+            Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
 
 
             * `true` - True
@@ -5916,13 +5915,13 @@ paths:
                 - role
                 - user
           description: |-
-            Ordre
+            Ordering
 
             * `entity_name` - Entity name
             * `-entity_name` - Entity name (décroissant)
             * `entity_id` - Entity id
             * `-entity_id` - Entity id (décroissant)
-            * `user` - Utilisateur
+            * `user` - User
             * `-user` - Utilisateur (décroissant)
             * `role` - Role
             * `-role` - Role (décroissant)
@@ -6049,13 +6048,13 @@ paths:
             type: array
             items:
               type: boolean
-              title: Actif
+              title: Active
               enum:
                 - "false"
                 - "true"
           description: >-
-            Précise si l’utilisateur doit être considéré comme actif. Décochez
-            ceci plutôt que de supprimer le compte.
+            Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
 
 
             * `true` - True
@@ -6081,13 +6080,13 @@ paths:
                 - role
                 - user
           description: |-
-            Ordre
+            Ordering
 
             * `entity_name` - Entity name
             * `-entity_name` - Entity name (décroissant)
             * `entity_id` - Entity id
             * `-entity_id` - Entity id (décroissant)
-            * `user` - Utilisateur
+            * `user` - User
             * `-user` - Utilisateur (décroissant)
             * `role` - Role
             * `-role` - Role (décroissant)
@@ -6201,13 +6200,13 @@ paths:
             type: array
             items:
               type: boolean
-              title: Actif
+              title: Active
               enum:
                 - "false"
                 - "true"
           description: >-
-            Précise si l’utilisateur doit être considéré comme actif. Décochez
-            ceci plutôt que de supprimer le compte.
+            Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
 
 
             * `true` - True
@@ -6233,13 +6232,13 @@ paths:
                 - role
                 - user
           description: |-
-            Ordre
+            Ordering
 
             * `entity_name` - Entity name
             * `-entity_name` - Entity name (décroissant)
             * `entity_id` - Entity id
             * `-entity_id` - Entity id (décroissant)
-            * `user` - Utilisateur
+            * `user` - User
             * `-user` - Utilisateur (décroissant)
             * `role` - Role
             * `-role` - Role (décroissant)
@@ -8061,7 +8060,7 @@ paths:
                 - name
                 - site_siret
           description: |-
-            Ordre
+            Ordering
 
             * `name` - Name
             * `-name` - Name (décroissant)
@@ -8354,7 +8353,7 @@ paths:
                 - name
                 - site_siret
           description: |-
-            Ordre
+            Ordering
 
             * `name` - Name
             * `-name` - Name (décroissant)
@@ -8994,7 +8993,7 @@ paths:
                 - ghg_reduction
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -9224,7 +9223,7 @@ paths:
                 - ghg_reduction
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -9391,7 +9390,7 @@ paths:
                 - ghg_reduction
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -9658,7 +9657,7 @@ paths:
                 - supplier
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -10098,7 +10097,7 @@ paths:
                 - supplier
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -10357,7 +10356,7 @@ paths:
                 - supplier
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -10644,7 +10643,7 @@ paths:
                 - quantity
                 - status
           description: |-
-            Ordre
+            Ordering
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
@@ -11027,7 +11026,7 @@ paths:
                 - quantity
                 - status
           description: |-
-            Ordre
+            Ordering
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
@@ -11168,7 +11167,7 @@ paths:
                 - quantity
                 - status
           description: |-
-            Ordre
+            Ordering
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
@@ -11321,7 +11320,7 @@ paths:
                 - quantity
                 - status
           description: |-
-            Ordre
+            Ordering
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
@@ -11818,7 +11817,7 @@ paths:
                 - type
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -12409,7 +12408,7 @@ paths:
                 - type
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -12711,7 +12710,7 @@ paths:
                 - type
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -13070,7 +13069,7 @@ paths:
                 - type
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -13494,7 +13493,7 @@ paths:
                 - status
                 - working_date
           description: |-
-            Ordre
+            Ordering
 
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
@@ -13785,7 +13784,7 @@ paths:
                 - status
                 - working_date
           description: |-
-            Ordre
+            Ordering
 
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
@@ -14071,7 +14070,7 @@ paths:
                 - status
                 - working_date
           description: |-
-            Ordre
+            Ordering
 
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
@@ -14706,33 +14705,13 @@ components:
         - expired
         - inactive
         - incoming
-    AgreementStatusBulkUpdateErrorResponse:
+    AgreementStatusUpdateResponse:
       type: object
       properties:
-        message:
-          type: string
-      required:
-        - message
-    AgreementStatusBulkUpdateRequest:
-      type: object
-      properties:
-        agreement_ids:
-          type: array
-          items:
-            type: integer
-          maxItems: 100
         status:
           $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
       required:
-        - agreement_ids
         - status
-    AgreementStatusBulkUpdateResponse:
-      type: object
-      properties:
-        updated_count:
-          type: integer
-      required:
-        - updated_count
     Airport:
       type: object
       properties:
@@ -17126,12 +17105,15 @@ components:
       properties:
         group:
           type: string
+          default: ""
           maxLength: 128
         category:
           type: string
+          default: ""
           maxLength: 128
         subcategory:
           type: string
+          default: ""
           maxLength: 128
         crop_type:
           allOf:
@@ -17139,10 +17121,7 @@ components:
           nullable: true
           readOnly: true
       required:
-        - category
         - crop_type
-        - group
-        - subcategory
     CollectionTypeEnum:
       enum:
         - PRIVATE
@@ -17690,7 +17669,7 @@ components:
         producer_user:
           type: string
           format: email
-          title: Adresse électronique
+          title: Email address
           readOnly: true
         production_site:
           allOf:
@@ -17779,7 +17758,7 @@ components:
         producer_user:
           type: string
           format: email
-          title: Adresse électronique
+          title: Email address
           readOnly: true
       required:
         - agreement_id
@@ -20573,11 +20552,16 @@ components:
           type: array
           items:
             type: integer
+        debt:
+          allOf:
+            - $ref: "#/components/schemas/OperationDebt"
+          nullable: true
       required:
         - biofuel
         - credited_entity
         - customs_category
         - debited_entity
+        - debt
         - lot_count
         - operation_id
         - rows
@@ -21301,6 +21285,11 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
+    PatchedAgreementStatusUpdateRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
@@ -21766,12 +21755,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Mot de passe
+          title: Password
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Confirmation du mot de passe
+          title: Password confirmation
       required:
         - password1
         - password2
@@ -23094,11 +23083,10 @@ components:
         email:
           type: string
           format: email
-          title: Adresse électronique
+          title: Email address
           maxLength: 255
         name:
           type: string
-          title: Nom
           maxLength: 255
       required:
         - email
@@ -23113,23 +23101,22 @@ components:
           type: string
           format: email
           minLength: 1
-          title: Adresse électronique
+          title: Email address
           maxLength: 255
         name:
           type: string
           minLength: 1
-          title: Nom
           maxLength: 255
         password1:
           type: string
           writeOnly: true
           minLength: 1
-          title: Mot de passe
+          title: Password
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Confirmation du mot de passe
+          title: Password confirmation
       required:
         - email
         - name

@@ -4947,8 +4947,11 @@ export interface components {
             checked_at: string;
         };
         Classification: {
+            /** @default  */
             group: string;
+            /** @default  */
             category: string;
+            /** @default  */
             subcategory: string;
             readonly crop_type: components["schemas"]["CropTypeEnum"] | null;
         };
@@ -5217,7 +5220,7 @@ export interface components {
             readonly created_at: string;
             readonly producer: components["schemas"]["Entity"];
             /**
-             * Adresse électronique
+             * Email address
              * Format: email
              */
             readonly producer_user: string;
@@ -5249,7 +5252,7 @@ export interface components {
             /** Format: double */
             readonly quotas_progression: number;
             /**
-             * Adresse électronique
+             * Email address
              * Format: email
              */
             readonly producer_user: string;
@@ -6379,6 +6382,7 @@ export interface components {
             /** Format: double */
             total_volume: number;
             rows: number[];
+            debt: components["schemas"]["OperationDebt"] | null;
         };
         OperationImportResponse: {
             mode: components["schemas"]["ModeEnum"];
@@ -6985,9 +6989,9 @@ export interface components {
         ResetPasswordRequest: {
             uidb64: string;
             token: string;
-            /** Mot de passe */
+            /** Password */
             password1: string;
-            /** Confirmation du mot de passe */
+            /** Password confirmation */
             password2: string;
         };
         Response: {
@@ -7519,11 +7523,10 @@ export interface components {
          */
         UserCreation: {
             /**
-             * Adresse électronique
+             * Email address
              * Format: email
              */
             email: string;
-            /** Nom */
             name: string;
         };
         /**
@@ -7532,15 +7535,14 @@ export interface components {
          */
         UserCreationRequest: {
             /**
-             * Adresse électronique
+             * Email address
              * Format: email
              */
             email: string;
-            /** Nom */
             name: string;
-            /** Mot de passe */
+            /** Password */
             password1: string;
-            /** Confirmation du mot de passe */
+            /** Password confirmation */
             password2: string;
         };
         UserEntity: {
@@ -9567,7 +9569,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -9667,7 +9669,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -9709,7 +9711,7 @@ export interface operations {
             query?: {
                 certificate_id?: string;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -9751,7 +9753,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -9795,7 +9797,7 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter?: string;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -10159,7 +10161,7 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryFilter;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -10231,7 +10233,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -10403,7 +10405,7 @@ export interface operations {
                 entity_id: number;
                 operating_unit?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
@@ -10785,7 +10787,7 @@ export interface operations {
                 filter: PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter;
                 operating_unit?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
@@ -10919,7 +10921,7 @@ export interface operations {
                 month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -11125,7 +11127,7 @@ export interface operations {
                 month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -11349,20 +11351,20 @@ export interface operations {
                  */
                 entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
-                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
                  *
                  *     * `true` - True
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `entity_name` - Entity name
                  *     * `-entity_name` - Entity name (décroissant)
                  *     * `entity_id` - Entity id
                  *     * `-entity_id` - Entity id (décroissant)
-                 *     * `user` - Utilisateur
+                 *     * `user` - User
                  *     * `-user` - Utilisateur (décroissant)
                  *     * `role` - Role
                  *     * `-role` - Role (décroissant)
@@ -11425,20 +11427,20 @@ export interface operations {
                  */
                 entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
-                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
                  *
                  *     * `true` - True
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `entity_name` - Entity name
                  *     * `-entity_name` - Entity name (décroissant)
                  *     * `entity_id` - Entity id
                  *     * `-entity_id` - Entity id (décroissant)
-                 *     * `user` - Utilisateur
+                 *     * `user` - User
                  *     * `-user` - Utilisateur (décroissant)
                  *     * `role` - Role
                  *     * `-role` - Role (décroissant)
@@ -11505,20 +11507,20 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiEntitiesAdminUsersFiltersGetParametersQueryFilter;
                 /**
-                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
                  *
                  *     * `true` - True
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `entity_name` - Entity name
                  *     * `-entity_name` - Entity name (décroissant)
                  *     * `entity_id` - Entity id
                  *     * `-entity_id` - Entity id (décroissant)
-                 *     * `user` - Utilisateur
+                 *     * `user` - User
                  *     * `-user` - Utilisateur (décroissant)
                  *     * `role` - Role
                  *     * `-role` - Role (décroissant)
@@ -11577,20 +11579,20 @@ export interface operations {
                  */
                 entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
-                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
                  *
                  *     * `true` - True
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `entity_name` - Entity name
                  *     * `-entity_name` - Entity name (décroissant)
                  *     * `entity_id` - Entity id
                  *     * `-entity_id` - Entity id (décroissant)
-                 *     * `user` - Utilisateur
+                 *     * `user` - User
                  *     * `-user` - Utilisateur (décroissant)
                  *     * `role` - Role
                  *     * `-role` - Role (décroissant)
@@ -12929,7 +12931,7 @@ export interface operations {
                  */
                 has_personal_vehicle_connector?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `name` - Name
                  *     * `-name` - Name (décroissant)
@@ -13125,7 +13127,7 @@ export interface operations {
                  */
                 has_personal_vehicle_connector?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `name` - Name
                  *     * `-name` - Name (décroissant)
@@ -13596,7 +13598,7 @@ export interface operations {
                 entity_id: number;
                 feedstock?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -13711,7 +13713,7 @@ export interface operations {
                 entity_id: number;
                 feedstock?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -13768,7 +13770,7 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiSafTicketSourcesFiltersGetParametersQueryFilter;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -13886,7 +13888,7 @@ export interface operations {
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -14149,7 +14151,7 @@ export interface operations {
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -14243,7 +14245,7 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiSafTicketsFiltersGetParametersQueryFilter;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -14399,7 +14401,7 @@ export interface operations {
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -14664,7 +14666,7 @@ export interface operations {
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -14715,7 +14717,7 @@ export interface operations {
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -14767,7 +14769,7 @@ export interface operations {
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -15027,7 +15029,7 @@ export interface operations {
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -15406,7 +15408,7 @@ export interface operations {
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -15529,7 +15531,7 @@ export interface operations {
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -15693,7 +15695,7 @@ export interface operations {
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -15971,7 +15973,7 @@ export interface operations {
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
@@ -16110,7 +16112,7 @@ export interface operations {
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
@@ -16253,7 +16255,7 @@ export interface operations {
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
