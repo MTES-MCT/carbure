@@ -3358,23 +3358,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/tiruert/operations/repay_debt/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Repay the open debts of a biofuel / customs category by debiting lots of the entity */
-        post: operations["repay_debt"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/tiruert/operations/simulate/": {
         parameters: {
             query?: never;
@@ -5146,19 +5129,6 @@ export interface components {
          * @enum {string}
          */
         CropTypeEnum: CropTypeEnum;
-        DebtRepaymentInputRequest: {
-            biofuel: number;
-            customs_category: components["schemas"]["MPCategoriesEnum"];
-            lots: components["schemas"]["OperationLotRequest"][];
-            /** @default VALIDATED */
-            status: components["schemas"]["DebtRepaymentInputStatusEnum"];
-        };
-        /**
-         * @description * `VALIDATED` - VALIDATED
-         *     * `DRAFT` - DRAFT
-         * @enum {string}
-         */
-        DebtRepaymentInputStatusEnum: DebtRepaymentInputStatusEnum;
         DebtSummary: {
             biofuel: components["schemas"]["BalanceBiofuel"];
             customs_category: components["schemas"]["MPCategoriesEnum"];
@@ -6408,9 +6378,11 @@ export interface components {
             readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
+            details?: components["schemas"]["OperationDetail"][];
             readonly year: number;
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
             readonly debt: components["schemas"]["OperationDebt"] | null;
+            readonly transaction: string;
         };
         OperationCorrectionRequest: {
             /** Format: double */
@@ -6427,6 +6399,13 @@ export interface components {
         OperationDepot: {
             id: number;
             name: string;
+        };
+        OperationDetail: {
+            lot: number;
+            /** Format: double */
+            volume?: number;
+            /** Format: double */
+            emission_rate_per_mj?: number;
         };
         OperationEntity: {
             id: number;
@@ -6456,27 +6435,12 @@ export interface components {
             mode: components["schemas"]["ModeEnum"];
             operations: components["schemas"]["OperationImportGroup"][];
         };
-        OperationInput: {
-            type: components["schemas"]["OperationTypeEnum"];
-            customs_category: components["schemas"]["MPCategoriesEnum"];
-            biofuel: number | null;
-            credited_entity?: number | null;
-            debited_entity: number | null;
-            from_depot?: number | null;
-            to_depot?: number | null;
-            export_country?: string | null;
-            export_recipient?: string;
-            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
-            lots: components["schemas"]["OperationLot"][];
-            status?: components["schemas"]["OperationStatusEnum"];
-            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
-        };
         OperationInputRequest: {
             type: components["schemas"]["OperationTypeEnum"];
             customs_category: components["schemas"]["MPCategoriesEnum"];
-            biofuel: number | null;
+            biofuel: number;
             credited_entity?: number | null;
-            debited_entity: number | null;
+            debited_entity: number;
             from_depot?: number | null;
             to_depot?: number | null;
             export_country?: string | null;
@@ -6514,11 +6478,7 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
-        };
-        OperationLot: {
-            id: number;
-            /** Format: double */
-            volume: number;
+            readonly transaction: string;
         };
         OperationLotRequest: {
             id: number;
@@ -15290,7 +15250,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OperationInput"];
+                    "application/json": components["schemas"]["Operation"] | components["schemas"]["OperationList"][];
                 };
             };
         };
@@ -15976,34 +15936,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": File;
-                };
-            };
-        };
-    };
-    repay_debt: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DebtRepaymentInputRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["DebtRepaymentInputRequest"];
-                "multipart/form-data": components["schemas"]["DebtRepaymentInputRequest"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OperationList"][];
                 };
             };
         };
@@ -17125,10 +17057,6 @@ export enum CorrectionStatusEnum {
 export enum CropTypeEnum {
     PRIMARY = "PRIMARY",
     INTERMEDIATE = "INTERMEDIATE"
-}
-export enum DebtRepaymentInputStatusEnum {
-    VALIDATED = "VALIDATED",
-    DRAFT = "DRAFT"
 }
 export enum DeliveryTypeEnum {
     UNKNOWN = "UNKNOWN",

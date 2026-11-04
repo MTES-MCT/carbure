@@ -12057,7 +12057,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationInput"
+                oneOf:
+                  - $ref: "#/components/schemas/Operation"
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/OperationList"
           description: ""
   /api/tiruert/operations/{id}/:
     get:
@@ -13332,44 +13336,6 @@ paths:
                 type: string
                 format: binary
           description: Fichier Excel généré
-  /api/tiruert/operations/repay_debt/:
-    post:
-      operationId: repay_debt
-      description: Repay the open debts of a biofuel / customs category by debiting
-        lots of the entity
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-      tags:
-        - tiruert
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DebtRepaymentInputRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/DebtRepaymentInputRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/DebtRepaymentInputRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "201":
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/OperationList"
-          description: ""
   /api/tiruert/operations/simulate/:
     post:
       operationId: simulate
@@ -17555,33 +17521,6 @@ components:
       description: |-
         * `PRIMARY` - PRIMARY
         * `INTERMEDIATE` - INTERMEDIATE
-    DebtRepaymentInputRequest:
-      type: object
-      properties:
-        biofuel:
-          type: integer
-        customs_category:
-          $ref: "#/components/schemas/MPCategoriesEnum"
-        lots:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationLotRequest"
-        status:
-          allOf:
-            - $ref: "#/components/schemas/DebtRepaymentInputStatusEnum"
-          default: VALIDATED
-      required:
-        - biofuel
-        - customs_category
-        - lots
-    DebtRepaymentInputStatusEnum:
-      enum:
-        - VALIDATED
-        - DRAFT
-      type: string
-      description: |-
-        * `VALIDATED` - VALIDATED
-        * `DRAFT` - DRAFT
     DebtSummary:
       type: object
       properties:
@@ -20605,6 +20544,10 @@ components:
           type: number
           format: double
           readOnly: true
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationDetail"
         year:
           type: integer
           readOnly: true
@@ -20617,6 +20560,9 @@ components:
             - $ref: "#/components/schemas/OperationDebt"
           readOnly: true
           nullable: true
+        transaction:
+          type: string
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -20632,6 +20578,7 @@ components:
         - id
         - sector
         - to_depot
+        - transaction
         - type
         - volume
         - year
@@ -20673,6 +20620,19 @@ components:
       required:
         - id
         - name
+    OperationDetail:
+      type: object
+      properties:
+        lot:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - lot
     OperationEntity:
       type: object
       properties:
@@ -20750,54 +20710,6 @@ components:
       required:
         - mode
         - operations
-    OperationInput:
-      type: object
-      properties:
-        type:
-          $ref: "#/components/schemas/OperationTypeEnum"
-        customs_category:
-          $ref: "#/components/schemas/MPCategoriesEnum"
-        biofuel:
-          type: integer
-          nullable: true
-        credited_entity:
-          type: integer
-          nullable: true
-        debited_entity:
-          type: integer
-          nullable: true
-        from_depot:
-          type: integer
-          nullable: true
-        to_depot:
-          type: integer
-          nullable: true
-        export_country:
-          type: string
-          nullable: true
-        export_recipient:
-          type: string
-          maxLength: 255
-        objective_sector:
-          allOf:
-            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
-          nullable: true
-        lots:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationLot"
-        status:
-          $ref: "#/components/schemas/OperationStatusEnum"
-        devaluation_type:
-          allOf:
-            - $ref: "#/components/schemas/DevaluationTypeEnum"
-          nullable: true
-      required:
-        - biofuel
-        - customs_category
-        - debited_entity
-        - lots
-        - type
     OperationInputRequest:
       type: object
       properties:
@@ -20807,13 +20719,11 @@ components:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: integer
-          nullable: true
         credited_entity:
           type: integer
           nullable: true
         debited_entity:
           type: integer
-          nullable: true
         from_depot:
           type: integer
           nullable: true
@@ -20912,6 +20822,9 @@ components:
         year:
           type: integer
           readOnly: true
+        transaction:
+          type: string
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -20925,20 +20838,10 @@ components:
         - id
         - sector
         - to_depot
+        - transaction
         - type
         - volume
         - year
-    OperationLot:
-      type: object
-      properties:
-        id:
-          type: integer
-        volume:
-          type: number
-          format: double
-      required:
-        - id
-        - volume
     OperationLotRequest:
       type: object
       properties:
