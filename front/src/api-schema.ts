@@ -3640,15 +3640,10 @@ export interface components {
          *     previous_material is the nearest declared material above the action.
          *     origin_material is the first declared material from the root. It is the action's
          *     own material when nothing above declares one.
-         *     nearest_site is the first site above the action. The action's own site is ignored.
-         *     producer and root_pos are the holder and the pos_id of the root.
          */
         ActionInheritedFields: {
             previous_material: components["schemas"]["Material"] | null;
             origin_material: components["schemas"]["Material"] | null;
-            nearest_site: components["schemas"]["ActionSite"] | null;
-            producer: components["schemas"]["EntityPreview"];
-            root_pos: string;
         };
         /** @description Small representation used for the parent action relation. */
         ActionParent: {

@@ -12,6 +12,7 @@ from traceability.services.parent_chain import annotate_parent_chain, filter_by_
 
 # Le dictionnaire de production est vide. Ces tests déclarent les colonnes
 # le temps de vérifier la descente et la remontée.
+# La remontée filtre une colonne que le parcours porte encore.
 ROOT_COLUMNS = {
     "root_holder_id": "holder_id",
     "root_pos_id": "pos_id",
@@ -75,7 +76,7 @@ class ParentChainTest(TestCase):
         self.assertIn("descendants", sql)
         self.assertNotIn("parent_chain", sql)
 
-    @patch("traceability.services.parent_chain.ROOT_COLUMNS", ROOT_COLUMNS)
+    @patch("traceability.services.parent_chain.ROOT_COLUMNS", {"origin_material_id": "material_id"})
     def test_root_columns_climb_when_the_list_is_no_larger_than_the_roots(self):
         queryset = Action.objects.filter(pk=self.root.pk)
 
@@ -83,7 +84,7 @@ class ParentChainTest(TestCase):
             ids = list(
                 filter_by_chain(
                     queryset,
-                    {"root_holder_id": [self.root.holder_id]},
+                    {"origin_material_id": [self.root.material_id]},
                     ("inherited_fields",),
                 ).values_list("pk", flat=True)
             )

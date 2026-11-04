@@ -90,10 +90,6 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertIsNone(by_id[child.id]["material"])
         self.assertEqual(by_id[child.id]["inherited_fields"]["previous_material"]["id"], self.own_action.material_id)
         self.assertEqual(by_id[child.id]["inherited_fields"]["origin_material"]["id"], self.own_action.material_id)
-        self.assertEqual(by_id[child.id]["inherited_fields"]["nearest_site"]["id"], self.own_action.site_id)
-        self.assertEqual(by_id[child.id]["inherited_fields"]["producer"]["id"], self.own_action.holder_id)
-        self.assertEqual(by_id[child.id]["inherited_fields"]["root_pos"], self.own_action.pos_id)
-        self.assertIsNone(by_id[self.own_action.id]["inherited_fields"]["nearest_site"])
         self.assertIsNone(by_id[self.own_action.id]["inherited_fields"]["previous_material"])
         self.assertEqual(
             by_id[self.own_action.id]["inherited_fields"]["origin_material"]["id"],
