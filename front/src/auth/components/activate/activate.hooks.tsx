@@ -1,16 +1,12 @@
 import { ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  createSearchParams,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { useMutation, useQuery } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { Button } from "common/components/button2"
-import { addQueryParams, ROUTE_URLS } from "common/utils/routes"
+import { ROUTE_URLS } from "common/utils/routes"
 import * as api from "../../api"
-import { useToken } from "./use-token"
+import { PasswordResetState, useToken } from "./use-token"
 
 const ACCOUNT_ALREADY_ACTIVE = "ACCOUNT_ALREADY_ACTIVE"
 const ACTIVATION_LINK_ERROR = "Could not send activation link"
@@ -61,10 +57,9 @@ export function useActivate(): ActivationContent {
   }
 
   if (activate.status === "success") {
-    const passwordParams = createSearchParams({
-      uidb64: uidb64 || "",
-      token: activate.result?.data?.token || "",
-    })
+    const passwordToken = activate.result?.data?.token
+    const passwordState: PasswordResetState | undefined =
+      uidb64 && passwordToken ? { uidb64, token: passwordToken } : undefined
 
     return {
       success: true,
@@ -75,12 +70,14 @@ export function useActivate(): ActivationContent {
         : t("Vous pouvez maintenant vous connecter sur CarbuRe."),
       action: isUserInvited ? (
         <Button
-          linkProps={{
-            to: addQueryParams(
-              ROUTE_URLS.AUTH.RESET_PASSWORD,
-              Object.fromEntries(passwordParams.entries())
-            ),
-          }}
+          onClick={() =>
+            navigate(
+              passwordState
+                ? ROUTE_URLS.AUTH.RESET_PASSWORD
+                : ROUTE_URLS.AUTH.RESET_PASSWORD_REQUEST,
+              { state: passwordState }
+            )
+          }
         >
           {t("Définir mon mot de passe")}
         </Button>
