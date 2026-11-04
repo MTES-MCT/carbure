@@ -122,3 +122,7 @@ class Action(models.Model):
         verbose_name = "Action"
         verbose_name_plural = "Actions"
         ordering = ["id"]
+        indexes = [
+            # Years and date ordering always filter by industry and type.
+            models.Index(fields=["industry", "type", "working_date"], name="action_industry_type_date"),
+        ]
