@@ -157,8 +157,8 @@ class LotCorrectionTest(TestCase):
         assert lot.lot_status == CarbureLot.ACCEPTED
 
     @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
-    def test_submit_fix_triggers_volume_correction_service(self, correction_mock):
-        """Trigger volume correction creation when a lot fix is submitted."""
+    def test_submit_fix_defers_volume_correction_for_transferred_lot(self, correction_mock):
+        """Defer volume correction creation for a lot transferred to a client."""
         lot = self.prepare_lot(self.producer, self.trader)
         lot = self.request_fix(lot, self.trader)
         self.client.post(
@@ -167,6 +167,23 @@ class LotCorrectionTest(TestCase):
         )
 
         self.submit_fix(lot, self.producer)
+
+        correction_mock.assert_not_called()
+
+    @patch("transactions.api.lots.approve_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
+    def test_approve_fix_triggers_volume_correction_service(self, correction_mock):
+        """Create the volume correction when the client accepts the fix."""
+        lot = self.prepare_lot(self.producer, self.trader)
+        lot = self.request_fix(lot, self.trader)
+        self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
+        )
+        self.submit_fix(lot, self.producer)
+
+        correction_mock.assert_not_called()
+
+        self.approve_fix(lot, self.trader)
 
         correction_mock.assert_called_once_with([lot.id])
 

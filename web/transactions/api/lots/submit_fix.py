@@ -59,6 +59,9 @@ def submit_fix(request, context):
     update_events = []
     # the fixed lots were edited before this call, so their volume change is not in the propagation diff
     volume_correction_lot_ids = set(fix_lots.values_list("id", flat=True))
+    deferred_volume_correction_lot_ids = set(
+        fix_lots.exclude(carbure_client_id=entity_id).exclude(carbure_client_id__isnull=True).values_list("id", flat=True)
+    )
 
     for node in updated_nodes:
         if node.type == Node.LOT:
@@ -86,6 +89,7 @@ def submit_fix(request, context):
 
         bulk_update_traceability_nodes(updated_nodes)
 
+        volume_correction_lot_ids -= deferred_volume_correction_lot_ids
         if volume_correction_lot_ids:
             CorrectionService.create_correction_operations_for_lot_volume_update(sorted(volume_correction_lot_ids))
 
