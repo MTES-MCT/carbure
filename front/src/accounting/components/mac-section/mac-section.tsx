@@ -14,6 +14,7 @@ type MacSectionProps = {
   downloadLabel: string
   description?: string
   readOnly?: boolean
+  actionDisabled?: boolean
   entityId?: number
 }
 
@@ -23,6 +24,7 @@ export const MacSection = ({
   downloadLabel,
   description,
   readOnly: isReadOnly,
+  actionDisabled = false,
   entityId,
 }: MacSectionProps) => {
   const entity = useEntity()
@@ -49,7 +51,12 @@ export const MacSection = ({
         <Title is="h1" as="h3">
           {title}
         </Title>
-        <Button asideX priority="secondary" onClick={onAddMac}>
+        <Button
+          asideX
+          priority="secondary"
+          onClick={onAddMac}
+          disabled={actionDisabled}
+        >
           {actionLabel}
         </Button>
       </Row>
