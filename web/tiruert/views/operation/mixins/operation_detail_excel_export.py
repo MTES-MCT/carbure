@@ -2,7 +2,8 @@ import os
 import tempfile
 from datetime import datetime
 
-from drf_spectacular.utils import OpenApiTypes, extend_schema
+from drf_spectacular.utils import OpenApiResponse, OpenApiTypes, extend_schema
+from rest_framework import status
 from rest_framework.decorators import action
 
 from core.excel import ExcelResponse, export_to_excel
@@ -12,7 +13,10 @@ from tiruert.models import OperationDetail
 
 class OperationDetailExcelExportActionMixin:
     @extend_schema(
-        responses={(200, "application/vnd.ms-excel"): OpenApiTypes.BINARY},
+        responses={
+            (status.HTTP_200_OK, "application/vnd.ms-excel"): OpenApiTypes.BINARY,
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(response={"detail": "Not found."}, description="Operation not found"),
+        },
         operation_id="export_tiruert_operation_details_excel",
     )
     @action(
