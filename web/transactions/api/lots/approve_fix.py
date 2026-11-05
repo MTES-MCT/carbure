@@ -4,6 +4,7 @@ from django.db import transaction
 from core.common import ErrorResponse, SuccessResponse
 from core.decorators import check_user_rights
 from core.models import CarbureLot, CarbureLotEvent, UserRights
+from tiruert.services.correction import CorrectionService
 
 
 class ApproveFixError:
@@ -31,7 +32,10 @@ def approve_fix(request, context):
         approve_fix_events.append(event)
 
     with transaction.atomic():
+        fixed_lot_ids = list(lots.filter(correction_status=CarbureLot.FIXED).values_list("id", flat=True))
         lots.update(correction_status=CarbureLot.NO_PROBLEMO)
+        if fixed_lot_ids:
+            CorrectionService.create_correction_operations_for_lot_volume_update(sorted(fixed_lot_ids))
         CarbureLotEvent.objects.bulk_create(approve_fix_events)
 
     return SuccessResponse()
