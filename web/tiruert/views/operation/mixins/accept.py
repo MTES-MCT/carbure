@@ -10,7 +10,6 @@ from tiruert.models import Operation
 
 class AcceptActionMixinErrors:
     NOTHING_TO_DECLARE = "NOTHING_TO_DECLARE"
-    OPERATION_NOT_FOUND = "OPERATION_NOT_FOUND"
     OPERATION_ALREADY_ACCEPTED_VALIDATED = "OPERATION_ALREADY_ACCEPTED_VALIDATED"
     OPERATION_TYPE_NOT_ALLOWED = "OPERATION_TYPE_NOT_ALLOWED"
 
@@ -32,9 +31,7 @@ class AcceptActionMixin:
         request=None,
         responses={
             status.HTTP_200_OK: OpenApiResponse(response={"status": "accepted"}, description="Success message"),
-            status.HTTP_404_NOT_FOUND: OpenApiResponse(
-                response={"error": AcceptActionMixinErrors.OPERATION_NOT_FOUND}, description="Error message"
-            ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(response={"detail": "Not found."}, description="Operation not found"),
             status.HTTP_400_BAD_REQUEST: OpenApiResponse(
                 response={"error": AcceptActionMixinErrors.OPERATION_ALREADY_ACCEPTED_VALIDATED}, description="Error message"
             ),
