@@ -2,10 +2,11 @@ from django.db import transaction
 
 from carbure.tasks import background_bulk_scoring
 from core.carburetypes import CarbureStockErrors
-from core.models import CarbureLotEvent, GenericError
+from core.models import CarbureLot, CarbureLotEvent, GenericError
 from core.serializers import CarbureLotPublicSerializer
 from core.traceability import LotNode, diff_to_metadata, get_traceability_nodes, serialize_integrity_errors
 from doublecount.helpers import get_lot_dc_agreement
+from tiruert.services.correction import CorrectionService
 from transactions.helpers import bulk_insert_lots, compute_lot_quantity, construct_carbure_lot
 from transactions.sanity_checks.helpers import get_prefetched_data
 from transactions.sanity_checks.sanity_checks import bulk_sanity_checks
@@ -133,3 +134,7 @@ def do_update_lot(user, entity, lot_to_update, update_data):
             raise LotUpdateFailure(LotUpdateFailure.INTEGRITY_CHECKS_FAILED, {"errors": errors})
 
         persist_changes(user, entity, lot_node, stock_error)
+
+        volume_diff = lot_node.diff.get("volume")
+        if volume_diff and volume_diff[0] != volume_diff[1] and lot_node.data.correction_status == CarbureLot.NO_PROBLEMO:
+            CorrectionService.create_correction_operations_for_lot_volume_update([lot_node.data.id])
