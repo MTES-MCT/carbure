@@ -53,7 +53,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `scope_queryset` | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière |
 | `transitions`, `action_flow` | Transitions de statut et liens de création déclarés par la filière |
 
-`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. `can_create(handler, type, parent=None)` renvoie le lien correspondant de `action_flow`, ou `None`. Chaque lien contient l'état du parent `(type, statut)`, l'état initial de l'enfant `(type, statut)` et une règle d'autorisation. Une création racine utilise `None` comme parent. Les règles d'autorisation ne sont pas encore appliquées. Ces déclarations ne sont pas encore utilisées par les services de création ou de changement de statut.
+`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. `ActionAuthorizationSerializer.find_edge(handler, type, parent=None)` renvoie le lien correspondant de `action_flow`, ou `None`. Chaque lien contient l'état du parent `(type, statut)`, l'état initial de l'enfant `(type, statut)` et une règle d'autorisation. Une création racine utilise `None` comme parent. Le serializer vérifie ces règles, mais n'est pas encore utilisé par les services de création. Les transitions ne sont pas encore utilisées par les services de changement de statut.
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 
