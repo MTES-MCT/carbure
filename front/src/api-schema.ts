@@ -6976,6 +6976,10 @@ export interface components {
             role: string;
             entity_id: number;
         };
+        RequestActivationLinkSuccess: {
+            /** @default success */
+            status: string;
+        };
         RequestEmailChangeError: {
             /** @description Message d'erreur général */
             message?: string;
@@ -7904,7 +7908,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserCreation"];
+                    "application/json": components["schemas"]["RequestActivationLinkSuccess"];
                 };
             };
         };

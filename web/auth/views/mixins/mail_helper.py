@@ -49,26 +49,50 @@ def activation_email_context(user, entity_name=None):
     return {"invitation": True, "entity_name": entity_name}
 
 
+def restore_invited_activation_secret(user, previous_password):
+    """Put back the secret rotated for a mail that was not sent.
+
+    Returns False when the account was activated, or its password changed, since the rotation.
+    """
+    if user.password == previous_password:
+        return True
+    restored = (
+        get_user_model()
+        .objects.filter(pk=user.pk, is_active=False, password=user.password)
+        .update(password=previous_password)
+    )
+    if not restored:
+        return False
+    user.password = previous_password
+    return True
+
+
 def send_email(user, request, subject, email_type, extra_context, rotate=False):
+    previous_password = user.password
     if rotate and not rotate_invited_activation_secret(user):
         return False
-    email_subject = subject
-    email_context = {
-        "user": user,
-        "domain": environ.get("BASE_URL"),
-        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-        "token": account_activation_token.make_token(user),
-    } | extra_context
-    html_message = loader.render_to_string(f"emails/{email_type}.html", email_context)
-    text_message = loader.render_to_string(f"emails/{email_type}.txt", email_context)
-    send_mail(
-        request=request,
-        subject=email_subject,
-        message=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        html_message=html_message,
-        recipient_list=[user.email],
-    )
+    try:
+        email_context = {
+            "user": user,
+            "domain": environ.get("BASE_URL"),
+            "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+            "token": account_activation_token.make_token(user),
+        } | extra_context
+        html_message = loader.render_to_string(f"emails/{email_type}.html", email_context)
+        text_message = loader.render_to_string(f"emails/{email_type}.txt", email_context)
+        send_mail(
+            request=request,
+            subject=subject,
+            message=text_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            html_message=html_message,
+            recipient_list=[user.email],
+        )
+    except Exception:
+        # The new token is already in the message. If it never left, the previous link must stay valid.
+        if user.password != previous_password:
+            restore_invited_activation_secret(user, previous_password)
+        raise
     if not user_has_device(user):
         email_otp = EmailDevice()
         email_otp.user = user

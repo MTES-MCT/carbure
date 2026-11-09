@@ -277,13 +277,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserCreation"
+                $ref: "#/components/schemas/RequestActivationLinkSuccess"
               examples:
                 ExampleResponse.:
                   value:
                     status: success
                   summary: Example response.
-          description: ""
+          description: The request was accepted. A mail is sent only when a pending
+            account matches the address.
   /api/auth/request-email-change/:
     post:
       operationId: auth_request_email_change_create
@@ -21740,6 +21741,12 @@ components:
       required:
         - entity_id
         - role
+    RequestActivationLinkSuccess:
+      type: object
+      properties:
+        status:
+          type: string
+          default: success
     RequestEmailChangeError:
       type: object
       properties:

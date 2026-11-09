@@ -106,3 +106,26 @@ class RequestActivationLinkTest(TestCase):
         assert "Entité invitante" in body
         token = re.search(r"token=([^&\s]+)", body).group(1)
         assert account_activation_token.check_token(invited, token)
+
+    def test_failed_send_keeps_the_previous_invitation_link(self):
+        invited = User.objects.create_user(email="invited@example.com", password=None, is_active=False)
+        Entity.objects.create(name="Entité invitante")
+        UserRights.objects.create(
+            user=invited,
+            entity=Entity.objects.get(name="Entité invitante"),
+            role=UserRights.RO,
+        )
+        previous = account_activation_token.make_token(invited)
+
+        with (
+            patch("auth.views.mixins.mail_helper.send_mail", side_effect=OSError("smtp down")),
+            self.assertLogs("auth.views.mixins.request_activation_link", level="ERROR") as logged,
+        ):
+            response = self.client.post(self.request_activation_link_url, {"email": invited.email})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {"status": "success"}
+        invited.refresh_from_db()
+        assert account_activation_token.check_token(invited, previous)
+        assert len(mail.outbox) == 0
+        assert any("Could not resend the activation link" in line for line in logged.output)
