@@ -285,12 +285,17 @@ class OperationUpdateSerializer(serializers.ModelSerializer):
         fields = ["to_depot", "status"]
 
     def validate_status(self, value):
-        # A repayment draft already reserves its volume: validating it is its only transition
-        if self.instance is not None and self.instance.type == Operation.DEBT_REPAYMENT:
-            if self.instance.status != Operation.DRAFT or value != Operation.VALIDATED:
-                raise serializers.ValidationError(
-                    _("Un acquittement de dette ne peut passer que du statut DRAFT au statut VALIDATED.")
-                )
+        request = self.context.get("request")
+        entity_id = getattr(getattr(request, "entity", None), "id", None)
+        if self.instance is None or entity_id != self.instance.debited_entity_id:
+            raise serializers.ValidationError(_("Seule l'entité débitée peut modifier le statut de l'opération."))
+
+        allowed_transition = {
+            Operation.TRANSFERT: (Operation.DRAFT, Operation.PENDING),
+            Operation.DEBT_REPAYMENT: (Operation.DRAFT, Operation.VALIDATED),
+        }.get(self.instance.type)
+        if allowed_transition != (self.instance.status, value):
+            raise serializers.ValidationError(_("Le statut de cette opération ne peut pas être modifié via cette action."))
         return value
 
 
