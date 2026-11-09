@@ -62,6 +62,7 @@ def submit_fix(request, context):
     deferred_volume_correction_lot_ids = set(
         fix_lots.exclude(carbure_client_id=entity_id).exclude(carbure_client_id__isnull=True).values_list("id", flat=True)
     )
+    deferred_descendant_lot_ids = set()
 
     for node in updated_nodes:
         if node.type == Node.LOT:
@@ -70,6 +71,9 @@ def submit_fix(request, context):
             volume_diff = node.diff.get("volume")
             if volume_diff is not None and volume_diff[0] != volume_diff[1]:
                 volume_correction_lot_ids.add(node.data.id)
+                if node.data.carbure_client_id not in (None, entity_id):
+                    deferred_volume_correction_lot_ids.add(node.data.id)
+                    deferred_descendant_lot_ids.add(node.data.id)
 
             if len(node.diff) > 0:
                 update_events.append(
@@ -86,6 +90,7 @@ def submit_fix(request, context):
         rejected_lots.update(lot_status=CarbureLot.PENDING, correction_status=CarbureLot.NO_PROBLEMO)
         fix_lots.update(correction_status=CarbureLot.FIXED)
         own_lots.update(correction_status=CarbureLot.NO_PROBLEMO)
+        CarbureLot.objects.filter(id__in=deferred_descendant_lot_ids).update(correction_status=CarbureLot.FIXED)
 
         bulk_update_traceability_nodes(updated_nodes)
 
@@ -95,7 +100,8 @@ def submit_fix(request, context):
 
         CarbureLotEvent.objects.bulk_create(submit_fix_events)
         CarbureLotEvent.objects.bulk_create(update_events)
-        notify_correction_done(lots.exclude(carbure_client_id=entity_id))
+        notified_lot_ids = set(lots.values_list("id", flat=True)) | deferred_descendant_lot_ids
+        notify_correction_done(CarbureLot.objects.filter(id__in=notified_lot_ids).exclude(carbure_client_id=entity_id))
 
     return SuccessResponse()
 
