@@ -28,6 +28,10 @@ class CorrectionService:
         if not lot_ids:
             return
 
+        lot_ids = OperationService.lock_lots_for_update(lot_ids)
+        if not lot_ids:
+            return
+
         credit_data_by_lot_category_biofuel = CorrectionService._get_current_credited_volume_by_lot_category_biofuel(lot_ids)
         corrected_lots = CarbureLot.objects.filter(id__in=lot_ids).select_related("feedstock", "biofuel")
         # Convert a copy so the in-memory conversions (ETH 15°, EP2 split, EMAG) never leak into the lot objects themselves

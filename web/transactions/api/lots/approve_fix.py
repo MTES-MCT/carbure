@@ -21,10 +21,12 @@ def approve_fix(request, context):
 
     entity_id = form.cleaned_data["entity_id"]
     lots = form.cleaned_data["lot_ids"]
+    lot_ids = []
 
     approve_fix_events = []
 
     for lot in lots:
+        lot_ids.append(lot.id)
         if lot.carbure_client_id != entity_id:
             return ErrorResponse(400, ApproveFixError.UNAUTHORIZED_ENTITY)
 
@@ -32,7 +34,8 @@ def approve_fix(request, context):
         approve_fix_events.append(event)
 
     with transaction.atomic():
-        fixed_lot_ids = list(lots.filter(correction_status=CarbureLot.FIXED).values_list("id", flat=True))
+        locked_lots = CarbureLot.objects.select_for_update().filter(id__in=lot_ids).order_by("id")
+        fixed_lot_ids = [lot.id for lot in locked_lots if lot.correction_status == CarbureLot.FIXED]
         lots.update(correction_status=CarbureLot.NO_PROBLEMO)
         if fixed_lot_ids:
             CorrectionService.create_correction_operations_for_lot_volume_update(sorted(fixed_lot_ids))

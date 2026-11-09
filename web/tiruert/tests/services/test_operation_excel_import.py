@@ -410,8 +410,10 @@ class OperationExcelImportServiceExecuteTest(TestCase):
     @patch("tiruert.services.operation_excel_import.OperationExcelImportService._build_lookup_caches")
     @patch("tiruert.services.operation_excel_import.OperationExcelRowSerializer")
     @patch("tiruert.services.operation_excel_import.OperationExcelImportService._parse_rows")
+    @patch("tiruert.services.operation_excel_import.OperationService.lock_lots_for_update")
     def test_execute_create_mode_creates_operations(
         self,
+        mock_lock_lots,
         mock_parse_rows,
         mock_row_serializer_cls,
         mock_build_lookup_caches,
@@ -424,6 +426,9 @@ class OperationExcelImportServiceExecuteTest(TestCase):
         mock_response_serializer,
     ):
         """Should create operations and include created operation data in create mode response."""
+        calls = []
+        mock_lock_lots.side_effect = lambda lot_ids: calls.append(("lock_lots", lot_ids))
+        mock_validate_groups.side_effect = lambda *args: calls.append("validate")
         debited = SimpleNamespace(id=1, name="Debited")
         parsed_rows = [{"lot_id": 1, "volume": 100, "operation_type": Operation.TENEUR}]
         mock_parse_rows.return_value = parsed_rows
@@ -433,7 +438,7 @@ class OperationExcelImportServiceExecuteTest(TestCase):
         mock_row_serializer_cls.return_value = mock_row_serializer
         mock_build_lookup_caches.return_value = {"lot_cache": {}, "credited_entity_cache": {}}
         mock_validate_retrieved_data.return_value = mock_row_serializer
-        groups = [Mock()]
+        groups = [SimpleNamespace(lot_volumes={1: 100})]
         mock_build_groups.return_value = groups
         mock_get_current_declaration_year.return_value = 2026
         operations = [Mock()]
@@ -443,6 +448,7 @@ class OperationExcelImportServiceExecuteTest(TestCase):
 
         result = OperationExcelImportService.execute(Mock(), "create", debited)
 
+        self.assertEqual(calls, [("lock_lots", [1]), "validate"])
         mock_create_operations.assert_called_once_with(groups, 2026)
         mock_build_groups_data.assert_called_once_with(groups, operations)
         self.assertEqual(result, {"mode": "create", "operations": [{"created": True}]})
