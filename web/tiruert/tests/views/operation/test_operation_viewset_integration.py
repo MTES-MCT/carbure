@@ -361,9 +361,9 @@ class OperationViewSetIntegrationTest(TestCase):
         self.assertEqual(data["to_depot"]["name"], new_depot.name)
 
     def test_partial_update_status_changes_operation_status(self):
-        """Test PATCH /operations/:id/ can update status."""
+        """The debited entity can submit a transfer draft, but only to PENDING."""
         operation = Operation.objects.create(
-            type=Operation.CESSION,
+            type=Operation.TRANSFERT,
             status=Operation.DRAFT,
             biofuel=self.biofuel_eth,
             debited_entity=self.entity,
@@ -383,6 +383,86 @@ class OperationViewSetIntegrationTest(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["status"], Operation.PENDING)
+
+    def test_partial_update_status_rejects_transitions_other_than_transfer_submission(self):
+        """A debtor cannot use PATCH to accept, cancel, or re-submit a transfer."""
+        operation = Operation.objects.create(
+            type=Operation.TRANSFERT,
+            status=Operation.DRAFT,
+            biofuel=self.biofuel_eth,
+            debited_entity=self.entity,
+            credited_entity=self.other_entity,
+            to_depot=self.depot,
+            customs_category=MatierePremiere.CONV,
+            renewable_energy_share=1.0,
+        )
+        url = reverse("operations-detail", kwargs={"pk": operation.id})
+
+        for target_status in (Operation.ACCEPTED, Operation.VALIDATED, Operation.CANCELED, Operation.DRAFT):
+            with self.subTest(status=target_status):
+                response = self.client.patch(
+                    url,
+                    data={"status": target_status},
+                    content_type="application/json",
+                    QUERY_STRING=f"entity_id={self.entity.id}",
+                )
+
+                self.assertEqual(response.status_code, 400)
+                self.assertIn("status", response.json())
+
+        operation.refresh_from_db()
+        self.assertEqual(operation.status, Operation.DRAFT)
+
+    def test_credited_entity_cannot_change_operation_status(self):
+        """A credited entity cannot bypass accept/reject actions through PATCH."""
+        operation = Operation.objects.create(
+            type=Operation.TRANSFERT,
+            status=Operation.PENDING,
+            biofuel=self.biofuel_eth,
+            debited_entity=self.other_entity,
+            credited_entity=self.entity,
+            to_depot=self.depot,
+            customs_category=MatierePremiere.CONV,
+            renewable_energy_share=1.0,
+        )
+        url = reverse("operations-detail", kwargs={"pk": operation.id})
+
+        response = self.client.patch(
+            url,
+            data={"status": Operation.ACCEPTED},
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.entity.id}",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("status", response.json())
+        operation.refresh_from_db()
+        self.assertEqual(operation.status, Operation.PENDING)
+
+    def test_partial_update_status_rejects_non_transfer_draft(self):
+        """Only TRANSFERT and DEBT_REPAYMENT drafts have a PATCH submission transition."""
+        operation = Operation.objects.create(
+            type=Operation.TENEUR,
+            status=Operation.DRAFT,
+            biofuel=self.biofuel_eth,
+            debited_entity=self.entity,
+            to_depot=self.depot,
+            customs_category=MatierePremiere.CONV,
+            renewable_energy_share=1.0,
+        )
+        url = reverse("operations-detail", kwargs={"pk": operation.id})
+
+        response = self.client.patch(
+            url,
+            data={"status": Operation.PENDING},
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.entity.id}",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("status", response.json())
+        operation.refresh_from_db()
+        self.assertEqual(operation.status, Operation.DRAFT)
 
     def test_destroy_operation_with_valid_conditions(self):
         """Test DELETE /operations/:id/ deletes operation when conditions met."""
