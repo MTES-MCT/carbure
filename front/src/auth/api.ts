@@ -68,12 +68,6 @@ export function requestActivateAccount(email: string) {
   })
 }
 
-export function resendActivationLink(uidb64: string, token: string) {
-  return apiFetch.POST("/auth/request-activation-link/", {
-    body: { uidb64, token },
-  })
-}
-
 export function checkActivateProfile(
   uidb64: string | undefined,
   token: string | undefined

@@ -3,15 +3,12 @@ from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core import mail
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from auth.tokens import account_activation_token
-from core.carburetypes import CarbureError
 from core.models import Entity, UserRights
 
 User = get_user_model()
@@ -63,60 +60,6 @@ class RequestActivationLinkTest(TestCase):
         html_content, _ = sent_mail.alternatives[0]
         assert not re.search("https://http://", html_content)
 
-    @override_settings(PASSWORD_RESET_TIMEOUT=-1)
-    def test_expired_signed_token_resends_to_the_account(self):
-        token = account_activation_token.make_token(self.user)
-        assert not account_activation_token.check_token(self.user, token)
-        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
-
-        response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": token})
-
-        assert response.status_code == status.HTTP_200_OK
-        assert len(mail.outbox) == 1
-        assert mail.outbox[0].to == [self.user.email]
-
-    def test_account_id_without_issued_token_sends_nothing(self):
-        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
-
-        response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": "not-issued"})
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["message"] == CarbureError.ACTIVATION_LINK_ERROR
-        assert len(mail.outbox) == 0
-
-    def test_unknown_account_id_sends_nothing(self):
-        response = self.client.post(
-            self.request_activation_link_url,
-            {"uidb64": "not-an-account", "token": "not-issued"},
-        )
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["message"] == CarbureError.ACTIVATION_LINK_ERROR
-        assert len(mail.outbox) == 0
-
-    def test_link_of_an_activated_account_reports_already_active(self):
-        token = account_activation_token.make_token(self.user)
-        self.user.is_active = True
-        self.user.save(update_fields=["is_active"])
-        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
-
-        response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": token})
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["message"] == CarbureError.ACCOUNT_ALREADY_ACTIVE
-        assert len(mail.outbox) == 0
-
-    def test_unrelated_token_of_an_activated_account_is_rejected(self):
-        self.user.is_active = True
-        self.user.save(update_fields=["is_active"])
-        uidb64 = urlsafe_base64_encode(force_bytes(self.user.pk))
-
-        response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": "not-issued"})
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["message"] == CarbureError.ACTIVATION_LINK_ERROR
-        assert len(mail.outbox) == 0
-
     def test_responds_with_http_200_on_request_with_unknown_email(self):
         response = self.client.post(self.request_activation_link_url, {"email": "unknown@example.com"})
         assert response.status_code == status.HTTP_200_OK
@@ -141,25 +84,6 @@ class RequestActivationLinkTest(TestCase):
         assert self.user.password == password
         assert account_activation_token.check_token(self.user, previous)
         assert "/auth/activate?" in mail.outbox[0].body
-
-    def test_link_resend_does_not_overwrite_a_password_chosen_in_between(self):
-        invited = User.objects.create_user(email="invited@example.com", password=None, is_active=False)
-        stale = User.objects.get(pk=invited.pk)
-        uidb64 = urlsafe_base64_encode(force_bytes(invited.pk))
-        token = account_activation_token.make_token(invited)
-        invited.set_password("UnePhraseAssezLongue")
-        invited.is_active = True
-        invited.save(update_fields=["password", "is_active"])
-
-        with patch("auth.views.mixins.request_activation_link.user_from_uid", return_value=stale):
-            response = self.client.post(self.request_activation_link_url, {"uidb64": uidb64, "token": token})
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert response.data["message"] == CarbureError.ACTIVATION_LINK_ERROR
-        assert len(mail.outbox) == 0
-        invited.refresh_from_db()
-        assert invited.is_active
-        assert invited.check_password("UnePhraseAssezLongue")
 
     def test_resend_invalidates_previous_link_for_invited_user(self):
         invited = User.objects.create_user(email="invited@example.com", password=None, is_active=False)

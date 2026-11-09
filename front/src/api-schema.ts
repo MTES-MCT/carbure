@@ -7590,15 +7590,13 @@ export interface components {
             username: string;
             password: string;
         };
-        /** @description Resend the activation email from an email address, or from the account id carried by an expired link. */
+        /** @description Resend the activation email for the pending account matching this address. */
         UserResendActivationLinkRequest: {
             /**
              * Courriel
              * Format: email
              */
-            email?: string;
-            uidb64?: string;
-            token?: string;
+            email: string;
         };
         UserRights: {
             readonly name: string;

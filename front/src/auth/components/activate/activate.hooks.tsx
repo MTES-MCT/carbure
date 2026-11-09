@@ -1,12 +1,11 @@
 import { useTranslation } from "react-i18next"
 import { useQuery } from "common/hooks/async"
 import * as api from "../../api"
-import { ActivationScreen, useActivationResend } from "./activation-link"
+import { ActivationScreen, useActivationLink } from "./activation-link"
 
 export function useActivate(): ActivationScreen {
   const { t } = useTranslation()
-  const { uidb64, token, activated, resendResult, resendButton } =
-    useActivationResend()
+  const { uidb64, token, activated, invalidLink } = useActivationLink()
 
   const activate = useQuery(api.activateAccount, {
     key: "activate-account",
@@ -25,19 +24,8 @@ export function useActivate(): ActivationScreen {
     return activated
   }
 
-  if (resendResult) {
-    return resendResult
-  }
-
   if (activate.status === "error") {
-    return {
-      success: false,
-      title: errorTitle,
-      message: t(
-        "Ce lien n'est plus valable : il a expiré ou a déjà été utilisé. Demandez un nouveau lien pour activer votre compte."
-      ),
-      action: resendButton,
-    }
+    return invalidLink
   }
 
   return { success: false, title: errorTitle }

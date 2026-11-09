@@ -15,7 +15,7 @@ import {
   ActivationLayout,
   ActivationScreen,
   apiMessage,
-  useActivationResend,
+  useActivationLink,
 } from "./activation-link"
 
 export const Join = () => {
@@ -25,8 +25,7 @@ export const Join = () => {
 
 function useJoin(): ActivationScreen {
   const { t } = useTranslation()
-  const { uidb64, token, activated, resendResult, resendButton } =
-    useActivationResend()
+  const { uidb64, token, activated, invalidLink } = useActivationLink()
   const [done, setDone] = useState(false)
   const [linkRejected, setLinkRejected] = useState(false)
   const link = useQuery(api.checkActivateProfile, {
@@ -36,22 +35,11 @@ function useJoin(): ActivationScreen {
 
   if (done) return activated
 
-  if (resendResult) return resendResult
-
   if (link.loading) {
     return { success: false, loading: true, title: t("Activez votre compte") }
   }
 
-  if (link.status === "error" || linkRejected) {
-    return {
-      success: false,
-      title: t("Ce lien n'est plus valable"),
-      message: t(
-        "Il a expiré ou a déjà été utilisé. Demandez un nouveau lien pour activer votre compte."
-      ),
-      action: resendButton,
-    }
-  }
+  if (link.status === "error" || linkRejected) return invalidLink
 
   return {
     success: false,

@@ -1,33 +1,7 @@
-from copy import copy
-
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.crypto import constant_time_compare
-from django.utils.http import base36_to_int
 
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
-    def was_issued_for(self, user, token, is_active=None):
-        """True when the token was signed for this user, including after it expired.
-
-        is_active replaces the account's current flag in the signature, so a link
-        issued before activation can still be recognized once the account is active.
-        """
-        if not (user and token):
-            return False
-        try:
-            ts_b36, _ = token.split("-")
-            timestamp = base36_to_int(ts_b36)
-        except ValueError:
-            return False
-
-        # In-memory copy: the signature can be recomputed with another is_active without touching the account.
-        signed_as = user
-        if is_active is not None:
-            signed_as = copy(user)
-            signed_as.is_active = is_active
-        expected = self._make_token_with_timestamp(signed_as, timestamp, self.secret)
-        return constant_time_compare(expected, token)
-
     def _make_hash_value(self, user, timestamp):
         # is_active invalidates the link once the account is activated.
         # password invalidates previously issued links when an invited user's secret is rotated.

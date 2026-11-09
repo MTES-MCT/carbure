@@ -23296,20 +23296,16 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: Resend the activation email from an email address, or from the
-        account id carried by an expired link.
+      description: Resend the activation email for the pending account matching
+        this address.
       properties:
         email:
           type: string
           format: email
           minLength: 1
           title: Courriel
-        uidb64:
-          type: string
-          minLength: 1
-        token:
-          type: string
-          minLength: 1
+      required:
+        - email
     UserRights:
       type: object
       properties:
