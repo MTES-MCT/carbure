@@ -83,8 +83,8 @@ export const Saf = () => {
               replace
               to={
                 entity.isAirline
-                  ? "tickets-received/pending"
-                  : "ticket-sources/available"
+                  ? "../tickets-received/pending"
+                  : "../ticket-sources/available"
               }
             />
           }

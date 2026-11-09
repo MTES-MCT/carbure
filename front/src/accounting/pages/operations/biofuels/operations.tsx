@@ -24,9 +24,11 @@ import { Button } from "common/components/button2"
 import { useLocation, useNavigate } from "react-router-dom"
 import { OperationsExcelImportDialog } from "./pages/operations-excel-import-dialog"
 import { OperationTable } from "./components/operations-table"
+import useEntity from "common/hooks/entity"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const { formatUnit } = useUnit(DEFAULT_UNIT_OPERATION)
   const { selectedEntityId } = useSelectedEntity()
   const navigate = useNavigate()
@@ -65,6 +67,7 @@ const OperationsBiofuels = () => {
           iconId="ri-upload-line"
           asideX
           priority="secondary"
+          disabled={!entity.canWrite()}
         >
           {t("Importer des opérations")}
         </Button>

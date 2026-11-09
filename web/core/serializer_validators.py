@@ -9,7 +9,7 @@ class UniqueInListSerializer(serializers.ListSerializer):
 
     def to_internal_value(self, data):
         attrs = super().to_internal_value(data)
-        errors = [{} for _ in attrs]
+        errors = {}
         message = _("Cette valeur est déjà utilisée ailleurs dans le fichier.")
 
         for name in self.unique_fields:
@@ -22,8 +22,8 @@ class UniqueInListSerializer(serializers.ListSerializer):
             for indexes in seen.values():
                 if len(indexes) > 1:
                     for i in indexes:
-                        errors[i][name] = [message]
+                        errors.setdefault(i, {})[name] = [message]
 
-        if any(errors):
+        if errors:
             raise serializers.ValidationError(errors)
         return attrs

@@ -23,6 +23,7 @@ class DoubleCountingRegistrationSerializer(serializers.ModelSerializer):
             "production_site",
             "valid_until",
             "status",
+            "computed_status",
             "quotas_progression",
         ]
 
@@ -50,6 +51,7 @@ class DoubleCountingRegistrationPublicSerializer(serializers.ModelSerializer):
             "certificate_id",
             "valid_from",
             "valid_until",
+            "status",
             "biofuel_list",
         ]
 
@@ -114,6 +116,7 @@ class DoubleCountingRegistrationDetailsSerializer(serializers.ModelSerializer):
             "valid_from",
             "valid_until",
             "status",
+            "computed_status",
             "producer",
             "production_site",
             "application",

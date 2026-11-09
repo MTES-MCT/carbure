@@ -3125,6 +3125,46 @@ paths:
                 items:
                   $ref: "#/components/schemas/DoubleCountingRegistrationPublic"
           description: ""
+  /api/double-counting/agreements/bulk-update-status/:
+    post:
+      operationId: double_counting_agreements_bulk_update_status_create
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementStatusBulkUpdateResponse"
+          description: ""
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementStatusBulkUpdateErrorResponse"
+          description: ""
   /api/double-counting/agreements/export/:
     get:
       operationId: double_counting_agreements_export_retrieve
@@ -14612,10 +14652,42 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DoubleCountingRegistration"
+        inactive:
+          type: array
+          items:
+            $ref: "#/components/schemas/DoubleCountingRegistration"
       required:
         - active
         - expired
+        - inactive
         - incoming
+    AgreementStatusBulkUpdateErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    AgreementStatusBulkUpdateRequest:
+      type: object
+      properties:
+        agreement_ids:
+          type: array
+          items:
+            type: integer
+          maxItems: 100
+        status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
+      required:
+        - agreement_ids
+        - status
+    AgreementStatusBulkUpdateResponse:
+      type: object
+      properties:
+        updated_count:
+          type: integer
+      required:
+        - updated_count
     Airport:
       type: object
       properties:
@@ -14720,9 +14792,12 @@ components:
           type: integer
         agreements_expired:
           type: integer
+        agreements_inactive:
+          type: integer
       required:
         - agreements_active
         - agreements_expired
+        - agreements_inactive
         - agreements_incoming
         - applications_pending
         - applications_rejected
@@ -17970,6 +18045,8 @@ components:
           type: string
           format: date
         status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
+        computed_status:
           allOf:
             - $ref: "#/components/schemas/DoubleCountingAgreementStatus"
           readOnly: true
@@ -17979,11 +18056,11 @@ components:
           readOnly: true
       required:
         - certificate_id
+        - computed_status
         - id
         - producer
         - production_site
         - quotas_progression
-        - status
         - valid_from
         - valid_until
     DoubleCountingRegistrationDetails:
@@ -18002,6 +18079,8 @@ components:
           type: string
           format: date
         status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
+        computed_status:
           allOf:
             - $ref: "#/components/schemas/DoubleCountingAgreementStatus"
           readOnly: true
@@ -18021,11 +18100,11 @@ components:
       required:
         - application
         - certificate_id
+        - computed_status
         - id
         - producer
         - production_site
         - quotas
-        - status
         - valid_from
         - valid_until
     DoubleCountingRegistrationPublic:
@@ -18044,6 +18123,8 @@ components:
         valid_until:
           type: string
           format: date
+        status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
         biofuel_list:
           type: string
           readOnly: true
@@ -18053,6 +18134,18 @@ components:
         - production_site
         - valid_from
         - valid_until
+    DoubleCountingRegistrationStatusEnum:
+      enum:
+        - VALID
+        - SUSPENDED
+        - WITHDRAWN
+        - TERMINATED
+      type: string
+      description: |-
+        * `VALID` - Valide
+        * `SUSPENDED` - Suspendu
+        * `WITHDRAWN` - Retiré
+        * `TERMINATED` - Interrompu
     DoubleCountingSourcing:
       type: object
       properties:

@@ -1,11 +1,12 @@
 from datetime import datetime
 
 from django.db.models.query_utils import Q
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema, inline_serializer
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from certificates.models import DoubleCountingRegistration
 from certificates.serializers import DoubleCountingRegistrationSerializer
 
 from .utils import add_quotas_to_agreements
@@ -15,9 +16,42 @@ class AgreementListsSerializer(serializers.Serializer):
     active = DoubleCountingRegistrationSerializer(many=True)
     incoming = DoubleCountingRegistrationSerializer(many=True)
     expired = DoubleCountingRegistrationSerializer(many=True)
+    inactive = DoubleCountingRegistrationSerializer(many=True)
+
+
+class AgreementStatusUpdateSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(
+        choices=DoubleCountingRegistration.STATUS_CHOICES,
+    )
 
 
 class AgreementAdminListActionMixin:
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "entity_id",
+                OpenApiTypes.INT,
+                OpenApiParameter.QUERY,
+                description="Entity ID",
+                required=True,
+            ),
+        ],
+        request=AgreementStatusUpdateSerializer,
+        responses=inline_serializer(
+            name="AgreementStatusUpdateResponse",
+            fields={"status": serializers.ChoiceField(choices=DoubleCountingRegistration.STATUS_CHOICES)},
+        ),
+    )
+    @action(methods=["patch"], detail=True, url_path="update-status")
+    def update_status(self, request, *args, **kwargs):
+        serializer = AgreementStatusUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        agreement = self.get_object()
+        agreement.status = serializer.validated_data["status"]
+        agreement.save(update_fields=["status"])
+        return Response({"status": agreement.status})
+
     @extend_schema(
         filters=True,
         parameters=[
@@ -44,10 +78,14 @@ class AgreementAdminListActionMixin:
 
         year = self.request.query_params.get("year", datetime.now().year)
 
-        agreements_active = queryset.filter(Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year))
+        agreements_active = queryset.filter(
+            Q(valid_from__year__lte=year) & Q(valid_until__year__gte=year),
+            status=DoubleCountingRegistration.VALID,
+        )
 
-        agreements_incoming = queryset.filter(Q(valid_from__year__gt=year))
-        agreements_expired = queryset.filter(Q(valid_until__year__lt=year))
+        agreements_incoming = queryset.filter(Q(valid_from__year__gt=year), status=DoubleCountingRegistration.VALID)
+        agreements_expired = queryset.filter(Q(valid_until__year__lt=year), status=DoubleCountingRegistration.VALID)
+        agreements_inactive = queryset.exclude(status=DoubleCountingRegistration.VALID)
 
         active_agreements = DoubleCountingRegistrationSerializer(agreements_active, many=True).data
         active_agreements_with_quotas = add_quotas_to_agreements(year, active_agreements)
@@ -56,5 +94,6 @@ class AgreementAdminListActionMixin:
             "active": active_agreements_with_quotas,
             "incoming": DoubleCountingRegistrationSerializer(agreements_incoming, many=True).data,
             "expired": DoubleCountingRegistrationSerializer(agreements_expired, many=True).data,
+            "inactive": DoubleCountingRegistrationSerializer(agreements_inactive, many=True).data,
         }
         return Response(data)

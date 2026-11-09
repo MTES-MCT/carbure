@@ -18,7 +18,8 @@ admin.site.register(ProductionSiteCertificate, ProductionSiteCertificateAdmin)
 
 @admin.register(DoubleCountingRegistration)
 class DoubleCountingRegistrationAdmin(admin.ModelAdmin):
-    list_display = ("certificate_id", "production_site", "valid_from", "valid_until", "certificate_holder")
+    list_display = ("certificate_id", "production_site", "valid_from", "valid_until", "certificate_holder", "status")
+    list_filter = ("status",)
     search_fields = (
         "certificate_id",
         "certificate_holder",

@@ -139,7 +139,10 @@ const Settings = () => {
           {isBiomethaneProducer && (
             <Route path="biomethane/*" element={<BiomethaneSettingsRoutes />} />
           )}
-          <Route path="*" element={<Navigate replace to={defaultTab} />} />
+          <Route
+            path="*"
+            element={<Navigate replace to={`../${defaultTab}`} />}
+          />
         </Routes>
       </Content>
     </Main>

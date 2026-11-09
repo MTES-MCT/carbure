@@ -12,8 +12,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from carbure.tasks import background_bulk_sanity_checks, background_bulk_scoring
-from core.carburetypes import CarbureSanityCheckErrors
-from core.models import CarbureLot, Entity, GenericError
+from core.models import CarbureLot, Entity
 from transactions.models import Depot, EntitySite
 
 
@@ -108,7 +107,6 @@ class AddDepotActionMixin:
             lots = CarbureLot.objects.filter(carbure_client=entity, carbure_delivery_site=ds)
             background_bulk_scoring(lots)
             background_bulk_sanity_checks(lots)
-            GenericError.objects.filter(lot__in=lots, error=CarbureSanityCheckErrors.DEPOT_NOT_CONFIGURED).delete()
         except Exception:
             traceback.print_exc()
             return Response(

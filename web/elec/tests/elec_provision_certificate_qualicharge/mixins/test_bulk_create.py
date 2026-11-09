@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -89,3 +91,38 @@ class BulkCreateMixinTest(TestCase):
         json_response = response.json()
         self.assertIn("errors", json_response)
         self.assertTrue(len(json_response["errors"]) > 0)
+
+    def test_validation_errors_keep_sparse_indexes_at_every_level(self):
+        data = [deepcopy(self.data[0]), deepcopy(self.data[0])]
+        data[1]["entity"] = "Second CPO"
+        data[1]["siren"] = "invalid"
+        units = data[1]["operational_units"]
+        units.append(deepcopy(units[0]))
+        units[1]["code"] = "FR002"
+        units[1]["from"] = "invalid"
+        stations = units[1]["stations"]
+        stations.append(deepcopy(stations[0]))
+        stations[1]["id"] = "FRXYZP654321"
+        stations[1]["energy"] = "invalid"
+
+        response = self.client.post(self.url, data=data, format="json")
+
+        self.assertEqual(response.status_code, 400)
+        errors = response.json()["errors"]
+        self.assertEqual(len(errors), 3)
+        self.assertTrue(all(error["index"] == "1" for error in errors))
+        self.assertTrue(all(error["entity"] == "Second CPO" for error in errors))
+        by_field = {error["field"]: error for error in errors}
+        self.assertIn("siren", by_field)
+        self.assertEqual(by_field["from"]["unit_code"], "FR002")
+        self.assertEqual(by_field["energy"]["station_id"], "FRXYZP654321")
+        self.assertEqual(ElecProvisionCertificateQualicharge.objects.count(), 0)
+
+    def test_invalid_list_fields_return_validation_errors(self):
+        for field, value in (("operational_units", None), ("operational_units", "invalid")):
+            with self.subTest(value=value):
+                data = deepcopy(self.data)
+                data[0][field] = value
+                response = self.client.post(self.url, data=data, format="json")
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json()["errors"][0]["field"], field)

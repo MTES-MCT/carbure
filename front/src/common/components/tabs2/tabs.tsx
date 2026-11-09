@@ -1,4 +1,5 @@
-import { NavLink, useLocation } from "react-router-dom"
+import { createPath, NavLink, resolvePath, useLocation } from "react-router-dom"
+import { useRouteBase } from "common/hooks/route-base"
 import { layout, Layout } from "../scaffold"
 import { useMatcher } from "./tabs.hooks"
 import { useEffect, useState } from "react"
@@ -37,7 +38,8 @@ export const Tabs = <T extends string>({
   sticky,
   ...props
 }: TabsProps<T>) => {
-  const matcher = useMatcher()
+  const basePath = useRouteBase()
+  const matcher = useMatcher(basePath)
   const location = useLocation()
   const tabs = tabsConfig.filter(Boolean)
   const match = tabs.find((tab) => matcher(tab.path)) ?? tabs[0]!
@@ -89,11 +91,16 @@ export const Tabs = <T extends string>({
           )
         }
 
+        // Keep parent-relative and absolute links under the router's control.
+        const path = /^(\.\.(\/|$)|\/|[a-z][a-z0-9+.-]*:)/i.test(tab.path)
+          ? tab.path
+          : createPath(resolvePath(tab.path, basePath))
+
         return (
           <Text
             is={NavLink}
             componentProps={{
-              to: keepSearch ? `${tab.path}${location.search}` : tab.path,
+              to: keepSearch ? `${path}${location.search}` : path,
             }}
             fontWeight="bold"
             {...props}

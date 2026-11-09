@@ -120,13 +120,23 @@ class ExcelImporterTestCase(TestCase):
         self.assertTrue(result.is_valid())
         self.assertEqual(result, serializer)
 
+    def test_validation_keeps_original_row_numbers_for_sparse_errors(self):
+        data = [dict(row) for row in self.sample_data]
+        data[1]["email"] = "invalid"
+        serializer = MockSerializer(data=data, many=True)
+
+        with self.assertRaises(ExcelValidationError) as context:
+            ExcelImporter.validate_retrieved_data(serializer, {"header_row": 4}, len(data))
+
+        self.assertEqual(len(context.exception.validation_errors), 1)
+        self.assertEqual(context.exception.validation_errors[0]["row"], 7)
+        self.assertIn("email", context.exception.validation_errors[0]["errors"])
+
     def test_validate_retrieved_data_exception_structure(self):
         """Test the structure and attributes of ExcelValidationError exception"""
         mock_serializer = Mock()
         mock_serializer.is_valid.return_value = False
-        mock_serializer.errors = [
-            {"field": ["Sample error message"]},
-        ]
+        mock_serializer.errors = {0: {"field": ["Sample error message"]}}
 
         config = {"header_row": 0}
         nb_rows = 5
@@ -151,13 +161,10 @@ class ExcelImporterTestCase(TestCase):
         """Test that validation only includes rows with errors, filtering out empty error dictionaries"""
         mock_serializer = Mock()
         mock_serializer.is_valid.return_value = False
-        mock_serializer.errors = [
-            {},  # Empty errors - should be filtered out
-            {"name": ["Required field"]},  # Has errors - should be included
-            {},  # Empty errors - should be filtered out
-            {"email": ["Invalid email"]},  # Has errors - should be included
-            {},  # Empty errors - should be filtered out
-        ]
+        mock_serializer.errors = {
+            1: {"name": ["Required field"]},
+            3: {"email": ["Invalid email"]},
+        }
 
         config = {"header_row": 0}
 

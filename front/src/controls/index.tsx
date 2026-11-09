@@ -5,6 +5,7 @@ import { useQuery } from "common/hooks/async"
 import { Main } from "common/components/scaffold"
 import Select from "common/components/select"
 import { useStatus } from "./components/status"
+import { useRouteBase } from "common/hooks/route-base"
 import Lots from "./components/lots"
 
 import pickApi from "./api"
@@ -12,6 +13,7 @@ import Stocks from "./components/stocks"
 import useYears from "common/hooks/years"
 
 export const Controls = () => {
+  const basePath = useRouteBase("/org/:entity/controls/:year/*")
   const { t } = useTranslation()
 
   const entity = useEntity()
@@ -27,7 +29,7 @@ export const Controls = () => {
   })
 
   if (status === "unknown") {
-    return <Navigate replace to="alerts" />
+    return <Navigate replace to={`${basePath}/alerts`} />
   }
 
   const snapshotData = snapshot.result?.data.data
