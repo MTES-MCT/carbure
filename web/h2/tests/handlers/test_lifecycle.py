@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from django.test import SimpleTestCase
 
 from h2.handlers.action import H2ActionHandler
+from h2.handlers.authorization import can_create_consumption, can_create_valorization
 from traceability.lifecycle.checks import can_change_status, can_create
 from traceability.models import Action, ActionStatus
 
@@ -29,10 +30,13 @@ class H2LifecycleTest(SimpleTestCase):
         root = can_create(self.handler, Action.INIT)
         child = can_create(self.handler, Action.VALORIZE, parent=pending_init)
 
-        self.assertEqual(root, (None, (Action.INIT, ActionStatus.PENDING), None))
+        self.assertEqual(root, (None, (Action.INIT, ActionStatus.PENDING), can_create_consumption))
         self.assertIsNone(can_create(self.handler, Action.INIT, parent=pending_init))
         self.assertIsNone(can_create(self.handler, Action.VALORIZE))
-        self.assertEqual(child, ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), None))
+        self.assertEqual(
+            child,
+            ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_valorization),
+        )
         self.assertIsNone(
             can_create(
                 self.handler,
