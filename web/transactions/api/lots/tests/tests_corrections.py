@@ -201,6 +201,7 @@ class LotCorrectionTest(TestCase):
         correction_mock.assert_not_called()
 
         self.approve_fix(lot, self.trader)
+        self.approve_fix(lot, self.trader)
 
         correction_mock.assert_called_once_with([lot.id])
 

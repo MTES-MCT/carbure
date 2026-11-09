@@ -425,6 +425,9 @@ class OperationExcelImportService:
 
         # One transaction from the debt locks to the creation: the validated repayment plan is the one persisted
         with transaction.atomic():
+            if mode == "create":
+                lot_ids = [lot_id for group in groups for lot_id in group.lot_volumes]
+                OperationService.lock_lots_for_update(lot_ids)
             OperationExcelImportService._validate_groups(groups, len(data), declaration_year)
 
             operations = (

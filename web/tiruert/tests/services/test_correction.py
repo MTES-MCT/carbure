@@ -1,4 +1,6 @@
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from tiruert.models import Operation, OperationDetail, TiruertDebt
@@ -145,6 +147,24 @@ class CorrectionServiceVolumeTest(TestCase):
 
         self.assertEqual(list(TiruertDebt.objects.values_list("id", "value")), [(debt.id, 300)])
         self.assertFalse(self.corrections().exists())
+
+    def test_lot_is_locked_before_tiruert_history_is_read(self):
+        """Acquire the lot lock before calculating its TIRUERT correction."""
+        if not connection.features.has_select_for_update:
+            self.skipTest("The database backend does not support SELECT FOR UPDATE")
+
+        lot = self.create_lot()
+
+        with CaptureQueriesContext(connection) as captured_queries:
+            CorrectionService.create_correction_operations_for_lot_volume_update([lot.id])
+
+        queries = [query["sql"].upper() for query in captured_queries]
+        lot_table = CarbureLot._meta.db_table.upper()
+        detail_table = OperationDetail._meta.db_table.upper()
+        lock_index = next(index for index, query in enumerate(queries) if lot_table in query and "FOR UPDATE" in query)
+        history_index = next(index for index, query in enumerate(queries) if detail_table in query)
+
+        self.assertLess(lock_index, history_index)
 
     def test_volume_increase_leaves_existing_debts_untouched(self):
         """Credit the whole increase and keep the open debt unchanged."""

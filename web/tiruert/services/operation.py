@@ -36,6 +36,7 @@ class OperationService:
         """
         entity_id = request.entity.id
         validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
+        OperationService.lock_lots_for_update([lot["id"] for lot in selected_lots])
 
         if validated_data["type"] == Operation.DEBT_REPAYMENT:
             # Planned before the checks: it locks the debts, so everything read afterwards is up to date
@@ -59,6 +60,16 @@ class OperationService:
             )
             for debt, lots in repayments
         ]
+
+    @staticmethod
+    def lock_lots_for_update(lot_ids: list[int]) -> list[int]:
+        """Lock lots in a stable order before checking or correcting their TIRUERT balances."""
+        if not lot_ids:
+            return []
+
+        return list(
+            CarbureLot.objects.select_for_update().filter(id__in=set(lot_ids)).order_by("id").values_list("id", flat=True)
+        )
 
     @staticmethod
     def get_emission_rates_by_lot(lot_ids):
