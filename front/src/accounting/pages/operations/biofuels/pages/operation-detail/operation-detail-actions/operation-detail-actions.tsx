@@ -130,7 +130,10 @@ export const OperationDetailActions = ({
           priority="primary"
           onClick={() =>
             validateDraftTransfer(entity.id, operation.id, {
-              status: OperationsStatus.PENDING,
+              status:
+                operation.type === OperationType.DEBT_REPAYMENT
+                  ? OperationsStatus.VALIDATED
+                  : OperationsStatus.PENDING,
             })
           }
           loading={validateDraftTransferLoading}
