@@ -6,9 +6,10 @@ from django.test import TestCase
 from django.urls import reverse
 
 from core.carburetypes import CarbureError
-from core.models import CarbureLot, Entity
+from core.models import CarbureLot, CarbureNotification, Entity
 from core.tests_utils import setup_current_user
 from transactions.api.lots.tests.tests_utils import get_lot
+from transactions.factories import CarbureLotFactory
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models import YearConfig
 
@@ -114,6 +115,22 @@ class LotCorrectionTest(TestCase):
         lot = CarbureLot.objects.get(id=lot.id)
         assert lot.volume == 42000
 
+    @patch("transactions.services.lots.CorrectionService.create_correction_operations_for_lot_volume_update")
+    def test_direct_volume_update_triggers_tiruert_correction(self, correction_mock):
+        """Correct TIRUERT volume when an accepted lot is directly updated outside a fix workflow."""
+        lot = self.prepare_lot(self.producer, self.producer)
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.correction_status = CarbureLot.NO_PROBLEMO
+        lot.save(update_fields=["lot_status", "correction_status"])
+
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000},
+        )
+
+        assert response.status_code == 200
+        correction_mock.assert_called_once_with([lot.id])
+
     def test_simple_correction(self):
         YearConfig.objects.create(year=2020, locked=True)
 
@@ -186,6 +203,39 @@ class LotCorrectionTest(TestCase):
         self.approve_fix(lot, self.trader)
 
         correction_mock.assert_called_once_with([lot.id])
+
+    @patch("transactions.api.lots.approve_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
+    def test_submit_fix_defers_changed_descendant_until_its_client_approves(self, submit_mock, approve_mock):
+        """Do not apply a descendant's volume correction before its client approves the fix."""
+        lot = self.prepare_lot(self.producer, self.trader)
+        child = CarbureLotFactory.create(
+            lot_status=CarbureLot.ACCEPTED,
+            correction_status=CarbureLot.NO_PROBLEMO,
+            delivery_type=CarbureLot.BLENDING,
+            added_by=self.producer,
+            carbure_supplier=self.producer,
+            carbure_client=self.operator,
+            biofuel=lot.biofuel,
+            feedstock=lot.feedstock,
+            volume=lot.volume,
+            parent_lot=lot,
+        )
+
+        self.request_fix(lot, self.trader)
+        self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": lot.volume + 1000},
+        )
+        self.submit_fix(lot, self.producer)
+
+        submit_mock.assert_not_called()
+        child.refresh_from_db()
+        assert child.volume == lot.volume + 1000
+        assert child.correction_status == CarbureLot.FIXED
+        assert CarbureNotification.objects.filter(dest=self.operator, type=CarbureNotification.CORRECTION_DONE).exists()
+        self.approve_fix(child, self.operator)
+        approve_mock.assert_called_once_with([child.id])
 
     def test_simple_correction_on_locked_year(self):
         lot = self.prepare_lot(self.producer, self.trader)
