@@ -48,7 +48,7 @@ export function useH2LotsPage(): {
     columns.period,
     columns.pos_id,
     { ...columns.site, header: t("Station") },
-    { ...columns.material, header: t("Nature d'H2") },
+    { ...columns.origin_material, header: t("Nature d'H2") },
     columns.mass,
     columns.total_emissions,
   ]
@@ -62,7 +62,7 @@ export function useH2LotsPage(): {
       fixedQuery: H2_LOT_QUERY,
       filters: [
         filters.status,
-        { ...filters.material, label: t("Nature d'H2") },
+        { ...filters.origin_material, label: t("Nature d'H2") },
         filters.period,
         filters.site,
         filters.shipping_method,
@@ -73,7 +73,7 @@ export function useH2LotsPage(): {
           legend: t("Production"),
           fields: [
             fields.certificate,
-            { ...fields.material, label: t("Nature d'hydrogène") },
+            { ...fields.origin_material, label: t("Nature d'hydrogène") },
             fields.pos_id,
           ],
         },

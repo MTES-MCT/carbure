@@ -27,7 +27,7 @@ class ActionSerializer(serializers.ModelSerializer):
     status = serializers.ChoiceField(choices=ActionStatus.STATUSES, read_only=True, allow_null=True)
     holder = EntityPreviewSerializer(read_only=True)
     parent = ActionParentSerializer(read_only=True, required=False, allow_null=True)
-    material = MaterialSerializer(read_only=True)
+    material = MaterialSerializer(read_only=True, allow_null=True)
     site = ActionSiteSerializer(read_only=True)
     certificate = ActionCertificateSerializer(read_only=True, allow_null=True)
 

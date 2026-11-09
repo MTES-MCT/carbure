@@ -41,8 +41,22 @@ export function useActionColumns() {
     material: {
       key: "material",
       header: t("Matière"),
+      cell: (action) => <Cell text={action.material?.name} />,
+    },
+
+    origin_material: {
+      key: "origin_material",
+      header: t("Matière"),
       cell: (action) => (
-        <Cell text={action.inherited_fields.previous_material?.name} />
+        <Cell text={action.inherited_fields?.origin_material?.name} />
+      ),
+    },
+
+    previous_material: {
+      key: "previous_material",
+      header: t("Dernière matière déclarée"),
+      cell: (action) => (
+        <Cell text={action.inherited_fields?.previous_material?.name} />
       ),
     },
 
