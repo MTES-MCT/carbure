@@ -1,3 +1,5 @@
+import os
+import tempfile
 from io import BufferedReader
 
 import xlsxwriter
@@ -101,32 +103,43 @@ def _get_operator_lots(entity_id: int) -> list[dict]:
 
 
 def create_operation_import_template(entity_id: int) -> BufferedReader:
-    location = "/tmp/tiruert_operations_import_template.xlsx"
-    workbook = xlsxwriter.Workbook(location)
+    temporary_file = tempfile.NamedTemporaryFile(prefix="tiruert_operations_import_template_", suffix=".xlsx", delete=False)
+    location = temporary_file.name
+    temporary_file.close()
 
-    header_format = workbook.add_format({"bold": True, "text_wrap": True, "valign": "vcenter"})
-    editable_format = workbook.add_format({"locked": False, "bg_color": "#FFF2CC"})
-    decimal_format = workbook.add_format({"num_format": "0.00"})
-    editable_decimal_format = workbook.add_format({"locked": False, "num_format": "0.00", "bg_color": "#FFF2CC"})
+    try:
+        workbook = xlsxwriter.Workbook(location)
+        try:
+            header_format = workbook.add_format({"bold": True, "text_wrap": True, "valign": "vcenter"})
+            editable_format = workbook.add_format({"locked": False, "bg_color": "#FFF2CC"})
+            decimal_format = workbook.add_format({"num_format": "0.00"})
+            editable_decimal_format = workbook.add_format({"locked": False, "num_format": "0.00", "bg_color": "#FFF2CC"})
 
-    entities = list(get_tiruert_operator_queryset())
-    lots = _get_operator_lots(entity_id)
+            entities = list(get_tiruert_operator_queryset())
+            lots = _get_operator_lots(entity_id)
 
-    _create_main_sheet(
-        workbook,
-        header_format,
-        editable_format,
-        editable_decimal_format,
-        decimal_format,
-        entities,
-        lots,
-    )
-    _create_entities_sheet(workbook, entities)
-    _create_biofuels_sheet(workbook)
-    _create_debts_sheet(workbook, entity_id)
+            _create_main_sheet(
+                workbook,
+                header_format,
+                editable_format,
+                editable_decimal_format,
+                decimal_format,
+                entities,
+                lots,
+            )
+            _create_entities_sheet(workbook, entities)
+            _create_biofuels_sheet(workbook)
+            _create_debts_sheet(workbook, entity_id)
+        finally:
+            workbook.close()
 
-    workbook.close()
-    return open(location, "rb")
+        return open(location, "rb")
+    except Exception:
+        try:
+            os.unlink(location)
+        except OSError:
+            pass
+        raise
 
 
 def _create_main_sheet(

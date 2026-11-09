@@ -137,8 +137,12 @@ class OperationExcelTemplateServiceTest(TestCase):
         )
 
         fh = create_operation_import_template(self.allowed_entity_1.id)
+        fh2 = create_operation_import_template(self.allowed_entity_1.id)
+        self.assertNotEqual(fh.name, fh2.name)
         self.addCleanup(lambda: fh.close())
         self.addCleanup(lambda: os.path.exists(fh.name) and os.remove(fh.name))
+        self.addCleanup(lambda: fh2.close())
+        self.addCleanup(lambda: os.path.exists(fh2.name) and os.remove(fh2.name))
 
         workbook = openpyxl.load_workbook(fh.name)
         main_sheet = workbook[MAIN_SHEET_NAME]
