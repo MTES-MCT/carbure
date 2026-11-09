@@ -35,7 +35,7 @@ export function materialField(key: MaterialFieldKey = "material"): ActionField {
         )
       }
 
-      const value = form.value.inherited_fields?.[key] ?? undefined
+      const value = form.value.inherited_fields?.[key]
 
       return (
         <Autocomplete<ActionMaterial, ActionMaterial>
