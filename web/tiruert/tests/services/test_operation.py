@@ -1328,9 +1328,11 @@ class OperationServiceCreationPipelineTest(TestCase):
     @patch.object(OperationService, "create_operation_with_details")
     @patch.object(OperationService, "get_emission_rates_by_lot")
     @patch.object(OperationService, "perform_checks_before_create")
-    def test_everything_is_checked_before_anything_is_created(self, checks, emission_rates, create):
+    @patch.object(OperationService, "lock_lots_for_update")
+    def test_lots_are_locked_before_checks_and_creation(self, lock_lots, checks, emission_rates, create):
         """The checks, the emission rates and the status come first, then one operation is created."""
         calls = []
+        lock_lots.side_effect = lambda lot_ids: calls.append(("lock_lots", lot_ids))
         checks.side_effect = lambda *args: calls.append("checks")
         emission_rates.side_effect = lambda lot_ids: calls.append("emission_rates") or {1: 9.8}
         create.side_effect = lambda data, details: calls.append("create") or "operation"
@@ -1339,7 +1341,7 @@ class OperationServiceCreationPipelineTest(TestCase):
         operations = OperationService.create_operations(Mock(), data, [{"id": 1, "volume": 10}], 2026)
 
         self.assertEqual(operations, ["operation"])
-        self.assertEqual(calls, ["checks", "emission_rates", "create"])
+        self.assertEqual(calls, [("lock_lots", [1]), "checks", "emission_rates", "create"])
         self.assertEqual(data["renewable_energy_share"], 0.5)
         self.assertEqual(data["status"], Operation.PENDING)
         self.assertNotIn("debt", create.call_args[0][0])
