@@ -1,7 +1,9 @@
 from django.utils.decorators import decorator_from_middleware, method_decorator
 from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from core.filters import FiltersActionFactory
@@ -12,6 +14,7 @@ from traceability.handlers.action import ActionIndustryHandler
 from traceability.middlewares import ActionHandlerMiddleware
 from traceability.models import Action
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
+from traceability.serializers.action_authorization import ActionAuthorizationSerializer
 from traceability.services.delete import delete_action
 from traceability.services.inherited_fields import attach_inherited_fields
 from traceability.services.parent_chain import annotate_parent_chain
@@ -88,6 +91,16 @@ class ActionViewset(
         context["entity"] = getattr(self.request, "entity", None)
         context["handler"] = getattr(self.request, "handler", None)
         return context
+
+    @extend_schema(
+        request=ActionAuthorizationSerializer,
+        responses={201: ActionSerializer, 400: None, 403: None},
+        description="Create an action.",
+    )
+    def create(self, request, *args, **kwargs):
+        serializer = ActionAuthorizationSerializer(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
     def perform_destroy(self, instance):
         try:

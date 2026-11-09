@@ -16,7 +16,7 @@ class ActionIndustryHandler:
     lookups = default_lookups
     excel_columns: list[dict] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
     excel_import_serializer_class = ActionExcelImportSerializer
-    write_actions = ("destroy", "import_actions")
+    write_actions = ("create", "destroy", "import_actions")
     read_permission = HasEntityReadRights
     write_permission = HasEntityWriteRights
     admin_permission = None
