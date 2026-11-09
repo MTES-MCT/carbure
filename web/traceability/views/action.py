@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils.decorators import decorator_from_middleware, method_decorator
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import OpenApiParameter, extend_schema
@@ -13,7 +14,7 @@ from traceability.exceptions import ActionNotDeletableError
 from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.middlewares import ActionHandlerMiddleware
-from traceability.models import Action
+from traceability.models import Action, ActionStatus
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
 from traceability.serializers.action_authorization import ActionAuthorizationSerializer
 from traceability.services.delete import delete_action
@@ -110,7 +111,21 @@ class ActionViewset(
 
         serializer = serializer_class(data=request.data, context=context)
         serializer.is_valid(raise_exception=True)
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        with transaction.atomic():
+            action = serializer.save(
+                type=action_type,
+                holder=authorization.validated_data["holder"],
+                parent=authorization.validated_data.get("parent"),
+                industry=request.handler.industry,
+            )
+            ActionStatus.objects.create(action=action, status=authorization.validated_data["initial_status"])
+
+            action = annotate_parent_chain(Action.objects.filter(pk=action.pk)).get()
+            attach_inherited_fields([action])
+            attach_quantities([action])
+
+            return Response(ActionSerializer(action, context=context).data, status=status.HTTP_201_CREATED)
 
     def perform_destroy(self, instance):
         try:
