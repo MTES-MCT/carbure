@@ -1,18 +1,24 @@
-from django_filters import FilterSet, MultipleChoiceFilter, NumberFilter, OrderingFilter
+from django_filters import MultipleChoiceFilter, NumberFilter, OrderingFilter
 
 from core.filters import MultiValueInFilter
+from traceability.filters.recursive import OriginMaterialFilter, RecursiveFilterSet
 from traceability.models import Action, ActionStatus
 
 
-class ActionFilter(FilterSet):
+class ActionFilter(RecursiveFilterSet):
+    # MultipleChoiceFilter defaults to distinct=True to collapse rows duplicated by
+    # relation joins. These fields are plain Action columns, so the filter never
+    # duplicates rows: DISTINCT only forced the pagination COUNT to deduplicate
+    # every selected column, for the same total.
     year = NumberFilter(field_name="working_date__year")
     period = MultiValueInFilter(field_name="period")
-    type = MultipleChoiceFilter(field_name="type", choices=Action.TYPES)
-    status = MultipleChoiceFilter(field_name="status", choices=ActionStatus.STATUSES)
+    type = MultipleChoiceFilter(field_name="type", choices=Action.TYPES, distinct=False)
+    status = MultipleChoiceFilter(field_name="status", choices=ActionStatus.STATUSES, distinct=False)
     holder = MultiValueInFilter(field_name="holder__name")
     material = MultiValueInFilter(field_name="material__code")
     site = MultiValueInFilter(field_name="site__name")
-    shipping_method = MultipleChoiceFilter(field_name="shipping_method", choices=Action.SHIPPING_METHODS)
+    shipping_method = MultipleChoiceFilter(field_name="shipping_method", choices=Action.SHIPPING_METHODS, distinct=False)
+    origin_material = OriginMaterialFilter()
 
     order_by = OrderingFilter(
         fields=(

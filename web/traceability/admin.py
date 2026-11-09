@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 
 from core.models import StoredFile
-from traceability.exceptions import ConversionError, NoEligibleActionError
+from traceability.exceptions import NoEligibleActionError
 from traceability.models import Action, ActionStatus, Material
 from traceability.services.refuse import refuse
 from traceability.services.valorize import valorize
@@ -58,10 +58,6 @@ def valorize_actions_into_certificates(modeladmin, request, queryset):
         created = valorize(queryset)
     except NoEligibleActionError:
         modeladmin.message_user(request, "Aucune action éligible à valoriser", messages.WARNING)
-        return
-    except ConversionError as exc:
-        pos_ids = ", ".join(action.pos_id for action in exc.actions)
-        modeladmin.message_user(request, f"Conversion impossible vers MJ pour : {pos_ids}", messages.ERROR)
         return
     modeladmin.message_user(request, f"{len(created)} certificat(s) créé(s).")
 

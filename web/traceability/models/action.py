@@ -5,14 +5,11 @@ from django.db.models import CharField, OuterRef, QuerySet, Subquery, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
-from traceability.services.quantities import quantities_db_annotation
-
 from .action_status import ActionStatus
 
 
 class ActionManager(models.Manager):
     def get_queryset(self):
-        first_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("created_at", "id")
         latest_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("-created_at", "-id")
 
         return (
@@ -20,8 +17,6 @@ class ActionManager(models.Manager):
             .get_queryset()
             .select_related("holder", "material", "site", "parent", "certificate")
             .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
-            .annotate(created_at=Subquery(first_status_subquery.values("created_at")[:1]))
-            .annotate(updated_at=Subquery(latest_status_subquery.values("created_at")[:1]))
             .annotate(
                 period=Concat(
                     ExtractYear("working_date"),
@@ -30,7 +25,6 @@ class ActionManager(models.Manager):
                     output_field=CharField(),
                 )
             )
-            .annotate(**quantities_db_annotation())
         )
 
 
@@ -128,3 +122,7 @@ class Action(models.Model):
         verbose_name = "Action"
         verbose_name_plural = "Actions"
         ordering = ["id"]
+        indexes = [
+            # Years and date ordering always filter by industry and type.
+            models.Index(fields=["industry", "type", "working_date"], name="action_industry_type_date"),
+        ]

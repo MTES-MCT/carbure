@@ -41,9 +41,7 @@ export function useH2CertificatesPage(): {
       subpath: "certificates",
       fixedQuery: H2_CERTIFICATE_QUERY,
       emptyState: <EmptyCertificates />,
-      filters: [
-        filters.period, //
-      ],
+      filters: [filters.period, filters.origin_material],
       columns: [
         { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
         columns.period,
@@ -55,7 +53,7 @@ export function useH2CertificatesPage(): {
           legend: t("Certificat"),
           fields: [
             fields.carbure_id,
-            { ...fields.energy, label: t("Quantité certifiée") },
+            { ...fields.quantity, label: t("Quantité certifiée") },
             { ...fields.working_date, label: t("Date de création") },
           ],
         },

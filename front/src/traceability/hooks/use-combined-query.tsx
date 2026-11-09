@@ -6,6 +6,7 @@ const COMBINABLE_FILTERS = [
   ActionFilter.holder,
   ActionFilter.type,
   ActionFilter.material,
+  ActionFilter.origin_material,
   ActionFilter.shipping_method,
   ActionFilter.site,
 ] as const

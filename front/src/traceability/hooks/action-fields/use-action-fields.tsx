@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 
-import { findEnabledEntities, findMaterials, findSites } from "common/api"
+import { findEnabledEntities, findSites } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { FormManager } from "common/components/form2"
 import {
@@ -19,15 +19,13 @@ import { SiteTypeEnum } from "api-schema"
 import {
   Action,
   ActionHolder,
-  ActionMaterial,
   ActionShippingMethod,
   ActionSite,
+  InheritedFieldKey,
 } from "traceability/types"
-import {
-  normalizeActionMaterial,
-  normalizeActionSite,
-} from "traceability/normalizers"
+import { normalizeActionSite } from "traceability/normalizers"
 import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
+import { materialField } from "./material-field"
 import { quantityField } from "./quantity-field"
 import {
   ACTION_EMISSIONS_UNIT,
@@ -47,7 +45,7 @@ export type ActionFieldConfig = {
 }
 
 export type ActionField = {
-  key: keyof Partial<Action>
+  key: keyof Partial<Action> | InheritedFieldKey
   label: string
   field: (config: ActionFieldConfig) => React.ReactNode
   condition?: (entity: EntityManager) => boolean
@@ -94,23 +92,9 @@ export function useActionFields() {
       },
     },
 
-    material: {
-      key: "material",
-      label: t("Matière"),
-      field: ({ form, props }) => {
-        const bound = form.bind("material")
-
-        return (
-          <Autocomplete<ActionMaterial, ActionMaterial>
-            {...props}
-            {...bound}
-            defaultOptions={bound.value ? [bound.value] : undefined}
-            getOptions={findMaterials}
-            normalize={normalizeActionMaterial}
-          />
-        )
-      },
-    },
+    material: materialField(),
+    origin_material: materialField("origin_material"),
+    previous_material: materialField("previous_material"),
 
     quantity: quantityField(),
     mass: quantityField("mass"),

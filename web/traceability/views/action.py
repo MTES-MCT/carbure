@@ -5,7 +5,7 @@ from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveMod
 from rest_framework.viewsets import GenericViewSet
 
 from core.filters import FiltersActionFactory
-from core.pagination import TotalCountPagination
+from core.utils import CustomPageNumberPagination
 from traceability.exceptions import ActionNotDeletableError
 from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
@@ -13,7 +13,9 @@ from traceability.middlewares import ActionHandlerMiddleware
 from traceability.models import Action
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
 from traceability.services.delete import delete_action
-from traceability.services.total_emissions import annotate_total_emissions
+from traceability.services.inherited_fields import attach_inherited_fields
+from traceability.services.parent_chain import annotate_parent_chain
+from traceability.services.quantities import attach_quantities
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
 
@@ -49,7 +51,7 @@ class ActionViewset(
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     filterset_class = ActionFilter
-    pagination_class = TotalCountPagination
+    pagination_class = CustomPageNumberPagination
     search_fields = ["holder__name", "pos_id"]
 
     def get_permissions(self):
@@ -58,20 +60,28 @@ class ActionViewset(
         return handler.get_permissions(self.action)
 
     def get_queryset(self):
-        queryset = self.request.handler.scope_queryset(self.request, self.queryset)
+        return self.request.handler.scope_queryset(self.request, self.queryset)
+
+    def get_object(self):
+        action = super().get_object()
         if self.action == "retrieve":
-            queryset = annotate_total_emissions(queryset.filter(pk=self.kwargs["pk"]))
-        return queryset
+            action = annotate_parent_chain(self.get_queryset().filter(pk=action.pk)).get()
+            attach_inherited_fields([action])
+            attach_quantities([action])
+        return action
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
-        if page is None:
-            return None
-        # Annotate the current page only: the CTE cannot run on a sliced queryset
-        # (MySQL rejects LIMIT in the pk__in subquery). Re-index to keep page order.
+        if not page:
+            return page
+
+        # The walk runs on the page ids. MySQL rejects LIMIT inside the CTE.
+        # origin_material has already reduced this queryset to the matching ids.
         ids = [action.pk for action in page]
-        by_id = {action.pk: action for action in annotate_total_emissions(queryset.filter(pk__in=ids))}
-        return [by_id[action_id] for action_id in ids]
+        annotated = annotate_parent_chain(queryset.filter(pk__in=ids))
+        actions_by_id = {action.pk: action for action in annotated}
+        actions = [actions_by_id[pk] for pk in ids]
+        return attach_quantities(attach_inherited_fields(actions))
 
     def get_serializer_context(self):
         context = super().get_serializer_context()

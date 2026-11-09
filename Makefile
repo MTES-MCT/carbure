@@ -74,7 +74,7 @@ translate-missing:
 
 # Type checking
 generate-and-check-types:
-	$(django_cmd) spectacular --file api-schema.yaml
+	$(django_cmd) spectacular --lang en --file api-schema.yaml
 	$(npm_cmd) run generate-api
 	$(npm_cmd) run check-diff
 	$(npm_cmd) run check-types

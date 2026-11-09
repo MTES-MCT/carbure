@@ -13,7 +13,6 @@ export function quantityColumn(
   key: ActionQuantityKey = "quantity"
 ): ActionColumn {
   return {
-    key,
     header: i18next.t("Quantité"),
     cell: (action) => {
       const { value, unit } = getActionQuantity(action, key)

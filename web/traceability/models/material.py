@@ -27,14 +27,6 @@ class Material(models.Model):
     MATERIAL_UNIT_CHOICE = ((L, "litres"), (KG, "kg"), (MJ, "MJ"))
     unit = models.CharField(verbose_name="Unité", choices=MATERIAL_UNIT_CHOICE, max_length=8)
 
-    VALORIZED_ENERGY_CODE = "VALORIZED-ENERGY"
-    VALORIZED_ENERGY_NAME = "VALORIZED_ENERGY"
-
-    @classmethod
-    def valorized_energy(cls):
-        """Shared MJ material assigned to VALORIZE actions. Created by load_materials."""
-        return cls.objects.get(code=cls.VALORIZED_ENERGY_CODE)
-
     class Meta:
         db_table = "material"
         verbose_name = "Matière"
