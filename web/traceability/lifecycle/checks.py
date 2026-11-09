@@ -1,5 +1,5 @@
 from traceability.handlers.action import ActionIndustryHandler
-from traceability.lifecycle.rules import Creation, Transition
+from traceability.lifecycle.rules import ActionFlowEdge, Transition
 from traceability.models import Action
 
 
@@ -17,19 +17,11 @@ def can_change_status(
     return None
 
 
-def can_create(handler: ActionIndustryHandler, action_type: str, parent: Action | None = None) -> Creation | None:
-    """Return the creation allowed by this handler, or None.
-
-    Without a parent, only a root creation matches.
-    With a parent, its type and current status must match the line's parent and parent_status.
-    """
-    for creation in handler.creations:
-        if creation.action_type != action_type:
-            continue
-        if parent is None:
-            if creation.root:
-                return creation
-            continue
-        if creation.parent == parent.type and creation.parent_status == parent.status:
-            return creation
+def can_create(handler: ActionIndustryHandler, action_type: str, parent: Action | None = None) -> ActionFlowEdge | None:
+    """Return the matching flow edge, without evaluating its authorization rule."""
+    parent_state = (parent.type, parent.status) if parent is not None else None
+    for edge in handler.action_flow:
+        source, (child_type, _), _ = edge
+        if source == parent_state and child_type == action_type:
+            return edge
     return None

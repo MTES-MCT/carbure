@@ -29,12 +29,10 @@ class H2LifecycleTest(SimpleTestCase):
         root = can_create(self.handler, Action.INIT)
         child = can_create(self.handler, Action.VALORIZE, parent=pending_init)
 
-        self.assertEqual(root.action_type, Action.INIT)
-        self.assertEqual(root.status, ActionStatus.PENDING)
+        self.assertEqual(root, (None, (Action.INIT, ActionStatus.PENDING), None))
         self.assertIsNone(can_create(self.handler, Action.INIT, parent=pending_init))
         self.assertIsNone(can_create(self.handler, Action.VALORIZE))
-        self.assertEqual(child.action_type, Action.VALORIZE)
-        self.assertEqual(child.status, ActionStatus.CREATED)
+        self.assertEqual(child, ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), None))
         self.assertIsNone(
             can_create(
                 self.handler,

@@ -51,9 +51,9 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `excel_import_serializer_class` | Validation d’import (surcharge filière) |
 | `read_permission`, `write_permission`, `admin_permission` | Droits pour chaque endpoint |
 | `scope_queryset` | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière |
-| `transitions`, `creations` | Matrices de la filière. Une ligne absente est un droit absent. `valorize` et `refuse` lisent `transitions` |
+| `transitions`, `action_flow` | Transitions de statut et liens de création déclarés par la filière |
 
-`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. `can_create(handler, type, parent=None)` renvoie la `Creation`, ou `None`. Chaque ligne porte le statut de naissance de l’action (`status`, sans valeur par défaut). Sans parent, seule une création `root` convient. Avec parent, son type et son statut courant doivent correspondre à `parent` et `parent_status` de la ligne. Une ligne nomme au plus un parent : plusieurs parents possibles s’écrivent en plusieurs lignes.
+`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. `can_create(handler, type, parent=None)` renvoie le lien correspondant de `action_flow`, ou `None`. Chaque lien contient l'état du parent `(type, statut)`, l'état initial de l'enfant `(type, statut)` et un emplacement pour une règle d'autorisation. Une création racine utilise `None` comme parent. Les règles d'autorisation ne sont pas encore appliquées ; les liens actuels utilisent `None`. Ces déclarations ne sont pas encore utilisées par les services de création ou de changement de statut.
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 

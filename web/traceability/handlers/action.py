@@ -3,7 +3,7 @@ from django.db.models import Q
 import traceability.handlers.lookups as default_lookups
 from core.permissions import HasEntityReadRights, HasEntityWriteRights
 from traceability.handlers.excel import ACTION_EXCEL_COLUMNS, excel_column
-from traceability.lifecycle.rules import Creation, Transition
+from traceability.lifecycle.rules import ActionFlowEdge, Transition
 from traceability.serializers.action import ActionExcelImportSerializer
 
 
@@ -12,7 +12,7 @@ class ActionIndustryHandler:
 
     industry: str | None = None
     transitions: tuple[Transition, ...] = ()
-    creations: tuple[Creation, ...] = ()
+    action_flow: tuple[ActionFlowEdge, ...] = ()
     lookups = default_lookups
     excel_columns: list[dict] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
     excel_import_serializer_class = ActionExcelImportSerializer
