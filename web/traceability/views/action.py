@@ -1,4 +1,5 @@
 from django.utils.decorators import decorator_from_middleware, method_decorator
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -98,7 +99,16 @@ class ActionViewset(
         description="Create an action.",
     )
     def create(self, request, *args, **kwargs):
-        serializer = ActionAuthorizationSerializer(data=request.data, context=self.get_serializer_context())
+        context = self.get_serializer_context()
+        authorization = ActionAuthorizationSerializer(data=request.data, context=context)
+        authorization.is_valid(raise_exception=True)
+
+        action_type = authorization.validated_data["type"]
+        serializer_class = request.handler.get_action_creation_serializers().get(action_type)
+        if serializer_class is None:
+            raise ValidationError({"type": _("Ce type d'action ne peut pas être créé.")})
+
+        serializer = serializer_class(data=request.data, context=context)
         serializer.is_valid(raise_exception=True)
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
