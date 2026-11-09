@@ -88,7 +88,7 @@ export const useOperationDetailFields = (operation?: Operation) => {
       },
       operation.type === OperationType.CORRECTION && lotDetails?.lot
         ? {
-            label: "Lot modifié n°",
+            label: t("Lot modifié n°"),
             value: t("{{id}}", { id: lotDetails.lot }),
             href: lotHref(lotDetails.lot),
           }
