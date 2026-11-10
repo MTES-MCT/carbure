@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import CharField, OuterRef, QuerySet, Subquery, Value
+from django.db.models import CharField, OuterRef, Q, QuerySet, Subquery, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
@@ -125,4 +125,7 @@ class Action(models.Model):
         indexes = [
             # Years and date ordering always filter by industry and type.
             models.Index(fields=["industry", "type", "working_date"], name="action_industry_type_date"),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=Q(quantity__gt=0), name="action_quantity_positive"),
         ]
