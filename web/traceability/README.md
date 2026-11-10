@@ -12,7 +12,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 ## Choix de conception
 
 - **La valorisation recopie la quantité.** `valorize()` crée un enfant `VALORIZE` avec la `quantity` du parent et sans matière. Rien n’est converti ni figé en MJ.
-- **`quantity` et `quantity_available` sont renvoyés tels quels.** `quantity` est la valeur stockée. `quantity_available` vaut `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED` et `REJECTED`. Un enfant sans statut compte. Même unité que `quantity`. Pas de conversion en masse, volume ou énergie.
+- **`quantity` et `quantity_available` sont renvoyés tels quels.** `quantity` est la valeur stockée. `quantity_available` vaut `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED` et `REJECTED`. Un enfant sans statut compte. Même unité que `quantity`. Pas de conversion en masse, volume ou énergie. `quantity_available` est toujours renvoyée : 0 si elle n'a pas été calculée.
 
 ## Modèle
 

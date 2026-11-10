@@ -14325,6 +14325,7 @@ components:
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
+          default: "0.000"
         pos_id:
           type: string
           title: N° de POS
