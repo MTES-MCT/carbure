@@ -1,14 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
-from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema, inline_serializer
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.serializers import CharField
 
 from auth.serializers import ActivateAccountSerializer
-from auth.tokens import account_activation_token, password_reset_token
+from auth.tokens import account_activation_token
 from core.carburetypes import CarbureError
 
 
@@ -16,13 +15,6 @@ class ActivateAccountAction:
     @extend_schema(
         request=ActivateAccountSerializer,
         responses={
-            200: inline_serializer(
-                name="ActivateResponse",
-                fields={
-                    "message": CharField(),
-                    "token": CharField(required=False),
-                },
-            ),
             400: OpenApiResponse(
                 response={"message": CarbureError.ACTIVATION_COULD_NOT_ACTIVATE_USER},
                 description="Bad request - missing fields.",
@@ -33,7 +25,7 @@ class ActivateAccountAction:
                 "Success example",
                 summary="A successful activation",
                 description="The account was successfully activated.",
-                value={"status": "success"},
+                value={},
                 response_only=True,
                 status_codes=["200"],
             ),
@@ -54,12 +46,18 @@ class ActivateAccountAction:
         token = serializer.validated_data.get("token", "")
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
-            user_model = get_user_model()
-            user = user_model.objects.get(pk=uid)
+            user = get_user_model().objects.get(pk=uid)
         except Exception:
             user = None
 
-        if user is None or user.is_active or not account_activation_token.check_token(user, token):
+        # An invited account has no password yet. It is finished by activate-profile,
+        # which collects the name. Activating it here would skip that step.
+        if (
+            user is None
+            or user.is_active
+            or not user.has_usable_password()
+            or not account_activation_token.check_token(user, token)
+        ):
             return Response(
                 {"message": CarbureError.ACTIVATION_COULD_NOT_ACTIVATE_USER},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -67,12 +65,4 @@ class ActivateAccountAction:
 
         user.is_active = True
         user.save(update_fields=["is_active"])
-
-        data = {}
-
-        # Invited users are created without a profile name and must set a password after activation.
-        if not user.name:
-            passtoken = password_reset_token.make_token(user)
-            data = {"token": passtoken}
-
-        return Response(data=data)
+        return Response({})

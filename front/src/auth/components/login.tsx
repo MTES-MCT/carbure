@@ -16,10 +16,13 @@ import {
   ResetPasswordPending,
   ResetPasswordRequest,
 } from "auth/components/password"
+import { usePortal } from "common/components/portal"
+import { ActivateRequest } from "./activate"
 const Login = () => {
   const { t } = useTranslation()
   const notify = useNotify()
   const navigate = useNavigate()
+  const portal = usePortal()
 
   const { value, bind, setField } = useForm({
     username: "" as string | undefined,
@@ -58,6 +61,9 @@ const Login = () => {
       notify(errorMessage, { variant: "danger" })
     },
   })
+
+  const openActivateRequestDialog = () =>
+    portal((close) => <ActivateRequest onClose={close} />)
 
   return (
     <Container>
@@ -106,7 +112,7 @@ const Login = () => {
           </Button> */}
           <Button
             customPriority="link"
-            linkProps={{ to: ROUTE_URLS.AUTH.ACTIVATE_REQUEST }}
+            onClick={openActivateRequestDialog}
             center
           >
             {t("Cliquez ici pour activer votre compte.")}

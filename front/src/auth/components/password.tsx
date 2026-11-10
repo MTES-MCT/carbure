@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"
 import * as api from "../api"
-import { useToken } from "./activate"
+import { usePasswordToken } from "./activate"
 import { Form, useForm } from "common/components/form2"
 import {
   Container,
@@ -115,7 +115,7 @@ export const ResetPassword = () => {
     repeatNewPassword: "" as string | undefined,
   })
 
-  const { uidb64, token } = useToken()
+  const { uidb64, token } = usePasswordToken()
 
   const resetPassword = useMutation(api.resetPassword, {
     onSuccess: () => {

@@ -1,68 +1,55 @@
-from os import environ
+import logging
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.template import loader
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-from drf_spectacular.utils import OpenApiExample, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from auth.serializers import UserResendActivationLinkSerializer
-from auth.tokens import account_activation_token
-from core.helpers import send_mail
+from auth.views.mixins.mail_helper import send_account_activation_email
+
+logger = logging.getLogger(__name__)
 
 
-def email_from(data):
+def user_from_email(data):
     serializer = UserResendActivationLinkSerializer(data=data)
     serializer.is_valid(raise_exception=True)
-    return serializer.validated_data.get("email", "")
-
-
-def retrieve_user(data):
-    usermodel = get_user_model()
-    email = email_from(data)
-    return usermodel.objects.get(email__iexact=email)
-
-
-def send_notification_mail(user, request):
-    email_subject = "Carbure - Activation de compte"
-    email_context = {
-        "user": user,
-        "domain": environ.get("BASE_URL"),
-        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-        "token": account_activation_token.make_token(user),
-    }
-    html_message = loader.render_to_string("emails/account_activation_email.html", email_context)
-    text_message = loader.render_to_string("emails/account_activation_email.txt", email_context)
-    send_mail(
-        request=request,
-        subject=email_subject,
-        message=text_message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        html_message=html_message,
-        recipient_list=[user.email],
-    )
+    return get_user_model().objects.get(email__iexact=serializer.validated_data["email"])
 
 
 class UserResendActivationLinkAction:
     @extend_schema(
         request=UserResendActivationLinkSerializer,
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                response=inline_serializer(
+                    name="RequestActivationLinkSuccess",
+                    fields={"status": serializers.CharField(default="success")},
+                ),
+                description="The request was accepted. A mail is sent only when a pending account matches the address.",
+            ),
+        },
         examples=[
             OpenApiExample(
                 "Example response.",
                 value={"status": "success"},
-                request_only=False,
                 response_only=True,
+                status_codes=["200"],
             ),
         ],
     )
     @action(detail=False, methods=["post"], url_path="request-activation-link", throttle_scope="auth-anon")
     def request_activation_link(self, request):
         try:
-            user = retrieve_user(request.data)
-            send_notification_mail(user, request)
-            return Response({"status": "success"})
+            user = user_from_email(request.data)
+            # Only a pending account gets a new mail. An active one, an unknown address
+            # and a send failure all look the same, so the form cannot be used to probe accounts.
+            if not user.is_active:
+                send_account_activation_email(user, request)
+        except (get_user_model().DoesNotExist, ValidationError):
+            pass
         except Exception:
-            return Response({"status": "success"})  # Do not expose user existence to avoid enumeration attacks
+            logger.exception("Could not resend the activation link")
+        return Response({"status": "success"})

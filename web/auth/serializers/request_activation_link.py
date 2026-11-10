@@ -3,9 +3,7 @@ from rest_framework import serializers
 
 
 class UserResendActivationLinkSerializer(serializers.Serializer):
-    """
-    A serializer for re-sending the user activation email. Includes email field only.
-    """
+    """Resend the activation email for the pending account matching this address."""
 
     email = serializers.EmailField(label=_("Email"))
 

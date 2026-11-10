@@ -1,7 +1,7 @@
-from django.contrib.auth import password_validation
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+
+from auth.serializers.credentials import validate_password_confirmation
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -11,12 +11,5 @@ class ResetPasswordSerializer(serializers.Serializer):
     password2 = serializers.CharField(label=_("Password confirmation"), write_only=True)
 
     def validate(self, data):
-        if data["password1"] != data["password2"]:
-            raise serializers.ValidationError({"password2": _("The two password fields didn't match.")})
-
-        try:
-            password_validation.validate_password(data["password2"], self.instance)
-        except ValidationError as e:
-            raise serializers.ValidationError({"password2": e.messages})
-
+        validate_password_confirmation(data["password1"], data["password2"], self.instance)
         return data

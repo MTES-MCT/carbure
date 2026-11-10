@@ -8,6 +8,9 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from auth.tokens import account_activation_token
+from core.models import Entity, UserRights
+
 User = get_user_model()
 
 
@@ -61,3 +64,68 @@ class RequestActivationLinkTest(TestCase):
         response = self.client.post(self.request_activation_link_url, {"email": "unknown@example.com"})
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"status": "success"}
+
+    def test_does_not_send_when_account_is_already_active(self):
+        self.user.is_active = True
+        self.user.save(update_fields=["is_active"])
+
+        response = self.client.post(self.request_activation_link_url, {"email": self.user.email})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(mail.outbox) == 0
+
+    def test_resend_keeps_password_and_previous_link_for_registered_user(self):
+        previous = account_activation_token.make_token(self.user)
+        password = self.user.password
+
+        self.client.post(self.request_activation_link_url, {"email": self.user.email})
+
+        self.user.refresh_from_db()
+        assert self.user.password == password
+        assert account_activation_token.check_token(self.user, previous)
+        assert "/auth/activate?" in mail.outbox[0].body
+
+    def test_resend_invalidates_previous_link_for_invited_user(self):
+        invited = User.objects.create_user(email="invited@example.com", password=None, is_active=False)
+        Entity.objects.create(name="Entité invitante")
+        UserRights.objects.create(
+            user=invited,
+            entity=Entity.objects.get(name="Entité invitante"),
+            role=UserRights.RO,
+        )
+        previous = account_activation_token.make_token(invited)
+
+        response = self.client.post(self.request_activation_link_url, {"email": invited.email})
+
+        assert response.status_code == status.HTTP_200_OK
+        invited.refresh_from_db()
+        assert not invited.has_usable_password()
+        assert not account_activation_token.check_token(invited, previous)
+        body = mail.outbox[0].body
+        assert "/auth/join?" in body
+        assert "Entité invitante" in body
+        token = re.search(r"token=([^&\s]+)", body).group(1)
+        assert account_activation_token.check_token(invited, token)
+
+    def test_failed_send_keeps_the_previous_invitation_link(self):
+        invited = User.objects.create_user(email="invited@example.com", password=None, is_active=False)
+        Entity.objects.create(name="Entité invitante")
+        UserRights.objects.create(
+            user=invited,
+            entity=Entity.objects.get(name="Entité invitante"),
+            role=UserRights.RO,
+        )
+        previous = account_activation_token.make_token(invited)
+
+        with (
+            patch("auth.views.mixins.mail_helper.send_mail", side_effect=OSError("smtp down")),
+            self.assertLogs("auth.views.mixins.request_activation_link", level="ERROR") as logged,
+        ):
+            response = self.client.post(self.request_activation_link_url, {"email": invited.email})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == {"status": "success"}
+        invited.refresh_from_db()
+        assert account_activation_token.check_token(invited, previous)
+        assert len(mail.outbox) == 0
+        assert any("Could not resend the activation link" in line for line in logged.output)
