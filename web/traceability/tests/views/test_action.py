@@ -148,7 +148,7 @@ class ActionViewsetQuerysetTest(TestCase):
             seen_pks.extend(queryset.values_list("pk", flat=True))
             return annotate_parent_chain(queryset, **kwargs)
 
-        with patch("traceability.views.action.annotate_parent_chain", side_effect=capture):
+        with patch("traceability.services.parent_chain.annotate_parent_chain", side_effect=capture):
             response = self.client.get(
                 reverse("traceability-action-detail", args=[self.own_action.id]),
                 self.base_params,
@@ -164,7 +164,7 @@ class ActionViewsetQuerysetTest(TestCase):
             seen.append(list(queryset.values_list("pk", flat=True)))
             return annotate_parent_chain(queryset, **kwargs)
 
-        with patch("traceability.views.action.annotate_parent_chain", side_effect=capture):
+        with patch("traceability.services.parent_chain.annotate_parent_chain", side_effect=capture):
             response = self.client.get(self.list_url, self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

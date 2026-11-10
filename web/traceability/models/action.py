@@ -27,6 +27,28 @@ class ActionManager(models.Manager):
             )
         )
 
+    def annotate_actions(self, actions: list["Action"], queryset: QuerySet["Action"]) -> list["Action"]:
+        """Annotate these actions and return them in the same order.
+
+        The parent walk covers inherited fields and total emissions, and it runs
+        only on the given rows. Callers paginate first: MySQL rejects LIMIT inside
+        that walk. ``quantity_available`` is attached afterwards, in the same unit
+        as ``quantity``.
+        """
+        if not actions:
+            return actions
+
+        from traceability.services.inherited_fields import attach_inherited_fields
+        from traceability.services.parent_chain import annotate_parent_chain
+        from traceability.services.quantities import attach_quantity_available
+
+        ids = [action.pk for action in actions]
+        annotated = {action.pk: action for action in annotate_parent_chain(queryset.filter(pk__in=ids))}
+        ordered = [annotated[pk] for pk in ids]
+        attach_inherited_fields(ordered)
+        attach_quantity_available(ordered)
+        return ordered
+
 
 class Action(models.Model):
     pos_id = models.CharField(

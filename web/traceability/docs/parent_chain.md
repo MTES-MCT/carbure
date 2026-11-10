@@ -43,7 +43,7 @@ Pour une action, la requête produit une ligne par cran. On garde celle dont le 
 | `GET /filters/?filter=origin_material` | `chain_column` sur le queryset déjà filtré par les autres paramètres. Une ligne par action, puis les libellés sont dédoublonnés. Tant que `origin_material` est dans l'URL, les options d'un autre filtre rejouent aussi cette remontée. |
 | `/years/` | Pas de parcours. |
 
-La vue appelle `annotate_parent_chain`. `annotate_total_emissions` et `annotate_inherited_fields` ne demandent qu'un groupe. Ce ne sont pas le chemin de la liste.
+La liste et le détail appellent `Action.objects.annotate_actions`. Elle lance `annotate_parent_chain` sur les lignes demandées, charge les matières héritées, puis pose `quantity_available`. `annotate_total_emissions` et `annotate_inherited_fields` ne demandent qu'un groupe. Ce ne sont pas le chemin de la liste.
 
 Ne pas poser cette annotation sur `Action.objects`. La CTE lit `Action.unannotated`. Un manager déjà annoté s'imbriquerait dans la récursion.
 
