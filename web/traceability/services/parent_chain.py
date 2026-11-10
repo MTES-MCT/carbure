@@ -28,10 +28,10 @@ def _names(groups: Iterable[str]) -> list[str]:
 
 def _chain_cte(queryset: QuerySet[Action], groups: Iterable[str]) -> CTE:
     actions = _plain_actions()
-    # Mysql refuse les sous-requetes et order by dans une requete récursive
-    # Ici "queryset" a la sous-requete status + l'order by par défaut définit sur la table
-    # Donc on réinitialise l'order by et on ne prend que les ids
-    listed = actions.filter(pk__in=queryset.order_by().values("pk"))
+    # MySQL rejects ORDER BY and subqueries inside the recursive query.
+    # The manager filters quantity_available with a status subquery, so the
+    # caller's WHERE cannot be pasted in. Evaluate the ids first.
+    listed = actions.filter(pk__in=list(queryset.order_by().values_list("pk", flat=True)))
     parts = [COLUMN_GROUPS[name] for name in _names(groups)]
 
     def columns(cte=None):

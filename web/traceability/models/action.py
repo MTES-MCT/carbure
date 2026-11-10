@@ -1,22 +1,22 @@
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import CharField, OuterRef, Q, QuerySet, Subquery, Value
+from django.db.models import CharField, Q, QuerySet, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
-from .action_status import ActionStatus
+from traceability.services.quantities import quantity_available
+
+from .action_status import ActionStatus, latest_status
 
 
 class ActionManager(models.Manager):
     def get_queryset(self):
-        latest_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("-created_at", "-id")
-
         return (
             super()
             .get_queryset()
             .select_related("holder", "material", "site", "parent", "certificate")
-            .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
+            .annotate(status=latest_status())
             .annotate(
                 period=Concat(
                     ExtractYear("working_date"),
@@ -25,6 +25,8 @@ class ActionManager(models.Manager):
                     output_field=CharField(),
                 )
             )
+            .annotate(quantity_available=quantity_available())
+            .filter(quantity_available__gt=0)
         )
 
     def annotate_actions(self, actions: list["Action"], queryset: QuerySet["Action"]) -> list["Action"]:
@@ -32,21 +34,18 @@ class ActionManager(models.Manager):
 
         The parent walk covers inherited fields and total emissions, and it runs
         only on the given rows. Callers paginate first: MySQL rejects LIMIT inside
-        that walk. ``quantity_available`` is attached afterwards, in the same unit
-        as ``quantity``.
+        that walk. ``quantity_available`` is already on the manager queryset.
         """
         if not actions:
             return actions
 
         from traceability.services.inherited_fields import attach_inherited_fields
         from traceability.services.parent_chain import annotate_parent_chain
-        from traceability.services.quantities import attach_quantity_available
 
         ids = [action.pk for action in actions]
         annotated = {action.pk: action for action in annotate_parent_chain(queryset.filter(pk__in=ids))}
         ordered = [annotated[pk] for pk in ids]
         attach_inherited_fields(ordered)
-        attach_quantity_available(ordered)
         return ordered
 
 

@@ -1,30 +1,33 @@
-from django.db.models import Q, Sum
+from decimal import Decimal
 
-from traceability.models.action import Action
-from traceability.models.action_status import ActionStatus
+from django.db.models import DecimalField, ExpressionWrapper, F, OuterRef, Subquery, Sum, Value
+from django.db.models.functions import Coalesce
 
-# A rejected or deleted child does not consume its parent. A missing status still does.
+from traceability.models.action_status import ActionStatus, latest_status
+
+# A rejected or deleted child does not consume its parent.
 _EXCLUDED_CHILD_STATUSES = (ActionStatus.DELETED, ActionStatus.REJECTED)
+_QUANTITY = DecimalField(max_digits=16, decimal_places=3)
 
 
-def attach_quantity_available(actions: list) -> list:
-    """Set quantity_available from the action's own quantity and its direct children.
+def quantity_available():
+    """quantity minus the sum of direct children.
 
-    quantity_available = quantity - sum of direct children's quantities.
-    Children whose current status is DELETED or REJECTED are left out.
-    The value stays in the same unit as quantity. Only the given actions are
-    aggregated, so pass the page or the detail row, not the whole table.
+    Children whose latest status is DELETED or REJECTED are left out.
+    Grandchildren do not. No consuming child leaves the stored quantity.
     """
-    if not actions:
-        return actions
+    from traceability.models.action import Action
 
-    consumed_rows = (
-        Action.objects.filter(parent_id__in=[action.pk for action in actions])
-        .filter(Q(status__isnull=True) | ~Q(status__in=_EXCLUDED_CHILD_STATUSES))
+    consumed = (
+        Action.unannotated.filter(parent_id=OuterRef("pk"))
+        .annotate(status=latest_status())
+        .exclude(status__in=_EXCLUDED_CHILD_STATUSES)
+        .order_by()
         .values("parent_id")
-        .annotate(consumed=Sum("quantity"))
+        .annotate(total=Sum("quantity"))
+        .values("total")
     )
-    consumed_by_parent = {row["parent_id"]: row["consumed"] for row in consumed_rows}
-    for action in actions:
-        action.quantity_available = action.quantity - consumed_by_parent.get(action.pk, 0)
-    return actions
+    return ExpressionWrapper(
+        F("quantity") - Coalesce(Subquery(consumed, output_field=_QUANTITY), Value(Decimal("0")), output_field=_QUANTITY),
+        output_field=_QUANTITY,
+    )

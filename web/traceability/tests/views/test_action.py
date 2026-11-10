@@ -25,12 +25,13 @@ class ActionViewsetQuerysetTest(TestCase):
         self.list_url = reverse("traceability-action-list")
         self.base_params = {"entity_id": self.entity.id, "industry": Action.H2}
 
-        self.own_action = ActionFactory.create(holder=self.entity, industry=Action.H2)
+        self.own_action = ActionFactory.create(holder=self.entity, industry=Action.H2, quantity=Decimal("1000000.000"))
         self.other_holder_action = ActionFactory.create(holder=self.other_entity, industry=Action.H2)
         self.child_of_own_action = ActionFactory.create(
             holder=self.other_entity,
             industry=Action.H2,
             parent=self.own_action,
+            quantity=Decimal("1.000"),
         )
         self.other_industry_action = ActionFactory.create(holder=self.entity, industry="BIOMASS")
 
