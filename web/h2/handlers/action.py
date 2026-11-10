@@ -14,7 +14,7 @@ class H2ActionHandler(ActionIndustryHandler):
         Transition(Action.INIT, ActionStatus.PENDING, ActionStatus.ACCEPTED),
         Transition(Action.INIT, ActionStatus.PENDING, ActionStatus.REJECTED),
     )
-    action_flow = (
+    action_creation_flow = (
         (None, (Action.INIT, ActionStatus.PENDING), can_create_consumption),
         ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_valorization),
     )

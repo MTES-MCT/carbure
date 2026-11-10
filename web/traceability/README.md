@@ -2,13 +2,13 @@
 
 Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : elle branche un **handler**.
 
-| Doc | Sujet |
-|---|---|
-| [`docs/parent_chain.md`](docs/parent_chain.md) | Parcours récursif, filtres, ajout d'une colonne |
-| [`docs/inherited_fields.md`](docs/inherited_fields.md) | Règles des champs hérités |
-| [`docs/total_emissions.md`](docs/total_emissions.md) | Formule du cumul GES |
-| [`docs/excel.md`](docs/excel.md) | Colonnes et import Excel |
-| [`docs/action_creation.md`](docs/action_creation.md) | Flow, autorisation et validation de création |
+| Doc                                                    | Sujet                                           |
+| ------------------------------------------------------ | ----------------------------------------------- |
+| [`docs/parent_chain.md`](docs/parent_chain.md)         | Parcours récursif, filtres, ajout d'une colonne |
+| [`docs/inherited_fields.md`](docs/inherited_fields.md) | Règles des champs hérités                       |
+| [`docs/total_emissions.md`](docs/total_emissions.md)   | Formule du cumul GES                            |
+| [`docs/excel.md`](docs/excel.md)                       | Colonnes et import Excel                        |
+| [`docs/action_creation.md`](docs/action_creation.md)   | Flow, autorisation et validation de création    |
 
 ## Choix de conception
 
@@ -23,11 +23,11 @@ energy = mass × lhv
 
 ## Modèle
 
-| Concept | Rôle |
-|---|---|
-| `Action` | POS, détenteur, matière, quantité, site, logistique, GES. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
-| `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset |
-| `Material` | Catalogue (`code`, `name`, `unit`, `lhv`, `density`). L’unité native de `quantity` vit ici. Facteurs optionnels, ou strictement > 0 |
+| Concept        | Rôle                                                                                                                                                            |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Action`       | POS, détenteur, matière, quantité, site, logistique, GES. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
+| `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset                                                                  |
+| `Material`     | Catalogue (`code`, `name`, `unit`, `lhv`, `density`). L’unité native de `quantity` vit ici. Facteurs optionnels, ou strictement > 0                             |
 
 Import des matières :
 
@@ -45,17 +45,17 @@ Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action 
 
 Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`handlers/registry.py`).
 
-| Surcharge | Effet |
-|---|---|
-| `lookups` | Listes de choix `material` / `site` / `certificate` (API, Excel, validation) |
-| `excel_columns` | Colonnes du template et mapping à l’import — voir [`docs/excel.md`](docs/excel.md) |
-| `excel_import_serializer_class` | Validation d’import (surcharge filière) |
-| `action_creation_serializers` | Serializers de création associés aux types d'action ; ceux de la filière complètent ou remplacent les valeurs par défaut |
-| `read_permission`, `write_permission`, `admin_permission` | Droits pour chaque endpoint |
-| `scope_queryset` | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière |
-| `transitions`, `action_flow` | Transitions de statut et liens de création déclarés par la filière |
+| Surcharge                                                 | Effet                                                                                                                    |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `lookups`                                                 | Listes de choix `material` / `site` / `certificate` (API, Excel, validation)                                             |
+| `excel_columns`                                           | Colonnes du template et mapping à l’import — voir [`docs/excel.md`](docs/excel.md)                                       |
+| `excel_import_serializer_class`                           | Validation d’import (surcharge filière)                                                                                  |
+| `action_creation_serializers`                             | Serializers de création associés aux types d'action ; ceux de la filière complètent ou remplacent les valeurs par défaut |
+| `read_permission`, `write_permission`, `admin_permission` | Droits pour chaque endpoint                                                                                              |
+| `scope_queryset`                                          | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière            |
+| `transitions`, `action_creation_flow`                     | Transitions de statut et liens de création déclarés par la filière                                                       |
 
-`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. Le `POST` de création utilise `action_flow` pour vérifier l'autorisation et définir le statut initial ; voir [`docs/action_creation.md`](docs/action_creation.md). Les transitions ne sont pas encore utilisées par les services de changement de statut.
+`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. Le `POST` de création utilise `action_creation_flow` pour vérifier l'autorisation et définir le statut initial ; voir [`docs/action_creation.md`](docs/action_creation.md). Les transitions ne sont pas encore utilisées par les services de changement de statut.
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 

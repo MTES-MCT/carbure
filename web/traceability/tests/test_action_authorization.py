@@ -60,7 +60,9 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_rejects_edge_without_authorization_rule(self):
-        handler = SimpleNamespace(industry=Action.H2, action_flow=((None, (Action.INIT, ActionStatus.PENDING), None),))
+        handler = SimpleNamespace(
+            industry=Action.H2, action_creation_flow=((None, (Action.INIT, ActionStatus.PENDING), None),)
+        )
         serializer = self.validate_action({"type": Action.INIT, "holder": 1}, handler=handler)
 
         self.assertFalse(serializer.is_valid())

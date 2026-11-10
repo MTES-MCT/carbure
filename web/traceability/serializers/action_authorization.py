@@ -13,7 +13,7 @@ class ActionAuthorizationSerializer(serializers.Serializer):
     @staticmethod
     def find_edge(handler, action_type, parent=None):
         parent_state = (parent.type, parent.status) if parent is not None else None
-        for edge in handler.action_flow:
+        for edge in handler.action_creation_flow:
             source, (child_type, _status), _authorize = edge
             if source == parent_state and child_type == action_type:
                 return edge

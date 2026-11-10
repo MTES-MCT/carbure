@@ -1,10 +1,10 @@
 # Création des actions : flow, autorisation et validation
 
-Chaque filière déclare les créations possibles dans son handler. Un lien de `action_flow` contient l'état du parent, l'état initial de l'enfant et la fonction qui autorise l'opération :
+Chaque filière déclare les créations possibles dans son handler. Un lien de `action_creation_flow` contient l'état du parent, l'état initial de l'enfant et la fonction qui autorise l'opération :
 
 ```python
 class H2ActionHandler(ActionIndustryHandler):
-    action_flow = (
+    action_creation_flow = (
         (None, (Action.INIT, ActionStatus.PENDING), can_create_consumption),
         ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_valorization),
     )

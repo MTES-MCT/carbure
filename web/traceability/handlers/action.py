@@ -14,7 +14,7 @@ class ActionIndustryHandler:
 
     industry: str | None = None
     transitions: tuple[Transition, ...] = ()
-    action_flow: tuple[ActionFlowEdge, ...] = ()
+    action_creation_flow: tuple[ActionFlowEdge, ...] = ()
     action_creation_serializers = {Action.INIT: ConsumptionSerializer}
     lookups = default_lookups
     excel_columns: list[dict] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
