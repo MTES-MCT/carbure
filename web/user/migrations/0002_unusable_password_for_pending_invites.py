@@ -10,7 +10,9 @@ def set_unusable_password_on_pending_invites(apps, schema_editor):
     password, which is what activation and link resend rely on.
     """
     User = apps.get_model("authtools", "User")
-    pending_invites = User.objects.filter(is_active=False).filter(Q(name="") | Q(name__isnull=True))
+    pending_invites = (
+        User.objects.filter(is_active=False).filter(Q(name="") | Q(name__isnull=True)).filter(last_login__isnull=True)
+    )
     for user in pending_invites.iterator():
         user.password = make_password(None)
         user.save(update_fields=["password"])
