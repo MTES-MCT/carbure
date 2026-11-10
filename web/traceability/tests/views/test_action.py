@@ -72,9 +72,6 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertIn("total_emissions", by_id[self.own_action.id])
         self.assertIn("total", by_id[self.own_action.id]["total_emissions"])
         self.assertEqual(by_id[self.own_action.id]["status"], "PENDING")
-        self.assertIn("mass", by_id[self.own_action.id])
-        self.assertIn("volume", by_id[self.own_action.id])
-        self.assertIn("energy", by_id[self.own_action.id])
 
     def test_list_and_retrieve_expose_quantity_available(self):
         self.own_action.quantity = Decimal("100.000")

@@ -11,16 +11,8 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 ## Choix de conception
 
-- **Les facteurs vivent sur la matière.** `lhv` (MJ/kg) et `density` (kg/l) sont lus sur `Material` à chaque calcul. Un changement de PCI au catalogue s’applique aux actions déjà créées. À l’import Excel, une matière sans `lhv` **et** sans `density` lève une erreur interne (oubli catalogue, pas une erreur de cellule).
 - **La valorisation recopie la quantité.** `valorize()` crée un enfant `VALORIZE` avec la `quantity` du parent et sans matière. Rien n’est converti ni figé en MJ.
-- **Le reste est calculé, pas persisté.** À la lecture (liste paginée et détail), `mass` / `volume` / `energy` sont calculés en Python depuis la matière stockée, ou `previous_material` si l'action n'en a pas. Un facteur manquant laisse la valeur vide :
-
-```
-mass   = volume × density
-energy = mass × lhv
-```
-
-- **`quantity_available`.** `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED` et `REJECTED`. Un enfant sans statut compte. Même unité que `quantity`.
+- **`quantity` et `quantity_available` sont renvoyés tels quels.** `quantity` est la valeur stockée. `quantity_available` vaut `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED` et `REJECTED`. Un enfant sans statut compte. Même unité que `quantity`. Pas de conversion en masse, volume ou énergie.
 
 ## Modèle
 

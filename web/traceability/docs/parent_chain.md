@@ -4,7 +4,7 @@ Code : `services/parent_chain.py`. Groupes de colonnes : `services/column_groups
 
 Chaque action a un `parent`. La chaîne part de l'action et monte jusqu'à la racine, celle dont le parent est vide. La profondeur n'est pas connue à l'avance. Un `JOIN` ordinaire ne joint qu'un nombre fixe de niveaux. La requête récursive part des actions demandées, puis répète « prendre le parent » jusqu'à ce qu'il n'y en ait plus.
 
-Le résultat n'est pas stocké. `mass`, `volume` et `energy` sont calculés ensuite en Python. Les champs renvoyés : [`inherited_fields.md`](inherited_fields.md). La formule GES : [`total_emissions.md`](total_emissions.md).
+Le résultat n'est pas stocké. Les champs renvoyés : [`inherited_fields.md`](inherited_fields.md). La formule GES : [`total_emissions.md`](total_emissions.md).
 
 ## Un seul `WITH`, plusieurs groupes de colonnes
 

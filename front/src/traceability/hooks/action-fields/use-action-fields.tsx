@@ -26,7 +26,6 @@ import {
 import { normalizeActionSite } from "traceability/normalizers"
 import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
 import { materialField } from "./material-field"
-import { quantityField } from "./quantity-field"
 import {
   ACTION_EMISSIONS_UNIT,
   formatUnitActionDecimal,
@@ -96,10 +95,25 @@ export function useActionFields() {
     origin_material: materialField("origin_material"),
     previous_material: materialField("previous_material"),
 
-    quantity: quantityField(),
-    mass: quantityField("mass"),
-    volume: quantityField("volume"),
-    energy: quantityField("energy"),
+    quantity: {
+      key: "quantity",
+      label: t("Quantité"),
+      field: ({ form, props }) => {
+        const unit =
+          form.value.material?.unit ??
+          form.value.inherited_fields?.previous_material?.unit
+
+        return (
+          <ActionDecimalInput
+            readOnlyValue={
+              unit ? formatUnitActionDecimal(form.value.quantity, unit) : "-"
+            }
+            {...props}
+            {...form.bind("quantity")}
+          />
+        )
+      },
+    },
 
     site: {
       key: "site",

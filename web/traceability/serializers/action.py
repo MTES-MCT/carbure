@@ -33,9 +33,6 @@ class ActionSerializer(serializers.ModelSerializer):
 
     total_emissions = ActionTotalEmissionsSerializer(read_only=True, allow_null=True)
     inherited_fields = ActionInheritedFieldsSerializer(read_only=True)
-    mass = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
-    volume = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
-    energy = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
     quantity_available = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True)
 
     class Meta:

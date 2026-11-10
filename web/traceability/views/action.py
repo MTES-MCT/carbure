@@ -15,7 +15,7 @@ from traceability.serializers.action import ActionQuerySerializer, ActionSeriali
 from traceability.services.delete import delete_action
 from traceability.services.inherited_fields import attach_inherited_fields
 from traceability.services.parent_chain import annotate_parent_chain
-from traceability.services.quantities import attach_quantities, attach_quantity_available
+from traceability.services.quantities import attach_quantity_available
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
 
@@ -67,7 +67,6 @@ class ActionViewset(
         if self.action == "retrieve":
             action = annotate_parent_chain(self.get_queryset().filter(pk=action.pk)).get()
             attach_inherited_fields([action])
-            attach_quantities([action])
             attach_quantity_available([action])
         return action
 
@@ -83,7 +82,6 @@ class ActionViewset(
         actions_by_id = {action.pk: action for action in annotated}
         actions = [actions_by_id[pk] for pk in ids]
         attach_inherited_fields(actions)
-        attach_quantities(actions)
         attach_quantity_available(actions)
         return actions
 

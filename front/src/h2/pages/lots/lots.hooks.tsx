@@ -49,7 +49,7 @@ export function useH2LotsPage(): {
     columns.pos_id,
     { ...columns.site, header: t("Station") },
     { ...columns.origin_material, header: t("Nature d'H2") },
-    columns.mass,
+    columns.quantity,
     columns.total_emissions,
   ]
 
@@ -93,7 +93,7 @@ export function useH2LotsPage(): {
               label: t("Station"),
               options: H2_SITE_FIELD_OPTIONS,
             },
-            { ...fields.mass, label: t("Quantité consommée") },
+            { ...fields.quantity, label: t("Quantité consommée") },
             { ...fields.working_date, label: t("Date de consommation") },
           ],
         },

@@ -2,14 +2,13 @@ import { useTranslation } from "react-i18next"
 
 import { Cell, Column } from "common/components/table2"
 import { EntityManager } from "common/hooks/entity"
-import { formatDate } from "common/utils/formatters"
+import { formatDate, formatUnitOnly } from "common/utils/formatters"
 import { ActionStatusBadge } from "traceability/components/action-status-badge"
 import { Action } from "traceability/types"
 import {
   ACTION_EMISSIONS_UNIT,
   formatActionDecimal,
 } from "traceability/utils/formatters"
-import { quantityColumn } from "./quantity-column"
 
 export type ActionColumn = Column<Action> & {
   condition?: (entity: EntityManager) => boolean
@@ -68,10 +67,23 @@ export function useActionColumns() {
       ),
     },
 
-    quantity: quantityColumn(),
-    mass: quantityColumn("mass"),
-    volume: quantityColumn("volume"),
-    energy: quantityColumn("energy"),
+    quantity: {
+      key: "quantity",
+      header: t("Quantité"),
+      cell: (action) => {
+        const text = formatActionDecimal(action.quantity)
+        const unit =
+          action.material?.unit ??
+          action.inherited_fields?.previous_material?.unit
+
+        return (
+          <Cell
+            text={text || "-"}
+            sub={text && unit ? formatUnitOnly(unit) : undefined}
+          />
+        )
+      },
+    },
 
     site: {
       key: "site",
