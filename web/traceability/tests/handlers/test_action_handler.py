@@ -1,15 +1,18 @@
 from django.test import SimpleTestCase, TestCase
 
-from h2.handlers import H2ActionHandler
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.registry import get_action_handler
 from traceability.models import Action
 from traceability.serializers.consumption import ConsumptionSerializer
 
 
+class GenericActionHandler(ActionIndustryHandler):
+    industry = "TEST"
+
+
 class ActionCreationSerializersTest(SimpleTestCase):
     def test_industry_inherits_default_serializer(self):
-        self.assertIs(H2ActionHandler.get_action_creation_serializers()[Action.INIT], ConsumptionSerializer)
+        self.assertIs(GenericActionHandler.get_action_creation_serializers()[Action.INIT], ConsumptionSerializer)
 
     def test_industry_can_extend_and_override_defaults(self):
         class IndustryHandler(ActionIndustryHandler):
@@ -28,6 +31,8 @@ class ActionCreationSerializersTest(SimpleTestCase):
 
 class ActionHandlerRegistryTest(TestCase):
     def test_returns_the_h2_handler_for_the_h2_industry(self):
+        from h2.handlers.action import H2ActionHandler
+
         handler = get_action_handler(Action.H2)
 
         self.assertIsInstance(handler, H2ActionHandler)

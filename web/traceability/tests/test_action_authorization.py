@@ -4,22 +4,38 @@ from unittest.mock import Mock, patch
 from django.test import SimpleTestCase
 
 from core.models import Entity
-from h2.handlers.action import H2ActionHandler
+from traceability.handlers.action import ActionIndustryHandler
 from traceability.models import Action, ActionStatus
 from traceability.serializers.action_authorization import ActionAuthorizationSerializer
 
 
+def can_create_root(actor, _parent_holder, child_holder):
+    return actor == child_holder
+
+
+def can_create_child(actor, _parent_holder, _child_holder):
+    return actor.entity_type == Entity.ADMIN
+
+
+class GenericActionHandler(ActionIndustryHandler):
+    industry = "TEST"
+    action_creation_flow = (
+        (None, (Action.INIT, ActionStatus.PENDING), can_create_root),
+        ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_child),
+    )
+
+
 class ActionAuthorizationSerializerTest(SimpleTestCase):
     def setUp(self):
-        self.holder = Entity(id=1, entity_type=Entity.HRS)
+        self.holder = Entity(id=1, entity_type=Entity.OPERATOR)
         self.admin = Entity(id=2, entity_type=Entity.ADMIN)
-        self.parent = Action(id=3, type=Action.INIT, industry=Action.H2, holder=self.holder)
+        self.parent = Action(id=3, type=Action.INIT, industry=GenericActionHandler.industry, holder=self.holder)
         self.parent.status = ActionStatus.PENDING
 
     def validate_action(self, data, actor=None, parent=None, holder=None, handler=None):
         serializer = ActionAuthorizationSerializer(
             data=data,
-            context={"entity": actor or self.admin, "handler": handler or H2ActionHandler()},
+            context={"entity": actor or self.admin, "handler": handler or GenericActionHandler()},
         )
         holder_queryset = Mock()
         holder_queryset.get.return_value = holder or self.holder
@@ -69,7 +85,7 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
 
     def test_rejects_edge_without_authorization_rule(self):
         handler = SimpleNamespace(
-            industry=Action.H2, action_creation_flow=((None, (Action.INIT, ActionStatus.PENDING), None),)
+            industry=GenericActionHandler.industry, action_creation_flow=((None, (Action.INIT, ActionStatus.PENDING), None),)
         )
         serializer = self.validate_action(
             {"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1}, handler=handler
@@ -78,7 +94,7 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_find_edge_matches_parent_type_and_status(self):
-        handler = H2ActionHandler()
+        handler = GenericActionHandler()
         find_edge = ActionAuthorizationSerializer.find_edge
 
         self.assertIsNotNone(find_edge(handler, Action.VALORIZE, ActionStatus.CREATED, self.parent))
@@ -111,7 +127,7 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         refused = Mock(return_value=False)
         allowed = Mock(return_value=True)
         handler = SimpleNamespace(
-            industry=Action.H2,
+            industry=GenericActionHandler.industry,
             action_creation_flow=(
                 ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), refused),
                 ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.PENDING), allowed),
