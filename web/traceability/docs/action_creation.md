@@ -10,7 +10,7 @@ class H2ActionHandler(ActionIndustryHandler):
     )
 ```
 
-Un état est un couple `(type, statut)`. `None` désigne une création sans parent. Le premier lien correspondant au type demandé et à l'état courant du parent est utilisé ; sans lien, la création est refusée.
+Un état est un couple `(type, statut)`. `None` désigne une création sans parent. Le premier lien correspondant au couple `(type, status)` demandé et à l'état courant du parent est utilisé ; sans lien, la création est refusée.
 
 ## Autorisation
 
@@ -21,7 +21,7 @@ def can_create_consumption(actor, parent_holder, child_holder):
     return actor.entity_type == Entity.HRS and actor == child_holder
 ```
 
-`ActionAuthorizationSerializer` résout `parent`, `type` et `holder`, vérifie la filière du parent, recherche le lien et appelle sa fonction d'autorisation. Il fournit aussi le statut initial du lien. Une règle absente ou qui renvoie `False` refuse la création.
+`ActionAuthorizationSerializer` résout `parent`, `type`, `status` et `holder`, vérifie la filière du parent, recherche le lien et appelle sa fonction d'autorisation. Le statut initial est obligatoire et doit correspondre à un statut connu et au lien demandé. Une règle absente ou qui renvoie `False` refuse la création.
 
 ## Validation par type d'action
 
@@ -38,6 +38,8 @@ Une filière peut déclarer sa propre map pour ajouter des types ou remplacer un
 ## Création par l'API
 
 Pour `POST /api/traceability/actions/?entity_id=…&industry=H2` :
+
+La requête doit inclure `type`, `status` et `holder`, ainsi que `parent` si nécessaire et les données propres au type d'action. Par exemple, une création H2 sans parent demande `"type": "INIT"` et `"status": "PENDING"`.
 
 1. Le handler est choisi selon `industry` et sa permission d'écriture est vérifiée.
 2. Le serializer d'autorisation vérifie le lien et l'acteur.

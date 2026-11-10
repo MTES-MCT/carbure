@@ -32,30 +32,38 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
             serializer.is_valid()
         return serializer
 
-    def test_authorizes_child_and_returns_resolved_values_and_initial_status(self):
-        serializer = self.validate_action({"type": Action.VALORIZE, "parent": 3, "holder": 1})
+    def test_authorizes_child_and_returns_resolved_values_and_status(self):
+        serializer = self.validate_action(
+            {"type": Action.VALORIZE, "status": ActionStatus.CREATED, "parent": 3, "holder": 1}
+        )
 
         self.assertEqual(serializer.errors, {})
         self.assertIs(serializer.validated_data["parent"], self.parent)
         self.assertIs(serializer.validated_data["holder"], self.holder)
-        self.assertEqual(serializer.validated_data["initial_status"], ActionStatus.CREATED)
+        self.assertEqual(serializer.validated_data["status"], ActionStatus.CREATED)
 
     def test_authorizes_root_without_parent(self):
-        serializer = self.validate_action({"type": Action.INIT, "holder": 1}, actor=self.holder)
+        serializer = self.validate_action(
+            {"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1}, actor=self.holder
+        )
 
         self.assertEqual(serializer.errors, {})
-        self.assertEqual(serializer.validated_data["initial_status"], ActionStatus.PENDING)
+        self.assertEqual(serializer.validated_data["status"], ActionStatus.PENDING)
 
     def test_rejects_unauthorized_actor_and_unknown_edge(self):
-        unauthorized = self.validate_action({"type": Action.VALORIZE, "parent": 3, "holder": 1}, actor=self.holder)
-        unknown_edge = self.validate_action({"type": Action.VALORIZE, "holder": 1})
+        unauthorized = self.validate_action(
+            {"type": Action.VALORIZE, "status": ActionStatus.CREATED, "parent": 3, "holder": 1}, actor=self.holder
+        )
+        unknown_edge = self.validate_action({"type": Action.VALORIZE, "status": ActionStatus.CREATED, "holder": 1})
 
         self.assertFalse(unauthorized.is_valid())
         self.assertFalse(unknown_edge.is_valid())
 
     def test_rejects_parent_from_another_industry(self):
         self.parent.industry = "OTHER"
-        serializer = self.validate_action({"type": Action.VALORIZE, "parent": 3, "holder": 1})
+        serializer = self.validate_action(
+            {"type": Action.VALORIZE, "status": ActionStatus.CREATED, "parent": 3, "holder": 1}
+        )
 
         self.assertFalse(serializer.is_valid())
 
@@ -63,7 +71,9 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         handler = SimpleNamespace(
             industry=Action.H2, action_creation_flow=((None, (Action.INIT, ActionStatus.PENDING), None),)
         )
-        serializer = self.validate_action({"type": Action.INIT, "holder": 1}, handler=handler)
+        serializer = self.validate_action(
+            {"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1}, handler=handler
+        )
 
         self.assertFalse(serializer.is_valid())
 
@@ -71,10 +81,54 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         handler = H2ActionHandler()
         find_edge = ActionAuthorizationSerializer.find_edge
 
-        self.assertIsNotNone(find_edge(handler, Action.VALORIZE, self.parent))
-        self.assertIsNone(find_edge(handler, "UNKNOWN", self.parent))
+        self.assertIsNotNone(find_edge(handler, Action.VALORIZE, ActionStatus.CREATED, self.parent))
+        self.assertIsNone(find_edge(handler, "UNKNOWN", ActionStatus.CREATED, self.parent))
+        self.assertIsNone(find_edge(handler, Action.VALORIZE, ActionStatus.PENDING, self.parent))
         self.parent.type = Action.VALORIZE
-        self.assertIsNone(find_edge(handler, Action.VALORIZE, self.parent))
+        self.assertIsNone(find_edge(handler, Action.VALORIZE, ActionStatus.CREATED, self.parent))
         self.parent.type = Action.INIT
         self.parent.status = ActionStatus.ACCEPTED
-        self.assertIsNone(find_edge(handler, Action.VALORIZE, self.parent))
+        self.assertIsNone(find_edge(handler, Action.VALORIZE, ActionStatus.CREATED, self.parent))
+
+    def test_rejects_missing_or_invalid_status(self):
+        for fields in ({}, {"status": "UNKNOWN"}, {"status": None}, {"status": ""}):
+            with self.subTest(fields=fields):
+                serializer = self.validate_action({"type": Action.INIT, "holder": 1, **fields}, actor=self.holder)
+
+                self.assertIn("status", serializer.errors)
+
+    def test_rejects_status_without_matching_edge(self):
+        for data, actor in (
+            ({"type": Action.INIT, "status": ActionStatus.CREATED, "holder": 1}, self.holder),
+            ({"type": Action.VALORIZE, "status": ActionStatus.PENDING, "parent": 3, "holder": 1}, self.admin),
+        ):
+            with self.subTest(data=data):
+                serializer = self.validate_action(data, actor=actor)
+
+                self.assertIn("non_field_errors", serializer.errors)
+
+    def test_uses_authorization_rule_for_requested_status(self):
+        refused = Mock(return_value=False)
+        allowed = Mock(return_value=True)
+        handler = SimpleNamespace(
+            industry=Action.H2,
+            action_creation_flow=(
+                ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), refused),
+                ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.PENDING), allowed),
+            ),
+        )
+        serializer = self.validate_action(
+            {"type": Action.VALORIZE, "status": ActionStatus.PENDING, "parent": 3, "holder": 1}, handler=handler
+        )
+
+        self.assertEqual(serializer.errors, {})
+        self.assertEqual(serializer.validated_data["status"], ActionStatus.PENDING)
+        allowed.assert_called_once_with(self.admin, self.holder, self.holder)
+        refused.assert_not_called()
+
+        serializer = self.validate_action(
+            {"type": Action.VALORIZE, "status": ActionStatus.CREATED, "parent": 3, "holder": 1}, handler=handler
+        )
+
+        self.assertIn("non_field_errors", serializer.errors)
+        refused.assert_called_once_with(self.admin, self.holder, self.holder)

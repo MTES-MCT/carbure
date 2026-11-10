@@ -36,7 +36,9 @@ class ActionCreateTest(SimpleTestCase):
             return self.view(request)
 
     def test_authorized_request_validates_action_data(self):
-        response = self.post({"type": Action.INIT, "holder": self.holder.id, "quantity": "invalid"})
+        response = self.post(
+            {"type": Action.INIT, "status": ActionStatus.PENDING, "holder": self.holder.id, "quantity": "invalid"}
+        )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("quantity", response.data)
@@ -44,13 +46,13 @@ class ActionCreateTest(SimpleTestCase):
 
     def test_missing_serializer_is_reported_as_validation_error(self):
         with patch.object(H2ActionHandler, "get_action_creation_serializers", return_value={}):
-            response = self.post({"type": Action.INIT, "holder": self.holder.id})
+            response = self.post({"type": Action.INIT, "status": ActionStatus.PENDING, "holder": self.holder.id})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("type", response.data)
 
     def test_unauthorized_request_returns_validation_error(self):
-        response = self.post({"type": Action.VALORIZE, "holder": self.holder.id})
+        response = self.post({"type": Action.VALORIZE, "status": ActionStatus.CREATED, "holder": self.holder.id})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -60,6 +62,7 @@ class ActionCreateTest(SimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("type", response.data)
         self.assertIn("holder", response.data)
+        self.assertIn("status", response.data)
 
     def test_create_uses_the_write_permission(self):
         permission = H2ActionHandler.get_permissions("create")[0]
@@ -76,6 +79,7 @@ class ActionCreateIntegrationTest(TestCase):
         self.params = {"entity_id": self.holder.id, "industry": Action.H2}
         self.payload = {
             "type": Action.INIT,
+            "status": ActionStatus.PENDING,
             "holder": self.holder.id,
             "pos_id": "POS-1",
             "quantity": "12.500",
@@ -89,7 +93,7 @@ class ActionCreateIntegrationTest(TestCase):
             self.url, data=json.dumps(payload), content_type="application/json", query_params=self.params
         )
 
-    def test_creates_action_and_initial_status(self):
+    def test_creates_action_and_status(self):
         response = self.post(self.payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -105,6 +109,12 @@ class ActionCreateIntegrationTest(TestCase):
     def test_rejected_request_does_not_create_action(self):
         other = Entity.objects.create(name="Other HRS", entity_type=Entity.HRS)
         response = self.post({**self.payload, "holder": other.pk})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Action.objects.exists())
+
+    def test_status_without_matching_edge_does_not_create_action(self):
+        response = self.post({**self.payload, "status": ActionStatus.ACCEPTED})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(Action.objects.exists())

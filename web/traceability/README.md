@@ -55,7 +55,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `scope_queryset`                                          | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière            |
 | `transitions`, `action_creation_flow`                     | Transitions de statut et liens de création déclarés par la filière                                                       |
 
-`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. Le `POST` de création utilise `action_creation_flow` pour vérifier l'autorisation et définir le statut initial ; voir [`docs/action_creation.md`](docs/action_creation.md). Les transitions ne sont pas encore utilisées par les services de changement de statut.
+`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. Le `POST` de création utilise `action_creation_flow` pour vérifier l'autorisation et le statut initial demandé via `status` ; voir [`docs/action_creation.md`](docs/action_creation.md). Les transitions ne sont pas encore utilisées par les services de changement de statut.
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 

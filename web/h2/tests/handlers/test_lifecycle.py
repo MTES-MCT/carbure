@@ -30,12 +30,12 @@ class H2LifecycleTest(SimpleTestCase):
     def test_creation_rights(self):
         pending_init = SimpleNamespace(type=Action.INIT, status=ActionStatus.PENDING)
 
-        root = find_edge(self.handler, Action.INIT)
-        child = find_edge(self.handler, Action.VALORIZE, parent=pending_init)
+        root = find_edge(self.handler, Action.INIT, ActionStatus.PENDING)
+        child = find_edge(self.handler, Action.VALORIZE, ActionStatus.CREATED, parent=pending_init)
 
         self.assertEqual(root, (None, (Action.INIT, ActionStatus.PENDING), can_create_consumption))
-        self.assertIsNone(find_edge(self.handler, Action.INIT, parent=pending_init))
-        self.assertIsNone(find_edge(self.handler, Action.VALORIZE))
+        self.assertIsNone(find_edge(self.handler, Action.INIT, ActionStatus.PENDING, parent=pending_init))
+        self.assertIsNone(find_edge(self.handler, Action.VALORIZE, ActionStatus.CREATED))
         self.assertEqual(
             child,
             ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_valorization),
@@ -44,6 +44,7 @@ class H2LifecycleTest(SimpleTestCase):
             find_edge(
                 self.handler,
                 Action.VALORIZE,
+                ActionStatus.CREATED,
                 parent=SimpleNamespace(type=Action.INIT, status=ActionStatus.ACCEPTED),
             )
         )
@@ -51,6 +52,7 @@ class H2LifecycleTest(SimpleTestCase):
             find_edge(
                 self.handler,
                 Action.VALORIZE,
+                ActionStatus.CREATED,
                 parent=SimpleNamespace(type=Action.VALORIZE, status=ActionStatus.PENDING),
             )
         )

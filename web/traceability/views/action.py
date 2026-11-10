@@ -119,7 +119,7 @@ class ActionViewset(
                 parent=authorization.validated_data.get("parent"),
                 industry=request.handler.industry,
             )
-            ActionStatus.objects.create(action=action, status=authorization.validated_data["initial_status"])
+            ActionStatus.objects.create(action=action, status=authorization.validated_data["status"])
 
             action = annotate_parent_chain(Action.objects.filter(pk=action.pk)).get()
             attach_inherited_fields([action])
