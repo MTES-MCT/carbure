@@ -1,3 +1,4 @@
+from decimal import Decimal
 from unittest.mock import patch
 
 from django.db import connection
@@ -74,6 +75,25 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertIn("mass", by_id[self.own_action.id])
         self.assertIn("volume", by_id[self.own_action.id])
         self.assertIn("energy", by_id[self.own_action.id])
+
+    def test_list_and_retrieve_expose_quantity_available(self):
+        self.own_action.quantity = Decimal("100.000")
+        self.own_action.save(update_fields=["quantity"])
+        self.child_of_own_action.quantity = Decimal("40.000")
+        self.child_of_own_action.save(update_fields=["quantity"])
+
+        listing = self.client.get(self.list_url, self.base_params)
+        detail = self.client.get(
+            reverse("traceability-action-detail", args=[self.own_action.id]),
+            self.base_params,
+        )
+
+        self.assertEqual(listing.status_code, status.HTTP_200_OK)
+        by_id = {item["id"]: item for item in listing.data["results"]}
+        self.assertEqual(by_id[self.own_action.id]["quantity_available"], "60.000")
+        self.assertEqual(by_id[self.child_of_own_action.id]["quantity_available"], "40.000")
+        self.assertEqual(detail.status_code, status.HTTP_200_OK)
+        self.assertEqual(detail.data["quantity_available"], "60.000")
 
     def test_list_includes_inherited_material(self):
         child = ActionFactory.create(

@@ -20,6 +20,8 @@ mass   = volume × density
 energy = mass × lhv
 ```
 
+- **`quantity_available`.** `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED` et `REJECTED`. Un enfant sans statut compte. Même unité que `quantity`.
+
 ## Modèle
 
 | Concept | Rôle |

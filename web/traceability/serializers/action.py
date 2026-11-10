@@ -36,6 +36,7 @@ class ActionSerializer(serializers.ModelSerializer):
     mass = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
     volume = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
     energy = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, allow_null=True)
+    quantity_available = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True)
 
     class Meta:
         model = Action

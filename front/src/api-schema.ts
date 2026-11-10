@@ -3580,6 +3580,8 @@ export interface components {
             readonly volume: string | null;
             /** Format: decimal */
             readonly energy: string | null;
+            /** Format: decimal */
+            readonly quantity_available: string;
             /** N° de POS */
             pos_id: string;
             /** Filière */

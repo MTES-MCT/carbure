@@ -14338,6 +14338,11 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
           nullable: true
+        quantity_available:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          readOnly: true
         pos_id:
           type: string
           title: N° de POS
@@ -14423,6 +14428,7 @@ components:
         - parent
         - pos_id
         - quantity
+        - quantity_available
         - site
         - status
         - total_emissions
