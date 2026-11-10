@@ -1,19 +1,20 @@
 from django.db.models import F, Sum
-from django_filters import AllValuesMultipleFilter, BooleanFilter, FilterSet, MultipleChoiceFilter
+from django_filters import BooleanFilter, FilterSet, MultipleChoiceFilter
 
+from core.filters import MultiValueInFilter
 from elec.models import ElecProvisionCertificateQualicharge
 
 
 class ProvisionCertificateQualichargeFilter(FilterSet):
-    cpo = AllValuesMultipleFilter(field_name="cpo__name")
+    cpo = MultiValueInFilter(field_name="cpo__name")
     not_validated = BooleanFilter(method="filter_not_validated")
     validated_by = MultipleChoiceFilter(choices=ElecProvisionCertificateQualicharge.VALIDATION_CHOICES)
-    operating_unit = AllValuesMultipleFilter(field_name="operating_unit")
-    station_id = AllValuesMultipleFilter(field_name="station_id")
+    operating_unit = MultiValueInFilter(field_name="operating_unit")
+    station_id = MultiValueInFilter(field_name="station_id")
     group_by = MultipleChoiceFilter(
         choices=[("operating_unit", "operating_unit")], field_name="group_by", method="filter_group_by"
     )
-    date_from = AllValuesMultipleFilter(field_name="date_from")
+    date_from = MultiValueInFilter(field_name="date_from")
 
     def filter_not_validated(self, queryset, name, value):
         if value:

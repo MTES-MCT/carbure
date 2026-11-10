@@ -70,10 +70,5 @@ class FilterActionMixin:
         if not column:
             raise ValidationError(f"Filter '{filter}' does not exist for operations")
 
-        values = queryset.values_list(column, flat=True).distinct()
-        results = []
-        for v in values:
-            results.append(v)
-        data = set(results)
-
-        return Response(list(data))
+        values = queryset.order_by().values_list(column, flat=True).distinct()
+        return Response([v for v in values if v is not None])
