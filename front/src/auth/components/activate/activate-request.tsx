@@ -16,7 +16,7 @@ type ActivateRequestForm = {
 }
 
 type ActivateRequestProps = {
-  onClose?: () => void
+  onClose: () => void
 }
 
 export const ActivateRequest = ({ onClose }: ActivateRequestProps) => {
@@ -37,8 +37,6 @@ export const ActivateRequest = ({ onClose }: ActivateRequestProps) => {
       notify(t("Le lien n'a pas pu être envoyé !"), { variant: "danger" })
     },
   })
-
-  const close = onClose ?? (() => navigate(ROUTE_URLS.AUTH.REGISTER))
 
   if (sent) {
     return (
@@ -63,7 +61,10 @@ export const ActivateRequest = ({ onClose }: ActivateRequestProps) => {
   }
 
   return (
-    <DialogContainer onClose={close} title={t("Renvoyer le lien d’activation")}>
+    <DialogContainer
+      onClose={onClose}
+      title={t("Renvoyer le lien d’activation")}
+    >
       <Content>
         <Section>
           {t(
