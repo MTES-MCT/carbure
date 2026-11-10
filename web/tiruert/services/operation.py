@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from certificates.models import DoubleCountingRegistration
 from core.models import CarbureLot, MatierePremiere
 from core.models.feedstock import Biocarburant
 from core.utils import truncate
@@ -379,7 +380,7 @@ class OperationService:
     @staticmethod
     def exclude_tiruert_ineligible_lots(lots: list[CarbureLot]):
         """Exclude lots carrying the double counting certificate reserved for TIRUERT-ineligible lots."""
-        return lots.exclude(production_site_double_counting_certificate="non_éligible_TIRUERT")
+        return lots.exclude(production_site_double_counting_certificate=DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT)
 
     @staticmethod
     def exclude_saf_biofuel(lots: list[CarbureLot]):

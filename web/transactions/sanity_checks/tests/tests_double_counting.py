@@ -230,7 +230,7 @@ class DoubleCountingSanityChecksTest(TestCase):
     def test_tiruert_ineligibility_is_non_blocking(self):
         """Test that the TIRUERT-ineligible certificate produces a non-blocking warning."""
         error = CarbureCertificatesErrors.LOT_NOT_ELIGIBLE_TIRUERT
-        certificate_id = "non_éligible_TIRUERT"
+        certificate_id = DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT
         DoubleCountingRegistration.objects.create(
             certificate_id=certificate_id,
             production_site=self.production_site,

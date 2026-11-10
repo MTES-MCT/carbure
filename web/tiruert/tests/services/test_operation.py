@@ -5,6 +5,7 @@ from django.http import QueryDict
 from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 
+from certificates.models import DoubleCountingRegistration
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.models import Operation, OperationDetail
@@ -294,7 +295,7 @@ class OperationServiceFilterLotsTest(OperationServiceTestCase):
             biofuel=self.biofuel_eth,
             lot_status="ACCEPTED",
             delivery_type="BLENDING",
-            production_site_double_counting_certificate="non_éligible_TIRUERT",
+            production_site_double_counting_certificate=DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT,
             volume=700,
             carbure_delivery_site=self.depot,
         )
