@@ -1,3 +1,5 @@
+from django.db.models import F, Sum
+from django.db.models.functions import Coalesce
 from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema, extend_schema_view
 from rest_framework import status
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
@@ -20,23 +22,10 @@ from .mixins import ActionMixin
 
 
 class ElecProvisionCertificateQualichargePagination(MetadataPageNumberPagination):
-    aggregate_fields = {"total_quantity": 0, "total_quantity_renewable": 0}
-
-    def get_extra_metadata(self):
-        metadata = {"total_quantity": 0, "total_quantity_renewable": 0}
-
-        for qualichargeData in self.queryset:
-            # Handle both model instances and dict
-            if isinstance(qualichargeData, dict):
-                renewable_energy = qualichargeData.get("renewable_energy", 0)
-                energy = qualichargeData.get("energy_amount", 0)
-            else:
-                renewable_energy = qualichargeData.renewable_energy
-                energy = qualichargeData.energy_amount
-
-            metadata["total_quantity"] += energy
-            metadata["total_quantity_renewable"] += renewable_energy
-        return metadata
+    aggregate_fields = {
+        "total_quantity": Coalesce(Sum("energy_amount"), 0.0),
+        "total_quantity_renewable": Coalesce(Sum(F("energy_amount") * F("enr_ratio")), 0.0),
+    }
 
 
 @extend_schema(
