@@ -227,6 +227,30 @@ class DoubleCountingSanityChecksTest(TestCase):
             assert has_error(error, error_list), status
             assert next(e for e in error_list if e.error == error).is_blocking
 
+    def test_tiruert_ineligibility_is_non_blocking(self):
+        """Test that the TIRUERT-ineligible certificate produces a non-blocking warning."""
+        error = CarbureCertificatesErrors.LOT_NOT_ELIGIBLE_TIRUERT
+        certificate_id = DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT
+        DoubleCountingRegistration.objects.create(
+            certificate_id=certificate_id,
+            production_site=self.production_site,
+            valid_from=datetime.date(2026, 1, 1),
+            valid_until=datetime.date(2027, 12, 31),
+        )
+        lot = self.create_lot(
+            feedstock=self.dc_feedstock,
+            biofuel=self.dc_biofuel,
+            carbure_producer=self.producer,
+            carbure_production_site=self.production_site,
+            delivery_date=datetime.date(2026, 6, 1),
+            production_site_double_counting_certificate=certificate_id,
+        )
+
+        error_list = self.run_checks(lot, get_prefetched_data())
+        warning = next(e for e in error_list if e.error == error)
+
+        assert not warning.is_blocking
+
     @patch("certificates.models.timezone.localdate", new=lambda: datetime.date(2026, 10, 6))
     def test_computed_status(self):
         self.assertEqual(self.old_dc_cert.computed_status, DoubleCountingRegistration.EXPIRED)

@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from certificates.models import DoubleCountingRegistration
 from core.models import CarbureLot, MatierePremiere
 from core.models.feedstock import Biocarburant
 from core.utils import truncate
@@ -298,6 +299,7 @@ class OperationService:
 
         # Filter lots to keep only those that are valid for TIRUERT operations
         valid_lots = OperationService.filter_valid_lots(lots)
+        valid_lots = OperationService.exclude_tiruert_ineligible_lots(valid_lots)
         valid_lots = OperationService.filter_fr_delivery_site(valid_lots)
         valid_lots = OperationService.exclude_saf_biofuel(valid_lots)
         valid_lots = OperationService.remove_existing_lots(valid_lots)
@@ -374,6 +376,11 @@ class OperationService:
             | Q(delivery_type=CarbureLot.RFC, usage="")
             | Q(delivery_type__in=DELIVERY_TYPES_ACCEPTED)
         )
+
+    @staticmethod
+    def exclude_tiruert_ineligible_lots(lots: list[CarbureLot]):
+        """Exclude lots carrying the double counting certificate reserved for TIRUERT-ineligible lots."""
+        return lots.exclude(production_site_double_counting_certificate=DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT)
 
     @staticmethod
     def exclude_saf_biofuel(lots: list[CarbureLot]):

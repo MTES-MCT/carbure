@@ -95,6 +95,14 @@ def check_inactive_double_counting_certificate(lot: CarbureLot, prefetched_data)
         )
 
 
+def check_tiruert_ineligibility(lot: CarbureLot):
+    if lot.production_site_double_counting_certificate == DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT:
+        return generic_error(
+            error=CarbureCertificatesErrors.LOT_NOT_ELIGIBLE_TIRUERT,
+            lot=lot,
+        )
+
+
 def get_dc(lot: CarbureLot, prefetched_data):
     # only focus on the original lot, ignore children
     if lot.parent_lot or lot.parent_stock:
