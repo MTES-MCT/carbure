@@ -7,8 +7,9 @@ from core.serializers import EntityPreviewSerializer
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
 from traceability.serializers.certificate import ActionCertificateSerializer
-from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField, LookupSlugRelatedField
+from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField
 from traceability.serializers.inherited_fields import ActionInheritedFieldsSerializer
+from traceability.serializers.lookups import CertificateLookupField, MaterialLookupField, SiteLookupField
 from traceability.serializers.material import MaterialSerializer
 from traceability.serializers.site import ActionSiteSerializer
 from traceability.serializers.total_emissions import ActionTotalEmissionsSerializer
@@ -98,23 +99,9 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
 
 
 class ActionExcelImportSerializer(serializers.ModelSerializer):
-    material = LookupSlugRelatedField(
-        slug_field="name",
-        lookup="material",
-        error_messages={"does_not_exist": _("Matière inconnue")},
-    )
-    certificate = LookupSlugRelatedField(
-        slug_field="certificate_id",
-        lookup="certificate",
-        required=True,
-        allow_null=False,
-        error_messages={"does_not_exist": _("Certificat inconnu")},
-    )
-    site = LookupSlugRelatedField(
-        slug_field="name",
-        lookup="site",
-        error_messages={"does_not_exist": _("Site inconnu")},
-    )
+    material = MaterialLookupField()
+    certificate = CertificateLookupField(required=True, allow_null=False)
+    site = SiteLookupField()
     shipping_date = ExcelDateField(
         input_formats=["%d/%m/%Y"],
         error_messages={"invalid": _("La date doit être au format jour/mois/année.")},

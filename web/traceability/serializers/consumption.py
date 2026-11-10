@@ -1,33 +1,14 @@
-from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from traceability.models import Action
-from traceability.serializers.fields import LookupSlugRelatedField
+from traceability.serializers.lookups import CertificateLookupField, MaterialLookupField, SiteLookupField
 
 
 class ConsumptionSerializer(serializers.ModelSerializer):
     type = serializers.HiddenField(default=Action.INIT)
-    material = LookupSlugRelatedField(
-        slug_field="name",
-        lookup="material",
-        required=False,
-        allow_null=True,
-        error_messages={"does_not_exist": _("Matière inconnue")},
-    )
-    certificate = LookupSlugRelatedField(
-        slug_field="certificate_id",
-        lookup="certificate",
-        required=False,
-        allow_null=True,
-        error_messages={"does_not_exist": _("Certificat inconnu")},
-    )
-    site = LookupSlugRelatedField(
-        slug_field="name",
-        lookup="site",
-        required=False,
-        allow_null=True,
-        error_messages={"does_not_exist": _("Site inconnu")},
-    )
+    material = MaterialLookupField(required=False, allow_null=True)
+    certificate = CertificateLookupField(required=False, allow_null=True)
+    site = SiteLookupField(required=False, allow_null=True)
 
     class Meta:
         model = Action
