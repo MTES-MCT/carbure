@@ -18,7 +18,7 @@ class ActionIndustryHandler:
 
     industry: str | None = None
 
-    action_creation_flow: tuple[ActionFlowEdge, ...] = ()
+    action_creation_flow: list[ActionFlowEdge] = []
 
     action_creation_serializers = {
         Action.INIT: ConsumptionSerializer,

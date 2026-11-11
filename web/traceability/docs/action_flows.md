@@ -7,10 +7,10 @@ Chaque filière configure son handler, qui hérite d'`ActionIndustryHandler`. L'
 `action_creation_flow` contient des liens de la forme `(état du parent, état initial de la nouvelle action)`. Un état est un couple `(type, statut)`.
 
 ```python
-action_creation_flow = (
+action_creation_flow = [
     (None, (Action.INIT, ActionStatus.PENDING)),
     ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
-)
+]
 ```
 
 Le premier lien permet de créer une action `INIT` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `INIT` actuellement en `PENDING` comme parent.

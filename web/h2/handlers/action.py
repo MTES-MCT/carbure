@@ -14,10 +14,10 @@ class H2ActionHandler(ActionIndustryHandler):
     write_permission = HasHRSWriteRights
     admin_permission = HasH2AdminRights
 
-    action_creation_flow = (
+    action_creation_flow = [
         (None, (Action.INIT, ActionStatus.PENDING)),
         ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
-    )
+    ]
 
     action_status_authorizations = {
         Action.INIT: {
