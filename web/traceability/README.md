@@ -8,7 +8,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 | [`docs/inherited_fields.md`](docs/inherited_fields.md) | Règles des champs hérités                       |
 | [`docs/total_emissions.md`](docs/total_emissions.md)   | Formule du cumul GES                            |
 | [`docs/excel.md`](docs/excel.md)                       | Colonnes et import Excel                        |
-| [`docs/action_creation.md`](docs/action_creation.md)   | Flow et validation de création                  |
+| [`docs/action_flows.md`](docs/action_flows.md)         | Flows de création et autorisations des statuts   |
 
 ## Choix de conception
 
@@ -34,7 +34,7 @@ Fichier : [`fixtures/materials.csv`](fixtures/materials.csv), le catalogue édit
 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 
-Le graphe commun des changements de statut est défini par `ActionStatus.TRANSITIONS`. `ActionStatus.can_transition(statut de départ, statut d’arrivée)` indique si une transition appartient à ce graphe. Ce contrôle n'est pas encore utilisé par les services de changement de statut.
+Le graphe commun des changements de statut est défini par `ActionStatus.TRANSITIONS`. Le changement de statut vérifie la transition avec `ActionStatus.can_transition(statut de départ, statut d’arrivée)`, puis l'autorisation d'attribuer le statut d'arrivée.
 
 `inherited_fields` et `total_emissions` sont calculés à la lecture par le même parcours de parents ([`docs/parent_chain.md`](docs/parent_chain.md)).
 
@@ -53,7 +53,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `scope_queryset`                                          | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière            |
 | `action_creation_flow`                                    | Liens de création déclarés par la filière                                                                                |
 
-Le `POST` de création utilise `action_creation_flow` pour valider le lien de création et le statut initial demandé via `status`, puis vérifie le prédicat correspondant dans les autorisations héritées via `get_action_status_authorizations()` ; voir [`docs/action_creation.md`](docs/action_creation.md).
+Le `POST` de création utilise `action_creation_flow` pour valider le lien de création et le statut initial demandé via `status`, puis vérifie le prédicat correspondant dans les autorisations héritées via `get_action_status_authorizations()` ; voir [`docs/action_flows.md`](docs/action_flows.md).
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 
