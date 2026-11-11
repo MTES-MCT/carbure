@@ -10,6 +10,10 @@ from traceability.models import Action, ActionStatus
 class H2ActionHandler(ActionIndustryHandler):
     industry = Action.H2
 
+    read_permission = HasHRSRights
+    write_permission = HasHRSWriteRights
+    admin_permission = HasH2AdminRights
+
     action_creation_flow = (
         (None, (Action.INIT, ActionStatus.PENDING)),
         ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
@@ -26,9 +30,7 @@ class H2ActionHandler(ActionIndustryHandler):
     }
 
     lookups = lookups
-    read_permission = HasHRSRights
-    write_permission = HasHRSWriteRights
-    admin_permission = HasH2AdminRights
+
     excel_import_serializer_class = H2ActionExcelImportSerializer
     excel_columns = [
         {

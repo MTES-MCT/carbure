@@ -29,7 +29,7 @@ class ActionIndustryHandler:
     lookups = default_lookups
     excel_columns: list[dict] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
     excel_import_serializer_class = ActionExcelImportSerializer
-    write_actions = ("create", "destroy", "import_actions")
+    write_actions = ("create", "destroy", "import_actions", "status")
     read_permission = HasEntityReadRights
     write_permission = HasEntityWriteRights
     admin_permission = None
@@ -48,6 +48,12 @@ class ActionIndustryHandler:
                     for status in statuses:
                         status_authorizations[status] = authorize
         return authorizations
+
+    @classmethod
+    def can_assign_status(cls, actor: Entity, action_type: str, status: str, holder: Entity, parent: Action | None) -> bool:
+        authorize = cls.get_action_status_authorizations().get(action_type, {}).get(status)
+        parent_holder = parent.holder if parent is not None else None
+        return authorize is not None and authorize(actor, holder, parent_holder)
 
     @classmethod
     def get_permissions(cls, action: str):

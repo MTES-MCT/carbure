@@ -3,6 +3,7 @@ from django.utils.decorators import decorator_from_middleware, method_decorator
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.response import Response
@@ -17,6 +18,7 @@ from traceability.middlewares import ActionHandlerMiddleware
 from traceability.models import Action, ActionStatus
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
 from traceability.serializers.action_authorization import ActionAuthorizationSerializer
+from traceability.serializers.action_status import ActionStatusAuthorizationSerializer
 from traceability.services.delete import delete_action
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
@@ -62,7 +64,10 @@ class ActionViewset(
         return handler.get_permissions(self.action)
 
     def get_queryset(self):
-        return self.request.handler.scope_queryset(self.request, self.queryset)
+        queryset = self.request.handler.scope_queryset(self.request, self.queryset)
+        if self.action == "status":
+            return queryset.select_for_update()
+        return queryset
 
     def get_object(self):
         action = super().get_object()
@@ -112,6 +117,23 @@ class ActionViewset(
             ActionStatus.objects.create(action=action, status=authorization.validated_data["status"])
             action = Action.annotate_actions([action])[0]
             return Response(ActionSerializer(action, context=context).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        request=ActionStatusAuthorizationSerializer,
+        responses={200: ActionStatusAuthorizationSerializer, 400: None, 403: None, 404: None},
+        description="Change an action's status.",
+    )
+    @action(detail=True, methods=["post"])
+    def status(self, request, *args, **kwargs):
+        with transaction.atomic():
+            action = self.get_object()
+            serializer = ActionStatusAuthorizationSerializer(
+                action, data=request.data, context=self.get_serializer_context()
+            )
+            serializer.is_valid(raise_exception=True)
+            ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
+
+        return Response(serializer.validated_data)
 
     def perform_destroy(self, instance):
         try:

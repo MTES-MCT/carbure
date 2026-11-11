@@ -31,9 +31,13 @@ class ActionAuthorizationSerializer(serializers.Serializer):
         if edge is None:
             raise serializers.ValidationError(_("Opération non autorisée."))
 
-        authorize = handler.get_action_status_authorizations().get(attrs["type"], {}).get(attrs["status"])
-        parent_holder = parent.holder if parent is not None else None
-        if authorize is None or not authorize(self.context["entity"], attrs["holder"], parent_holder):
+        if not handler.can_assign_status(
+            self.context["entity"],
+            attrs["type"],
+            attrs["status"],
+            attrs["holder"],
+            parent,
+        ):
             raise serializers.ValidationError(_("Opération non autorisée."))
 
         return attrs

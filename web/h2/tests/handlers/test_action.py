@@ -21,7 +21,7 @@ class H2ActionHandlerPermissionTest(TestCase, PermissionTestMixin):
                     [(HasHRSRights | HasH2AdminRights)()],
                 ),
                 (
-                    ["create", "destroy", "import_actions"],
+                    ["create", "destroy", "import_actions", "status"],
                     [HasHRSWriteRights()],
                 ),
             ],
