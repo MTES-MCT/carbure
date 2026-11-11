@@ -1,19 +1,21 @@
+from collections.abc import Callable
+
 from django.db.models import Q
 
 import traceability.handlers.lookups as default_lookups
 from core.permissions import HasEntityReadRights, HasEntityWriteRights
 from traceability.handlers.excel import ACTION_EXCEL_COLUMNS, excel_column
-from traceability.lifecycle.rules import ActionFlowEdge, Transition
 from traceability.models import Action
 from traceability.serializers.action import ActionExcelImportSerializer
 from traceability.serializers.consumption import ConsumptionSerializer
+
+ActionFlowEdge = tuple[tuple[str, str] | None, tuple[str, str], Callable | None]
 
 
 class ActionIndustryHandler:
     """Per-industry plugin loaded from the `industry` query param."""
 
     industry: str | None = None
-    transitions: tuple[Transition, ...] = ()
     action_creation_flow: tuple[ActionFlowEdge, ...] = ()
     action_creation_serializers = {Action.INIT: ConsumptionSerializer}
     lookups = default_lookups

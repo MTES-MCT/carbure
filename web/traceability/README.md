@@ -34,6 +34,8 @@ Fichier : [`fixtures/materials.csv`](fixtures/materials.csv), le catalogue édit
 
 Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
 
+Le graphe commun des changements de statut est défini par `ActionStatus.TRANSITIONS`. `ActionStatus.can_transition(statut de départ, statut d’arrivée)` indique si une transition appartient à ce graphe. Ce contrôle n'est pas encore utilisé par les services de changement de statut.
+
 `inherited_fields` et `total_emissions` sont calculés à la lecture par le même parcours de parents ([`docs/parent_chain.md`](docs/parent_chain.md)).
 
 ## Ce que la filière personnalise
@@ -48,9 +50,9 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `action_creation_serializers`                             | Serializers de création associés aux types d'action ; ceux de la filière complètent ou remplacent les valeurs par défaut |
 | `read_permission`, `write_permission`, `admin_permission` | Droits pour chaque endpoint                                                                                              |
 | `scope_queryset`                                          | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière            |
-| `transitions`, `action_creation_flow`                     | Transitions de statut et liens de création déclarés par la filière                                                       |
+| `action_creation_flow`                                    | Liens de création déclarés par la filière                                                                                |
 
-`can_change_status(handler, type, statut de départ, statut d’arrivée)` renvoie la `Transition`, ou `None`. Le `POST` de création utilise `action_creation_flow` pour vérifier l'autorisation et le statut initial demandé via `status` ; voir [`docs/action_creation.md`](docs/action_creation.md). Les transitions ne sont pas encore utilisées par les services de changement de statut.
+Le `POST` de création utilise `action_creation_flow` pour vérifier l'autorisation et le statut initial demandé via `status` ; voir [`docs/action_creation.md`](docs/action_creation.md).
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 
