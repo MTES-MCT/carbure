@@ -19,11 +19,25 @@ class ActionStatus(models.Model):
         (DELETED, DELETED),
     ]
 
+    # Shared lifecycle; handlers restrict target statuses and who may assign them.
+    TRANSITIONS = (
+        (CREATED, DELETED),
+        (PENDING, ACCEPTED),
+        (PENDING, REJECTED),
+        (PENDING, BLOCKED),
+        (PENDING, DELETED),
+        (REJECTED, DELETED),
+    )
+
     status = models.CharField(choices=STATUSES, max_length=16, verbose_name="Statut")
     created_at = models.DateTimeField(auto_now_add=True)
     action = models.ForeignKey(
         "traceability.Action", on_delete=models.CASCADE, related_name="action_statuses", verbose_name="Action"
     )
+
+    @classmethod
+    def can_transition(cls, from_status: str, to_status: str) -> bool:
+        return (from_status, to_status) in cls.TRANSITIONS
 
     class Meta:
         db_table = "action_status"
