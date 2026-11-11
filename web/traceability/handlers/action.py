@@ -3,6 +3,7 @@ from collections.abc import Callable
 from django.db.models import Q
 
 import traceability.handlers.lookups as default_lookups
+from core.models import Entity
 from core.permissions import HasEntityReadRights, HasEntityWriteRights
 from traceability.handlers.excel import ACTION_EXCEL_COLUMNS, excel_column
 from traceability.models import Action
@@ -16,8 +17,15 @@ class ActionIndustryHandler:
     """Per-industry plugin loaded from the `industry` query param."""
 
     industry: str | None = None
+
     action_creation_flow: tuple[ActionFlowEdge, ...] = ()
-    action_creation_serializers = {Action.INIT: ConsumptionSerializer}
+
+    action_creation_serializers = {
+        Action.INIT: ConsumptionSerializer,
+    }
+
+    action_status_authorizations: dict[str, dict[tuple[str, ...], Callable[[Entity, Action], bool]]] = {}
+
     lookups = default_lookups
     excel_columns: list[dict] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
     excel_import_serializer_class = ActionExcelImportSerializer

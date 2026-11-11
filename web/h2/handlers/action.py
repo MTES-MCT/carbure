@@ -1,5 +1,5 @@
 import h2.handlers.lookups as lookups
-from h2.handlers.authorization import can_create_consumption, can_create_valorization
+from h2.handlers.authorization import can_create_consumption, can_create_valorization, is_h2_admin, is_hrs_holder
 from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 from h2.serializers.action import SHIPPING_FUEL_TYPES, H2ActionExcelImportSerializer
 from traceability.handlers.action import ActionIndustryHandler
@@ -9,10 +9,22 @@ from traceability.models import Action, ActionStatus
 
 class H2ActionHandler(ActionIndustryHandler):
     industry = Action.H2
+
     action_creation_flow = (
         (None, (Action.INIT, ActionStatus.PENDING), can_create_consumption),
         ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_valorization),
     )
+
+    action_status_authorizations = {
+        Action.INIT: {
+            (ActionStatus.PENDING,): is_hrs_holder,
+            (ActionStatus.ACCEPTED, ActionStatus.REJECTED, ActionStatus.BLOCKED): is_h2_admin,
+        },
+        Action.VALORIZE: {
+            (ActionStatus.CREATED,): is_h2_admin,
+        },
+    }
+
     lookups = lookups
     read_permission = HasHRSRights
     write_permission = HasHRSWriteRights
