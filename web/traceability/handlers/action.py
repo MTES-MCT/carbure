@@ -24,7 +24,7 @@ class ActionIndustryHandler:
         Action.INIT: ConsumptionSerializer,
     }
 
-    action_status_authorizations: dict[str, dict[tuple[str, ...], Callable[[Entity, Action], bool]]] = {}
+    action_status_authorizations: dict[str, dict[tuple[str, ...], Callable[[Entity, Entity, Entity | None], bool]]] = {}
 
     lookups = default_lookups
     excel_columns: list[dict] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
@@ -37,6 +37,17 @@ class ActionIndustryHandler:
     @classmethod
     def get_action_creation_serializers(cls):
         return {**ActionIndustryHandler.action_creation_serializers, **cls.action_creation_serializers}
+
+    @classmethod
+    def get_action_status_authorizations(cls) -> dict[str, dict[str, Callable[[Entity, Entity, Entity | None], bool]]]:
+        authorizations: dict[str, dict[str, Callable[[Entity, Entity, Entity | None], bool]]] = {}
+        for definitions in (ActionIndustryHandler.action_status_authorizations, cls.action_status_authorizations):
+            for action_type, rules in definitions.items():
+                status_authorizations = authorizations.setdefault(action_type, {})
+                for statuses, authorize in rules.items():
+                    for status in statuses:
+                        status_authorizations[status] = authorize
+        return authorizations
 
     @classmethod
     def get_permissions(cls, action: str):

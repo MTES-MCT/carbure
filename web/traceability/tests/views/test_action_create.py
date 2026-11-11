@@ -17,9 +17,14 @@ from traceability.models import Action, ActionStatus
 from traceability.views.action import ActionViewset
 
 
+def is_holder(actor, holder, parent_holder):
+    return actor == holder
+
+
 class GenericActionHandler(ActionIndustryHandler):
     industry = Action.H2
     action_creation_flow = ((None, (Action.INIT, ActionStatus.PENDING)),)
+    action_status_authorizations = {Action.INIT: {(ActionStatus.PENDING,): is_holder}}
 
 
 @patch.dict(ACTION_HANDLERS, {GenericActionHandler.industry: GenericActionHandler})
@@ -28,6 +33,14 @@ class ActionCreateTest(SimpleTestCase):
         self.factory = APIRequestFactory()
         self.holder = Entity(id=1, entity_type=Entity.OPERATOR)
         self.view = ActionViewset.as_view({"post": "create"})
+        self.payload = {
+            "type": Action.INIT,
+            "status": ActionStatus.PENDING,
+            "holder": self.holder.id,
+            "pos_id": "POS-1",
+            "quantity": "12.500",
+            "working_date": "2026-01-01",
+        }
 
     def post(self, data):
         request = self.factory.post(f"/actions/?industry={GenericActionHandler.industry}", data, format="json")
@@ -75,6 +88,42 @@ class ActionCreateTest(SimpleTestCase):
         permission = GenericActionHandler.get_permissions("create")[0]
         self.assertIsInstance(permission, HasEntityWriteRights)
 
+    def test_missing_status_authorization_refuses_creation(self):
+        with patch.object(GenericActionHandler, "action_status_authorizations", {}):
+            response = self.post(self.payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_specific_predicate_receives_holders_and_refuses_without_fallback(self):
+        default = Mock(return_value=True)
+        specific = Mock(return_value=False)
+        with (
+            patch.object(
+                ActionIndustryHandler, "action_status_authorizations", {Action.INIT: {(ActionStatus.PENDING,): default}}
+            ),
+            patch.object(
+                GenericActionHandler, "action_status_authorizations", {Action.INIT: {(ActionStatus.PENDING,): specific}}
+            ),
+        ):
+            response = self.post({**self.payload, "industry": "OTHER"})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        default.assert_not_called()
+        specific.assert_called_once_with(self.holder, self.holder, None)
+
+    def test_creation_uses_default_authorization(self):
+        default = Mock(return_value=False)
+        with (
+            patch.object(
+                ActionIndustryHandler, "action_status_authorizations", {Action.INIT: {(ActionStatus.PENDING,): default}}
+            ),
+            patch.object(GenericActionHandler, "action_status_authorizations", {}),
+        ):
+            response = self.post(self.payload)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        default.assert_called_once_with(self.holder, self.holder, None)
+
 
 @patch.dict(ACTION_HANDLERS, {GenericActionHandler.industry: GenericActionHandler})
 class ActionCreateIntegrationTest(TestCase):
@@ -119,6 +168,14 @@ class ActionCreateIntegrationTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(Action.objects.exists())
+
+    def test_unauthorized_holder_does_not_create_action(self):
+        other = Entity.objects.create(name="Autre opérateur", entity_type=Entity.OPERATOR)
+        response = self.post({**self.payload, "holder": other.pk})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Action.objects.exists())
+        self.assertFalse(ActionStatus.objects.exists())
 
     def test_status_creation_failure_rolls_back_action(self):
         with patch.object(ActionStatus.objects, "create", side_effect=RuntimeError("status failure")):

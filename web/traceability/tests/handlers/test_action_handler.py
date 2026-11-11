@@ -1,8 +1,10 @@
+from unittest.mock import Mock, patch
+
 from django.test import SimpleTestCase, TestCase
 
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.registry import get_action_handler
-from traceability.models import Action
+from traceability.models import Action, ActionStatus
 from traceability.serializers.consumption import ConsumptionSerializer
 
 
@@ -27,6 +29,43 @@ class ActionCreationSerializersTest(SimpleTestCase):
         )
         self.assertIs(OtherIndustryHandler.get_action_creation_serializers()[Action.INIT], str)
         self.assertEqual(ActionIndustryHandler.get_action_creation_serializers(), {Action.INIT: ConsumptionSerializer})
+
+
+class ActionStatusAuthorizationsTest(SimpleTestCase):
+    def test_industry_extends_and_overrides_defaults_per_status(self):
+        default = Mock()
+        specific = Mock()
+        defaults = {
+            Action.INIT: {(ActionStatus.PENDING, ActionStatus.ACCEPTED): default},
+            Action.VALORIZE: {(ActionStatus.CREATED,): default},
+        }
+
+        class IndustryHandler(ActionIndustryHandler):
+            action_status_authorizations = {
+                Action.INIT: {(ActionStatus.PENDING, ActionStatus.REJECTED): specific},
+            }
+
+        with patch.object(ActionIndustryHandler, "action_status_authorizations", defaults):
+            self.assertEqual(
+                IndustryHandler.get_action_status_authorizations(),
+                {
+                    Action.INIT: {
+                        ActionStatus.PENDING: specific,
+                        ActionStatus.ACCEPTED: default,
+                        ActionStatus.REJECTED: specific,
+                    },
+                    Action.VALORIZE: {ActionStatus.CREATED: default},
+                },
+            )
+            self.assertEqual(
+                GenericActionHandler.get_action_status_authorizations(),
+                {
+                    Action.INIT: {ActionStatus.PENDING: default, ActionStatus.ACCEPTED: default},
+                    Action.VALORIZE: {ActionStatus.CREATED: default},
+                },
+            )
+
+        self.assertEqual(defaults[Action.INIT], {(ActionStatus.PENDING, ActionStatus.ACCEPTED): default})
 
 
 class ActionHandlerRegistryTest(TestCase):

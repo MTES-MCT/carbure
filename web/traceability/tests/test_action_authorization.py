@@ -8,12 +8,20 @@ from traceability.models import Action, ActionStatus
 from traceability.serializers.action_authorization import ActionAuthorizationSerializer
 
 
+def is_holder(actor, holder, parent_holder):
+    return actor == holder
+
+
 class GenericActionHandler(ActionIndustryHandler):
     industry = "TEST"
     action_creation_flow = (
         (None, (Action.INIT, ActionStatus.PENDING)),
         ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
     )
+    action_status_authorizations = {
+        Action.INIT: {(ActionStatus.PENDING,): is_holder},
+        Action.VALORIZE: {(ActionStatus.CREATED,): is_holder},
+    }
 
 
 class ActionAuthorizationSerializerTest(SimpleTestCase):
@@ -22,10 +30,10 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         self.parent = Action(id=3, type=Action.INIT, industry=GenericActionHandler.industry, holder=self.holder)
         self.parent.status = ActionStatus.PENDING
 
-    def validate_action(self, data, parent=None, holder=None):
+    def validate_action(self, data, parent=None, holder=None, actor=None):
         serializer = ActionAuthorizationSerializer(
             data=data,
-            context={"handler": GenericActionHandler()},
+            context={"handler": GenericActionHandler(), "entity": actor or self.holder},
         )
         holder_queryset = Mock()
         holder_queryset.get.return_value = holder or self.holder
@@ -53,6 +61,31 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
 
         self.assertEqual(serializer.errors, {})
         self.assertEqual(serializer.validated_data["status"], ActionStatus.PENDING)
+
+    def test_authorization_receives_actor_holder_and_parent_holder_in_order(self):
+        actor = Entity(id=2, entity_type=Entity.ADMIN)
+        holder = Entity(id=4, entity_type=Entity.HRS)
+        authorize = Mock(return_value=True)
+        with patch.object(
+            GenericActionHandler, "action_status_authorizations", {Action.VALORIZE: {(ActionStatus.CREATED,): authorize}}
+        ):
+            serializer = self.validate_action(
+                {"type": Action.VALORIZE, "status": ActionStatus.CREATED, "parent": 3, "holder": holder.id},
+                holder=holder,
+                actor=actor,
+            )
+
+        self.assertEqual(serializer.errors, {})
+        authorize.assert_called_once_with(actor, holder, self.holder)
+
+    def test_refuses_missing_or_denied_status_authorization(self):
+        denied = Mock(return_value=False)
+        for rules in ({}, {Action.INIT: {(ActionStatus.PENDING,): denied}}):
+            with self.subTest(rules=rules), patch.object(GenericActionHandler, "action_status_authorizations", rules):
+                serializer = self.validate_action({"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1})
+
+                self.assertIn("non_field_errors", serializer.errors)
+        denied.assert_called_once_with(self.holder, self.holder, None)
 
     def test_rejects_unknown_edge(self):
         unknown_edge = self.validate_action({"type": Action.VALORIZE, "status": ActionStatus.CREATED, "holder": 1})
