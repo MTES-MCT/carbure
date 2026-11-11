@@ -1,27 +1,20 @@
-# Création des actions : flow, autorisation et validation
+# Création des actions : flow et validation
 
-Chaque filière déclare les créations possibles dans son handler. Un lien de `action_creation_flow` contient l'état du parent, l'état initial de l'enfant et la fonction qui autorise l'opération :
+Chaque filière déclare les créations possibles dans son handler. Un lien de `action_creation_flow` contient l'état du parent et l'état initial de l'enfant :
 
 ```python
 class H2ActionHandler(ActionIndustryHandler):
     action_creation_flow = (
-        (None, (Action.INIT, ActionStatus.PENDING), can_create_consumption),
-        ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_valorization),
+        (None, (Action.INIT, ActionStatus.PENDING)),
+        ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
     )
 ```
 
 Un état est un couple `(type, statut)`. `None` désigne une création sans parent. Le premier lien correspondant au couple `(type, status)` demandé et à l'état courant du parent est utilisé ; sans lien, la création est refusée.
 
-## Autorisation
+## Validation du flow
 
-Une fonction d'autorisation reçoit l'entité appelante, le détenteur du parent et le futur détenteur. Pour une création sans parent, `parent_holder` vaut `None`.
-
-```python
-def can_create_consumption(actor, parent_holder, child_holder):
-    return actor.entity_type == Entity.HRS and actor == child_holder
-```
-
-`ActionAuthorizationSerializer` résout `parent`, `type`, `status` et `holder`, vérifie la filière du parent, recherche le lien et appelle sa fonction d'autorisation. Le statut initial est obligatoire et doit correspondre à un statut connu et au lien demandé. Une règle absente ou qui renvoie `False` refuse la création.
+`ActionAuthorizationSerializer` résout `parent`, `type`, `status` et `holder`, vérifie la filière du parent et recherche le lien de création. Le statut initial est obligatoire et doit correspondre à un statut connu et au lien demandé.
 
 ## Validation par type d'action
 
@@ -33,7 +26,7 @@ action_creation_serializers = {
 }
 ```
 
-Une filière peut déclarer sa propre map pour ajouter des types ou remplacer un serializer ; les autres entrées par défaut restent disponibles. Le serializer sélectionné valide les champs propres à l'action. Les valeurs d'autorisation sont vérifiées séparément et fournies à la sauvegarde.
+Une filière peut déclarer sa propre map pour ajouter des types ou remplacer un serializer ; les autres entrées par défaut restent disponibles. Le serializer sélectionné valide les champs propres à l'action. Les valeurs résolues par `ActionAuthorizationSerializer` sont fournies séparément à la sauvegarde.
 
 ## Création par l'API
 
@@ -42,7 +35,7 @@ Pour `POST /api/traceability/actions/?entity_id=…&industry=H2` :
 La requête doit inclure `type`, `status` et `holder`, ainsi que `parent` si nécessaire et les données propres au type d'action. Par exemple, une création H2 sans parent demande `"type": "INIT"` et `"status": "PENDING"`.
 
 1. Le handler est choisi selon `industry` et sa permission d'écriture est vérifiée.
-2. Le serializer d'autorisation vérifie le lien et l'acteur.
+2. `ActionAuthorizationSerializer` vérifie le lien et la filière du parent.
 3. Le serializer associé au type valide les données de l'action.
 4. L'action et son statut initial sont enregistrés dans une même transaction. La réponse `201` contient l'action créée.
 

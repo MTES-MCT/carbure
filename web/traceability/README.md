@@ -8,7 +8,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 | [`docs/inherited_fields.md`](docs/inherited_fields.md) | Règles des champs hérités                       |
 | [`docs/total_emissions.md`](docs/total_emissions.md)   | Formule du cumul GES                            |
 | [`docs/excel.md`](docs/excel.md)                       | Colonnes et import Excel                        |
-| [`docs/action_creation.md`](docs/action_creation.md)   | Flow, autorisation et validation de création    |
+| [`docs/action_creation.md`](docs/action_creation.md)   | Flow et validation de création                  |
 
 ## Choix de conception
 
@@ -52,7 +52,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `scope_queryset`                                          | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière            |
 | `action_creation_flow`                                    | Liens de création déclarés par la filière                                                                                |
 
-Le `POST` de création utilise `action_creation_flow` pour vérifier l'autorisation et le statut initial demandé via `status` ; voir [`docs/action_creation.md`](docs/action_creation.md).
+Le `POST` de création utilise `action_creation_flow` pour valider le lien de création et le statut initial demandé via `status` ; voir [`docs/action_creation.md`](docs/action_creation.md).
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 

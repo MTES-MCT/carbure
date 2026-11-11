@@ -10,7 +10,7 @@ from traceability.models import Action
 from traceability.serializers.action import ActionExcelImportSerializer
 from traceability.serializers.consumption import ConsumptionSerializer
 
-ActionFlowEdge = tuple[tuple[str, str] | None, tuple[str, str], Callable | None]
+ActionFlowEdge = tuple[tuple[str, str] | None, tuple[str, str]]
 
 
 class ActionIndustryHandler:

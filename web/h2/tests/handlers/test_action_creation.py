@@ -3,7 +3,6 @@ from types import SimpleNamespace
 from django.test import SimpleTestCase
 
 from h2.handlers.action import H2ActionHandler
-from h2.handlers.authorization import can_create_consumption, can_create_valorization
 from traceability.models import Action, ActionStatus
 from traceability.serializers.action_authorization import ActionAuthorizationSerializer
 
@@ -14,18 +13,18 @@ class H2ActionCreationTest(SimpleTestCase):
     def setUp(self):
         self.handler = H2ActionHandler()
 
-    def test_creation_rights(self):
+    def test_creation_flow(self):
         pending_init = SimpleNamespace(type=Action.INIT, status=ActionStatus.PENDING)
 
         root = find_edge(self.handler, Action.INIT, ActionStatus.PENDING)
         child = find_edge(self.handler, Action.VALORIZE, ActionStatus.CREATED, parent=pending_init)
 
-        self.assertEqual(root, (None, (Action.INIT, ActionStatus.PENDING), can_create_consumption))
+        self.assertEqual(root, (None, (Action.INIT, ActionStatus.PENDING)))
         self.assertIsNone(find_edge(self.handler, Action.INIT, ActionStatus.PENDING, parent=pending_init))
         self.assertIsNone(find_edge(self.handler, Action.VALORIZE, ActionStatus.CREATED))
         self.assertEqual(
             child,
-            ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_valorization),
+            ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
         )
         self.assertIsNone(
             find_edge(

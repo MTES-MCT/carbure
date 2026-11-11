@@ -17,13 +17,9 @@ from traceability.models import Action, ActionStatus
 from traceability.views.action import ActionViewset
 
 
-def can_create_consumption(actor, _parent_holder, child_holder):
-    return actor == child_holder
-
-
 class GenericActionHandler(ActionIndustryHandler):
     industry = Action.H2
-    action_creation_flow = ((None, (Action.INIT, ActionStatus.PENDING), can_create_consumption),)
+    action_creation_flow = ((None, (Action.INIT, ActionStatus.PENDING)),)
 
 
 @patch.dict(ACTION_HANDLERS, {GenericActionHandler.industry: GenericActionHandler})
@@ -46,7 +42,7 @@ class ActionCreateTest(SimpleTestCase):
         ):
             return self.view(request)
 
-    def test_authorized_request_validates_action_data(self):
+    def test_request_matching_flow_validates_action_data(self):
         response = self.post(
             {"type": Action.INIT, "status": ActionStatus.PENDING, "holder": self.holder.id, "quantity": "invalid"}
         )
@@ -62,7 +58,7 @@ class ActionCreateTest(SimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("type", response.data)
 
-    def test_unauthorized_request_returns_validation_error(self):
+    def test_unknown_creation_edge_returns_validation_error(self):
         response = self.post({"type": Action.VALORIZE, "status": ActionStatus.CREATED, "holder": self.holder.id})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -117,13 +113,6 @@ class ActionCreateIntegrationTest(TestCase):
         self.assertEqual(action.status, ActionStatus.PENDING)
         self.assertEqual(response.data["status"], ActionStatus.PENDING)
         self.assertEqual(ActionStatus.objects.filter(action=action).count(), 1)
-
-    def test_rejected_request_does_not_create_action(self):
-        other = Entity.objects.create(name="Autre opérateur", entity_type=Entity.OPERATOR)
-        response = self.post({**self.payload, "holder": other.pk})
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertFalse(Action.objects.exists())
 
     def test_status_without_matching_edge_does_not_create_action(self):
         response = self.post({**self.payload, "status": ActionStatus.ACCEPTED})
