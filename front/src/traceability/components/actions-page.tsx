@@ -135,7 +135,7 @@ export const ActionsPage = ({
     key: QUERY_KEY,
     params: [industry, combinedQuery],
     // Only execute the query if there is an active tab to avoid fetching data for nothing.
-    executeOnMount: Boolean(actionTabs.activeTab),
+    executeOnMount: !actionTabs.hasTabs || Boolean(actionTabs.activeTab),
   })
 
   const getFilterOptions = useCallback(

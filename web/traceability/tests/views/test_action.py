@@ -93,6 +93,28 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertEqual(detail.status_code, status.HTTP_200_OK)
         self.assertEqual(detail.data["quantity_available"], "60.000")
 
+    def test_list_keeps_exhausted_actions_unless_the_caller_filters_them(self):
+        exhausted = ActionFactory.create(holder=self.entity, industry=Action.H2, quantity=Decimal("30.000"))
+        ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=exhausted,
+            quantity=Decimal("30.000"),
+        )
+
+        shown = self.client.get(self.list_url, self.base_params)
+        available = self.client.get(self.list_url, {**self.base_params, "quantity_available": True})
+        exhausted_only = self.client.get(self.list_url, {**self.base_params, "quantity_available": False})
+
+        self.assertEqual(shown.status_code, status.HTTP_200_OK)
+        self.assertIn(exhausted.id, [item["id"] for item in shown.data["results"]])
+        self.assertIn(self.own_action.id, [item["id"] for item in shown.data["results"]])
+        self.assertEqual(available.status_code, status.HTTP_200_OK)
+        self.assertNotIn(exhausted.id, [item["id"] for item in available.data["results"]])
+        self.assertIn(self.own_action.id, [item["id"] for item in available.data["results"]])
+        self.assertEqual(exhausted_only.status_code, status.HTTP_200_OK)
+        self.assertEqual([item["id"] for item in exhausted_only.data["results"]], [exhausted.id])
+
     def test_list_includes_inherited_material(self):
         child = ActionFactory.create(
             holder=self.other_entity,

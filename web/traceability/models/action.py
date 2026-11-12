@@ -26,7 +26,6 @@ class ActionManager(models.Manager):
                 )
             )
             .annotate(quantity_available=quantity_available())
-            .filter(quantity_available__gt=0)
         )
 
 
