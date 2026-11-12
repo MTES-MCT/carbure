@@ -1,7 +1,11 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from edelivery.management.commands.export_national_scheme_certificates import carbure_entities, entity_names
+from edelivery.management.commands.export_national_scheme_certificates import (
+    carbure_entities,
+    entity_names,
+    find_entities_not_in_udb,
+)
 from entity.factories.entity import EntityFactory
 
 
@@ -72,3 +76,39 @@ class EntityNamesTest(TestCase):
     def test_format_entity_names_with_only_one_entity(self):
         entities = [EntityFactory.build(name="ENTITY 1")]
         self.assertEqual("entity 'ENTITY 1'", entity_names(entities))
+
+
+class EntitiesNotInUDBTest(TestCase):
+    def setUp(self):
+        module = "edelivery.management.commands.export_national_scheme_certificates"
+        self.patched_GetOrganisationByIDRequest = patch(f"{module}.GetOrganisationByIDRequest").start()
+        self.patched_Requester = patch(f"{module}.Requester").start()
+        self.patched_Requester.return_value.do_request.return_value = {}
+
+    def tearDown(self):
+        patch.stopall()
+
+    def test_returns_entities_not_present_in_UDB(self):
+        ntr_ids = ["NTR_ID_1", "NTR_ID_2", "NTR_ID_3"]
+        entities = [MagicMock(**{"ntr_id.return_value": ntr_id}) for ntr_id in ntr_ids]
+        request = "request"
+        self.patched_GetOrganisationByIDRequest.return_value = request
+        patched_do_request = self.patched_Requester.return_value.do_request
+        patched_do_request.return_value = {"found_organisations": ["NTR_ID_2"]}
+
+        self.patched_GetOrganisationByIDRequest.assert_not_called()
+        self.patched_Requester.assert_not_called()
+        patched_do_request.assert_not_called()
+
+        result = find_entities_not_in_udb(entities)
+        self.patched_GetOrganisationByIDRequest.assert_called_with("NTR_ID_1", "NTR_ID_2", "NTR_ID_3")
+        call_args = self.patched_Requester.call_args
+        self.assertEqual((request,), call_args.args)
+        self.assertEqual(["NTR_ID_1", "NTR_ID_3"], [e.ntr_id() for e in result])
+
+    def test_returns_entities_if_UDB_responds_not_found_error(self):
+        entities = [MagicMock(**{"ntr_id.return_value": "NTR_ID_1"})]
+        self.patched_Requester.return_value.do_request.return_value = {}
+
+        result = find_entities_not_in_udb(entities)
+        self.assertEqual(["NTR_ID_1"], [e.ntr_id() for e in result])
