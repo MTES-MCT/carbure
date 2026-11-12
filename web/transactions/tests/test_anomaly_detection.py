@@ -1,0 +1,90 @@
+from unittest.mock import Mock, patch
+
+import pandas as pd
+from django.core.exceptions import EmptyResultSet
+from django.test import SimpleTestCase
+
+from core.models import CarbureLot
+from transactions.services.anomaly_detection.create_errors import create_errors
+from transactions.services.anomaly_detection.detect_outliers import detect_outliers
+
+
+class DetectOutliersTest(SimpleTestCase):
+    def test_flags_identify_the_correct_model(self):
+        data = pd.DataFrame({"ep": [1.0, 2.0, 3.0, 4.0], "group": ["group"] * 4})
+        isolation_forest = Mock()
+        isolation_forest.fit_predict.return_value = pd.Series([-1, 1, 1, 1])
+        local_outlier_factor = Mock()
+        local_outlier_factor.fit_predict.return_value = pd.Series([1, -1, 1, 1])
+
+        outliers = detect_outliers(data, "ep", {"ep": []}, 0.75, [0.75], isolation_forest, local_outlier_factor)
+
+        self.assertEqual(outliers["ep"].tolist(), [1.0, 2.0])
+        self.assertEqual(outliers["is_if_outlier"].tolist(), [True, False])
+        self.assertEqual(outliers["is_lof_outlier"].tolist(), [False, True])
+
+
+class CreateAnomalyErrorsTest(SimpleTestCase):
+    def setUp(self):
+        self.exclude_patch = patch.object(CarbureLot.objects, "exclude")
+        self.processed_lots = self.exclude_patch.start().return_value.filter.return_value
+        self.addCleanup(self.exclude_patch.stop)
+        self.processed_lots.filter.side_effect = self.match_lots
+
+        self.errors_patch = patch("transactions.services.anomaly_detection.create_errors.GenericError.objects")
+        self.errors = self.errors_patch.start()
+        self.addCleanup(self.errors_patch.stop)
+
+    def match_lots(self, condition):
+        # Compile the actual Django predicate without executing a database query.
+        try:
+            CarbureLot.objects.filter(condition).query.sql_with_params()
+        except EmptyResultSet:
+            ids = []
+        else:
+            ids = [123]
+        result = Mock()
+        result.distinct.return_value.values_list.return_value = ids
+        return result
+
+    def test_no_outliers_does_not_flag_all_lots(self):
+        outliers = pd.DataFrame(columns=["ep", "is_lof_outlier", "is_if_outlier"])
+
+        self.assertEqual(create_errors({"ep": outliers}), [])
+
+        self.errors.bulk_create.assert_called_once_with([], batch_size=1000)
+        # Even an empty run must remove all previous outlier detections.
+        self.errors.filter.assert_called_once_with(error__in=["OUTLIER_EEC", "OUTLIER_EP", "OUTLIER_ETD"])
+        self.errors.filter.return_value.delete.assert_called_once_with()
+
+    def test_each_detection_model_creates_the_emission_outlier_error(self):
+        for flag in ["is_lof_outlier", "is_if_outlier"]:
+            with self.subTest(model=flag):
+                self.errors.reset_mock()
+                outliers = pd.DataFrame({"ep": [1.0], "is_lof_outlier": [False], "is_if_outlier": [False]})
+                outliers[flag] = True
+
+                self.assertEqual(create_errors({"ep": outliers}), [123])
+
+                created = self.errors.bulk_create.call_args.args[0]
+                self.assertEqual([(item.error, item.field, item.lot_id) for item in created], [("OUTLIER_EP", "ep", 123)])
+
+    def test_errors_are_unique_per_lot_and_emission_across_models(self):
+        outliers = pd.DataFrame({"ep": [1.0], "is_lof_outlier": [True], "is_if_outlier": [True]})
+
+        lot_ids = create_errors({"ep": outliers, "eec": outliers.rename(columns={"ep": "eec"})})
+
+        self.assertEqual(lot_ids, [123])
+        created = self.errors.bulk_create.call_args.args[0]
+        self.assertEqual(
+            [(item.error, item.field, item.lot_id) for item in created],
+            [("OUTLIER_EP", "ep", 123), ("OUTLIER_EEC", "eec", 123)],
+        )
+
+    def test_overlapping_filters_from_different_models_create_one_error_per_lot(self):
+        outliers = pd.DataFrame({"ep": [1.0, 1.0], "is_lof_outlier": [True, False], "is_if_outlier": [False, True]})
+
+        self.assertEqual(create_errors({"ep": outliers}), [123])
+
+        created = self.errors.bulk_create.call_args.args[0]
+        self.assertEqual([(item.error, item.field, item.lot_id) for item in created], [("OUTLIER_EP", "ep", 123)])
