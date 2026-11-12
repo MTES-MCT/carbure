@@ -32,6 +32,16 @@ def entity_names(entities):
     return f"{entities_label} {names}"
 
 
+def find_entities_not_in_udb(entities):
+    ntr_ids = [e.ntr_id() for e in entities]
+    request = GetOrganisationByIDRequest(*ntr_ids)
+    requester = Requester(request, timeout=70)
+    result = requester.do_request()
+
+    found_organisations = result.get("found_organisations", [])
+    return [e for e in entities if e.ntr_id() not in found_organisations]
+
+
 class Command(BaseCommand):
     help = "Export national scheme certificates to UDB"
 
@@ -55,24 +65,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        def find_entities_not_in_udb(entities, dry_run):
-            ntr_ids = [e.ntr_id() for e in entities]
-
-            if dry_run:
-                self.stdout.write(f"Would check if {entity_names(entities)} present in UDB… (assuming not)")
-                return entities
-
-            self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
-            request = GetOrganisationByIDRequest(*ntr_ids)
-            requester = Requester(request, timeout=70)
-            result = requester.do_request()
-
-            found_organisations_key = "found_organisations"
-            if found_organisations_key not in result:
-                return entities
-
-            return [e for e in entities if e.ntr_id() not in result[found_organisations_key]]
-
         def export_entities(entities, dry_run):
             if dry_run:
                 self.stdout.write(f"Would create {entity_names(entities)} in UDB…")
@@ -112,12 +104,17 @@ Would send UDB request with body being:
             return result
 
         dry_run = options["dry_run"]
-
         fetch_all = options["all"]
         entity_name = options["entity_name"]
 
         entities = carbure_entities(fetch_all=fetch_all, entity_name=entity_name)
-        entities_not_in_udb = find_entities_not_in_udb(entities, dry_run)
+        if dry_run:
+            self.stdout.write(f"Would check if {entity_names(entities)} present in UDB… (assuming not)")
+            entities_not_in_udb = entities
+        else:
+            self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
+            entities_not_in_udb = find_entities_not_in_udb(entities)
+
         if entities_not_in_udb:
             export_entities(entities_not_in_udb, dry_run)
         result = export_certificates(entities, dry_run)
