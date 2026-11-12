@@ -29,25 +29,6 @@ class ActionManager(models.Manager):
             .filter(quantity_available__gt=0)
         )
 
-    def annotate_actions(self, actions: list["Action"], queryset: QuerySet["Action"]) -> list["Action"]:
-        """Annotate these actions and return them in the same order.
-
-        The parent walk covers inherited fields and total emissions, and it runs
-        only on the given rows. Callers paginate first: MySQL rejects LIMIT inside
-        that walk. ``quantity_available`` is already on the manager queryset.
-        """
-        if not actions:
-            return actions
-
-        from traceability.services.inherited_fields import attach_inherited_fields
-        from traceability.services.parent_chain import annotate_parent_chain
-
-        ids = [action.pk for action in actions]
-        annotated = {action.pk: action for action in annotate_parent_chain(queryset.filter(pk__in=ids))}
-        ordered = [annotated[pk] for pk in ids]
-        attach_inherited_fields(ordered)
-        return ordered
-
 
 class Action(models.Model):
     pos_id = models.CharField(
@@ -126,6 +107,26 @@ class Action(models.Model):
 
     objects = ActionManager()
     unannotated = models.Manager()
+
+    @staticmethod
+    def annotate_actions(actions: list["Action"]) -> list["Action"]:
+        """Annotate these actions and return them in the same order.
+
+        The parent walk covers inherited fields and total emissions, and it runs
+        only on the given rows. Callers paginate first: MySQL rejects LIMIT inside
+        that walk. ``quantity_available`` is already on the manager queryset.
+        """
+        if not actions:
+            return actions
+
+        from traceability.services.inherited_fields import attach_inherited_fields
+        from traceability.services.parent_chain import annotate_parent_chain
+
+        ids = [action.pk for action in actions]
+        annotated = {action.pk: action for action in annotate_parent_chain(Action.objects.filter(pk__in=ids))}
+        ordered = [annotated[pk] for pk in ids]
+        attach_inherited_fields(ordered)
+        return ordered
 
     @staticmethod
     @transaction.atomic

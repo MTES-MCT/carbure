@@ -62,7 +62,7 @@ class ActionViewset(
     def get_object(self):
         action = super().get_object()
         if self.action == "retrieve":
-            return Action.objects.annotate_actions([action], self.get_queryset())[0]
+            return Action.annotate_actions([action])[0]
         return action
 
     def paginate_queryset(self, queryset):
@@ -71,7 +71,7 @@ class ActionViewset(
             return page
 
         # origin_material has already reduced this queryset to the matching ids.
-        return Action.objects.annotate_actions(page, queryset)
+        return Action.annotate_actions(page)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
