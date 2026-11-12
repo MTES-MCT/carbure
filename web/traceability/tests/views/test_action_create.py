@@ -148,7 +148,10 @@ class ActionCreateIntegrationTest(TestCase):
         self.assertFalse(ActionStatus.objects.exists())
 
     def test_status_creation_failure_rolls_back_action(self):
-        with patch.object(ActionStatus.objects, "create", side_effect=RuntimeError("status failure")):
+        with (
+            patch.object(ActionStatus.objects, "create", side_effect=RuntimeError("status failure")),
+            self.assertLogs("django.request", level="ERROR"),
+        ):
             with self.assertRaisesMessage(RuntimeError, "status failure"):
                 self.post(self.payload)
 
