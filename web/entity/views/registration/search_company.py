@@ -27,7 +27,7 @@ class SeachCompanyFormError:
 
 class CompanyNotFoundError(APIException):
     status_code = status.HTTP_400_BAD_REQUEST
-    default_detail = _("Company not found")
+    default_detail = _("Entreprise introuvable")
     default_code = "NO_COMPANY_FOUND"
 
 
