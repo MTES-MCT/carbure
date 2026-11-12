@@ -94,36 +94,6 @@ class ActionCreateTest(SimpleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_specific_predicate_receives_holders_and_refuses_without_fallback(self):
-        default = Mock(return_value=True)
-        specific = Mock(return_value=False)
-        with (
-            patch.object(
-                ActionIndustryHandler, "action_status_authorizations", {Action.INIT: {(ActionStatus.PENDING,): default}}
-            ),
-            patch.object(
-                GenericActionHandler, "action_status_authorizations", {Action.INIT: {(ActionStatus.PENDING,): specific}}
-            ),
-        ):
-            response = self.post({**self.payload, "industry": "OTHER"})
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        default.assert_not_called()
-        specific.assert_called_once_with(self.holder, self.holder, None)
-
-    def test_creation_uses_default_authorization(self):
-        default = Mock(return_value=False)
-        with (
-            patch.object(
-                ActionIndustryHandler, "action_status_authorizations", {Action.INIT: {(ActionStatus.PENDING,): default}}
-            ),
-            patch.object(GenericActionHandler, "action_status_authorizations", {}),
-        ):
-            response = self.post(self.payload)
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        default.assert_called_once_with(self.holder, self.holder, None)
-
 
 @patch.dict(ACTION_HANDLERS, {GenericActionHandler.industry: GenericActionHandler})
 class ActionCreateIntegrationTest(TestCase):

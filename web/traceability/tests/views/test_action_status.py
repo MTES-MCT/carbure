@@ -12,7 +12,6 @@ from core.tests_utils import PermissionTestMixin, setup_current_user
 from h2.handlers.action import H2ActionHandler
 from h2.permissions import HasH2AdminRights, HasHRSWriteRights
 from traceability.factories import ActionFactory
-from traceability.handlers.action import ActionIndustryHandler
 from traceability.models import Action, ActionStatus
 from traceability.views.action import ActionViewset
 
@@ -94,20 +93,6 @@ class ActionStatusTest(SimpleTestCase, PermissionTestMixin):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         authorize.assert_called_once_with(self.actor, self.holder, parent_holder)
         create_status.assert_called_once_with(action=self.action, status=ActionStatus.ACCEPTED)
-
-    def test_uses_base_authorization(self):
-        authorize = Mock(return_value=True)
-        with (
-            patch.object(
-                ActionIndustryHandler, "action_status_authorizations", {Action.INIT: {(ActionStatus.ACCEPTED,): authorize}}
-            ),
-            patch.object(H2ActionHandler, "action_status_authorizations", {}),
-        ):
-            response, create_status = self.post({"status": ActionStatus.ACCEPTED})
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        authorize.assert_called_once_with(self.actor, self.holder, None)
-        create_status.assert_called_once()
 
     def test_returns_not_found_for_inaccessible_action(self):
         response, create_status = self.post({"status": ActionStatus.ACCEPTED}, lookup_error=Http404())

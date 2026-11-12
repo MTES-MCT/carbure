@@ -39,21 +39,12 @@ class ActionIndustryHandler:
         return {**ActionIndustryHandler.action_creation_serializers, **cls.action_creation_serializers}
 
     @classmethod
-    def get_action_status_authorizations(cls) -> dict[str, dict[str, Callable[[Entity, Entity, Entity | None], bool]]]:
-        authorizations: dict[str, dict[str, Callable[[Entity, Entity, Entity | None], bool]]] = {}
-        for definitions in (ActionIndustryHandler.action_status_authorizations, cls.action_status_authorizations):
-            for action_type, rules in definitions.items():
-                status_authorizations = authorizations.setdefault(action_type, {})
-                for statuses, authorize in rules.items():
-                    for status in statuses:
-                        status_authorizations[status] = authorize
-        return authorizations
-
-    @classmethod
     def can_assign_status(cls, actor: Entity, action_type: str, status: str, holder: Entity, parent: Action | None) -> bool:
-        authorize = cls.get_action_status_authorizations().get(action_type, {}).get(status)
         parent_holder = parent.holder if parent is not None else None
-        return authorize is not None and authorize(actor, holder, parent_holder)
+        for statuses, authorize in cls.action_status_authorizations.get(action_type, {}).items():
+            if status in statuses:
+                return authorize(actor, holder, parent_holder)
+        return False
 
     @classmethod
     def get_permissions(cls, action: str):

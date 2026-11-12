@@ -46,8 +46,6 @@ def is_hrs_holder(actor, holder, parent_holder):
 
 Sans règle pour le couple `(type, statut)`, ou si la fonction renvoie `False`, l'opération est refusée.
 
-`get_action_status_authorizations()` fusionne les règles de base avec celles de la filière. Une règle de filière remplace celle définie sur le handler de base pour le même couple `(type, statut)` ; les autres restent disponibles.
-
 ## Changer le statut d'une action existante
 
 Une transition est le passage d'un statut à un autre pour une même action. `ActionStatus.TRANSITIONS`, défini dans [`models/action_status.py`](../models/action_status.py), liste les couples `(statut de départ, statut d'arrivée)` possibles, communs à toutes les filières. Par exemple :

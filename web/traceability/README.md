@@ -48,12 +48,12 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `excel_columns`                                           | Colonnes du template et mapping à l’import — voir [`docs/excel.md`](docs/excel.md)                                       |
 | `excel_import_serializer_class`                           | Validation d’import (surcharge filière)                                                                                  |
 | `action_creation_serializers`                             | Serializers de création associés aux types d'action ; ceux de la filière complètent ou remplacent les valeurs par défaut |
-| `action_status_authorizations`                           | Prédicats d'attribution des statuts par type d'action ; les règles de la filière complètent ou remplacent celles héritées par statut |
+| `action_status_authorizations`                           | Prédicats d'attribution des statuts par type d'action ; la filière définit l'ensemble de ses règles                        |
 | `read_permission`, `write_permission`, `admin_permission` | Droits pour chaque endpoint                                                                                              |
 | `scope_queryset`                                          | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière            |
 | `action_creation_flow`                                    | Liens de création déclarés par la filière                                                                                |
 
-Le `POST` de création utilise `action_creation_flow` pour valider le lien de création et le statut initial demandé via `status`, puis vérifie le prédicat correspondant dans les autorisations héritées via `get_action_status_authorizations()` ; voir [`docs/action_flows.md`](docs/action_flows.md).
+Le `POST` de création utilise `action_creation_flow` pour valider le lien de création et le statut initial demandé via `status`, puis vérifie le prédicat correspondant directement dans `action_status_authorizations` du handler ; voir [`docs/action_flows.md`](docs/action_flows.md).
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 
