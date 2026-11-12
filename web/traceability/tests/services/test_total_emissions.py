@@ -47,7 +47,7 @@ class TotalEmissionsTest(TestCase):
         )
 
     def test_each_action_sums_ges_from_itself_up_to_the_root(self):
-        by_id = {action.pk: action.total_emissions for action in annotate_total_emissions(Action.objects.all())}
+        by_id = {action.pk: action.total_emissions for action in annotate_total_emissions(Action.unannotated.all())}
 
         self.assertEqual(
             by_id[self.root.pk],

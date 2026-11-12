@@ -57,6 +57,7 @@ Ne pas poser cette annotation sur `Action.objects`. La CTE lit `Action.unannotat
 | `_next_parent_id` | Une fois la CTE jointe à `Action`, le champ du modèle reprend le nom. On filtre la copie. |
 | `Cast(Value(None), BigIntegerField())` | Un `NULL` nu fait deviner à MySQL une colonne trop étroite. L'id du parent ne rentre plus. |
 | Ids en liste Python | Une sous-requête relancerait la CTE pour le `COUNT`, puis pour la page. |
+| Liste d'ids vide | Pas de CTE. Django retire le membre vide d'un `UNION`, et MySQL refuse une CTE récursive qui n'a plus de `UNION`. |
 
 ## Valeur stockée sur la racine
 

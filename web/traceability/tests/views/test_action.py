@@ -171,6 +171,15 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(seen, [[self.own_action.id, self.child_of_own_action.id]])
 
+    def test_empty_year_with_origin_material_stays_empty(self):
+        response = self.client.get(
+            self.list_url,
+            {**self.base_params, "year": 1999, "origin_material": self.own_action.material.code},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["results"], [])
+
     def test_list_filters_by_origin_material(self):
         other = MaterialFactory(code="CH4", name="Méthane")
         child = ActionFactory.create(

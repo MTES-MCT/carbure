@@ -26,12 +26,21 @@ def _names(groups: Iterable[str]) -> list[str]:
     return list(dict.fromkeys(groups))
 
 
-def _chain_cte(queryset: QuerySet[Action], groups: Iterable[str]) -> CTE:
+def _listed_ids(queryset: QuerySet[Action]) -> list[int]:
+    return list(queryset.order_by().values_list("pk", flat=True))
+
+
+def _chain_cte(queryset: QuerySet[Action], groups: Iterable[str]) -> CTE | None:
     actions = _plain_actions()
     # MySQL rejects ORDER BY and subqueries inside the recursive query.
     # The manager filters quantity_available with a status subquery, so the
     # caller's WHERE cannot be pasted in. Evaluate the ids first.
-    listed = actions.filter(pk__in=list(queryset.order_by().values_list("pk", flat=True)))
+    # An empty id list must not build the CTE: Django drops the empty UNION
+    # member, and MySQL rejects a recursive CTE that no longer has a UNION.
+    ids = _listed_ids(queryset)
+    if not ids:
+        return None
+    listed = actions.filter(pk__in=ids)
     parts = [COLUMN_GROUPS[name] for name in _names(groups)]
 
     def columns(cte=None):
@@ -67,6 +76,8 @@ def _chain_cte(queryset: QuerySet[Action], groups: Iterable[str]) -> CTE:
 
 def _at_root(queryset: QuerySet[Action], groups: Iterable[str]):
     cte = _chain_cte(queryset, groups)
+    if cte is None:
+        return None, None
     # Meta.ordering is `id`, which is not a column of this CTE.
     rows = cte.queryset().filter(next_parent_id__isnull=True).order_by()
     return cte, rows
@@ -79,6 +90,8 @@ def annotate_parent_chain(queryset: QuerySet[Action], *, groups: Iterable[str] =
         return queryset
 
     cte = _chain_cte(queryset, names)
+    if cte is None:
+        return queryset
     annotations = {"_next_parent_id": cte.col.next_parent_id}
     for name in names:
         annotate = COLUMN_GROUPS[name].annotate
@@ -94,6 +107,8 @@ def annotate_parent_chain(queryset: QuerySet[Action], *, groups: Iterable[str] =
 def chain_column(queryset: QuerySet[Action], column: str, groups: Iterable[str]):
     """Walk to the root and return ``(action id, column)``. No emissions, no action row."""
     cte, rows = _at_root(queryset, groups)
+    if cte is None:
+        return Action.unannotated.none().values_list("pk", "pk")
     return with_cte(cte, select=rows).values_list("origin_id", column)
 
 
@@ -113,6 +128,8 @@ def _matching_roots(columns: dict[str, list]) -> list[int] | None:
 
 def _descendant_ids(root_ids: list[int]) -> list[int]:
     """The roots and every action below them."""
+    if not root_ids:
+        return []
     actions = _plain_actions()
     listed = actions.filter(pk__in=root_ids)
 
@@ -151,6 +168,8 @@ def filter_by_chain(queryset: QuerySet[Action], columns: dict[str, list], groups
         return queryset
 
     cte, rows = _at_root(queryset, groups)
+    if cte is None:
+        return queryset
     for column, values in columns.items():
         rows = rows.filter(**{f"{column}__in": values})
     # Une sous-requête relancerait le parcours pour le COUNT de la page, puis pour la page.

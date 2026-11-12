@@ -5,6 +5,7 @@ from django.test import TestCase
 from traceability.exceptions import NoEligibleActionError
 from traceability.factories import ActionFactory, MaterialFactory
 from traceability.models import Action, ActionStatus, Material
+from traceability.models.action_status import latest_status
 from traceability.services.inherited_fields import annotate_inherited_fields, attach_inherited_fields
 from traceability.services.valorize import valorize
 
@@ -29,7 +30,9 @@ class ValorizeTest(TestCase):
         self.assertEqual(child.holder_id, action.holder_id)
         self.assertIsNone(child.material_id)
         self.assertEqual(child.quantity, action.quantity)
-        self.assertEqual(Action.objects.get(pk=action.pk).status, ActionStatus.ACCEPTED)
+        parent = Action.unannotated.annotate(status=latest_status()).get(pk=action.pk)
+        self.assertEqual(parent.status, ActionStatus.ACCEPTED)
+        self.assertFalse(Action.objects.filter(pk=action.pk).exists())
 
     def test_displayed_unit_is_the_parent_material(self):
         action = self._pending_init(

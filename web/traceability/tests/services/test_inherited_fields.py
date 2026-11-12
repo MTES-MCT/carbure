@@ -16,7 +16,7 @@ class InheritedFieldsTest(TestCase):
         self.leaf = ActionFactory.create(industry=Action.H2, parent=self.middle, material=None)
 
     def _by_id(self):
-        actions = list(annotate_inherited_fields(Action.objects.all()))
+        actions = list(annotate_inherited_fields(Action.unannotated.all()))
         attach_inherited_fields(actions)
         return {action.pk: action.inherited_fields for action in actions}
 

@@ -24,8 +24,12 @@ class ParentChainTest(TestCase):
 
     def setUp(self):
         hydrogen = MaterialFactory(code="H2", name="Hydrogène")
-        self.root = ActionFactory.create(industry=Action.H2, parent=None, material=hydrogen, ei=1)
-        self.leaf = ActionFactory.create(industry=Action.H2, parent=self.root, material=None, ei=10)
+        self.root = ActionFactory.create(
+            industry=Action.H2, parent=None, material=hydrogen, ei=1, quantity=Decimal("100.000")
+        )
+        self.leaf = ActionFactory.create(
+            industry=Action.H2, parent=self.root, material=None, ei=10, quantity=Decimal("40.000")
+        )
 
     def _sql(self, **flags):
         with CaptureQueriesContext(connection) as captured:
@@ -93,3 +97,14 @@ class ParentChainTest(TestCase):
         self.assertEqual(ids, [self.root.pk])
         self.assertNotIn("descendants", sql)
         self.assertIn("parent_chain", sql)
+
+    def test_an_empty_list_does_not_build_the_parent_chain(self):
+        ids = list(
+            filter_by_chain(
+                Action.objects.none(),
+                {"origin_material_id": [self.root.material_id]},
+                ("inherited_fields",),
+            ).values_list("pk", flat=True)
+        )
+
+        self.assertEqual(ids, [])
