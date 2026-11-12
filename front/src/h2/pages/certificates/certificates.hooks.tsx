@@ -3,7 +3,12 @@ import { useTranslation } from "react-i18next"
 import { useActionColumns } from "traceability/hooks/action-columns"
 import { useActionFilters } from "traceability/hooks/use-action-filters"
 import { useActionFields } from "traceability/hooks/action-fields"
-import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
+import {
+  ActionIndustry,
+  ActionQuery,
+  ActionStatus,
+  ActionType,
+} from "traceability/types"
 import { ActionsPageProps } from "traceability/components/actions-page"
 import { EmptyCertificates } from "./components/empty-certificates"
 
@@ -18,6 +23,7 @@ type H2CertificatesPageConfig = Pick<
   | "detailTitle"
   | "subpath"
   | "fixedQuery"
+  | "tabs"
   | "emptyState"
   | "filters"
   | "columns"
@@ -40,6 +46,16 @@ export function useH2CertificatesPage(): {
       detailTitle: t("Certificat d'hydrogène n˚"),
       subpath: "certificates",
       fixedQuery: H2_CERTIFICATE_QUERY,
+      tabs: [
+        {
+          key: "available",
+          label: t("Disponibles"),
+          query: {
+            status: [ActionStatus.CREATED],
+          },
+        },
+        { key: "history", label: t("Historique") },
+      ],
       emptyState: <EmptyCertificates />,
       filters: [filters.period, filters.origin_material],
       columns: [

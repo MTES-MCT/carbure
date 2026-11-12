@@ -1,4 +1,4 @@
-import { ReactNode, useCallback } from "react"
+import { ReactNode, useCallback, useMemo } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { isEmpty } from "ramda"
 
@@ -11,6 +11,7 @@ import useEntity from "common/hooks/entity"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
+import { Tabs } from "common/components/tabs2"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
 
 import { getActionFilters, getActions, getActionYears } from "traceability/api"
@@ -24,6 +25,7 @@ import {
 import { ActionFilterDisplay } from "traceability/hooks/use-action-filters"
 import { ActionColumn } from "traceability/hooks/action-columns"
 import { useCombinedQuery } from "traceability/hooks/use-combined-query"
+import { ActionTab, useActionTabs } from "traceability/hooks/use-action-tabs"
 import { ActionModal } from "traceability/components/action-modal"
 import { ActionExcelImportDialog } from "traceability/components/action-excel-import-dialog"
 import { ActionFieldset } from "traceability/hooks/action-fields"
@@ -48,11 +50,14 @@ export type ExcelImportConfig = {
   fieldLabels?: Record<string, string>
 }
 
+export type { ActionTab }
+
 export type ActionsPageProps = {
   listTitle: string
   detailTitle: string
   subpath: string
   fixedQuery: Partial<ActionQuery>
+  tabs?: ActionTab[]
   mainAction?: MainAction
   renderDetailActions?: (action: Action) => ReactNode
   excelImport?: ExcelImportConfig
@@ -68,6 +73,7 @@ export const ActionsPage = ({
   detailTitle,
   subpath,
   fixedQuery,
+  tabs,
   mainAction,
   renderDetailActions,
   excelImport,
@@ -82,6 +88,11 @@ export const ActionsPage = ({
   const entity = useEntity()
   const location = useLocation()
   const navigate = useNavigate()
+  const actionTabs = useActionTabs(tabs)
+  const pageQuery = useMemo(
+    () => ({ ...fixedQuery, ...actionTabs.query }),
+    [fixedQuery, actionTabs.query]
+  )
 
   const visibleColumns = columns.filter(
     (column) => column.condition?.(entity) ?? true
@@ -118,17 +129,21 @@ export const ActionsPage = ({
     ActionQueryBuilder["config"]
   >({ year: years.selected })
 
-  const combinedQuery = useCombinedQuery(fixedQuery, query)
+  const combinedQuery = useCombinedQuery(pageQuery, query)
 
   const { result, loading } = useQuery(getActions, {
     key: QUERY_KEY,
     params: [industry, combinedQuery],
+    // Only execute the query if there is an active tab to avoid fetching data for nothing.
+    executeOnMount: Boolean(actionTabs.activeTab),
   })
 
   const getFilterOptions = useCallback(
     (filter: ActionFilter) => getActionFilters(filter, industry, combinedQuery),
     [industry, combinedQuery]
   )
+
+  if (actionTabs.redirect) return actionTabs.redirect
 
   const showEmptyState =
     Boolean(emptyState) &&
@@ -164,7 +179,16 @@ export const ActionsPage = ({
         </section>
       </header>
 
-      <Content marginTop>
+      {actionTabs.hasTabs && (
+        <Tabs
+          keepSearch
+          sticky
+          focus={actionTabs.activeTab?.key}
+          tabs={actionTabs.links ?? []}
+        />
+      )}
+
+      <Content marginTop={!actionTabs.hasTabs}>
         <ActionBar>
           <ActionBar.Grow>
             <SearchInput value={state.search} onChange={actions.setSearch} />

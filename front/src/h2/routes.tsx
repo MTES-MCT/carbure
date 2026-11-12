@@ -25,7 +25,10 @@ const H2AdminRoutes = () => {
           path="certificates"
           element={<Navigate replace to={`${currentYear}`} />}
         />
-        <Route path="certificates/:year" element={<AdminCertificatesPage />} />
+        <Route
+          path="certificates/:year/:tab?"
+          element={<AdminCertificatesPage />}
+        />
       </Route>
       <Route path="*" element={<Navigate replace to="../admin/lots" />} />
     </Routes>
@@ -49,7 +52,7 @@ export const H2Routes = () => {
         path="certificates"
         element={<Navigate replace to={`${currentYear}`} />}
       />
-      <Route path="certificates/:year" element={<CertificatesPage />} />
+      <Route path="certificates/:year/:tab?" element={<CertificatesPage />} />
       <Route path="*" element={<Navigate replace to="../stations" />} />
     </Routes>
   )
