@@ -19,23 +19,21 @@ La création est refusée si aucun lien ne correspond exactement au parent, au t
 
 ## Définir qui peut attribuer un statut
 
-`action_status_authorizations` associe un type d'action et un groupe de statuts à une fonction d'autorisation.
+`action_status_authorizations` associe chaque couple `(type d'action, statut)` à une fonction d'autorisation.
 
 ```python
 action_status_authorizations = {
-    Action.INIT: {
-        (ActionStatus.PENDING,): is_hrs_holder,
-        (ActionStatus.ACCEPTED, ActionStatus.REJECTED, ActionStatus.BLOCKED): is_h2_admin,
-    },
-    Action.VALORIZE: {
-        (ActionStatus.CREATED,): is_h2_admin,
-    },
+    (Action.INIT, ActionStatus.PENDING): is_hrs_holder,
+    (Action.INIT, ActionStatus.ACCEPTED): is_h2_admin,
+    (Action.INIT, ActionStatus.REJECTED): is_h2_admin,
+    (Action.INIT, ActionStatus.BLOCKED): is_h2_admin,
+    (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
 }
 ```
 
 Ici, une station HRS peut créer sa propre action `INIT` en `PENDING`. Les statuts `ACCEPTED`, `REJECTED` et `BLOCKED` sont réservés à l'administration H2. La création d'une `VALORIZE` en `CREATED` lui est aussi réservée.
 
-Les clés sont des tuples : pour un seul statut, garder la virgule dans `(ActionStatus.PENDING,)`.
+Chaque clé est un tuple contenant le type d'action et le statut à attribuer.
 
 La fonction reçoit trois entités : l'entité qui agit, le détenteur de l'action et le détenteur du parent (`None` sans parent). Par exemple, [`is_hrs_holder`](../../h2/handlers/authorization.py) vérifie que l'entité est une station HRS et agit pour elle-même :
 

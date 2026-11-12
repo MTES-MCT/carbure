@@ -24,7 +24,7 @@ def is_holder(actor, holder, parent_holder):
 class GenericActionHandler(ActionIndustryHandler):
     industry = Action.H2
     action_creation_flow = ((None, (Action.INIT, ActionStatus.PENDING)),)
-    action_status_authorizations = {Action.INIT: {(ActionStatus.PENDING,): is_holder}}
+    action_status_authorizations = {(Action.INIT, ActionStatus.PENDING): is_holder}
 
 
 @patch.dict(ACTION_HANDLERS, {GenericActionHandler.industry: GenericActionHandler})

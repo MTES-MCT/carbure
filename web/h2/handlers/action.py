@@ -20,13 +20,11 @@ class H2ActionHandler(ActionIndustryHandler):
     ]
 
     action_status_authorizations = {
-        Action.INIT: {
-            (ActionStatus.PENDING,): is_hrs_holder,
-            (ActionStatus.ACCEPTED, ActionStatus.REJECTED, ActionStatus.BLOCKED): is_h2_admin,
-        },
-        Action.VALORIZE: {
-            (ActionStatus.CREATED,): is_h2_admin,
-        },
+        (Action.INIT, ActionStatus.PENDING): is_hrs_holder,
+        (Action.INIT, ActionStatus.ACCEPTED): is_h2_admin,
+        (Action.INIT, ActionStatus.REJECTED): is_h2_admin,
+        (Action.INIT, ActionStatus.BLOCKED): is_h2_admin,
+        (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
     }
 
     lookups = lookups

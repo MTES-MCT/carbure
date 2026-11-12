@@ -24,7 +24,7 @@ class ActionIndustryHandler:
         Action.INIT: ConsumptionSerializer,
     }
 
-    action_status_authorizations: dict[str, dict[tuple[str, ...], Callable[[Entity, Entity, Entity | None], bool]]] = {}
+    action_status_authorizations: dict[tuple[str, str], Callable[[Entity, Entity, Entity | None], bool]] = {}
 
     lookups = default_lookups
     excel_columns: list[dict] = [excel_column(key) for key in ACTION_EXCEL_COLUMNS]
@@ -40,11 +40,9 @@ class ActionIndustryHandler:
 
     @classmethod
     def can_assign_status(cls, actor: Entity, action_type: str, status: str, holder: Entity, parent: Action | None) -> bool:
+        authorize = cls.action_status_authorizations.get((action_type, status))
         parent_holder = parent.holder if parent is not None else None
-        for statuses, authorize in cls.action_status_authorizations.get(action_type, {}).items():
-            if status in statuses:
-                return authorize(actor, holder, parent_holder)
-        return False
+        return authorize is not None and authorize(actor, holder, parent_holder)
 
     @classmethod
     def get_permissions(cls, action: str):

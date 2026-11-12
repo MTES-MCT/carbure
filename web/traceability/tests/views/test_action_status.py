@@ -84,7 +84,7 @@ class ActionStatusTest(SimpleTestCase, PermissionTestMixin):
         self.action.parent = Action(id=5, holder=parent_holder, industry=Action.H2, type=Action.INIT)
         authorize = Mock(return_value=True)
         with patch.object(
-            H2ActionHandler, "action_status_authorizations", {Action.INIT: {(ActionStatus.ACCEPTED,): authorize}}
+            H2ActionHandler, "action_status_authorizations", {(Action.INIT, ActionStatus.ACCEPTED): authorize}
         ):
             response, create_status = self.post(
                 {"status": ActionStatus.ACCEPTED, "type": Action.VALORIZE, "holder": self.actor.pk, "parent": None}

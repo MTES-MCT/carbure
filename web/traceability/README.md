@@ -48,7 +48,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `excel_columns`                                           | Colonnes du template et mapping à l’import — voir [`docs/excel.md`](docs/excel.md)                                       |
 | `excel_import_serializer_class`                           | Validation d’import (surcharge filière)                                                                                  |
 | `action_creation_serializers`                             | Serializers de création associés aux types d'action ; ceux de la filière complètent ou remplacent les valeurs par défaut |
-| `action_status_authorizations`                           | Prédicats d'attribution des statuts par type d'action ; la filière définit l'ensemble de ses règles                        |
+| `action_status_authorizations`                           | Prédicats d'attribution par couple `(type d'action, statut)` ; la filière définit l'ensemble de ses règles                 |
 | `read_permission`, `write_permission`, `admin_permission` | Droits pour chaque endpoint                                                                                              |
 | `scope_queryset`                                          | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière            |
 | `action_creation_flow`                                    | Liens de création déclarés par la filière                                                                                |

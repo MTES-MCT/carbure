@@ -19,8 +19,8 @@ class GenericActionHandler(ActionIndustryHandler):
         ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
     )
     action_status_authorizations = {
-        Action.INIT: {(ActionStatus.PENDING,): is_holder},
-        Action.VALORIZE: {(ActionStatus.CREATED,): is_holder},
+        (Action.INIT, ActionStatus.PENDING): is_holder,
+        (Action.VALORIZE, ActionStatus.CREATED): is_holder,
     }
 
 
@@ -67,7 +67,7 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         holder = Entity(id=4, entity_type=Entity.HRS)
         authorize = Mock(return_value=True)
         with patch.object(
-            GenericActionHandler, "action_status_authorizations", {Action.VALORIZE: {(ActionStatus.CREATED,): authorize}}
+            GenericActionHandler, "action_status_authorizations", {(Action.VALORIZE, ActionStatus.CREATED): authorize}
         ):
             serializer = self.validate_action(
                 {"type": Action.VALORIZE, "status": ActionStatus.CREATED, "parent": 3, "holder": holder.id},
@@ -80,7 +80,7 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
 
     def test_refuses_missing_or_denied_status_authorization(self):
         denied = Mock(return_value=False)
-        for rules in ({}, {Action.INIT: {(ActionStatus.PENDING,): denied}}):
+        for rules in ({}, {(Action.INIT, ActionStatus.PENDING): denied}):
             with self.subTest(rules=rules), patch.object(GenericActionHandler, "action_status_authorizations", rules):
                 serializer = self.validate_action({"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1})
 
