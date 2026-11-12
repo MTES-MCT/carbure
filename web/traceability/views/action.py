@@ -110,11 +110,7 @@ class ActionViewset(
                 industry=request.handler.industry,
             )
             ActionStatus.objects.create(action=action, status=authorization.validated_data["status"])
-
-            action = annotate_parent_chain(Action.objects.filter(pk=action.pk)).get()
-            attach_inherited_fields([action])
-            attach_quantities([action])
-
+            action = Action.annotate_actions([action])[0]
             return Response(ActionSerializer(action, context=context).data, status=status.HTTP_201_CREATED)
 
     def perform_destroy(self, instance):
