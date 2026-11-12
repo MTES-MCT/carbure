@@ -25,6 +25,13 @@ def carbure_entities(fetch_all=False, entity_name=None):
     return entities
 
 
+def entity_names(entities):
+    names = ", ".join([f"'{e.name}'" for e in entities])
+    entities_label = f"entit{'ies' if len(entities) > 1 else 'y'}"
+
+    return f"{entities_label} {names}"
+
+
 class Command(BaseCommand):
     help = "Export national scheme certificates to UDB"
 
@@ -49,17 +56,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         def find_entities_not_in_udb(entities, dry_run):
-            entity_names = ", ".join([f"'{e.name}'" for e in entities])
             ntr_ids = [e.ntr_id() for e in entities]
 
             if dry_run:
-                self.stdout.write(
-                    f"Would check if entit{'ies' if len(entities) > 1 else "y"}"
-                    f"{entity_names} present in UDB… (assuming not)"
-                )
+                self.stdout.write(f"Would check if {entity_names(entities)} present in UDB… (assuming not)")
                 return entities
 
-            self.stdout.write(f"Checking if entit{'ies' if len(entities) > 1 else "y"} {entity_names} present in UDB…")
+            self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
             request = GetOrganisationByIDRequest(*ntr_ids)
             requester = Requester(request, timeout=70)
             result = requester.do_request()
@@ -71,12 +74,11 @@ class Command(BaseCommand):
             return [e for e in entities if e.ntr_id() not in result[found_organisations_key]]
 
         def export_entities(entities, dry_run):
-            entity_names = ", ".join([f"'{e.name}'" for e in entities])
             if dry_run:
-                self.stdout.write(f"Would create entit{'ies' if len(entities) > 1 else "y"} {entity_names} in UDB…")
+                self.stdout.write(f"Would create {entity_names(entities)} in UDB…")
                 return
 
-            self.stdout.write(f"Creating entit{'ies' if len(entities) > 1 else "y"} {entity_names} in UDB…")
+            self.stdout.write(f"Creating {entity_names(entities)} in UDB…")
             request = AddOrganisationRequest(*entities)
             requester = Requester(request, timeout=70)
             requester.do_request()
