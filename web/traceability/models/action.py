@@ -40,7 +40,8 @@ class Action(models.Model):
     )
 
     H2 = "H2"
-    INDUSTRIES = [(H2, "Hydrogène")]
+    UNKNOWN = "UNKNOWN"
+    INDUSTRIES = [(H2, "Hydrogène"), (UNKNOWN, "Inconnu")]
     industry = models.CharField(verbose_name="Filière", choices=INDUSTRIES, max_length=16)
 
     INIT = "INIT"
