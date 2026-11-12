@@ -4,10 +4,12 @@ import {
   PathsApiTraceabilityActionsFiltersGetParametersQueryFilter as ActionFilter,
   PathsApiTraceabilityActionsGetParametersQueryShipping_method as ActionShippingMethod,
   PathsApiTraceabilityActionsGetParametersQueryType as ActionType,
+  components,
 } from "api-schema"
-export { PathsApiTraceabilityActionsGetParametersQueryIndustry as ActionIndustry } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
+
+export { PathsApiTraceabilityActionsGetParametersQueryIndustry as ActionIndustry } from "api-schema"
 
 export type Action = apiTypes["Action"]
 export type InheritedFieldKey = keyof Action["inherited_fields"]
@@ -27,6 +29,8 @@ export type ActionQuery = ActionQueryBuilder["query"] & {
   [ActionFilter.shipping_method]?: ActionShippingMethod[]
   [ActionFilter.site]?: string[]
 }
+
+export type ActionBody = components["schemas"]["ActionCreateRequest"]
 
 export {
   ActionType,

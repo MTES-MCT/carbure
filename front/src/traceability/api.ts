@@ -1,6 +1,11 @@
 import { api } from "common/services/api-fetch"
 import { download } from "common/services/api"
-import { ActionFilter, ActionIndustry, ActionQuery } from "traceability/types"
+import {
+  ActionBody,
+  ActionFilter,
+  ActionIndustry,
+  ActionQuery,
+} from "traceability/types"
 
 export function getActionYears(
   entity_id: number,
@@ -84,5 +89,18 @@ export function importActionsFromExcel(
       query: { entity_id, industry },
     },
     body: { file },
+  })
+}
+
+export function createAction(
+  entity_id: number,
+  industry: ActionIndustry,
+  data: ActionBody
+) {
+  return api.POST("/traceability/actions/", {
+    params: {
+      query: { entity_id, industry },
+    },
+    body: data,
   })
 }
