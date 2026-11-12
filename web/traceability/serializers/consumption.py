@@ -1,19 +1,19 @@
 from rest_framework import serializers
 
 from traceability.models import Action
+from traceability.serializers.action_create import ActionCreateSerializer
 from traceability.serializers.lookups import CertificateLookupField, MaterialLookupField, SiteLookupField
 
 
-class ConsumptionSerializer(serializers.ModelSerializer):
-    type = serializers.HiddenField(default=Action.INIT)
+class ConsumptionSerializer(ActionCreateSerializer):
+    type = serializers.ChoiceField(choices=[Action.INIT])
     material = MaterialLookupField(required=False, allow_null=True)
     certificate = CertificateLookupField(required=False, allow_null=True)
     site = SiteLookupField(required=False, allow_null=True)
 
-    class Meta:
-        model = Action
+    class Meta(ActionCreateSerializer.Meta):
         fields = [
-            "type",
+            *ActionCreateSerializer.Meta.fields,
             "pos_id",
             "material",
             "certificate",

@@ -1,16 +1,10 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from core.models import Entity
-from traceability.models import Action, ActionStatus
+from traceability.serializers.action_create import ActionCreateSerializer
 
 
-class ActionAuthorizationSerializer(serializers.Serializer):
-    parent = serializers.PrimaryKeyRelatedField(queryset=Action.objects.all(), required=False, allow_null=True)
-    type = serializers.ChoiceField(choices=Action.TYPES)
-    status = serializers.ChoiceField(choices=ActionStatus.STATUSES)
-    holder = serializers.PrimaryKeyRelatedField(queryset=Entity.objects.all())
-
+class ActionAuthorizationSerializer(ActionCreateSerializer):
     def validate(self, attrs):
         parent = attrs.get("parent")
         handler = self.context["handler"]

@@ -4,13 +4,14 @@ from unittest.mock import Mock, patch
 from django.test import SimpleTestCase
 from rest_framework.validators import UniqueValidator
 
-from traceability.models import Action
+from core.models import Entity
+from traceability.models import Action, ActionStatus
 from traceability.serializers.consumption import ConsumptionSerializer
 
 
 class ConsumptionSerializerTest(SimpleTestCase):
     def setUp(self):
-        self.entity = object()
+        self.entity = Entity(id=1)
         self.material = SimpleNamespace(name="Hydrogène gazeux")
         self.certificate = SimpleNamespace(certificate_id="CHY-001")
         self.site = SimpleNamespace(name="Station Paris")
@@ -21,6 +22,9 @@ class ConsumptionSerializerTest(SimpleTestCase):
         )
         self.context = {"handler": SimpleNamespace(lookups=self.lookups), "entity": self.entity}
         self.payload = {
+            "type": Action.INIT,
+            "status": ActionStatus.PENDING,
+            "holder": self.entity.pk,
             "pos_id": "POS-1",
             "quantity": "12.500",
             "working_date": "2026-01-01",
@@ -29,11 +33,19 @@ class ConsumptionSerializerTest(SimpleTestCase):
             "site": self.site.name,
         }
 
+    def validate(self, serializer):
+        queryset = Mock()
+        queryset.get.return_value = self.entity
+        with (
+            patch.object(serializer.fields["holder"], "get_queryset", return_value=queryset),
+            patch.object(UniqueValidator, "__call__", return_value=None),
+        ):
+            return serializer.is_valid()
+
     def test_resolves_relations_using_handler_lookups(self):
         serializer = ConsumptionSerializer(data=self.payload, context=self.context)
 
-        with patch.object(UniqueValidator, "__call__", return_value=None):
-            self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertTrue(self.validate(serializer), serializer.errors)
 
         for field in ("material", "certificate", "site"):
             with self.subTest(field=field):
@@ -48,29 +60,31 @@ class ConsumptionSerializerTest(SimpleTestCase):
                     context={**self.context, "serializer_cache": {}},
                 )
 
-                with patch.object(UniqueValidator, "__call__", return_value=None):
-                    self.assertFalse(serializer.is_valid())
+                self.assertFalse(self.validate(serializer))
 
                 self.assertEqual(set(serializer.errors), {field})
                 self.assertEqual(serializer.errors[field][0].code, "does_not_exist")
 
-    def test_validates_consumption_and_sets_its_type(self):
+    def test_validates_complete_consumption_request(self):
         serializer = ConsumptionSerializer(
             data={
-                "type": Action.VALORIZE,
-                "pos_id": "POS-1",
-                "quantity": "12.500",
-                "working_date": "2026-01-01",
+                **self.payload,
                 "material": None,
+                "certificate": None,
                 "site": None,
             }
         )
 
-        with patch.object(UniqueValidator, "__call__", return_value=None):
-            self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertTrue(self.validate(serializer), serializer.errors)
 
         self.assertEqual(serializer.validated_data["type"], Action.INIT)
         self.assertEqual(str(serializer.validated_data["quantity"]), "12.500")
+
+    def test_rejects_another_action_type(self):
+        serializer = ConsumptionSerializer(data={**self.payload, "type": Action.VALORIZE}, context=self.context)
+
+        self.assertFalse(self.validate(serializer))
+        self.assertEqual(set(serializer.errors), {"type"})
 
     def test_rejects_missing_or_invalid_required_data(self):
         serializer = ConsumptionSerializer(data={"quantity": "not a number"})

@@ -4,15 +4,12 @@ from django.db import transaction
 from rest_framework import serializers
 
 from traceability.models import Action, ActionStatus
+from traceability.serializers.action_create import ActionCreateSerializer
 
 
-class ValorizeSerializer(serializers.ModelSerializer):
-    type = serializers.HiddenField(default=Action.VALORIZE)
+class ValorizeSerializer(ActionCreateSerializer):
+    type = serializers.ChoiceField(choices=[Action.VALORIZE])
     parent = serializers.PrimaryKeyRelatedField(queryset=Action.objects.all())
-
-    class Meta:
-        model = Action
-        fields = ["type", "parent"]
 
     @transaction.atomic
     def create(self, validated_data):
