@@ -1,4 +1,20 @@
 export interface paths {
+    "/api/auth/activate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["auth_activate_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/activate-profile/": {
         parameters: {
             query?: never;
@@ -24,23 +40,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["auth_check_activate_profile_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/auth/activate/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["auth_activate_create"];
+        post: operations["auth_activate_profile_check_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3442,7 +3442,8 @@ export interface paths {
         /** @description Add a years action based on an action's working date. */
         get: operations["traceability_actions_list"];
         put?: never;
-        post?: never;
+        /** @description Create an action. */
+        post: operations["traceability_actions_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3462,6 +3463,23 @@ export interface paths {
         post?: never;
         /** @description Add a years action based on an action's working date. */
         delete: operations["traceability_actions_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/traceability/actions/{id}/status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Change an action's status. */
+        post: operations["traceability_actions_status_create"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3661,6 +3679,7 @@ export interface components {
             certificate_type: components["schemas"]["CertificateTypeEnum"];
             certificate_holder: string;
         };
+        ActionCreateRequest: components["schemas"]["ConsumptionRequest"] | components["schemas"]["ValorizeRequest"];
         ActionExcelUploadRequest: {
             /** Format: binary */
             file: File;
@@ -3683,10 +3702,10 @@ export interface components {
             pos_id: string;
         };
         /**
-         * @description * `ROAD` - Transport routier
+         * @description * `ROAD` - Road transport
          *     * `PIPELINE` - Pipeline
          *     * `RAILROAD` - Rail
-         *     * `SEA` - Transport maritime
+         *     * `SEA` - Maritime transport
          * @enum {string}
          */
         ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
@@ -3694,6 +3713,12 @@ export interface components {
             readonly id: number;
             name: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+        };
+        ActionStatusAuthorization: {
+            status: components["schemas"]["ActionStatusEnum"];
+        };
+        ActionStatusAuthorizationRequest: {
+            status: components["schemas"]["ActionStatusEnum"];
         };
         /**
          * @description * `CREATED` - CREATED
@@ -3745,7 +3770,6 @@ export interface components {
             password1: string;
             password2: string;
         };
-        ActivateResponse: Record<string, never>;
         AddCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -5036,12 +5060,64 @@ export interface components {
             /** @default success */
             status: string;
         };
+        /** @description Common request fields; authorization is validated separately before creation. */
+        ConsumptionRequest: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "INIT";
+            parent?: number | null;
+            status: components["schemas"]["ActionStatusEnum"];
+            holder: number;
+            /** N° de POS */
+            pos_id: string;
+            material?: string | null;
+            certificate?: string | null;
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            site?: string | null;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date?: string | null;
+            /** Distance de livraison */
+            shipping_distance?: number | null;
+            /** Mode de transport */
+            shipping_method?: components["schemas"]["ActionShippingMethodEnum"] | null;
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
+            /** Format: decimal */
+            eec?: string;
+            /** Format: decimal */
+            el?: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Format: decimal */
+            esca?: string;
+            /** Format: decimal */
+            eccr?: string;
+        };
         /**
-         * @description * `MAC` - MAC
-         *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+         * @description * `INIT` - INIT
          * @enum {string}
          */
-        ConsumptionTypeEnum: PathsApiSafTicketsGetParametersQueryConsumption_type;
+        ConsumptionTypeEnum: "INIT";
         /**
          * @description * `NO_PROBLEMO` - NO_PROBLEMO
          *     * `IN_CORRECTION` - IN_CORRECTION
@@ -5476,7 +5552,7 @@ export interface components {
          * @description * `ELEC` - ELEC
          * @enum {string}
          */
-        ElecBalanceSectorEnum: ElecBalanceSectorEnum;
+        ElecBalanceSectorEnum: "ELEC";
         ElecOperation: {
             readonly id: number;
             readonly type: string;
@@ -6110,6 +6186,7 @@ export interface components {
         IcpeRegimeEnum: IcpeRegimeEnum;
         /**
          * @description * `H2` - Hydrogène
+         *     * `UNKNOWN` - Inconnu
          * @enum {string}
          */
         IndustryEnum: PathsApiTraceabilityActionsGetParametersQueryIndustry;
@@ -7057,6 +7134,12 @@ export interface components {
             readonly created_at: string | null;
             assignment_period: number;
         };
+        /**
+         * @description * `MAC` - MAC
+         *     * `MAC_DECLASSEMENT` - MAC_DECLASSEMENT
+         * @enum {string}
+         */
+        SafConsumptionTypeEnum: PathsApiSafTicketsGetParametersQueryConsumption_type;
         SafParentLot: {
             readonly id: number;
             carbure_id?: string;
@@ -7105,7 +7188,7 @@ export interface components {
             readonly country_of_origin: components["schemas"]["Country"];
             /** Format: double */
             ghg_reduction?: number;
-            consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
+            consumption_type?: components["schemas"]["SafConsumptionTypeEnum"] | null;
             ets_status?: components["schemas"]["EtsStatusEnum"] | null;
             /** Format: date-time */
             readonly created_at: string | null;
@@ -7164,7 +7247,7 @@ export interface components {
             readonly country_of_origin: components["schemas"]["Country"];
             /** Format: double */
             ghg_reduction?: number;
-            consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
+            consumption_type?: components["schemas"]["SafConsumptionTypeEnum"] | null;
             ets_status?: components["schemas"]["EtsStatusEnum"] | null;
             /** Format: date-time */
             readonly created_at: string | null;
@@ -7228,7 +7311,7 @@ export interface components {
             free_field?: string | null;
             assignment_period: number;
             reception_airport?: number | null;
-            consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
+            consumption_type?: components["schemas"]["SafConsumptionTypeEnum"] | null;
             shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
@@ -7243,7 +7326,7 @@ export interface components {
             free_field?: string | null;
             assignment_period: number;
             reception_airport?: number | null;
-            consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
+            consumption_type?: components["schemas"]["SafConsumptionTypeEnum"] | null;
             shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
@@ -7258,7 +7341,7 @@ export interface components {
             free_field?: string | null;
             assignment_period: number;
             reception_airport?: number | null;
-            consumption_type?: components["schemas"]["ConsumptionTypeEnum"] | null;
+            consumption_type?: components["schemas"]["SafConsumptionTypeEnum"] | null;
             shipping_method?: components["schemas"]["SafShippingMethodEnum"] | null;
             /** @default false */
             has_intermediary_depot: boolean;
@@ -7660,6 +7743,22 @@ export interface components {
             rights: components["schemas"]["UserRightsSettings"][];
             requests: components["schemas"]["UserRightsRequests"][];
         };
+        /** @description Common request fields; authorization is validated separately before creation. */
+        ValorizeRequest: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "VALORIZE";
+            parent: number;
+            status: components["schemas"]["ActionStatusEnum"];
+            holder: number;
+        };
+        /**
+         * @description * `VALORIZE` - VALORIZE
+         * @enum {string}
+         */
+        ValorizeTypeEnum: "VALORIZE";
         /** @description A serializer for submitting the OTP sent via email. Includes otp_token field only. */
         VerifyOTPRequest: {
             /** Entrez le code à 6 chiffres reçu par email */
@@ -7685,7 +7784,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    auth_check_activate_profile_create: {
+    auth_activate_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -7700,14 +7799,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The invitation link is still valid. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description The link is expired, already used, or does not belong to an invited account. */
+            /** @description Bad request - missing fields. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7733,6 +7825,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The account was activated and the password was set. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -7750,7 +7843,7 @@ export interface operations {
             };
         };
     };
-    auth_activate_create: {
+    auth_activate_profile_check_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -7765,15 +7858,14 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The invitation link is still valid. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["ActivateResponse"];
-                };
+                content?: never;
             };
-            /** @description Bad request - missing fields. */
+            /** @description The link is expired, already used, or does not belong to an invited account. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7914,6 +8006,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The request was accepted. A mail is sent only when a pending account matches the address. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -16029,7 +16122,10 @@ export interface operations {
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16064,10 +16160,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16104,12 +16200,64 @@ export interface operations {
             };
         };
     };
+    traceability_actions_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ActionCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionCreateRequest"];
+                "multipart/form-data": components["schemas"]["ActionCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"];
+                };
+            };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     traceability_actions_retrieve: {
         parameters: {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16138,7 +16286,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16161,6 +16312,65 @@ export interface operations {
             };
         };
     };
+    traceability_actions_status_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionStatusAuthorizationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionStatusAuthorizationRequest"];
+                "multipart/form-data": components["schemas"]["ActionStatusAuthorizationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionStatusAuthorization"];
+                };
+            };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     traceability_actions_filters_retrieve: {
         parameters: {
             query: {
@@ -16169,7 +16379,10 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiTraceabilityActionsFiltersGetParametersQueryFilter;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16200,10 +16413,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16245,7 +16458,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16285,7 +16501,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16313,7 +16532,10 @@ export interface operations {
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `UNKNOWN` - Inconnu
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16344,10 +16566,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16890,7 +17112,8 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     years = "years"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryIndustry {
-    H2 = "H2"
+    H2 = "H2",
+    UNKNOWN = "UNKNOWN"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinusholder = "-holder",
@@ -16991,6 +17214,9 @@ export enum ComplementaryAidOrganismsEnum {
 export enum CompostingLocationsEnum {
     ON_SITE = "ON_SITE",
     EXTERNAL_PLATFORM = "EXTERNAL_PLATFORM"
+}
+export enum ConsumptionRequestType {
+    INIT = "INIT"
 }
 export enum CorrectionStatusEnum {
     NO_PROBLEMO = "NO_PROBLEMO",
@@ -17270,4 +17496,7 @@ export enum UserRightsRequestsStatusEnum {
     Accepted = "ACCEPTED",
     Rejected = "REJECTED",
     Revoked = "REVOKED"
+}
+export enum ValorizeRequestType {
+    VALORIZE = "VALORIZE"
 }
