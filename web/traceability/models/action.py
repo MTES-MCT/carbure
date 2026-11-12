@@ -1,22 +1,22 @@
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import CharField, OuterRef, QuerySet, Subquery, Value
+from django.db.models import CharField, Q, QuerySet, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
-from .action_status import ActionStatus
+from traceability.services.quantities import quantity_available
+
+from .action_status import ActionStatus, latest_status
 
 
 class ActionManager(models.Manager):
     def get_queryset(self):
-        latest_status_subquery = ActionStatus.objects.filter(action=OuterRef("id")).order_by("-created_at", "-id")
-
         return (
             super()
             .get_queryset()
             .select_related("holder", "material", "site", "parent", "certificate")
-            .annotate(status=Subquery(latest_status_subquery.values("status")[:1]))
+            .annotate(status=latest_status())
             .annotate(
                 period=Concat(
                     ExtractYear("working_date"),
@@ -25,6 +25,8 @@ class ActionManager(models.Manager):
                     output_field=CharField(),
                 )
             )
+            .annotate(quantity_available=quantity_available())
+            .filter(quantity_available__gt=0)
         )
 
 
@@ -107,6 +109,26 @@ class Action(models.Model):
     unannotated = models.Manager()
 
     @staticmethod
+    def annotate_actions(actions: list["Action"]) -> list["Action"]:
+        """Annotate these actions and return them in the same order.
+
+        The parent walk covers inherited fields and total emissions, and it runs
+        only on the given rows. Callers paginate first: MySQL rejects LIMIT inside
+        that walk. ``quantity_available`` is already on the manager queryset.
+        """
+        if not actions:
+            return actions
+
+        from traceability.services.inherited_fields import attach_inherited_fields
+        from traceability.services.parent_chain import annotate_parent_chain
+
+        ids = [action.pk for action in actions]
+        annotated = {action.pk: action for action in annotate_parent_chain(Action.objects.filter(pk__in=ids))}
+        ordered = [annotated[pk] for pk in ids]
+        attach_inherited_fields(ordered)
+        return ordered
+
+    @staticmethod
     @transaction.atomic
     def bulk_create(actions: list["Action"], default_status=ActionStatus.CREATED) -> QuerySet["Action"]:
         Action.objects.bulk_create(actions)
@@ -125,4 +147,7 @@ class Action(models.Model):
         indexes = [
             # Years and date ordering always filter by industry and type.
             models.Index(fields=["industry", "type", "working_date"], name="action_industry_type_date"),
+        ]
+        constraints = [
+            models.CheckConstraint(condition=Q(quantity__gt=0), name="action_quantity_positive"),
         ]

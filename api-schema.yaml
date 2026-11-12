@@ -14378,24 +14378,12 @@ components:
           allOf:
             - $ref: "#/components/schemas/ActionInheritedFields"
           readOnly: true
-        mass:
+        quantity_available:
           type: string
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
-          nullable: true
-        volume:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
-          readOnly: true
-          nullable: true
-        energy:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
-          readOnly: true
-          nullable: true
+          default: "0.000"
         pos_id:
           type: string
           title: N° de POS
@@ -14471,21 +14459,19 @@ components:
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
       required:
         - certificate
-        - energy
         - holder
         - id
         - industry
         - inherited_fields
-        - mass
         - material
         - parent
         - pos_id
         - quantity
+        - quantity_available
         - site
         - status
         - total_emissions
         - type
-        - volume
         - working_date
     ActionCertificate:
       type: object

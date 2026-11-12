@@ -3606,12 +3606,11 @@ export interface components {
             readonly certificate: components["schemas"]["ActionCertificate"] | null;
             readonly total_emissions: components["schemas"]["ActionTotalEmissions"] | null;
             readonly inherited_fields: components["schemas"]["ActionInheritedFields"];
-            /** Format: decimal */
-            readonly mass: string | null;
-            /** Format: decimal */
-            readonly volume: string | null;
-            /** Format: decimal */
-            readonly energy: string | null;
+            /**
+             * Format: decimal
+             * @default 0.000
+             */
+            readonly quantity_available: string;
             /** N° de POS */
             pos_id: string;
             /** Filière */

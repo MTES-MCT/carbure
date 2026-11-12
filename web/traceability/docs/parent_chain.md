@@ -4,7 +4,7 @@ Code : `services/parent_chain.py`. Groupes de colonnes : `services/column_groups
 
 Chaque action a un `parent`. La chaîne part de l'action et monte jusqu'à la racine, celle dont le parent est vide. La profondeur n'est pas connue à l'avance. Un `JOIN` ordinaire ne joint qu'un nombre fixe de niveaux. La requête récursive part des actions demandées, puis répète « prendre le parent » jusqu'à ce qu'il n'y en ait plus.
 
-Le résultat n'est pas stocké. `mass`, `volume` et `energy` sont calculés ensuite en Python. Les champs renvoyés : [`inherited_fields.md`](inherited_fields.md). La formule GES : [`total_emissions.md`](total_emissions.md).
+Le résultat n'est pas stocké. Les champs renvoyés : [`inherited_fields.md`](inherited_fields.md). La formule GES : [`total_emissions.md`](total_emissions.md).
 
 ## Un seul `WITH`, plusieurs groupes de colonnes
 
@@ -43,7 +43,7 @@ Pour une action, la requête produit une ligne par cran. On garde celle dont le 
 | `GET /filters/?filter=origin_material` | `chain_column` sur le queryset déjà filtré par les autres paramètres. Une ligne par action, puis les libellés sont dédoublonnés. Tant que `origin_material` est dans l'URL, les options d'un autre filtre rejouent aussi cette remontée. |
 | `/years/` | Pas de parcours. |
 
-La vue appelle `annotate_parent_chain`. `annotate_total_emissions` et `annotate_inherited_fields` ne demandent qu'un groupe. Ce ne sont pas le chemin de la liste.
+La liste et le détail appellent `Action.annotate_actions`. Elle lance `annotate_parent_chain` sur les lignes demandées et charge les matières héritées. `quantity_available` vient de l'annotation du manager. `annotate_total_emissions` et `annotate_inherited_fields` ne demandent qu'un groupe. Ce ne sont pas le chemin de la liste.
 
 Ne pas poser cette annotation sur `Action.objects`. La CTE lit `Action.unannotated`. Un manager déjà annoté s'imbriquerait dans la récursion.
 
@@ -51,12 +51,13 @@ Ne pas poser cette annotation sur `Action.objects`. La CTE lit `Action.unannotat
 
 | Dans le code | Pourquoi |
 |---|---|
-| `Action.unannotated.all().order_by()` | `ORDER BY`, `DISTINCT` et les sous-requêtes de statut sont interdits dans la CTE. Le tri du modèle et le manager annoté cassent la requête. On n'envoie que des ids. |
+| `Action.unannotated.all().order_by()` | `ORDER BY`, `DISTINCT` et les sous-requêtes de statut sont interdits dans la CTE. Le manager filtre `quantity_available` avec une sous-requête de statut. Les ids du queryset appelant sont donc lus en liste Python avant le parcours. |
 | `ei_sum` | Au `JOIN`, `ei` serait à la fois la somme transportée et la colonne de l'action. |
 | `next_parent_id` | Même collision avec `parent_id`. |
 | `_next_parent_id` | Une fois la CTE jointe à `Action`, le champ du modèle reprend le nom. On filtre la copie. |
 | `Cast(Value(None), BigIntegerField())` | Un `NULL` nu fait deviner à MySQL une colonne trop étroite. L'id du parent ne rentre plus. |
 | Ids en liste Python | Une sous-requête relancerait la CTE pour le `COUNT`, puis pour la page. |
+| Liste d'ids vide | Pas de CTE. Django retire le membre vide d'un `UNION`, et MySQL refuse une CTE récursive qui n'a plus de `UNION`. |
 
 ## Valeur stockée sur la racine
 

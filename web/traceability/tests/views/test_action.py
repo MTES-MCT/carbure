@@ -1,3 +1,4 @@
+from decimal import Decimal
 from unittest.mock import patch
 
 from django.db import connection
@@ -24,12 +25,13 @@ class ActionViewsetQuerysetTest(TestCase):
         self.list_url = reverse("traceability-action-list")
         self.base_params = {"entity_id": self.entity.id, "industry": Action.H2}
 
-        self.own_action = ActionFactory.create(holder=self.entity, industry=Action.H2)
+        self.own_action = ActionFactory.create(holder=self.entity, industry=Action.H2, quantity=Decimal("1000000.000"))
         self.other_holder_action = ActionFactory.create(holder=self.other_entity, industry=Action.H2)
         self.child_of_own_action = ActionFactory.create(
             holder=self.other_entity,
             industry=Action.H2,
             parent=self.own_action,
+            quantity=Decimal("1.000"),
         )
         self.other_industry_action = ActionFactory.create(holder=self.entity, industry="BIOMASS")
 
@@ -71,9 +73,25 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertIn("total_emissions", by_id[self.own_action.id])
         self.assertIn("total", by_id[self.own_action.id]["total_emissions"])
         self.assertEqual(by_id[self.own_action.id]["status"], "PENDING")
-        self.assertIn("mass", by_id[self.own_action.id])
-        self.assertIn("volume", by_id[self.own_action.id])
-        self.assertIn("energy", by_id[self.own_action.id])
+
+    def test_list_and_retrieve_expose_quantity_available(self):
+        self.own_action.quantity = Decimal("100.000")
+        self.own_action.save(update_fields=["quantity"])
+        self.child_of_own_action.quantity = Decimal("40.000")
+        self.child_of_own_action.save(update_fields=["quantity"])
+
+        listing = self.client.get(self.list_url, self.base_params)
+        detail = self.client.get(
+            reverse("traceability-action-detail", args=[self.own_action.id]),
+            self.base_params,
+        )
+
+        self.assertEqual(listing.status_code, status.HTTP_200_OK)
+        by_id = {item["id"]: item for item in listing.data["results"]}
+        self.assertEqual(by_id[self.own_action.id]["quantity_available"], "60.000")
+        self.assertEqual(by_id[self.child_of_own_action.id]["quantity_available"], "40.000")
+        self.assertEqual(detail.status_code, status.HTTP_200_OK)
+        self.assertEqual(detail.data["quantity_available"], "60.000")
 
     def test_list_includes_inherited_material(self):
         child = ActionFactory.create(
@@ -131,7 +149,7 @@ class ActionViewsetQuerysetTest(TestCase):
             seen_pks.extend(queryset.values_list("pk", flat=True))
             return annotate_parent_chain(queryset, **kwargs)
 
-        with patch("traceability.views.action.annotate_parent_chain", side_effect=capture):
+        with patch("traceability.services.parent_chain.annotate_parent_chain", side_effect=capture):
             response = self.client.get(
                 reverse("traceability-action-detail", args=[self.own_action.id]),
                 self.base_params,
@@ -147,11 +165,20 @@ class ActionViewsetQuerysetTest(TestCase):
             seen.append(list(queryset.values_list("pk", flat=True)))
             return annotate_parent_chain(queryset, **kwargs)
 
-        with patch("traceability.views.action.annotate_parent_chain", side_effect=capture):
+        with patch("traceability.services.parent_chain.annotate_parent_chain", side_effect=capture):
             response = self.client.get(self.list_url, self.base_params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(seen, [[self.own_action.id, self.child_of_own_action.id]])
+
+    def test_empty_year_with_origin_material_stays_empty(self):
+        response = self.client.get(
+            self.list_url,
+            {**self.base_params, "year": 1999, "origin_material": self.own_action.material.code},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["results"], [])
 
     def test_list_filters_by_origin_material(self):
         other = MaterialFactory(code="CH4", name="Méthane")

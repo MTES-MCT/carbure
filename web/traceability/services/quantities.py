@@ -1,61 +1,33 @@
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 
-from traceability.models.material import Material
+from django.db.models import DecimalField, ExpressionWrapper, F, OuterRef, Subquery, Sum, Value
+from django.db.models.functions import Coalesce
 
-_PLACES = Decimal("0.001")
+from traceability.models.action_status import ActionStatus, latest_status
 
-
-def _round(value):
-    if value is None:
-        return None
-    return Decimal(value).quantize(_PLACES, rounding=ROUND_HALF_UP)
-
-
-def _multiply(left, right):
-    if left is None or right is None:
-        return None
-    return Decimal(left) * Decimal(right)
+# A deleted child does not consume its parent.
+_EXCLUDED_CHILD_STATUSES = (ActionStatus.DELETED,)
+_QUANTITY = DecimalField(max_digits=16, decimal_places=3)
 
 
-def _divide(left, right):
-    if left is None or not right:
-        return None
-    return Decimal(left) / Decimal(right)
+def quantity_available():
+    """quantity minus the sum of direct children.
 
-
-def convert_quantity(quantity, material):
-    """Return mass (kg), volume (l) and energy (MJ).
-
-    mass   = volume × density
-    energy = mass × lhv
-
-    A missing material or factor yields None for the value that needs it.
+    Children whose latest status is DELETED are left out.
+    Grandchildren do not. No consuming child leaves the stored quantity.
     """
-    if quantity is None or material is None:
-        return None, None, None
+    from traceability.models.action import Action
 
-    quantity = Decimal(quantity)
-    if material.unit == Material.KG:
-        mass, volume, energy = quantity, _divide(quantity, material.density), _multiply(quantity, material.lhv)
-    elif material.unit == Material.L:
-        mass = _multiply(quantity, material.density)
-        volume = quantity
-        energy = _multiply(mass, material.lhv)
-    elif material.unit == Material.MJ:
-        mass = _divide(quantity, material.lhv)
-        volume = _divide(mass, material.density)
-        energy = quantity
-    else:
-        return None, None, None
-    return _round(mass), _round(volume), _round(energy)
-
-
-def attach_quantities(actions: list) -> list:
-    """Set mass, volume and energy from the stored material, or previous_material.
-
-    Call after ``attach_inherited_fields``.
-    """
-    for action in actions:
-        material = action.material or action.inherited_fields["previous_material"]
-        action.mass, action.volume, action.energy = convert_quantity(action.quantity, material)
-    return actions
+    consumed = (
+        Action.unannotated.filter(parent_id=OuterRef("pk"))
+        .annotate(status=latest_status())
+        .exclude(status__in=_EXCLUDED_CHILD_STATUSES)
+        .order_by()
+        .values("parent_id")
+        .annotate(total=Sum("quantity"))
+        .values("total")
+    )
+    return ExpressionWrapper(
+        F("quantity") - Coalesce(Subquery(consumed, output_field=_QUANTITY), Value(Decimal("0")), output_field=_QUANTITY),
+        output_field=_QUANTITY,
+    )

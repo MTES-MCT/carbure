@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import OuterRef, Subquery
 
 
 class ActionStatus(models.Model):
@@ -29,3 +30,11 @@ class ActionStatus(models.Model):
         verbose_name = "Statut d'action"
         verbose_name_plural = "Statuts d'action"
         ordering = ["id"]
+        indexes = [
+            models.Index(fields=["action", "-created_at", "-id"], name="action_status_latest"),
+        ]
+
+
+def latest_status():
+    """Subquery for an action's current status: newest row, then highest id."""
+    return Subquery(ActionStatus.objects.filter(action=OuterRef("id")).order_by("-created_at", "-id").values("status")[:1])
