@@ -11,15 +11,6 @@ class ActionAuthorizationSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=ActionStatus.STATUSES)
     holder = serializers.PrimaryKeyRelatedField(queryset=Entity.objects.all())
 
-    @staticmethod
-    def find_edge(handler, action_type, status, parent=None):
-        parent_state = (parent.type, parent.status) if parent is not None else None
-        for edge in handler.action_creation_flow:
-            source, target = edge
-            if source == parent_state and target == (action_type, status):
-                return edge
-        return None
-
     def validate(self, attrs):
         parent = attrs.get("parent")
         handler = self.context["handler"]
@@ -27,8 +18,7 @@ class ActionAuthorizationSerializer(serializers.Serializer):
         if parent is not None and parent.industry != handler.industry:
             raise serializers.ValidationError(_("Opération non autorisée."))
 
-        edge = self.find_edge(handler, attrs["type"], attrs["status"], parent)
-        if edge is None:
+        if not handler.can_create_action(attrs["type"], attrs["status"], parent):
             raise serializers.ValidationError(_("Opération non autorisée."))
 
         if not handler.can_assign_status(self.context["entity"], attrs["type"], attrs["status"], attrs["holder"], parent):

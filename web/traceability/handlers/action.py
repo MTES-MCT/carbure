@@ -39,6 +39,11 @@ class ActionIndustryHandler:
         return {**ActionIndustryHandler.action_creation_serializers, **cls.action_creation_serializers}
 
     @classmethod
+    def can_create_action(cls, action_type: str, status: str, parent: Action | None = None) -> bool:
+        parent_state = (parent.type, parent.status) if parent is not None else None
+        return (parent_state, (action_type, status)) in cls.action_creation_flow
+
+    @classmethod
     def can_assign_status(cls, actor: Entity, action_type: str, status: str, holder: Entity, parent: Action | None) -> bool:
         authorize = cls.action_status_authorizations.get((action_type, status))
         parent_holder = parent.holder if parent is not None else None

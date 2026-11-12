@@ -100,18 +100,17 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
 
         self.assertFalse(serializer.is_valid())
 
-    def test_find_edge_matches_parent_type_and_status(self):
+    def test_can_create_action_matches_parent_type_and_status(self):
         handler = GenericActionHandler()
-        find_edge = ActionAuthorizationSerializer.find_edge
 
-        self.assertIsNotNone(find_edge(handler, Action.VALORIZE, ActionStatus.CREATED, self.parent))
-        self.assertIsNone(find_edge(handler, "UNKNOWN", ActionStatus.CREATED, self.parent))
-        self.assertIsNone(find_edge(handler, Action.VALORIZE, ActionStatus.PENDING, self.parent))
+        self.assertIs(handler.can_create_action(Action.VALORIZE, ActionStatus.CREATED, self.parent), True)
+        self.assertIs(handler.can_create_action("UNKNOWN", ActionStatus.CREATED, self.parent), False)
+        self.assertIs(handler.can_create_action(Action.VALORIZE, ActionStatus.PENDING, self.parent), False)
         self.parent.type = Action.VALORIZE
-        self.assertIsNone(find_edge(handler, Action.VALORIZE, ActionStatus.CREATED, self.parent))
+        self.assertIs(handler.can_create_action(Action.VALORIZE, ActionStatus.CREATED, self.parent), False)
         self.parent.type = Action.INIT
         self.parent.status = ActionStatus.ACCEPTED
-        self.assertIsNone(find_edge(handler, Action.VALORIZE, ActionStatus.CREATED, self.parent))
+        self.assertIs(handler.can_create_action(Action.VALORIZE, ActionStatus.CREATED, self.parent), False)
 
     def test_rejects_missing_or_invalid_status(self):
         for fields in ({}, {"status": "UNKNOWN"}, {"status": None}, {"status": ""}):
