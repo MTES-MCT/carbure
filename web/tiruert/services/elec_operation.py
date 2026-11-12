@@ -67,4 +67,4 @@ class ElecOperationService:
             available_balance += updated.quantity
 
         if quantity > available_balance:
-            raise serializers.ValidationError({"quantity": _("Quantity is greater than the available balance")})
+            raise serializers.ValidationError({"quantity": _("La quantité est supérieure au solde disponible.")})
