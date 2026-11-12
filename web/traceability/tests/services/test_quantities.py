@@ -65,7 +65,7 @@ class QuantityAvailableTest(TestCase):
         self.assertEqual(values[parent.pk], Decimal("9.000"))
         self.assertNotIn(other.pk, values)
 
-    def test_the_manager_drops_a_fully_consumed_action(self):
+    def test_the_manager_keeps_a_fully_consumed_action(self):
         kept = ActionFactory.create(quantity=Decimal("100.000"), parent=None)
         exhausted = ActionFactory.create(quantity=Decimal("30.000"), parent=None)
         ActionFactory.create(quantity=Decimal("30.000"), parent=exhausted)
@@ -75,4 +75,5 @@ class QuantityAvailableTest(TestCase):
 
         self.assertIn(kept.id, ids)
         self.assertIn(untouched.id, ids)
-        self.assertNotIn(exhausted.id, ids)
+        self.assertIn(exhausted.id, ids)
+        self.assertEqual(Action.objects.get(pk=exhausted.id).quantity_available, Decimal("0.000"))

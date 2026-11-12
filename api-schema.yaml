@@ -25,17 +25,6 @@ paths:
         - cookieAuth: []
         - basicAuth: []
       responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ActivateResponse"
-              examples:
-                SuccessExample:
-                  value: {}
-                  summary: A successful activation
-                  description: The account was successfully activated.
-          description: ""
         "400":
           content:
             application/json:
@@ -78,7 +67,7 @@ paths:
           description: The link is no longer valid, or the account already has a password.
   /api/auth/activate-profile/check/:
     post:
-      operationId: auth_check_activate_profile_create
+      operationId: auth_activate_profile_check_create
       tags:
         - auth
       requestBody:
@@ -104,7 +93,8 @@ paths:
             application/json:
               schema:
                 message: Could not activate user account
-          description: The link is expired, already used, or does not belong to an invited account.
+          description: The link is expired, already used, or does not belong to an invited
+            account.
   /api/auth/confirm-email-change/:
     post:
       operationId: auth_confirm_email_change_create
@@ -4353,7 +4343,6 @@ paths:
             type: array
             items:
               type: string
-              format: date
           explode: true
           style: form
         - in: query
@@ -4630,7 +4619,6 @@ paths:
             type: array
             items:
               type: string
-              format: date
           explode: true
           style: form
         - in: query
@@ -13560,6 +13548,11 @@ paths:
               type: string
           explode: true
           style: form
+        - in: query
+          name: quantity_available
+          schema:
+            type: boolean
+            nullable: true
         - name: search
           required: false
           in: query
@@ -13848,6 +13841,11 @@ paths:
               type: string
           explode: true
           style: form
+        - in: query
+          name: quantity_available
+          schema:
+            type: boolean
+            nullable: true
         - name: search
           required: false
           in: query
@@ -14142,6 +14140,11 @@ paths:
               type: string
           explode: true
           style: form
+        - in: query
+          name: quantity_available
+          schema:
+            type: boolean
+            nullable: true
         - name: search
           required: false
           in: query
@@ -14692,9 +14695,6 @@ components:
         - password2
         - token
         - uidb64
-    ActivateResponse:
-      type: object
-      additionalProperties: false
     AddCertificateRequest:
       type: object
       properties:
@@ -23324,8 +23324,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: Resend the activation email for the pending account matching
-        this address.
+      description: Resend the activation email for the pending account matching this
+        address.
       properties:
         email:
           type: string

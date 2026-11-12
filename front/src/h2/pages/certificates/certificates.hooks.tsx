@@ -52,9 +52,9 @@ export function useH2CertificatesPage(): {
           label: t("Disponibles"),
           query: {
             status: [ActionStatus.CREATED],
+            quantity_available: true,
           },
         },
-        { key: "history", label: t("Historique") },
       ],
       emptyState: <EmptyCertificates />,
       filters: [filters.period, filters.origin_material],

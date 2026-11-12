@@ -20,6 +20,7 @@ export type ActionCertificate = NonNullable<Action["certificate"]>
 export type ActionQueryBuilder = QueryBuilder<ActionStatus[], ActionOrderBy[]>
 
 export type ActionQuery = ActionQueryBuilder["query"] & {
+  quantity_available?: boolean
   [ActionFilter.holder]?: string[]
   [ActionFilter.type]?: ActionType[]
   [ActionFilter.material]?: string[]
