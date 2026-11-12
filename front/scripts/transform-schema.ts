@@ -1,5 +1,5 @@
 /**
- * Transform the API schema to add File type for binary content
+ * Transform binary fields to File and single-value string enums to literals.
  */
 import openapiTS, { astToString } from "openapi-typescript"
 import ts from "typescript"
@@ -17,6 +17,17 @@ const ast = await openapiTS(new URL("../../api-schema.yaml", import.meta.url), {
       return schemaObject.nullable
         ? ts.factory.createUnionTypeNode([FILE, NULL])
         : FILE
+    }
+    if (
+      schemaObject.enum?.length === 1 &&
+      typeof schemaObject.enum[0] === "string"
+    ) {
+      const literal = ts.factory.createLiteralTypeNode(
+        ts.factory.createStringLiteral(schemaObject.enum[0])
+      )
+      return schemaObject.nullable
+        ? ts.factory.createUnionTypeNode([literal, NULL])
+        : literal
     }
   },
   enum: true,
