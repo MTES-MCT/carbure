@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 from edelivery.management.commands.export_national_scheme_certificates import (
     carbure_entities,
     entity_names,
+    export_entities,
     find_entities_not_in_udb,
 )
 from entity.factories.entity import EntityFactory
@@ -77,6 +78,10 @@ class EntityNamesTest(TestCase):
         entities = [EntityFactory.build(name="ENTITY 1")]
         self.assertEqual("entity 'ENTITY 1'", entity_names(entities))
 
+    def test_format_entity_names_if_no_entity(self):
+        entities = []
+        self.assertEqual("no entity", entity_names(entities))
+
 
 class EntitiesNotInUDBTest(TestCase):
     def setUp(self):
@@ -98,7 +103,6 @@ class EntitiesNotInUDBTest(TestCase):
 
         self.patched_GetOrganisationByIDRequest.assert_not_called()
         self.patched_Requester.assert_not_called()
-        patched_do_request.assert_not_called()
 
         result = find_entities_not_in_udb(entities)
         self.patched_GetOrganisationByIDRequest.assert_called_with("NTR_ID_1", "NTR_ID_2", "NTR_ID_3")
@@ -112,3 +116,33 @@ class EntitiesNotInUDBTest(TestCase):
 
         result = find_entities_not_in_udb(entities)
         self.assertEqual(["NTR_ID_1"], [e.ntr_id() for e in result])
+
+
+class ExportEntitiesTest(TestCase):
+    def setUp(self):
+        module = "edelivery.management.commands.export_national_scheme_certificates"
+        self.patched_AddOrganisationRequest = patch(f"{module}.AddOrganisationRequest").start()
+        self.patched_Requester = patch(f"{module}.Requester").start()
+
+    def tearDown(self):
+        patch.stopall()
+
+    def test_exports_entities_not_in_udb(self):
+        entities = ["entity_1", "entity_2"]
+        request = "request"
+        self.patched_AddOrganisationRequest.return_value = request
+        patched_do_request = self.patched_Requester.return_value.do_request
+
+        self.patched_AddOrganisationRequest.assert_not_called()
+        self.patched_Requester.assert_not_called()
+        patched_do_request.assert_not_called()
+
+        export_entities(entities)
+        self.patched_AddOrganisationRequest.assert_called_with("entity_1", "entity_2")
+        call_args = self.patched_Requester.call_args
+        self.assertEqual((request,), call_args.args)
+        patched_do_request.assert_called()
+
+    def test_does_not_request_udb_if_no_entity_to_create(self):
+        export_entities([])
+        self.patched_AddOrganisationRequest.assert_not_called()
