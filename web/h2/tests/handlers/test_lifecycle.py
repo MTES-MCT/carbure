@@ -3,8 +3,12 @@ from types import SimpleNamespace
 from django.test import SimpleTestCase
 
 from h2.handlers.action import H2ActionHandler
-from traceability.lifecycle.checks import can_change_status, can_create
+from h2.handlers.authorization import can_create_consumption, can_create_valorization
+from traceability.lifecycle.checks import can_change_status
 from traceability.models import Action, ActionStatus
+from traceability.serializers.action_authorization import ActionAuthorizationSerializer
+
+find_edge = ActionAuthorizationSerializer.find_edge
 
 
 class H2LifecycleTest(SimpleTestCase):
@@ -26,26 +30,29 @@ class H2LifecycleTest(SimpleTestCase):
     def test_creation_rights(self):
         pending_init = SimpleNamespace(type=Action.INIT, status=ActionStatus.PENDING)
 
-        root = can_create(self.handler, Action.INIT)
-        child = can_create(self.handler, Action.VALORIZE, parent=pending_init)
+        root = find_edge(self.handler, Action.INIT, ActionStatus.PENDING)
+        child = find_edge(self.handler, Action.VALORIZE, ActionStatus.CREATED, parent=pending_init)
 
-        self.assertEqual(root.action_type, Action.INIT)
-        self.assertEqual(root.status, ActionStatus.PENDING)
-        self.assertIsNone(can_create(self.handler, Action.INIT, parent=pending_init))
-        self.assertIsNone(can_create(self.handler, Action.VALORIZE))
-        self.assertEqual(child.action_type, Action.VALORIZE)
-        self.assertEqual(child.status, ActionStatus.CREATED)
+        self.assertEqual(root, (None, (Action.INIT, ActionStatus.PENDING), can_create_consumption))
+        self.assertIsNone(find_edge(self.handler, Action.INIT, ActionStatus.PENDING, parent=pending_init))
+        self.assertIsNone(find_edge(self.handler, Action.VALORIZE, ActionStatus.CREATED))
+        self.assertEqual(
+            child,
+            ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED), can_create_valorization),
+        )
         self.assertIsNone(
-            can_create(
+            find_edge(
                 self.handler,
                 Action.VALORIZE,
+                ActionStatus.CREATED,
                 parent=SimpleNamespace(type=Action.INIT, status=ActionStatus.ACCEPTED),
             )
         )
         self.assertIsNone(
-            can_create(
+            find_edge(
                 self.handler,
                 Action.VALORIZE,
+                ActionStatus.CREATED,
                 parent=SimpleNamespace(type=Action.VALORIZE, status=ActionStatus.PENDING),
             )
         )

@@ -8,11 +8,19 @@ class LookupSlugRelatedField(serializers.SlugRelatedField):
 
     The first access for a `lookup` runs `handler.lookups.<lookup>(entity)` once and stores
     `{slug: instance}` on `context["serializer_cache"][lookup]`. Later rows hit that dict.
+
+    Set `slug_field` and `lookup` as class attributes or pass them to the constructor.
+    Explicit constructor arguments take precedence over class attributes.
     """
 
-    def __init__(self, *args, lookup, **kwargs):
-        self.lookup = lookup
-        super().__init__(*args, **kwargs)
+    slug_field = None
+    lookup = None
+
+    def __init__(self, slug_field=serializers.empty, *, lookup=serializers.empty, **kwargs):
+        self.lookup = self.lookup if lookup is serializers.empty else lookup
+        assert self.lookup is not None, "The `lookup` argument or class attribute is required."
+        slug_field = self.slug_field if slug_field is serializers.empty else slug_field
+        super().__init__(slug_field=slug_field, **kwargs)
 
     def get_queryset(self):
         return getattr(self.context["handler"].lookups, self.lookup)(self.context.get("entity"))

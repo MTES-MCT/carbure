@@ -1,7 +1,11 @@
+from django.db import transaction
 from django.utils.decorators import decorator_from_middleware, method_decorator
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from core.filters import FiltersActionFactory
@@ -10,8 +14,9 @@ from traceability.exceptions import ActionNotDeletableError
 from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.middlewares import ActionHandlerMiddleware
-from traceability.models import Action
+from traceability.models import Action, ActionStatus
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
+from traceability.serializers.action_authorization import ActionAuthorizationSerializer
 from traceability.services.delete import delete_action
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
@@ -78,6 +83,39 @@ class ActionViewset(
         context["entity"] = getattr(self.request, "entity", None)
         context["handler"] = getattr(self.request, "handler", None)
         return context
+
+    @extend_schema(
+        request=ActionAuthorizationSerializer,
+        responses={201: ActionSerializer, 400: None, 403: None},
+        description="Create an action.",
+    )
+    def create(self, request, *args, **kwargs):
+        context = self.get_serializer_context()
+        authorization = ActionAuthorizationSerializer(data=request.data, context=context)
+        authorization.is_valid(raise_exception=True)
+
+        action_type = authorization.validated_data["type"]
+        serializer_class = request.handler.get_action_creation_serializers().get(action_type)
+        if serializer_class is None:
+            raise ValidationError({"type": _("Ce type d'action ne peut pas être créé.")})
+
+        serializer = serializer_class(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+
+        with transaction.atomic():
+            action = serializer.save(
+                type=action_type,
+                holder=authorization.validated_data["holder"],
+                parent=authorization.validated_data.get("parent"),
+                industry=request.handler.industry,
+            )
+            ActionStatus.objects.create(action=action, status=authorization.validated_data["status"])
+
+            action = annotate_parent_chain(Action.objects.filter(pk=action.pk)).get()
+            attach_inherited_fields([action])
+            attach_quantities([action])
+
+            return Response(ActionSerializer(action, context=context).data, status=status.HTTP_201_CREATED)
 
     def perform_destroy(self, instance):
         try:
