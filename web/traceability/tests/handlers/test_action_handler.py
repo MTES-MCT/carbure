@@ -4,6 +4,7 @@ from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.registry import get_action_handler
 from traceability.models import Action
 from traceability.serializers.consumption import ConsumptionSerializer
+from traceability.serializers.valorize import ValorizeSerializer
 
 
 class GenericActionHandler(ActionIndustryHandler):
@@ -13,6 +14,7 @@ class GenericActionHandler(ActionIndustryHandler):
 class ActionCreationSerializersTest(SimpleTestCase):
     def test_industry_inherits_default_serializer(self):
         self.assertIs(GenericActionHandler.get_action_creation_serializers()[Action.INIT], ConsumptionSerializer)
+        self.assertIs(GenericActionHandler.get_action_creation_serializers()[Action.VALORIZE], ValorizeSerializer)
 
     def test_industry_can_extend_and_override_defaults(self):
         class IndustryHandler(ActionIndustryHandler):
@@ -26,7 +28,10 @@ class ActionCreationSerializersTest(SimpleTestCase):
             {Action.INIT: ConsumptionSerializer, Action.VALORIZE: object},
         )
         self.assertIs(OtherIndustryHandler.get_action_creation_serializers()[Action.INIT], str)
-        self.assertEqual(ActionIndustryHandler.get_action_creation_serializers(), {Action.INIT: ConsumptionSerializer})
+        self.assertEqual(
+            ActionIndustryHandler.get_action_creation_serializers(),
+            {Action.INIT: ConsumptionSerializer, Action.VALORIZE: ValorizeSerializer},
+        )
 
 
 class ActionHandlerRegistryTest(TestCase):

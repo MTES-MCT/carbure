@@ -11,9 +11,11 @@ from rest_framework.validators import UniqueValidator
 from core.models import Entity
 from core.permissions import HasEntityWriteRights
 from core.tests_utils import setup_current_user
+from traceability.factories import ActionFactory
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.registry import ACTION_HANDLERS
 from traceability.models import Action, ActionStatus
+from traceability.models.action_status import latest_status
 from traceability.views.action import ActionViewset
 
 
@@ -132,6 +134,48 @@ class ActionCreateIntegrationTest(TestCase):
         self.assertEqual(action.status, ActionStatus.PENDING)
         self.assertEqual(response.data["status"], ActionStatus.PENDING)
         self.assertEqual(ActionStatus.objects.filter(action=action).count(), 1)
+
+    def test_valorize_copies_parent_fields_and_accepts_parent(self):
+        parent = ActionFactory(holder=self.holder, type=Action.INIT, industry=GenericActionHandler.industry)
+        with (
+            patch.object(
+                GenericActionHandler,
+                "action_creation_flow",
+                [((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED))],
+            ),
+            patch.object(
+                GenericActionHandler,
+                "action_status_authorizations",
+                {(Action.VALORIZE, ActionStatus.CREATED): is_holder},
+            ),
+        ):
+            response = self.post(
+                {
+                    "type": Action.VALORIZE,
+                    "status": ActionStatus.CREATED,
+                    "parent": parent.pk,
+                    "holder": self.holder.pk,
+                    "quantity": "999999.000",
+                    "pos_id": "CLIENT-POS",
+                    "working_date": "2000-01-01",
+                    "material": parent.material.name,
+                }
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        child = Action.objects.get(pk=response.data["id"])
+        self.assertEqual(child.type, Action.VALORIZE)
+        self.assertEqual(child.parent_id, parent.pk)
+        self.assertEqual(child.holder_id, parent.holder_id)
+        self.assertEqual(child.industry, parent.industry)
+        self.assertEqual(child.quantity, parent.quantity)
+        self.assertEqual(child.working_date, parent.working_date)
+        self.assertIsNone(child.material_id)
+        self.assertNotIn(child.pos_id, (parent.pos_id, "CLIENT-POS"))
+        self.assertEqual(child.status, ActionStatus.CREATED)
+        self.assertEqual(ActionStatus.objects.filter(action=child).count(), 1)
+        parent = Action.unannotated.annotate(status=latest_status()).get(pk=parent.pk)
+        self.assertEqual(parent.status, ActionStatus.ACCEPTED)
 
     def test_status_without_matching_edge_does_not_create_action(self):
         response = self.post({**self.payload, "status": ActionStatus.ACCEPTED})

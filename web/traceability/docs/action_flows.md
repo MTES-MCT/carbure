@@ -66,7 +66,7 @@ ActionStatus.can_transition(ActionStatus.PENDING, ActionStatus.ACCEPTED)  # True
 
 ## Permettre la création par l'API
 
-Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création. La base fournit celui d'`INIT` :
+Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création. Par exemple pour `INIT` :
 
 ```python
 action_creation_serializers = {
