@@ -468,6 +468,7 @@ SPECTACULAR_SETTINGS = {
         "ActionStatusEnum": "traceability.models.action_status.ActionStatus.STATUSES",
         "ActionShippingMethodEnum": "traceability.models.action.Action.SHIPPING_METHODS",
         "SafShippingMethodEnum": "saf.models.SafLogistics.SHIPPING_METHODS",
+        "SafConsumptionTypeEnum": "saf.models.SafTicket.CONSUMPTION_TYPES",
     },
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE": False,
