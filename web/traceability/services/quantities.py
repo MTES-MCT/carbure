@@ -5,15 +5,15 @@ from django.db.models.functions import Coalesce
 
 from traceability.models.action_status import ActionStatus, latest_status
 
-# A rejected or deleted child does not consume its parent.
-_EXCLUDED_CHILD_STATUSES = (ActionStatus.DELETED, ActionStatus.REJECTED)
+# A deleted child does not consume its parent.
+_EXCLUDED_CHILD_STATUSES = (ActionStatus.DELETED,)
 _QUANTITY = DecimalField(max_digits=16, decimal_places=3)
 
 
 def quantity_available():
     """quantity minus the sum of direct children.
 
-    Children whose latest status is DELETED or REJECTED are left out.
+    Children whose latest status is DELETED are left out.
     Grandchildren do not. No consuming child leaves the stored quantity.
     """
     from traceability.models.action import Action

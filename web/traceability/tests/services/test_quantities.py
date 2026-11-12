@@ -35,13 +35,13 @@ class QuantityAvailableTest(TestCase):
 
         self.assertEqual(values[parent.pk], Decimal("70.000"))
 
-    def test_deleted_and_rejected_children_do_not_consume_the_parent(self):
+    def test_a_deleted_child_does_not_consume_the_parent(self):
         parent = ActionFactory.create(quantity=Decimal("100.000"), parent=None)
         ActionFactory.create(quantity=Decimal("40.000"), parent=parent, status=ActionStatus.PENDING)
         ActionFactory.create(quantity=Decimal("25.000"), parent=parent, status=ActionStatus.DELETED)
         ActionFactory.create(quantity=Decimal("15.000"), parent=parent, status=ActionStatus.REJECTED)
 
-        self.assertEqual(available(parent)[parent.pk], Decimal("60.000"))
+        self.assertEqual(available(parent)[parent.pk], Decimal("45.000"))
 
     def test_only_the_latest_status_decides(self):
         parent = ActionFactory.create(quantity=Decimal("100.000"), parent=None)

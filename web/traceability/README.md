@@ -13,7 +13,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 - **La valorisation recopie la quantité.** `valorize()` crée un enfant `VALORIZE` avec la `quantity` du parent et sans matière. Rien n’est converti ni figé en MJ.
 - **`quantity` est strictement positive.** Contrainte SQL `action_quantity_positive` (`quantity > 0`), en plus du contrôle à la création.
-- **`quantity` et `quantity_available` sont renvoyés tels quels.** `quantity` est la valeur stockée. `quantity_available` vaut `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED` et `REJECTED`. Même unité que `quantity`. Pas de conversion en masse, volume ou énergie. `quantity_available` est toujours renvoyée : 0 si elle n'a pas été calculée.
+- **`quantity` et `quantity_available` sont renvoyés tels quels.** `quantity` est la valeur stockée. `quantity_available` vaut `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED`. Même unité que `quantity`. Pas de conversion en masse, volume ou énergie. `quantity_available` est toujours renvoyée : 0 si elle n'a pas été calculée.
 
 ## Modèle
 
