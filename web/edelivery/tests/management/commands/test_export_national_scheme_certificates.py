@@ -1,7 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from edelivery.management.commands.export_national_scheme_certificates import carbure_entities
+from edelivery.management.commands.export_national_scheme_certificates import carbure_entities, entity_names
+from entity.factories.entity import EntityFactory
 
 
 class CarbureEntitiesTest(TestCase):
@@ -56,8 +57,18 @@ class CarbureEntitiesTest(TestCase):
         patched_filter = self.patched_Entity.objects.filter
         patched_filter.return_value = []
 
-        command = ExportNSCertificates()
         with self.assertRaises(ValueError) as context:
-            command.carbure_entities(entity_name="SOME ENTITY")
+            carbure_entities(entity_name="SOME ENTITY")
 
         self.assertEqual("Value error: Entity 'SOME ENTITY' not found in CarbuRe", context.exception.args[0])
+
+
+class EntityNamesTest(TestCase):
+    def test_format_entity_names(self):
+        names = ["ENTITY 1", "ENTITY 2", "ENTITY 3"]
+        entities = [EntityFactory.build(name=n) for n in names]
+        self.assertEqual("entities 'ENTITY 1', 'ENTITY 2', 'ENTITY 3'", entity_names(entities))
+
+    def test_format_entity_names_with_only_one_entity(self):
+        entities = [EntityFactory.build(name="ENTITY 1")]
+        self.assertEqual("entity 'ENTITY 1'", entity_names(entities))
