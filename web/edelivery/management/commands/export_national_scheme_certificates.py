@@ -26,10 +26,21 @@ def carbure_entities(fetch_all=False, entity_name=None):
 
 
 def entity_names(entities):
+    if not entities:
+        return "no entity"
+
     names = ", ".join([f"'{e.name}'" for e in entities])
     entities_label = f"entit{'ies' if len(entities) > 1 else 'y'}"
-
     return f"{entities_label} {names}"
+
+
+def export_entities(entities):
+    if not entities:
+        return
+
+    request = AddOrganisationRequest(*entities)
+    requester = Requester(request, timeout=70)
+    requester.do_request()
 
 
 def find_entities_not_in_udb(entities):
@@ -65,16 +76,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        def export_entities(entities, dry_run):
-            if dry_run:
-                self.stdout.write(f"Would create {entity_names(entities)} in UDB…")
-                return
-
-            self.stdout.write(f"Creating {entity_names(entities)} in UDB…")
-            request = AddOrganisationRequest(*entities)
-            requester = Requester(request, timeout=70)
-            requester.do_request()
-
         def export_certificates(entities, dry_run):
             entity_certificates = EntityCertificate.objects.filter(
                 entity__in=entities,
@@ -110,12 +111,12 @@ Would send UDB request with body being:
         entities = carbure_entities(fetch_all=fetch_all, entity_name=entity_name)
         if dry_run:
             self.stdout.write(f"Would check if {entity_names(entities)} present in UDB… (assuming not)")
-            entities_not_in_udb = entities
+            self.stdout.write(f"Would create {entity_names(entities)} in UDB…")
         else:
             self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
             entities_not_in_udb = find_entities_not_in_udb(entities)
+            self.stdout.write(f"Creating {entity_names(entities)} in UDB…")
+            export_entities(entities_not_in_udb)
 
-        if entities_not_in_udb:
-            export_entities(entities_not_in_udb, dry_run)
         result = export_certificates(entities, dry_run)
         self.stdout.write(str(result))
