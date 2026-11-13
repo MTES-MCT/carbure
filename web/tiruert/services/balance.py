@@ -89,7 +89,7 @@ class BalanceService:
         volume_sign = 1 if credit_operation else -1
         balance[key]["available_balance"] += volume * volume_sign
 
-        balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj  # used when displaying balance by lot
+        balance[key]["emission_rate_per_mj"] = detail.emission_rate_per_mj
 
         avoided_emissions = detail.avoided_emissions
         balance[key]["saved_emissions"] += avoided_emissions * volume_sign
@@ -163,6 +163,13 @@ class BalanceService:
 
             if last_key is not None and operation.status in [Operation.PENDING, Operation.DRAFT]:
                 balance[last_key]["pending_operations"] += 1
+
+        if balance:
+            # Update the emission rates for each lot based on the effective emission rates (case when GHG corrections)
+            # key = (sector, customs_category, biofuel_code, lot_id) => lot_id = key[-1]
+            rates = OperationDetail.objects.get_effective_emission_rates_by_lot([key[-1] for key in balance])
+            for key, entry in balance.items():
+                entry["emission_rate_per_mj"] = rates.get(key[-1], entry["emission_rate_per_mj"])
 
         return balance
 

@@ -51,6 +51,8 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _entity = serializers.CharField(read_only=True)
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
+    corrected_avoided_emissions = serializers.FloatField(read_only=True, allow_null=True)
+    ghg_delta = serializers.FloatField(read_only=True, allow_null=True)
     year = serializers.IntegerField(source="declaration_year", read_only=True)
     transaction = serializers.CharField(read_only=True, source="_transaction")
 
@@ -98,6 +100,8 @@ class OperationListSerializer(BaseOperationSerializer):
             "energy",
             "details",
             "avoided_emissions",
+            "corrected_avoided_emissions",
+            "ghg_delta",
             "year",
             "transaction",
         ]
@@ -129,6 +133,8 @@ class OperationSerializer(BaseOperationSerializer):
             "volume",
             "energy",
             "avoided_emissions",
+            "corrected_avoided_emissions",
+            "ghg_delta",
             "details",
             "year",
             "devaluation_type",

@@ -1,9 +1,11 @@
 from datetime import date
 from io import BytesIO
 
+from django.db.models import F
 from django.test import TestCase
 from django.urls import reverse
 from openpyxl import load_workbook
+from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
@@ -11,6 +13,7 @@ from core.models import Biocarburant, DeclarationPeriod, Entity, MatierePremiere
 from core.tests_utils import setup_current_user
 from core.utils import truncate
 from tiruert.models import Operation, OperationDetail
+from tiruert.services.correction import CorrectionService
 from tiruert.views.operation.operation import OperationViewSet
 from transactions.factories import CarbureLotFactory
 from transactions.models import Depot
@@ -137,6 +140,68 @@ class OperationViewSetIntegrationTest(TestCase):
         self.assertIn("count", data)
         self.assertIn("results", data)
         self.assertEqual(data["count"], 4)
+
+    def _correct_lot1_ghg(self):
+        self.lot1.ghg_total = 25.5
+        self.lot1.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([self.lot1.id])
+        return Operation.objects.get(type=Operation.CORRECTION)
+
+    def _get_operation_data(self, operation, *, detail):
+        url = reverse("operations-detail", kwargs={"pk": operation.pk}) if detail else self.url
+        response = self.client.get(url, {"entity_id": self.entity.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.json()
+        return data if detail else next(item for item in data["results"] if item["id"] == operation.pk)
+
+    def test_corrected_emissions_include_the_unchanged_lot(self):
+        """List and detail sum corrected lot1 and historical lot2, without replacing history."""
+        self._correct_lot1_ghg()
+
+        for detail in (False, True):
+            with self.subTest(detail=detail):
+                original = self._get_operation_data(self.operation_incorporation, detail=detail)
+                self.assertEqual(original["status"], Operation.CORRECTED)
+                self.assertEqual(original["avoided_emissions"], 3.45)
+                self.assertEqual(original["corrected_avoided_emissions"], 3.29)
+                self.assertIsNone(original["ghg_delta"])
+
+    def test_ghg_event_exposes_delta_without_volume_or_emissions(self):
+        """List and detail represent a GHG correction as a delta, not a stock movement."""
+        correction = self._correct_lot1_ghg()
+
+        for detail in (False, True):
+            with self.subTest(detail=detail):
+                event = self._get_operation_data(correction, detail=detail)
+                self.assertEqual(event["ghg_delta"], 15)
+                self.assertEqual(event["volume"], 0)
+                self.assertEqual(event["avoided_emissions"], 0)
+                self.assertIsNone(event["corrected_avoided_emissions"])
+
+    def test_corrected_detail_keeps_historical_rate(self):
+        """The detail API keeps its historical rate and does not expose internal deltas."""
+        self._correct_lot1_ghg()
+
+        data = self._get_operation_data(self.operation_incorporation, detail=True)
+
+        corrected_detail = next(item for item in data["details"] if item["lot"] == self.lot1.id)
+        self.assertEqual(corrected_detail["emission_rate_per_mj"], 10.5)
+        self.assertNotIn("emission_rate_per_mj_delta", corrected_detail)
+        self.assertNotIn("effective_emission_rate_per_mj", corrected_detail)
+
+    def test_corrected_emissions_can_be_zero_or_negative(self):
+        """Do not replace a zero or negative corrected value with historical emissions."""
+        for rate, expected in ((94, 0), (100, -0.25)):
+            with self.subTest(rate=rate):
+                OperationDetail.objects.filter(operation=self.operation_incorporation).update(
+                    emission_rate_per_mj_delta=rate - F("emission_rate_per_mj")
+                )
+                self.operation_incorporation.status = Operation.CORRECTED
+                self.operation_incorporation.save(update_fields=["status"])
+
+                original = self._get_operation_data(self.operation_incorporation, detail=False)
+
+                self.assertEqual(original["corrected_avoided_emissions"], expected)
 
     def test_list_operations_returns_gpl_sector_for_gpl_compatible_biofuel(self):
         """The list annotation should expose GPL_C for GPL-compatible biofuels."""

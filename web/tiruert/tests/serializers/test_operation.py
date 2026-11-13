@@ -86,6 +86,8 @@ class BaseOperationSerializerTest(TestCase):
         operation._volume = 123.456
         operation._energy = 4567.891
         operation._avoided_emissions = 78.901
+        operation.corrected_avoided_emissions = None
+        operation.ghg_delta = None
         operation.declaration_year = 2024
 
         serializer = OperationListSerializer(operation, context={"details": False})
@@ -93,6 +95,8 @@ class BaseOperationSerializerTest(TestCase):
         self.assertEqual(serializer.data["volume"], 123.45)
         self.assertEqual(serializer.data["energy"], 4567)
         self.assertEqual(serializer.data["avoided_emissions"], 78.9)
+        self.assertIsNone(serializer.data["corrected_avoided_emissions"])
+        self.assertIsNone(serializer.data["ghg_delta"])
 
 
 class OperationSerializerTest(TestCase):

@@ -444,6 +444,7 @@ class BalanceServiceCalculateBalanceIntegrationTest(TestCase):
             Operation.VALIDATED,
             Operation.DECLARED,
             Operation.DRAFT,
+            Operation.CORRECTED,
         ]
 
         for status_code, _ in Operation.OPERATION_STATUSES:

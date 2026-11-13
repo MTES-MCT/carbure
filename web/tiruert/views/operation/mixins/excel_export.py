@@ -49,9 +49,21 @@ class ExcelExportActionMixin:
                             and o._type not in [Operation.TENEUR, Operation.CORRECTION, Operation.DEBT_REPAYMENT]
                             else "",
                         },
-                        {"label": "Volume (L)", "value": lambda o: truncate(o._volume)},
-                        {"label": "Énergie (MJ)", "value": lambda o: truncate(o._energy, 0)},
-                        {"label": "Tonnes CO2 eq. évitées", "value": lambda o: truncate(o.avoided_emissions)},
+                        {"label": "Volume (L)", "value": lambda o: None if o.ghg_delta is not None else truncate(o._volume)},
+                        {
+                            "label": "Énergie (MJ)",
+                            "value": lambda o: None if o.ghg_delta is not None else truncate(o._energy, 0),
+                        },
+                        {
+                            "label": "Tonnes CO2 eq. évitées",
+                            "value": lambda o: None
+                            if o.ghg_delta is not None
+                            else truncate(
+                                o.corrected_avoided_emissions
+                                if o.corrected_avoided_emissions is not None
+                                else o.avoided_emissions
+                            ),
+                        },
                     ],
                 }
             ],

@@ -1,6 +1,7 @@
 from django.db.models import (
     Case,
     CharField,
+    Count,
     ExpressionWrapper,
     F,
     FloatField,
@@ -33,6 +34,7 @@ from tiruert.serializers import (
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.energy import (
     avoided_emissions_tco2_expression,
+    effective_emission_rate_per_mj_expression,
     energy_mj_expression,
 )
 from tiruert.services.teneur import GHG_REFERENCE_RED_II
@@ -147,6 +149,33 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             )
             .values("total")[:1]
         )
+        corrected_emissions_subquery = (
+            details_queryset.values("operation_id")
+            .annotate(
+                corrected_count=Count("emission_rate_per_mj_delta"),
+                total=Sum(
+                    avoided_emissions_tco2_expression(
+                        energy_mj_expression(
+                            F("volume"),
+                            F("operation__renewable_energy_share"),
+                            F("lot__biofuel__pci_litre"),
+                        ),
+                        effective_emission_rate_per_mj_expression(
+                            F("emission_rate_per_mj"), F("emission_rate_per_mj_delta")
+                        ),
+                        GHG_REFERENCE_RED_II,
+                    )
+                ),
+            )
+            .filter(corrected_count__gt=0)
+            .values("total")[:1]
+        )
+        ghg_delta_subquery = (
+            details_queryset.values("operation_id")
+            .annotate(detail_count=Count("pk"), total_volume=Sum("volume"), delta=Sum("emission_rate_per_mj_delta"))
+            .filter(detail_count=1, total_volume=0)
+            .values("delta")[:1]
+        )
 
         total_volume_expr = Coalesce(
             Subquery(total_volume_subquery, output_field=FloatField()),
@@ -163,6 +192,16 @@ class OperationViewSet(ModelViewSet, ActionMixin):
             "_avoided_emissions": Coalesce(
                 Subquery(avoided_emissions_subquery, output_field=FloatField()),
                 Value(0.0),
+            ),
+            "_corrected_avoided_emissions": Case(
+                When(status=Operation.CORRECTED, then=Subquery(corrected_emissions_subquery, output_field=FloatField())),
+                default=Value(None),
+                output_field=FloatField(),
+            ),
+            "_ghg_delta": Case(
+                When(type=Operation.CORRECTION, then=Subquery(ghg_delta_subquery, output_field=FloatField())),
+                default=Value(None),
+                output_field=FloatField(),
             ),
             "_sector": Case(
                 When(type=Operation.TENEUR, objective_sector__isnull=False, then=F("objective_sector")),
