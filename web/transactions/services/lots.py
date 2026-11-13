@@ -125,6 +125,7 @@ def do_update_lot(user, entity, lot_to_update, update_data):
         stock_reset, stock_error = enforce_stock_integrity(lot_node, update_data)
         update_data |= stock_reset
 
+        ghg_total_before_update = lot_node.data.ghg_total
         lot_node.update(update_data, entity.id)
         lot_node.data.update_ghg()
 
@@ -136,5 +137,7 @@ def do_update_lot(user, entity, lot_to_update, update_data):
         persist_changes(user, entity, lot_node, stock_error)
 
         volume_diff = lot_node.diff.get("volume")
-        if volume_diff and volume_diff[0] != volume_diff[1] and lot_node.data.correction_status == CarbureLot.NO_PROBLEMO:
-            CorrectionService.create_correction_operations_for_lot_volume_update([lot_node.data.id])
+        volume_changed = volume_diff is not None and volume_diff[0] != volume_diff[1]
+        ghg_changed = lot_node.data.ghg_total != ghg_total_before_update
+        if lot_node.data.correction_status == CarbureLot.NO_PROBLEMO and (volume_changed or ghg_changed):
+            CorrectionService.create_correction_operations_for_lot_update([lot_node.data.id])

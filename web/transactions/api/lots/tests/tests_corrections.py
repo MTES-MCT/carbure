@@ -72,6 +72,30 @@ class LotCorrectionTest(TestCase):
 
         return CarbureLot.objects.get(id=lot_id)
 
+    def prepare_child_lot(self, lot, client):
+        return CarbureLotFactory.create(
+            lot_status=CarbureLot.ACCEPTED,
+            correction_status=CarbureLot.NO_PROBLEMO,
+            delivery_type=CarbureLot.BLENDING,
+            added_by=self.producer,
+            carbure_supplier=self.producer,
+            carbure_client=client,
+            biofuel=lot.biofuel,
+            feedstock=lot.feedstock,
+            volume=lot.volume,
+            eec=lot.eec,
+            el=lot.el,
+            ep=lot.ep,
+            etd=lot.etd,
+            eu=lot.eu,
+            esca=lot.esca,
+            eccs=lot.eccs,
+            eccr=lot.eccr,
+            eee=lot.eee,
+            ghg_total=lot.ghg_total,
+            parent_lot=lot,
+        )
+
     def request_fix(self, lot, entity):
         response = self.client.post(
             reverse("transactions-lots-request-fix"),
@@ -115,7 +139,7 @@ class LotCorrectionTest(TestCase):
         lot = CarbureLot.objects.get(id=lot.id)
         assert lot.volume == 42000
 
-    @patch("transactions.services.lots.CorrectionService.create_correction_operations_for_lot_volume_update")
+    @patch("transactions.services.lots.CorrectionService.create_correction_operations_for_lot_update", create=True)
     def test_direct_volume_update_triggers_tiruert_correction(self, correction_mock):
         """Correct TIRUERT volume when an accepted lot is directly updated outside a fix workflow."""
         lot = self.prepare_lot(self.producer, self.producer)
@@ -131,7 +155,84 @@ class LotCorrectionTest(TestCase):
         assert response.status_code == 200
         correction_mock.assert_called_once_with([lot.id])
 
-    def test_simple_correction(self):
+    @patch("transactions.services.lots.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_direct_ghg_update_triggers_tiruert_correction(self, correction_mock):
+        """Detect the recalculated GHG total even when only a component was submitted."""
+        lot = self.prepare_lot(self.producer, self.producer)
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.save(update_fields=["lot_status"])
+        previous_ghg_total = lot.ghg_total
+
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "eec": lot.eec + 1},
+        )
+
+        assert response.status_code == 200
+        lot.refresh_from_db()
+        assert lot.volume == 34500
+        assert lot.ghg_total == previous_ghg_total + 1
+        correction_mock.assert_called_once_with([lot.id])
+
+    @patch("transactions.services.lots.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_direct_volume_and_ghg_update_triggers_one_correction(self, correction_mock):
+        """Pass combined volume and GHG changes through the common service once."""
+        lot = self.prepare_lot(self.producer, self.producer)
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.save(update_fields=["lot_status"])
+
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "volume": 42000, "eec": lot.eec + 1},
+        )
+
+        assert response.status_code == 200
+        lot.refresh_from_db()
+        assert lot.volume == 42000
+        correction_mock.assert_called_once_with([lot.id])
+
+    @patch("transactions.services.lots.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_direct_update_with_unchanged_ghg_total_does_not_trigger_correction(self, correction_mock):
+        """Do not correct TIRUERT when changed GHG components leave the total unchanged."""
+        lot = self.prepare_lot(self.producer, self.producer)
+        lot.lot_status = CarbureLot.ACCEPTED
+        lot.save(update_fields=["lot_status"])
+        previous_ghg_total = lot.ghg_total
+
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "eec": lot.eec + 1, "ep": lot.ep - 1},
+        )
+
+        assert response.status_code == 200
+        lot.refresh_from_db()
+        assert lot.ghg_total == previous_ghg_total
+        correction_mock.assert_not_called()
+
+    @patch("transactions.services.lots.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_pending_fix_updates_do_not_trigger_tiruert_correction(self, correction_mock):
+        """Keep volume and GHG edits pending throughout the correction workflow."""
+        for correction_status in (CarbureLot.IN_CORRECTION, CarbureLot.FIXED):
+            for field, value in (("volume", 42000), ("eec", 2)):
+                with self.subTest(correction_status=correction_status, field=field):
+                    lot = self.prepare_lot(self.producer, self.trader)
+                    lot.lot_status = CarbureLot.ACCEPTED
+                    lot.correction_status = correction_status
+                    lot.save(update_fields=["lot_status", "correction_status"])
+
+                    response = self.client.post(
+                        reverse("transactions-lots-update"),
+                        {"entity_id": self.producer.id, "lot_id": lot.id, field: value},
+                    )
+
+                    assert response.status_code == 200
+                    lot.refresh_from_db()
+                    assert getattr(lot, field) == value
+                    assert lot.correction_status == correction_status
+                    correction_mock.assert_not_called()
+
+    @patch("transactions.api.lots.approve_fix.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_simple_correction(self, correction_mock):
         YearConfig.objects.create(year=2020, locked=True)
 
         lot = self.prepare_lot(self.producer, self.trader)
@@ -172,8 +273,20 @@ class LotCorrectionTest(TestCase):
         lot = CarbureLot.objects.get(id=lot.id)
         assert lot.correction_status == CarbureLot.NO_PROBLEMO
         assert lot.lot_status == CarbureLot.ACCEPTED
+        correction_mock.assert_called_once_with([lot.id])
 
-    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_submit_fix_checks_all_initial_own_lots_for_corrections(self, correction_mock):
+        """Check every submitted own lot against its validated GHG and volume."""
+        lot = self.prepare_lot(self.producer, self.producer)
+        lot = self.request_fix(lot, self.producer)
+
+        lot = self.submit_fix(lot, self.producer)
+
+        assert lot.correction_status == CarbureLot.NO_PROBLEMO
+        correction_mock.assert_called_once_with([lot.id])
+
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_update", create=True)
     def test_submit_fix_defers_volume_correction_for_transferred_lot(self, correction_mock):
         """Defer volume correction creation for a lot transferred to a client."""
         lot = self.prepare_lot(self.producer, self.trader)
@@ -187,7 +300,7 @@ class LotCorrectionTest(TestCase):
 
         correction_mock.assert_not_called()
 
-    @patch("transactions.api.lots.approve_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
+    @patch("transactions.api.lots.approve_fix.CorrectionService.create_correction_operations_for_lot_update", create=True)
     def test_approve_fix_triggers_volume_correction_service(self, correction_mock):
         """Create the volume correction when the client accepts the fix."""
         lot = self.prepare_lot(self.producer, self.trader)
@@ -205,23 +318,11 @@ class LotCorrectionTest(TestCase):
 
         correction_mock.assert_called_once_with([lot.id])
 
-    @patch("transactions.api.lots.approve_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
-    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_volume_update")
-    def test_submit_fix_defers_changed_descendant_until_its_client_approves(self, submit_mock, approve_mock):
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_submit_fix_defers_changed_descendant_until_its_client_approves(self, correction_mock):
         """Do not apply a descendant's volume correction before its client approves the fix."""
         lot = self.prepare_lot(self.producer, self.trader)
-        child = CarbureLotFactory.create(
-            lot_status=CarbureLot.ACCEPTED,
-            correction_status=CarbureLot.NO_PROBLEMO,
-            delivery_type=CarbureLot.BLENDING,
-            added_by=self.producer,
-            carbure_supplier=self.producer,
-            carbure_client=self.operator,
-            biofuel=lot.biofuel,
-            feedstock=lot.feedstock,
-            volume=lot.volume,
-            parent_lot=lot,
-        )
+        child = self.prepare_child_lot(lot, self.operator)
 
         self.request_fix(lot, self.trader)
         self.client.post(
@@ -230,13 +331,79 @@ class LotCorrectionTest(TestCase):
         )
         self.submit_fix(lot, self.producer)
 
-        submit_mock.assert_not_called()
+        correction_mock.assert_not_called()
         child.refresh_from_db()
         assert child.volume == lot.volume + 1000
         assert child.correction_status == CarbureLot.FIXED
         assert CarbureNotification.objects.filter(dest=self.operator, type=CarbureNotification.CORRECTION_DONE).exists()
         self.approve_fix(child, self.operator)
-        approve_mock.assert_called_once_with([child.id])
+        correction_mock.assert_called_once_with([child.id])
+
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_ghg_correction_waits_for_client_approval(self, correction_mock):
+        """Keep the stored GHG change pending until the client approves it once."""
+        lot = self.prepare_lot(self.producer, self.trader)
+        lot = self.request_fix(lot, self.trader)
+
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "eec": lot.eec + 1},
+        )
+        assert response.status_code == 200
+        correction_mock.assert_not_called()
+
+        lot = self.submit_fix(lot, self.producer)
+        assert lot.correction_status == CarbureLot.FIXED
+        correction_mock.assert_not_called()
+
+        self.approve_fix(lot, self.trader)
+        self.approve_fix(lot, self.trader)
+        correction_mock.assert_called_once_with([lot.id])
+
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_submit_fix_defers_ghg_descendant_until_its_client_approves(self, correction_mock):
+        """Defer a propagated GHG change and notify the descendant's client."""
+        lot = self.prepare_lot(self.producer, self.trader)
+        child = self.prepare_child_lot(lot, self.operator)
+        self.request_fix(lot, self.trader)
+
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "eec": lot.eec + 1},
+        )
+        assert response.status_code == 200
+        self.submit_fix(lot, self.producer)
+
+        correction_mock.assert_not_called()
+        child.refresh_from_db()
+        assert child.volume == lot.volume
+        assert child.ghg_total == lot.ghg_total + 1
+        assert child.correction_status == CarbureLot.FIXED
+        assert CarbureNotification.objects.filter(dest=self.operator, type=CarbureNotification.CORRECTION_DONE).exists()
+
+        self.approve_fix(child, self.operator)
+        self.approve_fix(child, self.operator)
+        correction_mock.assert_called_once_with([child.id])
+
+    @patch("transactions.api.lots.submit_fix.CorrectionService.create_correction_operations_for_lot_update", create=True)
+    def test_submit_fix_corrects_own_ghg_descendant(self, correction_mock):
+        """Apply propagated GHG corrections immediately when no third party must approve."""
+        lot = self.prepare_lot(self.producer, self.producer)
+        child = self.prepare_child_lot(lot, self.producer)
+        self.request_fix(lot, self.producer)
+
+        response = self.client.post(
+            reverse("transactions-lots-update"),
+            {"entity_id": self.producer.id, "lot_id": lot.id, "eec": lot.eec + 1},
+        )
+        assert response.status_code == 200
+        self.submit_fix(lot, self.producer)
+
+        child.refresh_from_db()
+        assert child.volume == lot.volume
+        assert child.ghg_total == lot.ghg_total + 1
+        assert child.correction_status == CarbureLot.NO_PROBLEMO
+        correction_mock.assert_called_once_with(sorted([lot.id, child.id]))
 
     def test_simple_correction_on_locked_year(self):
         lot = self.prepare_lot(self.producer, self.trader)
