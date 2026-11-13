@@ -1,5 +1,6 @@
 from collections import defaultdict
 from copy import copy
+from decimal import Decimal
 
 from django.db import transaction
 from django.db.models import Q, Sum
@@ -12,6 +13,100 @@ from tiruert.services.operation import OperationService
 
 
 class CorrectionService:
+    @staticmethod
+    @transaction.atomic
+    def create_correction_operations_for_lot_update(lot_ids: list[int]):
+        CorrectionService.create_correction_operations_for_lot_ghg_update(lot_ids)
+        CorrectionService.create_correction_operations_for_lot_volume_update(lot_ids)
+
+    @staticmethod
+    @transaction.atomic
+    def create_correction_operations_for_lot_ghg_update(lot_ids: list[int]):
+        """Create GHG correction operations for confirmed credits affected by lot emission-rate changes."""
+        lot_ids = OperationService.lock_lots_for_update(lot_ids)
+        if not lot_ids:
+            return
+
+        details = (
+            OperationDetail.objects.filter(lot_id__in=lot_ids, operation__status__in=Operation.CONFIRMED_STATUSES)
+            .filter(Q(operation__type__in=Operation.CREDIT_TYPES) | Q(operation__type=Operation.CORRECTION, volume__gt=0))
+            .select_related(None)
+            .select_related("operation", "lot")
+            .only(
+                "id",
+                "lot_id",
+                "operation_id",
+                "emission_rate_per_mj",
+                "emission_rate_per_mj_delta",
+                "lot__ghg_total",
+                "operation__type",
+                "operation__credited_entity_id",
+                "operation__customs_category",
+                "operation__biofuel_id",
+                "operation__renewable_energy_share",
+                "operation__durability_period",
+                "operation__declaration_year",
+            )
+            .order_by("operation__created_at", "id")
+        )
+        details_by_lot_category_biofuel = defaultdict(list)
+        for detail in details:
+            key = (detail.lot_id, detail.operation.customs_category, detail.operation.biofuel_id)
+            details_by_lot_category_biofuel[key].append(detail)
+
+        updated_details = []
+        corrected_operation_ids = set()
+        for grouped_details in details_by_lot_category_biofuel.values():
+            if not CorrectionService._apply_ghg_correction(grouped_details):
+                continue
+            updated_details.extend(grouped_details)
+            corrected_operation_ids.update(detail.operation_id for detail in grouped_details)
+
+        OperationDetail.objects.bulk_update(updated_details, ["emission_rate_per_mj_delta"])
+        Operation.objects.filter(id__in=corrected_operation_ids).update(status=Operation.CORRECTED)
+
+    @staticmethod
+    def _apply_ghg_correction(grouped_details: list[OperationDetail]) -> bool:
+        initial = next((detail for detail in grouped_details if detail.operation.type in Operation.CREDIT_TYPES), None)
+        if initial is None:
+            return False
+
+        previous_rate = Decimal(str(initial.effective_emission_rate_per_mj))
+        current_rate = Decimal(str(initial.lot.ghg_total))
+        delta = current_rate - previous_rate
+        if delta == 0:
+            return False
+
+        CorrectionService._create_ghg_correction(initial, previous_rate, delta)
+        for detail in grouped_details:
+            detail.emission_rate_per_mj_delta = float(current_rate - Decimal(str(detail.emission_rate_per_mj)))
+        return True
+
+    @staticmethod
+    def _create_ghg_correction(initial: OperationDetail, previous_rate: Decimal, delta: Decimal) -> Operation:
+        """Create a zero-volume GHG correction based on the initial credit operation."""
+        source = initial.operation
+        return OperationService.create_operation_with_details(
+            {
+                "type": Operation.CORRECTION,
+                "status": Operation.VALIDATED,
+                "customs_category": source.customs_category,
+                "biofuel_id": source.biofuel_id,
+                "credited_entity_id": source.credited_entity_id,
+                "renewable_energy_share": source.renewable_energy_share,
+                "durability_period": source.durability_period,
+                "declaration_year": source.declaration_year,
+            },
+            [
+                {
+                    "lot_id": initial.lot_id,
+                    "volume": 0,
+                    "emission_rate_per_mj": float(previous_rate),
+                    "emission_rate_per_mj_delta": float(delta),
+                }
+            ],
+        )
+
     @staticmethod
     @transaction.atomic
     def create_correction_operations_for_lot_volume_update(lot_ids: list[int]):
