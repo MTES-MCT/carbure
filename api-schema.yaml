@@ -20545,6 +20545,11 @@ components:
           format: double
           readOnly: true
           nullable: true
+        corrected_operation_ids:
+          type: array
+          items:
+            type: integer
+          readOnly: true
         details:
           type: array
           items:
@@ -20570,6 +20575,7 @@ components:
         - avoided_emissions
         - biofuel
         - corrected_avoided_emissions
+        - corrected_operation_ids
         - created_at
         - credited_entity
         - debited_entity

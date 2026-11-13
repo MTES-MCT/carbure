@@ -32,6 +32,14 @@
   grid-column: 1 / -1;
 }
 
+.operation-detail-corrected-links {
+  list-style: none;
+  padding: 0;
+}
+.operation-detail-corrected-links li {
+  padding-bottom: 5px;
+}
+
 .field-label {
   color: var(--text-mention-grey);
 }

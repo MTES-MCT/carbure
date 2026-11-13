@@ -6381,6 +6381,7 @@ export interface components {
             readonly corrected_avoided_emissions: number | null;
             /** Format: double */
             readonly ghg_delta: number | null;
+            readonly corrected_operation_ids: number[];
             details?: components["schemas"]["OperationDetail"][];
             readonly year: number;
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
