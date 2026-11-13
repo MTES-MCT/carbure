@@ -181,10 +181,17 @@ class Command(BaseCommand):
         Uses any confirmed credit operation for this entity (INCORPORATION, CESSION, etc.)
         since the entity may have received its credit via CESSION, not just via CREDIT_TYPES.
         """
-        source_details = OperationDetail.objects.filter(
-            lot_id__in=list(lots_to_expire.keys()),
-            operation__credited_entity_id=entity_id,
-            operation__status__in=Operation.CONFIRMED_STATUSES,
+        lot_ids = list(lots_to_expire)
+        emission_rates = OperationDetail.objects.get_effective_emission_rates_by_lot(lot_ids)
+        source_details = (
+            OperationDetail.objects.filter(
+                lot_id__in=lot_ids,
+                operation__credited_entity_id=entity_id,
+                operation__status__in=Operation.CONFIRMED_STATUSES,
+            )
+            .select_related(None)
+            .select_related("operation__biofuel", "operation__credited_entity")
+            .only("lot_id", "operation__biofuel", "operation__customs_category", "operation__credited_entity")
         )
 
         lot_source_info = {}
@@ -193,7 +200,7 @@ class Command(BaseCommand):
                 lot_source_info[detail.lot_id] = {
                     "biofuel": detail.operation.biofuel,
                     "customs_category": detail.operation.customs_category,
-                    "emission_rate_per_mj": detail.emission_rate_per_mj,
+                    "emission_rate_per_mj": emission_rates[detail.lot_id],
                     "entity": detail.operation.credited_entity,
                 }
         return lot_source_info
