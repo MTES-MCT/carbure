@@ -1,4 +1,15 @@
+from decimal import Decimal
+
 from django.db.models import ExpressionWrapper, FloatField, Value
+from django.db.models.functions import Coalesce
+
+
+def effective_emission_rate_per_mj(emission_rate, delta=None):
+    return float(Decimal(str(emission_rate)) + Decimal(str(delta if delta is not None else 0)))
+
+
+def effective_emission_rate_per_mj_expression(emission_rate_expr, delta_expr):
+    return ExpressionWrapper(emission_rate_expr + Coalesce(delta_expr, Value(0.0)), output_field=FloatField())
 
 
 def energy_mj(volume, pci_litre, renewable_energy_share=1.0):

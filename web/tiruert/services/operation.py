@@ -75,19 +75,9 @@ class OperationService:
     @staticmethod
     def get_emission_rates_by_lot(lot_ids):
         """
-        Return emission rates by lot_id using the oldest OperationDetail found for each lot.
+        Return the last validated emission rate from each lot's original detail.
         """
-        details = (
-            OperationDetail.objects.filter(lot_id__in=lot_ids)
-            .select_related("operation")
-            .order_by("lot_id", "operation__created_at", "id")
-            .values_list("lot_id", "emission_rate_per_mj")
-        )
-
-        emission_rates_by_lot = {}
-        for lot_id, emission_rate in details:
-            if lot_id not in emission_rates_by_lot:
-                emission_rates_by_lot[lot_id] = emission_rate
+        emission_rates_by_lot = OperationDetail.objects.get_effective_emission_rates_by_lot(lot_ids)
 
         missing_lot_ids = set(lot_ids) - set(emission_rates_by_lot)
         if missing_lot_ids:
@@ -332,6 +322,7 @@ class OperationService:
                     lot_id=detail["lot_id"],
                     volume=truncate(detail["volume"]),
                     emission_rate_per_mj=detail["emission_rate_per_mj"],
+                    emission_rate_per_mj_delta=detail.get("emission_rate_per_mj_delta"),
                 )
                 for detail in details_data
             ]
