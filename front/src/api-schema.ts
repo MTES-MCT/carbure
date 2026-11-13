@@ -6467,6 +6467,10 @@ export interface components {
             readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
+            /** Format: double */
+            readonly corrected_avoided_emissions: number | null;
+            /** Format: double */
+            readonly ghg_delta: number | null;
             details?: components["schemas"]["OperationDetail"][];
             readonly year: number;
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
@@ -6567,6 +6571,10 @@ export interface components {
             readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
+            /** Format: double */
+            readonly corrected_avoided_emissions: number | null;
+            /** Format: double */
+            readonly ghg_delta: number | null;
             readonly year: number;
             readonly transaction: string;
         };
@@ -15456,7 +15464,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15531,6 +15539,15 @@ export interface operations {
                     "application/vnd.ms-excel": File;
                 };
             };
+            /** @description Operation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
         };
     };
     reject_operation: {
@@ -15557,7 +15574,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;
