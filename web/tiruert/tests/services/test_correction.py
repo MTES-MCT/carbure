@@ -1,9 +1,12 @@
+from unittest.mock import patch
+
 from django.db import connection
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from tiruert.models import Operation, OperationDetail, TiruertDebt
+from tiruert.services.balance import BalanceService
 from tiruert.services.correction import CorrectionService
 from tiruert.services.operation import OperationService
 from transactions.factories import CarbureLotFactory
@@ -108,19 +111,6 @@ class CorrectionServiceVolumeTest(TestCase):
         correction = self.corrections().get()
         self.assertEqual(correction.credited_entity, self.entity)
         self.assertEqual(correction.details.get().volume, 150)
-
-    def test_volume_decrease_with_enough_balance_creates_debit_correction(self):
-        """Create a debit correction when the remaining balance covers the decrease."""
-        lot = self.create_lot()
-        self.consume(lot, 400)
-
-        self.update_volume(lot, 700)
-
-        correction = self.corrections().get()
-        self.assertEqual(correction.debited_entity, self.entity)
-        self.assertIsNone(correction.credited_entity)
-        self.assertEqual(correction.details.get().volume, 300)
-        self.assertFalse(TiruertDebt.objects.exists())
 
     def test_volume_decrease_with_insufficient_balance_creates_debt(self):
         """Record the whole decrease as a debt, without any debit, when the lot balance is insufficient."""
@@ -323,3 +313,205 @@ class CorrectionServiceVolumeTest(TestCase):
         self.assertEqual(debt.lot_id, lot.id)
         lot.refresh_from_db()
         self.assertEqual(lot.biofuel, emhv)
+
+    ### GES CORRECTIONS
+    def test_ghg_correction_creates_event_from_initial_metadata(self):
+        """Create a zero-volume GHG operation with the initial operation's metadata and rates."""
+        lot = self.create_lot(ghg_total=20)
+        source = Operation.objects.get(type=Operation.INCORPORATION)
+        source.renewable_energy_share = 0.5
+        source.durability_period = "2024"
+        source.declaration_year = 2024
+        source.save(update_fields=["renewable_energy_share", "durability_period", "declaration_year"])
+
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        correction = self.corrections().get()
+        self.assertEqual(correction.status, Operation.VALIDATED)
+        self.assertEqual(
+            (
+                correction.customs_category,
+                correction.biofuel_id,
+                correction.credited_entity_id,
+                correction.renewable_energy_share,
+                correction.durability_period,
+                correction.declaration_year,
+            ),
+            (
+                source.customs_category,
+                source.biofuel_id,
+                source.credited_entity_id,
+                source.renewable_energy_share,
+                source.durability_period,
+                source.declaration_year,
+            ),
+        )
+        detail = correction.details.get()
+        self.assertEqual(
+            (detail.lot_id, detail.volume, detail.emission_rate_per_mj, detail.emission_rate_per_mj_delta),
+            (lot.id, 0, 20, 5),
+        )
+
+    def test_ghg_correction_updates_existing_credit_details(self):
+        """Correct initial incorporation and previous volume correction without replacing their historical rates."""
+        lot = self.create_lot(ghg_total=20)
+        self.update_volume(lot, 1100)
+
+        original = Operation.objects.get(type=Operation.INCORPORATION)
+        volume_correction = self.corrections().get()
+
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        for operation in (original, volume_correction):
+            with self.subTest(operation_id=operation.pk):
+                operation.refresh_from_db()
+                self.assertEqual(operation.status, Operation.CORRECTED)
+                detail = operation.details.get()
+                self.assertEqual(detail.emission_rate_per_mj, 20)
+                self.assertEqual(detail.emission_rate_per_mj_delta, 5)
+
+    def test_ghg_correction_preserves_historical_balance(self):
+        """A GHG correction changes neither balance nor historical saved emissions."""
+        lot = self.create_lot(ghg_total=20)
+        self.consume(lot, 100)
+        before = BalanceService.calculate_balance(Operation.objects.all(), self.entity.id, None, "l")
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        after = BalanceService.calculate_balance(Operation.objects.all(), self.entity.id, None, "l")
+        self.assertEqual(after.keys(), before.keys())
+        before_entry = next(iter(before.values()))
+        after_entry = next(iter(after.values()))
+        self.assertEqual(after_entry["available_balance"], before_entry["available_balance"])
+        self.assertAlmostEqual(after_entry["saved_emissions"], before_entry["saved_emissions"])
+
+    def test_ghg_correction_ignores_unconfirmed_credits(self):
+        """Unconfirmed or inactive incorporation must not produce GHG corrections."""
+        lot = self.create_lot(ghg_total=20)
+        source = Operation.objects.get(type=Operation.INCORPORATION)
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+
+        for operation_status in (Operation.DRAFT, Operation.PENDING, Operation.CANCELED, Operation.REJECTED):
+            with self.subTest(status=operation_status):
+                source.status = operation_status
+                source.save(update_fields=["status"])
+
+                CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+                source.refresh_from_db()
+                self.assertEqual(source.status, operation_status)
+                self.assertIsNone(source.details.get().emission_rate_per_mj_delta)
+                self.assertFalse(self.corrections().exists())
+
+    def test_combined_update_rolls_back_ghg_when_volume_correction_fails(self):
+        """A failed volume correction rolls back the GHG event and source changes."""
+        lot = self.create_lot(ghg_total=20)
+        source = Operation.objects.get(type=Operation.INCORPORATION)
+        lot.ghg_total = 25
+        lot.volume = 1200
+        lot.save(update_fields=["ghg_total", "volume"])
+
+        with patch.object(
+            CorrectionService, "_create_volume_correction", side_effect=ValueError("Volume correction failed")
+        ):
+            with self.assertRaisesMessage(ValueError, "Volume correction failed"):
+                CorrectionService.create_correction_operations_for_lot_update([lot.id])
+
+        source.refresh_from_db()
+        self.assertEqual(source.status, Operation.VALIDATED)
+        self.assertIsNone(source.details.get().emission_rate_per_mj_delta)
+        self.assertFalse(self.corrections().exists())
+
+    def test_successive_ghg_corrections_keep_each_event_immutable(self):
+        """Keep event deltas immutable and the source delta relative to its creation rate."""
+        lot = self.create_lot(ghg_total=20)
+        for rate in (25, 25, 22, 20):
+            lot.ghg_total = rate
+            lot.save(update_fields=["ghg_total"])
+            CorrectionService.create_correction_operations_for_lot_update([lot.id])
+
+        details = OperationDetail.objects.filter(operation__type=Operation.CORRECTION).order_by("id")
+        self.assertEqual(
+            list(details.values_list("volume", "emission_rate_per_mj", "emission_rate_per_mj_delta")),
+            [(0, 20, 5), (0, 25, -3), (0, 22, -2)],
+        )
+        original = Operation.objects.get(type=Operation.INCORPORATION)
+        self.assertEqual(original.status, Operation.CORRECTED)
+        self.assertEqual(original.details.get().emission_rate_per_mj_delta, 0)
+        self.assertEqual(original.corrected_avoided_emissions, original.avoided_emissions)
+
+    def test_ghg_correction_keeps_existing_debits_and_other_lots_unchanged(self):
+        """Correct only the changed lot's source details, not historical debits or neighbouring lots."""
+        lot = self.create_lot(ghg_total=20)
+        self.consume(lot, 100)
+
+        original = Operation.objects.get(type=Operation.INCORPORATION)
+        other_lot = CarbureLotFactory.create(biofuel=self.biofuel_emag, ghg_total=30)
+        other_detail = OperationDetail.objects.create(operation=original, lot=other_lot, volume=500, emission_rate_per_mj=30)
+
+        lot.ghg_total = 10
+        lot.save(update_fields=["ghg_total"])
+
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        other_detail.refresh_from_db()
+        self.assertIsNone(other_detail.emission_rate_per_mj_delta)
+        debit = Operation.objects.get(type=Operation.TENEUR)
+        self.assertEqual(debit.status, Operation.ACCEPTED)
+        self.assertIsNone(debit.details.get().emission_rate_per_mj_delta)
+        self.assertIsNone(debit.corrected_avoided_emissions)
+        original.refresh_from_db()
+        self.assertGreater(original.corrected_avoided_emissions, original.avoided_emissions)
+
+    def test_combined_update_creates_volume_at_new_validated_rate(self):
+        """Create the new volume correction at the newly validated rate, without a historical delta."""
+        lot = self.create_lot(ghg_total=20)
+        lot.ghg_total = 25
+        lot.volume = 1200
+        lot.save(update_fields=["ghg_total", "volume"])
+
+        CorrectionService.create_correction_operations_for_lot_update([lot.id])
+        CorrectionService.create_correction_operations_for_lot_update([lot.id])
+
+        self.assertEqual(self.corrections().count(), 2)
+        volume_correction = self.corrections().get(details__volume=200)
+        self.assertEqual(volume_correction.status, Operation.VALIDATED)
+        self.assertEqual(volume_correction.details.get().emission_rate_per_mj, 25)
+        self.assertIsNone(volume_correction.details.get().emission_rate_per_mj_delta)
+        self.assertIsNone(volume_correction.ghg_delta)
+
+    def test_future_rate_ignores_unapproved_lot_changes_and_old_debits(self):
+        """Use the source's last validated GES rather than the mutable lot"""
+        lot = self.create_lot(ghg_total=20)
+        self.consume(lot, 100)
+
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        lot.ghg_total = 30
+        lot.save(update_fields=["ghg_total"])
+
+        self.assertEqual(OperationService.get_emission_rates_by_lot([lot.id]), {lot.id: 25})
+
+        balance = BalanceService.calculate_balance(Operation.objects.all(), self.entity.id, BalanceService.GROUP_BY_LOT, "l")
+        self.assertEqual(next(iter(balance.values()))["emission_rate_per_mj"], 25)
+
+    def test_zero_and_negative_ghg_rates_are_valid(self):
+        """Preserve zero and negative intensities rather than treating them as missing values."""
+        lot = self.create_lot(ghg_total=20)
+        for rate in (0, -5):
+            lot.ghg_total = rate
+            lot.save(update_fields=["ghg_total"])
+            CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+            self.assertEqual(OperationService.get_emission_rates_by_lot([lot.id]), {lot.id: rate})

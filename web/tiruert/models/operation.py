@@ -50,11 +50,11 @@ class OperationManager(models.Manager):
 
 class Operation(models.Model):
     PENDING = "PENDING"
-    ACCEPTED = "ACCEPTED"  # Acquisition
-    REJECTED = "REJECTED"  # Acquisition
+    ACCEPTED = "ACCEPTED"  # Acquisition / Transfert
+    REJECTED = "REJECTED"  # Acquisition / Transfert
     CANCELED = "CANCELED"
     DECLARED = "DECLARED"  # Teneur validation
-    CORRECTED = "CORRECTED"  # By customs
+    CORRECTED = "CORRECTED"
     VALIDATED = "VALIDATED"  # By customs
     DRAFT = "DRAFT"  # For transfert operations
 
@@ -109,10 +109,10 @@ class Operation(models.Model):
     CREDIT_TYPES = [INCORPORATION, MAC_BIO, LIVRAISON_DIRECTE]
 
     # Statuses considered active in balance calculation (credits + debits)
-    ACTIVE_STATUSES = [PENDING, ACCEPTED, VALIDATED, DECLARED, DRAFT]
+    ACTIVE_STATUSES = [PENDING, ACCEPTED, VALIDATED, DECLARED, DRAFT, CORRECTED]
 
     # Definitive statuses for confirmed operations (no longer pending)
-    CONFIRMED_STATUSES = [ACCEPTED, VALIDATED, DECLARED]
+    CONFIRMED_STATUSES = [ACCEPTED, VALIDATED, DECLARED, CORRECTED]
 
     ESSENCE = "ESSENCE"
     GAZOLE = "GAZOLE"
@@ -212,6 +212,33 @@ class Operation(models.Model):
             return truncate(self._avoided_emissions)
 
         return truncate(sum(detail.avoided_emissions for detail in self.details.all()))  # in tCO2
+
+    @property
+    def ghg_delta(self):
+        if hasattr(self, "_ghg_delta"):
+            return self._ghg_delta
+
+        if self.type != self.CORRECTION:
+            return None
+
+        details = list(self.details.all())
+        if len(details) == 1 and details[0].volume == 0:
+            return details[0].emission_rate_per_mj_delta
+        return None
+
+    @property
+    def corrected_avoided_emissions(self):
+        if hasattr(self, "_corrected_avoided_emissions"):
+            value = self._corrected_avoided_emissions
+            return truncate(value) if value is not None else None
+
+        if self.status != self.CORRECTED:
+            return None
+
+        details = list(self.details.all())
+        if not any(detail.emission_rate_per_mj_delta is not None for detail in details):
+            return None
+        return truncate(sum(detail.corrected_avoided_emissions for detail in details))
 
     class Meta:
         db_table = "tiruert_operations"
