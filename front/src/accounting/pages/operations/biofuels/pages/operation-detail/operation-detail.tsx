@@ -1,7 +1,7 @@
 import Dialog from "common/components/dialog2/dialog"
 import Portal from "common/components/portal"
 import { useQuery } from "common/hooks/async"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import * as api from "accounting/api/biofuels/operations"
 import useEntity from "common/hooks/entity"
 import { useHashMatch } from "common/components/hash-route"
@@ -15,6 +15,7 @@ import { useOperationDetailFields } from "./operation-detail-fields"
 import { OperationDetailActions } from "./operation-detail-actions"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 import { Button } from "common/components/button2"
+import { useTranslation } from "react-i18next"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
@@ -89,10 +90,40 @@ export const OperationDetail = () => {
                   </div>
                 ))}
               </Grid>
+              {operation?.ghg_delta != null && (
+                <CorrectedOperationLinks
+                  ids={operation.corrected_operation_ids}
+                />
+              )}
             </>
           )}
         </Main>
       </Dialog>
     </Portal>
+  )
+}
+
+export const CorrectedOperationLinks = ({ ids }: { ids?: number[] }) => {
+  const { t } = useTranslation()
+  const location = useLocation()
+
+  if (!ids?.length) return null
+
+  return (
+    <ul className={css["operation-detail-corrected-links"]}>
+      {ids.map((id) => (
+        <li key={id}>
+          <Button
+            customPriority="link"
+            linkProps={{
+              to: `${location.pathname}${location.search}#operation/${id}`,
+              target: "_blank",
+            }}
+          >
+            {t("Opération corrigée n° {{id}}", { id })}
+          </Button>
+        </li>
+      ))}
+    </ul>
   )
 }

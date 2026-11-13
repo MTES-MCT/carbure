@@ -270,6 +270,7 @@ const makeGhgCorrection = (ghgDelta: number): Operation => ({
   energy: 0,
   avoided_emissions: 0,
   ghg_delta: ghgDelta,
+  corrected_operation_ids: [123456, 789012],
   details: [
     {
       lot: 42,

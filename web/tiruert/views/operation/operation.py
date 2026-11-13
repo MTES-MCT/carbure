@@ -31,6 +31,7 @@ from tiruert.serializers import (
     OperationSerializer,
     OperationUpdateSerializer,
 )
+from tiruert.services.correction import CorrectionService
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.energy import (
     avoided_emissions_tco2_expression,
@@ -269,6 +270,13 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
 
         return queryset
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.corrected_operation_ids = CorrectionService.get_corrected_operation_ids(
+            instance, self.filter_queryset(self.get_queryset())
+        )
+        return Response(self.get_serializer(instance).data)
 
     @extend_schema(
         responses={
