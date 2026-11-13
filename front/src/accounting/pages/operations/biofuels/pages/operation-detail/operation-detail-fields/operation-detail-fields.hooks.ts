@@ -6,10 +6,11 @@ import {
   formatEnergyDisplay,
   formatQuantityDisplay,
 } from "./operation-detail-fields.utils"
-import { formatDate, formatPeriod } from "common/utils/formatters"
+import { formatDate, formatNumber, formatPeriod } from "common/utils/formatters"
 import { compact } from "common/utils/collection"
 import useEntity from "common/hooks/entity"
 import { ROUTE_URLS } from "common/utils/routes"
+import { isCreditOperation } from "../../../operations.utils"
 
 export const useOperationDetailFields = (operation?: Operation) => {
   const { t } = useTranslation()
@@ -26,6 +27,8 @@ export const useOperationDetailFields = (operation?: Operation) => {
 
     const applyRenewableShare = operation.renewable_energy_share !== 1
     const lotDetails = operation.details?.find((detail) => detail.lot !== null)
+    const isGhgCorrection = operation.ghg_delta != null
+    const transactionSign = isCreditOperation(operation.transaction) ? 1 : -1
 
     const lotHref = (lotId: number) => {
       const year = operation.year ?? new Date().getFullYear()
@@ -45,17 +48,29 @@ export const useOperationDetailFields = (operation?: Operation) => {
       },
       { label: t("Catégorie"), value: operation.customs_category },
       { label: t("Biocarburant"), value: operation.biofuel?.code },
-      {
+      !isGhgCorrection && {
         label: t("Quantité"),
         value: formatQuantityDisplay(operation, applyRenewableShare),
       },
-      applyRenewableShare && {
-        label: t("Energie renouvelable"),
-        value: formatEnergyDisplay(operation),
-      },
-      {
+      !isGhgCorrection &&
+        applyRenewableShare && {
+          label: t("Energie renouvelable"),
+          value: formatEnergyDisplay(operation),
+        },
+      !isGhgCorrection && {
         label: t("Tonnes CO2 eq évitées"),
-        value: formatTCO2Number(operation.avoided_emissions),
+        value: formatTCO2Number(
+          (operation.corrected_avoided_emissions ??
+            operation.avoided_emissions) * transactionSign
+        ),
+        originalValue:
+          operation.corrected_avoided_emissions != null
+            ? formatTCO2Number(operation.avoided_emissions * transactionSign)
+            : undefined,
+      },
+      operation.ghg_delta != null && {
+        label: t("Correction GES"),
+        value: `${formatNumber(operation.ghg_delta, { signDisplay: "always" })} gCO₂/MJ`,
       },
       operation.type === OperationType.TRANSFERT &&
         isReceiver && {

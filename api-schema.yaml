@@ -12309,8 +12309,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
@@ -12388,6 +12388,12 @@ paths:
                 type: string
                 format: binary
           description: ""
+        "404":
+          content:
+            application/json:
+              schema:
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/reject/:
     post:
       operationId: reject_operation
@@ -12421,8 +12427,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
@@ -20942,6 +20948,16 @@ components:
           type: number
           format: double
           readOnly: true
+        corrected_avoided_emissions:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
+        ghg_delta:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
         details:
           type: array
           items:
@@ -20966,6 +20982,7 @@ components:
         - _entity
         - avoided_emissions
         - biofuel
+        - corrected_avoided_emissions
         - created_at
         - credited_entity
         - debited_entity
@@ -20973,6 +20990,7 @@ components:
         - energy
         - export_country
         - from_depot
+        - ghg_delta
         - id
         - sector
         - to_depot
@@ -21222,6 +21240,16 @@ components:
           type: number
           format: double
           readOnly: true
+        corrected_avoided_emissions:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
+        ghg_delta:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
         year:
           type: integer
           readOnly: true
@@ -21233,11 +21261,13 @@ components:
         - _entity
         - avoided_emissions
         - biofuel
+        - corrected_avoided_emissions
         - created_at
         - credited_entity
         - debited_entity
         - energy
         - from_depot
+        - ghg_delta
         - id
         - sector
         - to_depot
