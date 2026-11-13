@@ -195,7 +195,10 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 Value(0.0),
             ),
             "_corrected_avoided_emissions": Case(
-                When(status=Operation.CORRECTED, then=Subquery(corrected_emissions_subquery, output_field=FloatField())),
+                When(
+                    corrected=True,
+                    then=Subquery(corrected_emissions_subquery, output_field=FloatField()),
+                ),
                 default=Value(None),
                 output_field=FloatField(),
             ),
