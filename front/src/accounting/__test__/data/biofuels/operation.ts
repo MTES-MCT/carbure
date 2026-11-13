@@ -35,6 +35,8 @@ export const operationCredit: Operation = {
   created_at: "2021-01-01T00:00:00Z",
   energy: 27000,
   avoided_emissions: 100,
+  corrected_avoided_emissions: null,
+  ghg_delta: null,
   debt: null,
   transaction: "CREDIT",
 }

@@ -25,17 +25,6 @@ paths:
         - cookieAuth: []
         - basicAuth: []
       responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ActivateResponse"
-              examples:
-                SuccessExample:
-                  value: {}
-                  summary: A successful activation
-                  description: The account was successfully activated.
-          description: ""
         "400":
           content:
             application/json:
@@ -78,7 +67,7 @@ paths:
           description: The link is no longer valid, or the account already has a password.
   /api/auth/activate-profile/check/:
     post:
-      operationId: auth_check_activate_profile_create
+      operationId: auth_activate_profile_check_create
       tags:
         - auth
       requestBody:
@@ -104,7 +93,8 @@ paths:
             application/json:
               schema:
                 message: Could not activate user account
-          description: The link is expired, already used, or does not belong to an invited account.
+          description: The link is expired, already used, or does not belong to an invited
+            account.
   /api/auth/confirm-email-change/:
     post:
       operationId: auth_confirm_email_change_create
@@ -4353,7 +4343,6 @@ paths:
             type: array
             items:
               type: string
-              format: date
           explode: true
           style: form
         - in: query
@@ -4630,7 +4619,6 @@ paths:
             type: array
             items:
               type: string
-              format: date
           explode: true
           style: form
         - in: query
@@ -12191,8 +12179,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
@@ -12270,6 +12258,12 @@ paths:
                 type: string
                 format: binary
           description: ""
+        "404":
+          content:
+            application/json:
+              schema:
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/reject/:
     post:
       operationId: reject_operation
@@ -12303,8 +12297,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
@@ -14751,9 +14745,6 @@ components:
         - password2
         - token
         - uidb64
-    ActivateResponse:
-      type: object
-      additionalProperties: false
     AddCertificateRequest:
       type: object
       properties:
@@ -20544,6 +20535,16 @@ components:
           type: number
           format: double
           readOnly: true
+        corrected_avoided_emissions:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
+        ghg_delta:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
         details:
           type: array
           items:
@@ -20568,6 +20569,7 @@ components:
         - _entity
         - avoided_emissions
         - biofuel
+        - corrected_avoided_emissions
         - created_at
         - credited_entity
         - debited_entity
@@ -20575,6 +20577,7 @@ components:
         - energy
         - export_country
         - from_depot
+        - ghg_delta
         - id
         - sector
         - to_depot
@@ -20824,6 +20827,16 @@ components:
           type: number
           format: double
           readOnly: true
+        corrected_avoided_emissions:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
+        ghg_delta:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
         year:
           type: integer
           readOnly: true
@@ -20835,11 +20848,13 @@ components:
         - _entity
         - avoided_emissions
         - biofuel
+        - corrected_avoided_emissions
         - created_at
         - credited_entity
         - debited_entity
         - energy
         - from_depot
+        - ghg_delta
         - id
         - sector
         - to_depot
@@ -23396,8 +23411,8 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: Resend the activation email for the pending account matching
-        this address.
+      description: Resend the activation email for the pending account matching this
+        address.
       properties:
         email:
           type: string

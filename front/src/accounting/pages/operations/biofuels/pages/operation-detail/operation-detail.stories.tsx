@@ -216,3 +216,79 @@ export const ReceiveTransfertOperationPendingAsMTEAdmin: Story = {
     },
   },
 }
+
+export const CorrectedIncorporationOperation: Story = {
+  parameters: getOperationParameters(
+    {
+      ...operationCredit,
+      type: OperationType.INCORPORATION,
+      status: OperationsStatus.CORRECTED,
+      corrected_avoided_emissions: 80,
+    },
+    "Original avoided emissions followed by the latest corrected value"
+  ),
+}
+
+export const CorrectedIncorporationWithNegativeEmissions: Story = {
+  parameters: getOperationParameters(
+    {
+      ...operationCredit,
+      type: OperationType.INCORPORATION,
+      status: OperationsStatus.CORRECTED,
+      corrected_avoided_emissions: -25,
+    },
+    "Negative corrected avoided emissions retain their sign"
+  ),
+}
+
+export const CorrectedVolumeDebitOperation: Story = {
+  parameters: getOperationParameters(
+    {
+      ...operationDebit,
+      type: OperationType.CORRECTION,
+      status: OperationsStatus.CORRECTED,
+      avoided_emissions: 100,
+      corrected_avoided_emissions: 80,
+      details: [
+        {
+          lot: 42,
+          volume: -1000,
+          emission_rate_per_mj: 20,
+        },
+      ],
+    },
+    "A corrected volume debit retains its signed quantity and natural emissions sign"
+  ),
+}
+
+const makeGhgCorrection = (ghgDelta: number): Operation => ({
+  ...operationCredit,
+  type: OperationType.CORRECTION,
+  status: OperationsStatus.VALIDATED,
+  volume: 0,
+  quantity_renewable: 0,
+  energy: 0,
+  avoided_emissions: 0,
+  ghg_delta: ghgDelta,
+  details: [
+    {
+      lot: 42,
+      volume: 0,
+      emission_rate_per_mj: 20,
+    },
+  ],
+})
+
+export const PositiveGhgCorrection: Story = {
+  parameters: getOperationParameters(
+    makeGhgCorrection(5),
+    "A positive GHG delta and lot link, without quantity, energy or tonnes"
+  ),
+}
+
+export const NegativeGhgCorrection: Story = {
+  parameters: getOperationParameters(
+    makeGhgCorrection(-3),
+    "A negative GHG delta and lot link, without quantity, energy or tonnes"
+  ),
+}

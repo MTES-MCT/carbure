@@ -1,4 +1,20 @@
 export interface paths {
+    "/api/auth/activate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["auth_activate_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/activate-profile/": {
         parameters: {
             query?: never;
@@ -24,23 +40,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["auth_check_activate_profile_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/auth/activate/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["auth_activate_create"];
+        post: operations["auth_activate_profile_check_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3763,7 +3763,6 @@ export interface components {
             password1: string;
             password2: string;
         };
-        ActivateResponse: Record<string, never>;
         AddCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -6378,6 +6377,10 @@ export interface components {
             readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
+            /** Format: double */
+            readonly corrected_avoided_emissions: number | null;
+            /** Format: double */
+            readonly ghg_delta: number | null;
             details?: components["schemas"]["OperationDetail"][];
             readonly year: number;
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
@@ -6478,6 +6481,10 @@ export interface components {
             readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
+            /** Format: double */
+            readonly corrected_avoided_emissions: number | null;
+            /** Format: double */
+            readonly ghg_delta: number | null;
             readonly year: number;
             readonly transaction: string;
         };
@@ -7711,7 +7718,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    auth_check_activate_profile_create: {
+    auth_activate_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -7726,14 +7733,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The invitation link is still valid. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description The link is expired, already used, or does not belong to an invited account. */
+            /** @description Bad request - missing fields. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7759,6 +7759,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The account was activated and the password was set. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -7776,7 +7777,7 @@ export interface operations {
             };
         };
     };
-    auth_activate_create: {
+    auth_activate_profile_check_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -7791,15 +7792,14 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The invitation link is still valid. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["ActivateResponse"];
-                };
+                content?: never;
             };
-            /** @description Bad request - missing fields. */
+            /** @description The link is expired, already used, or does not belong to an invited account. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7940,6 +7940,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The request was accepted. A mail is sent only when a pending account matches the address. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -15369,7 +15370,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15444,6 +15445,15 @@ export interface operations {
                     "application/vnd.ms-excel": File;
                 };
             };
+            /** @description Operation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
         };
     };
     reject_operation: {
@@ -15470,7 +15480,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;

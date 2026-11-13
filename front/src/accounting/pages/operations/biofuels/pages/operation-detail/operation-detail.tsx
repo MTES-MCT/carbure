@@ -62,8 +62,8 @@ export const OperationDetail = () => {
           ) : (
             <>
               <Grid className={css["operation-detail-fields"]}>
-                {fields.map(({ label, value, href }) => (
-                  <div key={`${label}-${value}`}>
+                {fields.map(({ label, value, href, originalValue }) => (
+                  <div key={label}>
                     {label && (
                       <Text className={css["field-label"]}>{label}</Text>
                     )}
@@ -78,6 +78,10 @@ export const OperationDetail = () => {
                         >
                           {value}
                         </Button>
+                      ) : originalValue != null ? (
+                        <>
+                          <del>{originalValue}</del> {value}
+                        </>
                       ) : (
                         value
                       )}

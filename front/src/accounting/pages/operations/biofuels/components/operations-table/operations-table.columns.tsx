@@ -133,6 +133,8 @@ export const useOperationsBiofuelsColumns = ({
         minWidth: "140px",
       },
       cell: (item) => {
+        if (item.ghg_delta != null) return <Cell text="-" />
+
         const calculatedQuantity = Math.abs(item.volume)
         const formattedQuantity = formatNumber(calculatedQuantity, {
           fractionDigits: FRACTION_DIGITS_LITERS,
@@ -147,7 +149,11 @@ export const useOperationsBiofuelsColumns = ({
     {
       header: `${t("tCO2 évitées")}`,
       cell: (item) => {
-        const calculatedAvoidedEmissions = Math.abs(item.avoided_emissions)
+        if (item.ghg_delta != null) return <Cell text="-" />
+
+        const avoidedEmissions =
+          item.corrected_avoided_emissions ?? item.avoided_emissions
+        const calculatedAvoidedEmissions = Math.abs(avoidedEmissions)
         const formattedAvoidedEmissions = formatTCO2Number(
           calculatedAvoidedEmissions
         )
