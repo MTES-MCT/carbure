@@ -25,12 +25,21 @@ def carbure_entities(fetch_all=False, entity_name=None):
     return entities
 
 
+def certificate_ids(entity_certificates):
+    if not entity_certificates:
+        return "no certificate"
+
+    ids = ", ".join([f"'{ec.certificate.certificate_id}'" for ec in entity_certificates])
+    certificates_label = "certificates" if len(entity_certificates) > 1 else "certificate"
+    return f"{certificates_label} {ids}"
+
+
 def entity_names(entities):
     if not entities:
         return "no entity"
 
     names = ", ".join([f"'{e.name}'" for e in entities])
-    entities_label = f"entit{'ies' if len(entities) > 1 else 'y'}"
+    entities_label = "entities" if len(entities) > 1 else "entity"
     return f"{entities_label} {names}"
 
 
@@ -82,12 +91,9 @@ class Command(BaseCommand):
                 certificate__certificate_type=GenericCertificate.SYSTEME_NATIONAL,
                 certificate__status=GenericCertificate.VALID,
             )
-            entity_certificate_ids = ", ".join([f"'{ec.certificate.certificate_id}'" for ec in entity_certificates])
 
             if dry_run:
-                self.stdout.write(
-                    f"Would export certificate{'s' if len(entity_certificates) > 1 else ''} {entity_certificate_ids}…"
-                )
+                self.stdout.write(f"Would export {certificate_ids(entity_certificates)}…")
 
             request = AddUpdateCertificateRequest(*entity_certificates)
             if dry_run:
@@ -97,9 +103,7 @@ Would send UDB request with body being:
 …""")
                 return {"result": "Got to the end of the dry run"}
 
-            self.stdout.write(
-                f"Exporting certificate{'s' if len(entity_certificates) > 1 else ''} {entity_certificate_ids}…"
-            )
+            self.stdout.write(f"Exporting {certificate_ids(entity_certificates)}…")
             requester = Requester(request, timeout=70)
             result = requester.do_request()
             return result
