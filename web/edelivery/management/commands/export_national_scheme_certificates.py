@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 
-from core.models.certificate import GenericCertificate
 from core.models.entity import Entity
 from core.models.entity_certificate import EntityCertificate
 from edelivery.ebms.requests.add_organisation_request import AddOrganisationRequest
@@ -86,11 +85,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         def export_certificates(entities, dry_run):
-            entity_certificates = EntityCertificate.objects.filter(
-                entity__in=entities,
-                certificate__certificate_type=GenericCertificate.SYSTEME_NATIONAL,
-                certificate__status=GenericCertificate.VALID,
-            )
+            entity_certificates = EntityCertificate.all_for_entities_with_valid_national_scheme_certificate(entities)
 
             if dry_run:
                 self.stdout.write(f"Would export {certificate_ids(entity_certificates)}…")
