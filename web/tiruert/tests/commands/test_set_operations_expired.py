@@ -169,6 +169,74 @@ class SetOperationsExpiredIntegrationTest(BaseExpirationTestCase):
         self.assertEqual(exp_details.first().lot_id, detail.lot_id)
         self.assertEqual(exp_details.first().emission_rate_per_mj, 10.0)
 
+    def test_corrected_credit_expires_at_validated_ghg_rate(self):
+        """Corrected incorporation expires at the validated rate without storing a delta."""
+        _, detail = self._create_incorporation(
+            emission_rate=20.0,
+            status=Operation.CORRECTED,
+        )
+        detail.emission_rate_per_mj_delta = 5.0
+        detail.save(update_fields=["emission_rate_per_mj_delta"])
+        self._call_command()
+
+        expiration_detail = OperationDetail.objects.get(operation__type=Operation.EXPIRATION, lot_id=detail.lot_id)
+        self.assertEqual(expiration_detail.emission_rate_per_mj, 25.0)
+        self.assertIsNone(expiration_detail.emission_rate_per_mj_delta)
+
+    def test_transferred_credit_expires_at_validated_source_ghg_rate(self):
+        """An old transfer must not replace the corrected source rate for new expirations."""
+        _, detail = self._create_incorporation(
+            emission_rate=20.0,
+            status=Operation.CORRECTED,
+        )
+        detail.emission_rate_per_mj_delta = 5.0
+        detail.save(update_fields=["emission_rate_per_mj_delta"])
+        recipient = Entity.objects.create(name="Corrected lot recipient", entity_type=Entity.OPERATOR)
+        cession = OperationFactory.create_cession(
+            debited_entity=self.entity,
+            credited_entity=recipient,
+            status=Operation.ACCEPTED,
+            biofuel=self.biofuel,
+        )
+        OperationDetailFactory.create_for_operation(
+            cession,
+            lot=detail.lot,
+            volume=detail.volume,
+            emission_rate_per_mj=20.0,
+        )
+
+        self._call_command()
+
+        expiration_detail = OperationDetail.objects.get(
+            operation__type=Operation.EXPIRATION,
+            operation__debited_entity=recipient,
+            lot_id=detail.lot_id,
+        )
+        self.assertEqual(expiration_detail.emission_rate_per_mj, 25.0)
+
+    def test_expiration_source_rates_are_resolved_in_bulk(self):
+        """Multiple lots resolve zero and negative validated rates without per-detail queries."""
+        _, zero_rate_detail = self._create_incorporation(
+            emission_rate=20.0,
+            status=Operation.CORRECTED,
+        )
+        _, negative_rate_detail = self._create_incorporation(
+            emission_rate=20.0,
+            status=Operation.CORRECTED,
+        )
+        OperationDetail.objects.filter(pk=zero_rate_detail.pk).update(emission_rate_per_mj_delta=-20.0)
+        OperationDetail.objects.filter(pk=negative_rate_detail.pk).update(emission_rate_per_mj_delta=-25.0)
+        lots_to_expire = {
+            zero_rate_detail.lot_id: zero_rate_detail.volume,
+            negative_rate_detail.lot_id: negative_rate_detail.volume,
+        }
+
+        with self.assertNumQueries(2):
+            source_info = self.cmd._get_lot_source_info(lots_to_expire, self.entity.id, 2024)
+
+        self.assertEqual(source_info[zero_rate_detail.lot_id]["emission_rate_per_mj"], 0.0)
+        self.assertEqual(source_info[negative_rate_detail.lot_id]["emission_rate_per_mj"], -5.0)
+
     def test_creates_expiration_only_for_remaining_volume(self):
         """Partial consumption: only the remaining volume is expired."""
         _, detail = self._create_incorporation(volume=1000.0)
