@@ -86,7 +86,7 @@ def update_many(request):
 
     # prepare lot events and comments
     updated_lots = []
-    updated_lot_ids_with_volume_change = []
+    correction_lot_ids = set()
     update_events = []
     update_comments = []
 
@@ -98,13 +98,17 @@ def update_many(request):
         updated_lots.append(node.data)
 
         volume_diff = node.diff.get("volume")
-        if volume_diff is not None and volume_diff[0] != volume_diff[1]:
-            updated_lot_ids_with_volume_change.append(node.data.id)
 
         # recompute the GHG values in case something changed
+        ghg_total_before_update = node.data.ghg_total
         diff_ghg = update_data_diff_with_ghg(node)
         # update node.diff to add new ghg values
         node.diff.update(diff_ghg)
+
+        volume_changed = volume_diff is not None and volume_diff[0] != volume_diff[1]
+        ghg_changed = node.data.ghg_total != ghg_total_before_update
+        if volume_changed or ghg_changed:
+            correction_lot_ids.add(node.data.id)
 
         # save a lot event with the current modification
         update_events.append(
@@ -167,10 +171,8 @@ def update_many(request):
             GenericError.objects.filter(lot__in=updated_lots).delete()
             GenericError.objects.bulk_create(sanity_check_errors)
 
-            if updated_lot_ids_with_volume_change:
-                CorrectionService.create_correction_operations_for_lot_volume_update(
-                    sorted(set(updated_lot_ids_with_volume_change))
-                )
+            if correction_lot_ids:
+                CorrectionService.create_correction_operations_for_lot_update(sorted(correction_lot_ids))
 
     # prepare the response data
     updates = [serialize_node(node) for node in updated_nodes]

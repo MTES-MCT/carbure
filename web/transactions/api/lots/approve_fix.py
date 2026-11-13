@@ -38,7 +38,7 @@ def approve_fix(request, context):
         fixed_lot_ids = [lot.id for lot in locked_lots if lot.correction_status == CarbureLot.FIXED]
         lots.update(correction_status=CarbureLot.NO_PROBLEMO)
         if fixed_lot_ids:
-            CorrectionService.create_correction_operations_for_lot_volume_update(sorted(fixed_lot_ids))
+            CorrectionService.create_correction_operations_for_lot_update(sorted(fixed_lot_ids))
         CarbureLotEvent.objects.bulk_create(approve_fix_events)
 
     return SuccessResponse()
