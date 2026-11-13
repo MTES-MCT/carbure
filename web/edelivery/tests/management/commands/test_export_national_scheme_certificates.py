@@ -3,11 +3,13 @@ from unittest.mock import MagicMock, patch
 
 from edelivery.management.commands.export_national_scheme_certificates import (
     carbure_entities,
+    certificate_ids,
     entity_names,
     export_entities,
     find_entities_not_in_udb,
 )
 from entity.factories.entity import EntityFactory
+from transactions.factories.certificate import EntityCertificateFactory, GenericCertificateFactory
 
 
 class CarbureEntitiesTest(TestCase):
@@ -68,6 +70,22 @@ class CarbureEntitiesTest(TestCase):
         self.assertEqual("Value error: Entity 'SOME ENTITY' not found in CarbuRe", context.exception.args[0])
 
 
+class CertificateIdsTest(TestCase):
+    def test_format_certificate_ids(self):
+        ids = ["CERT_ID_1", "CERT_ID_2", "CERT_ID_3"]
+        certificates = [GenericCertificateFactory.build(certificate_id=id) for id in ids]
+        entity_certificates = [EntityCertificateFactory.build(certificate=c) for c in certificates]
+        self.assertEqual("certificates 'CERT_ID_1', 'CERT_ID_2', 'CERT_ID_3'", certificate_ids(entity_certificates))
+
+    def test_format_certificate_id_when_only_one_entity_certificate(self):
+        certificate = GenericCertificateFactory.build(certificate_id="CERT_ID_1")
+        entity_certificates = [EntityCertificateFactory.build(certificate=certificate)]
+        self.assertEqual("certificate 'CERT_ID_1'", certificate_ids(entity_certificates))
+
+    def test_format_certificate_ids_when_no_entity_certificate(self):
+        self.assertEqual("no certificate", certificate_ids([]))
+
+
 class EntityNamesTest(TestCase):
     def test_format_entity_names(self):
         names = ["ENTITY 1", "ENTITY 2", "ENTITY 3"]
@@ -79,8 +97,7 @@ class EntityNamesTest(TestCase):
         self.assertEqual("entity 'ENTITY 1'", entity_names(entities))
 
     def test_format_entity_names_if_no_entity(self):
-        entities = []
-        self.assertEqual("no entity", entity_names(entities))
+        self.assertEqual("no entity", entity_names([]))
 
 
 class EntitiesNotInUDBTest(TestCase):
