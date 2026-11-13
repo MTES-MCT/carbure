@@ -39,6 +39,7 @@ export const operationCredit: Operation = {
   ghg_delta: null,
   debt: null,
   transaction: "CREDIT",
+  corrected_operation_ids: [1, 2],
 }
 
 export const operationDebit: Operation = {

@@ -3401,7 +3401,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** @description Set teneur operations to DECLARED */
+        /** @description Declare pending teneur operations, marking GHG-corrected operations as CORRECTED */
         post: operations["declare_teneur"];
         delete?: never;
         options?: never;

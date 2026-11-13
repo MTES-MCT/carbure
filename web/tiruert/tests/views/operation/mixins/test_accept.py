@@ -1,14 +1,20 @@
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from threading import Event
 from unittest.mock import patch
 
-from django.test import TestCase
+from django.db import close_old_connections, connection
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 
 from core.models import Biocarburant, Entity
 from core.tests_utils import setup_current_user
 from tiruert.factories import OperationFactory
+from tiruert.factories.operation import OperationDetailFactory
 from tiruert.models import Operation
+from tiruert.services.correction import CorrectionService
 from tiruert.views.operation.mixins.accept import AcceptActionMixin
+from transactions.factories import CarbureLotFactory
 from transactions.models import Depot
 
 
@@ -219,6 +225,47 @@ class DeclareTeneurActionMixinTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"error": "NOTHING_TO_DECLARE"})
 
+    def test_declare_teneur_uses_corrected_flag_and_entity_scope(self):
+        """Use the corrected flag, not detail deltas, while preserving entity scope."""
+        operations = []
+        corrected_and_delta = ((False, None), (True, None), (False, 0), (False, 5), (True, 5))
+        for corrected, delta in corrected_and_delta:
+            operation = OperationFactory(
+                type=Operation.TENEUR,
+                status=Operation.PENDING,
+                debited_entity=self.entity,
+                corrected=corrected,
+            )
+            OperationDetailFactory(operation=operation, emission_rate_per_mj_delta=delta)
+            operations.append(operation)
+        other = OperationFactory(
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            debited_entity=self.other_entity,
+            corrected=True,
+        )
+        OperationDetailFactory(operation=other, emission_rate_per_mj_delta=5)
+
+        response = self.client.post(reverse("operations-declare-teneur"), query_params=self.base_params)
+
+        self.assertEqual(response.status_code, 200)
+        expected_statuses = (
+            Operation.DECLARED,
+            Operation.CORRECTED,
+            Operation.DECLARED,
+            Operation.DECLARED,
+            Operation.CORRECTED,
+        )
+        for operation, expected_status, (expected_corrected, _delta) in zip(
+            operations, expected_statuses, corrected_and_delta
+        ):
+            operation.refresh_from_db()
+            self.assertEqual(operation.status, expected_status)
+            self.assertEqual(operation.corrected, expected_corrected)
+        other.refresh_from_db()
+        self.assertEqual(other.status, Operation.PENDING)
+        self.assertTrue(other.corrected)
+
     def test_declare_teneur_with_no_operations_returns_400(self):
         """Test POST /operations/teneur/declare/ returns 400 when no TENEUR operations exist at all."""
         url = reverse("operations-declare-teneur")
@@ -251,3 +298,106 @@ class DeclareTeneurActionMixinTest(TestCase):
 
         self.assertEqual(operation1.status, Operation.DECLARED)
         self.assertEqual(operation2.status, Operation.PENDING)  # Unchanged
+
+
+class DeclareTeneurCorrectionConcurrencyTest(TransactionTestCase):
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/depots.json",
+        "json/entities.json",
+        "json/entities_sites.json",
+    ]
+
+    def test_declaration_and_ghg_correction_serialize_in_both_orders(self):
+        """A simultaneous declaration and GHG correction always leave the teneur corrected."""
+        if not connection.features.has_select_for_update:
+            self.skipTest("The database backend does not support SELECT FOR UPDATE")
+
+        entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
+        biofuel = Biocarburant.objects.get(code="ETH")
+        setup_current_user(self, "concurrent@carbure.local", "Tester", "password", [(entity, "ADMIN")])
+
+        for first, filter_feedstock in (
+            ("correction", False),
+            ("declaration", False),
+            ("correction", True),
+            ("declaration", True),
+        ):
+            with self.subTest(first=first, filter_feedstock=filter_feedstock):
+                lot = CarbureLotFactory(biofuel=biofuel, ghg_total=20)
+                credit = OperationFactory(
+                    type=Operation.INCORPORATION, status=Operation.VALIDATED, biofuel=biofuel, credited_entity=entity
+                )
+                OperationDetailFactory(operation=credit, lot=lot, emission_rate_per_mj=20)
+                teneur = OperationFactory(
+                    type=Operation.TENEUR, status=Operation.PENDING, biofuel=biofuel, debited_entity=entity
+                )
+                OperationDetailFactory(operation=teneur, lot=lot, emission_rate_per_mj=20)
+                lot.ghg_total = 25
+                lot.save(update_fields=["ghg_total"])
+
+                first_locked = Event()
+                second_attempted = Event()
+                second_unblocked = Event()
+                release_first = Event()
+
+                def worker(kind):
+                    close_old_connections()
+
+                    def intercept(execute, sql, params, many, context):
+                        sql_upper = sql.upper()
+                        if kind == first and sql_upper.startswith("UPDATE "):
+                            table = "TIRUERT_OPERATION_DETAILS" if kind == "correction" else "TIRUERT_OPERATIONS"
+                            if table in sql_upper and not first_locked.is_set():
+                                if kind == "declaration":
+                                    result = execute(sql, params, many, context)
+                                first_locked.set()
+                                if not release_first.wait(20):
+                                    raise TimeoutError("Timed out waiting to release the first transaction")
+                                if kind == "declaration":
+                                    return result
+                        if (
+                            kind != first
+                            and "TIRUERT_OPERATIONS" in sql_upper
+                            and ("FOR UPDATE" in sql_upper or sql_upper.startswith("UPDATE "))
+                        ):
+                            second_attempted.set()
+                            try:
+                                return execute(sql, params, many, context)
+                            finally:
+                                second_unblocked.set()
+                        return execute(sql, params, many, context)
+
+                    try:
+                        with connection.execute_wrapper(intercept):
+                            if kind == "correction":
+                                CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+                            else:
+                                params = {"entity_id": entity.id}
+                                if filter_feedstock:
+                                    params["feedstock"] = lot.feedstock.code
+                                response = self.client.post(reverse("operations-declare-teneur"), query_params=params)
+                                if response.status_code != 200:
+                                    raise AssertionError(f"Declaration returned HTTP {response.status_code}")
+                    finally:
+                        connection.close()
+
+                second = "declaration" if first == "correction" else "correction"
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    first_result = executor.submit(worker, first)
+                    try:
+                        self.assertTrue(first_locked.wait(10), "First transaction did not acquire its lock")
+                        second_result = executor.submit(worker, second)
+                        self.assertTrue(second_attempted.wait(10), "Second transaction did not start its database write")
+                        self.assertFalse(second_unblocked.wait(0.2), "Second transaction did not wait for the first")
+                    finally:
+                        release_first.set()
+                    first_result.result(timeout=15)
+                    second_result.result(timeout=15)
+
+                teneur.refresh_from_db()
+                self.assertEqual(teneur.status, Operation.CORRECTED)
+                self.assertTrue(teneur.corrected)
+                self.assertEqual(teneur.details.get().emission_rate_per_mj_delta, 5)
