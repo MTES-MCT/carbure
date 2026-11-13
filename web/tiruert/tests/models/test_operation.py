@@ -153,6 +153,26 @@ class OperationAvoidedEmissionsPropertyTest(TestCase):
         self.assertEqual(result, 300.58)
 
 
+class OperationCorrectedAvoidedEmissionsPropertyTest(TestCase):
+    def test_corrected_emissions_depend_on_flag_not_status(self):
+        """A corrected operation exposes its GHG amount even when its status is not CORRECTED."""
+        detail = Mock(emission_rate_per_mj_delta=0, corrected_avoided_emissions=1.23)
+        details = Mock()
+        details.all.return_value = [detail]
+
+        with patch.object(Operation, "details", PropertyMock(return_value=details)):
+            self.assertEqual(Operation(status=Operation.PENDING, corrected=True).corrected_avoided_emissions, 1.23)
+            self.assertIsNone(Operation(status=Operation.CORRECTED, corrected=False).corrected_avoided_emissions)
+
+    def test_non_ghg_correction_does_not_produce_corrected_emissions(self):
+        """A correction without a GHG delta is not a corrected GHG amount."""
+        details = Mock()
+        details.all.return_value = [Mock(emission_rate_per_mj_delta=None)]
+
+        with patch.object(Operation, "details", PropertyMock(return_value=details)):
+            self.assertIsNone(Operation(corrected=True).corrected_avoided_emissions)
+
+
 class OperationSectorPropertyTest(TestCase):
     """Tests for Operation.sector property."""
 

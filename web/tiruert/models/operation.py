@@ -16,6 +16,7 @@ class OperationManager(models.Manager):
                 "id",
                 "type",
                 "status",
+                "corrected",
                 "customs_category",
                 "validation_date",
                 "created_at",
@@ -129,6 +130,7 @@ class Operation(models.Model):
 
     type = models.CharField(max_length=20, choices=OPERATION_TYPES)
     status = models.CharField(max_length=12, choices=OPERATION_STATUSES, default=PENDING)
+    corrected = models.BooleanField(default=False)
     customs_category = models.CharField(max_length=20, choices=MatierePremiere.MP_CATEGORIES, default=MatierePremiere.CONV)
     biofuel = models.ForeignKey("core.Biocarburant", null=True, blank=False, on_delete=models.SET_NULL)
     credited_entity = models.ForeignKey(
@@ -232,7 +234,7 @@ class Operation(models.Model):
             value = self._corrected_avoided_emissions
             return truncate(value) if value is not None else None
 
-        if self.status != self.CORRECTED:
+        if not self.corrected:
             return None
 
         details = list(self.details.all())
