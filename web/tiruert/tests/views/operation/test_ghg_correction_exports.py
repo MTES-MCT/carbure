@@ -27,6 +27,7 @@ class GhgCorrectionExportsTest(TestCase):
             entity=cls.entity,
             biofuel=Biocarburant.objects.get(code="ETH"),
             status=Operation.CORRECTED,
+            corrected=True,
         )
         cls.source_detail = OperationDetailFactory.create_for_operation(
             cls.source,

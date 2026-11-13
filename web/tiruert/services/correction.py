@@ -15,18 +15,20 @@ from tiruert.services.operation import OperationService
 class CorrectionService:
     @staticmethod
     def get_corrected_operation_ids(operation: Operation, accessible_operations: QuerySet[Operation]) -> list[int]:
-        """Reconstruct candidates from visible history; no correction link is persisted."""
+        """Return visible operations marked corrected in the same ledger group."""
         if operation.type != Operation.CORRECTION or operation.ghg_delta is None:
             return []
 
         detail = next(iter(operation.details.all()))
         return list(
             accessible_operations.filter(
-                Q(type__in=Operation.CREDIT_TYPES) | Q(type=Operation.CORRECTION, details__volume__gt=0),
+                Q(type__in=Operation.CREDIT_TYPES)
+                | Q(type=Operation.CORRECTION, details__volume__gt=0)
+                | Q(type=Operation.TENEUR),
+                corrected=True,
                 details__lot_id=detail.lot_id,
                 customs_category=operation.customs_category,
                 biofuel_id=operation.biofuel_id,
-                status=Operation.CORRECTED,
                 created_at__lt=operation.created_at,
             )
             .order_by("pk")
@@ -43,16 +45,31 @@ class CorrectionService:
     @staticmethod
     @transaction.atomic
     def create_correction_operations_for_lot_ghg_update(lot_ids: list[int]):
-        """Create GHG correction operations for confirmed credits affected by lot emission-rate changes."""
+        """Correct confirmed credits and affected teneurs after lot emission-rate changes."""
         lot_ids = OperationService.lock_lots_for_update(lot_ids)
         if not lot_ids:
             return
 
         details = (
-            OperationDetail.objects.filter(lot_id__in=lot_ids, operation__status__in=Operation.CONFIRMED_STATUSES)
-            .filter(Q(operation__type__in=Operation.CREDIT_TYPES) | Q(operation__type=Operation.CORRECTION, volume__gt=0))
+            OperationDetail.objects.filter(lot_id__in=lot_ids)
+            .filter(
+                Q(
+                    operation__type__in=Operation.CREDIT_TYPES,
+                    operation__status__in=Operation.CONFIRMED_STATUSES,
+                )
+                | Q(
+                    operation__type=Operation.CORRECTION,
+                    operation__status__in=Operation.CONFIRMED_STATUSES,
+                    volume__gt=0,
+                )
+                | Q(
+                    operation__type=Operation.TENEUR,
+                    operation__status__in=[Operation.PENDING, Operation.DECLARED, Operation.CORRECTED],
+                )
+            )
             .select_related(None)
             .select_related("operation", "lot")
+            .select_for_update()
             .only(
                 "id",
                 "lot_id",
@@ -84,7 +101,10 @@ class CorrectionService:
             corrected_operation_ids.update(detail.operation_id for detail in grouped_details)
 
         OperationDetail.objects.bulk_update(updated_details, ["emission_rate_per_mj_delta"])
-        Operation.objects.filter(id__in=corrected_operation_ids).update(status=Operation.CORRECTED)
+        Operation.objects.filter(id__in=corrected_operation_ids).update(corrected=True)
+        Operation.objects.filter(id__in=corrected_operation_ids).exclude(
+            type=Operation.TENEUR, status=Operation.PENDING
+        ).update(status=Operation.CORRECTED)
 
     @staticmethod
     def _apply_ghg_correction(grouped_details: list[OperationDetail]) -> bool:

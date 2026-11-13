@@ -59,6 +59,7 @@ class CorrectedOperationIdsIntegrationTest(TestCase):
             **{
                 "type": Operation.INCORPORATION,
                 "status": Operation.CORRECTED,
+                "corrected": kwargs.get("status", Operation.CORRECTED) == Operation.CORRECTED,
                 "biofuel": self.biofuel,
                 "customs_category": MatierePremiere.CONV,
                 "credited_entity": self.entity,
@@ -94,12 +95,35 @@ class CorrectedOperationIdsIntegrationTest(TestCase):
 
         self.assertEqual(self._retrieve(), expected)
 
-    def test_only_currently_corrected_operations_are_candidates(self):
-        """Confirmed, pending and inactive statuses must not look like corrected history."""
-        for operation_status, _ in Operation.OPERATION_STATUSES:
-            if operation_status != Operation.CORRECTED:
-                self._operation(status=operation_status)
-        expected = self._operation()
+    def test_corrected_teneurs_are_candidates_without_exposing_other_entities(self):
+        """Include affected teneurs regardless of declaration status, within the visible entity scope."""
+        expected = [
+            self._operation(
+                type=Operation.TENEUR,
+                status=operation_status,
+                corrected=True,
+                credited_entity=None,
+                debited_entity=self.entity,
+                delta=0 if operation_status == Operation.DECLARED else 5,
+            ).pk
+            for operation_status in (Operation.PENDING, Operation.DECLARED, Operation.CORRECTED)
+        ]
+        self._operation(type=Operation.TENEUR, status=Operation.PENDING, delta=None)
+        self._operation(type=Operation.TENEUR, status=Operation.CANCELED, delta=5)
+        self._operation(
+            type=Operation.TENEUR,
+            status=Operation.CORRECTED,
+            credited_entity=None,
+            debited_entity=self.other_entity,
+            delta=5,
+        )
+
+        self.assertEqual(self._retrieve(), expected)
+
+    def test_corrected_flag_determines_candidate_independently_of_status(self):
+        """Only operations marked corrected are candidates, regardless of their status."""
+        expected = self._operation(status=Operation.VALIDATED, corrected=True)
+        self._operation(status=Operation.CORRECTED, corrected=False)
 
         self.assertEqual(self._retrieve(), [expected.pk])
 
@@ -115,7 +139,7 @@ class CorrectedOperationIdsIntegrationTest(TestCase):
     def test_other_types_and_nonpositive_correction_details_are_excluded(self):
         """Ignore transfers, customs corrections and previous zero-volume GHG events."""
         for operation_type, _ in Operation.OPERATION_TYPES:
-            if operation_type not in Operation.CREDIT_TYPES + [Operation.CORRECTION]:
+            if operation_type not in Operation.CREDIT_TYPES + [Operation.CORRECTION, Operation.TENEUR]:
                 self._operation(type=operation_type)
         self._operation(type=Operation.CORRECTION, volume=0, delta=5)
         self._operation(type=Operation.CORRECTION, volume=-1)
@@ -360,6 +384,39 @@ class OperationViewSetIntegrationTest(TestCase):
                 self.assertEqual(original["corrected_avoided_emissions"], 3.29)
                 self.assertIsNone(original["ghg_delta"])
 
+    def test_teneur_correction_exposes_both_values_in_list_and_detail(self):
+        """A corrected pending or declared teneur exposes both amounts without losing its status."""
+        operations = []
+        for operation_status in (Operation.PENDING, Operation.DECLARED):
+            operation = Operation.objects.create(
+                type=Operation.TENEUR,
+                status=operation_status,
+                customs_category=self.feedstock_conv.category,
+                biofuel=self.biofuel_eth,
+                debited_entity=self.entity,
+            )
+            OperationDetail.objects.create(operation=operation, lot=self.lot1, volume=500, emission_rate_per_mj=10.5)
+            OperationDetail.objects.create(operation=operation, lot=self.lot2, volume=1500, emission_rate_per_mj=12.3)
+            operations.append((operation_status, operation))
+
+        self._correct_lot1_ghg()
+
+        for original_status, operation in operations:
+            for detail in (False, True):
+                with self.subTest(status=original_status, detail=detail):
+                    data = self._get_operation_data(operation, detail=detail)
+                    self.assertEqual(
+                        data["status"], Operation.PENDING if original_status == Operation.PENDING else Operation.CORRECTED
+                    )
+                    self.assertEqual(data["avoided_emissions"], 3.45)
+                    self.assertEqual(data["corrected_avoided_emissions"], 3.29)
+
+        response = self.client.post(reverse("operations-declare-teneur"), query_params={"entity_id": self.entity.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        declared = self._get_operation_data(operations[0][1], detail=True)
+        self.assertEqual(declared["status"], Operation.CORRECTED)
+        self.assertEqual(declared["corrected_avoided_emissions"], 3.29)
+
     def test_ghg_event_exposes_delta_without_volume_or_emissions(self):
         """List and detail represent a GHG correction as a delta, not a stock movement."""
         correction = self._correct_lot1_ghg()
@@ -395,7 +452,8 @@ class OperationViewSetIntegrationTest(TestCase):
                     emission_rate_per_mj_delta=rate - F("emission_rate_per_mj")
                 )
                 self.operation_incorporation.status = Operation.CORRECTED
-                self.operation_incorporation.save(update_fields=["status"])
+                self.operation_incorporation.corrected = True
+                self.operation_incorporation.save(update_fields=["status", "corrected"])
 
                 original = self._get_operation_data(self.operation_incorporation, detail=False)
 

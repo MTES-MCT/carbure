@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from django.db import transaction
+from django.db.models import Case, Value, When
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -63,7 +65,7 @@ class AcceptActionMixin:
 
     @extend_schema(
         operation_id="declare_teneur",
-        description="Set teneur operations to DECLARED",
+        description="Declare pending teneur operations, marking GHG-corrected operations as CORRECTED",
         request=None,
         responses={
             status.HTTP_200_OK: OpenApiResponse(response={"status": "validated"}, description="Success message"),
@@ -77,19 +79,20 @@ class AcceptActionMixin:
         methods=["post"],
         url_path="teneur/declare",
     )
+    @transaction.atomic
     def declare_teneur(self, request):
         queryset = self.filter_queryset(self.get_queryset()).filter(
             type=Operation.TENEUR,
             status=Operation.PENDING,
         )
 
-        if not queryset.exists():
+        updated_count = queryset.update(
+            status=Case(
+                When(corrected=True, then=Value(Operation.CORRECTED)),
+                default=Value(Operation.DECLARED),
+            )
+        )
+        if not updated_count:
             return Response({"error": AcceptActionMixinErrors.NOTHING_TO_DECLARE}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Get the first one to know which month to validate
-        # month = queryset.first().created_at.month
-        # queryset = queryset.filter(created_at__month=month)
-
-        queryset.update(status=Operation.DECLARED)
 
         return Response({"status": "declared"}, status=status.HTTP_200_OK)

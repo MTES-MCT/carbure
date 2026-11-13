@@ -13403,7 +13403,8 @@ paths:
   /api/tiruert/operations/teneur/declare/:
     post:
       operationId: declare_teneur
-      description: Set teneur operations to DECLARED
+      description: Declare pending teneur operations, marking GHG-corrected operations
+        as CORRECTED
       parameters:
         - in: query
           name: entity_id

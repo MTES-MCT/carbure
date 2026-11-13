@@ -23,6 +23,7 @@ from tiruert.models.operation_detail import OperationDetail
 from tiruert.services.balance_filters import apply_operation_detail_filters
 from tiruert.services.energy import (
     avoided_emissions_tco2_expression,
+    effective_emission_rate_per_mj_expression,
     energy_mj_expression,
 )
 
@@ -64,7 +65,7 @@ def _get_quantity_expression(unit):
         )
 
 
-def _get_avoided_emissions_expression():
+def _get_avoided_emissions_expression(corrected=False):
     from tiruert.services.teneur import GHG_REFERENCE_RED_II
 
     energy_expr = energy_mj_expression(
@@ -74,7 +75,9 @@ def _get_avoided_emissions_expression():
     )
     return avoided_emissions_tco2_expression(
         energy_expr,
-        F("emission_rate_per_mj"),
+        effective_emission_rate_per_mj_expression(F("emission_rate_per_mj"), F("emission_rate_per_mj_delta"))
+        if corrected
+        else F("emission_rate_per_mj"),
         GHG_REFERENCE_RED_II,
     )
 
@@ -97,6 +100,7 @@ def _build_common_context(entity_id, unit, declaration_year=None):
         "quantity_expr": quantity_expr,
         "teneur_energy_expr": teneur_energy_expr,
         "avoided_emissions_expr": avoided_emissions_expr,
+        "corrected_avoided_emissions_expr": _get_avoided_emissions_expression(corrected=True),
         "credit_cond": credit_cond,
         "debit_cond": debit_cond,
         "pending_or_draft_cond": pending_or_draft_cond,
@@ -174,12 +178,12 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
             context["process_cond"]
             & context["teneur_date_cond"]
             & Q(operation__type=Operation.TENEUR)
-            & Q(operation__status__in=[Operation.PENDING, Operation.DECLARED])
+            & Q(operation__status__in=[Operation.PENDING, Operation.DECLARED, Operation.CORRECTED])
         )
         .values(*group_fields, "operation_id", "operation__status")
         .annotate(
             operation_energy=Sum(context["teneur_energy_expr"]),
-            operation_saved_emissions=Sum(context["avoided_emissions_expr"]),
+            operation_saved_emissions=Sum(context["corrected_avoided_emissions_expr"]),
         )
     )
 
@@ -201,7 +205,7 @@ def _get_teneur_operation_contributions(details_qs, context, group_annotations, 
         if group["operation__status"] == Operation.PENDING:
             entry["pending_teneur"] += operation_energy
             entry["pending_saved_emissions"] += operation_saved_emissions
-        elif group["operation__status"] == Operation.DECLARED:
+        elif group["operation__status"] in [Operation.DECLARED, Operation.CORRECTED]:
             entry["declared_teneur"] += operation_energy
             entry["declared_saved_emissions"] += operation_saved_emissions
 
