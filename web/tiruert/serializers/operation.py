@@ -1,6 +1,3 @@
-from datetime import datetime
-
-from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -9,7 +6,7 @@ from core.models.lot import CarbureLot
 from core.serializer_fields import CachedPrimaryKeyRelatedField
 from core.serializers import CountrySerializer
 from core.utils import check_file_size_and_extension
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation
 from tiruert.serializers.balance import BalanceBiofuelSerializer
 from tiruert.serializers.fields import TruncatedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
@@ -306,60 +303,3 @@ class OperationUpdateSerializer(serializers.ModelSerializer):
         if allowed_transition != (self.instance.status, value):
             raise serializers.ValidationError(_("Le statut de cette opération ne peut pas être modifié via cette action."))
         return value
-
-
-class OperationCorrectionSerializer(serializers.Serializer):
-    correction_volume = serializers.FloatField()
-
-    def update(self, operation, validated_data):
-        with transaction.atomic():
-            correction_volume = validated_data["correction_volume"]
-            debit = correction_volume < 0
-            credit = not debit
-
-            # New operation which carry the new lots with the correction volume
-            correction = Operation.objects.create(
-                type=Operation.CUSTOMS_CORRECTION,
-                status=Operation.VALIDATED,
-                customs_category=operation.customs_category,
-                biofuel=operation.biofuel,
-                from_depot=operation.to_depot if debit else None,
-                to_depot=operation.to_depot if credit else None,
-                debited_entity=operation.credited_entity if debit else None,
-                credited_entity=operation.credited_entity if credit else None,
-                validation_date=datetime.now(),
-            )
-
-            # If the correction volume is positive, we add volume to the first lot id of the operation
-            if correction_volume > 0:
-                first_lot = operation.details.first()
-                OperationDetail.objects.create(
-                    operation=correction,
-                    lot_id=first_lot.lot_id,
-                    volume=abs(correction_volume),
-                    emission_rate_per_mj=first_lot.emission_rate_per_mj,  # gCO2/MJ
-                )
-            # If the correction volume is negative
-            # We first need to check if the correction volume is greater than the operation volume
-            # Then we empty each lot of the operation until the correction volume is reached
-            else:
-                if operation.volume < abs(correction_volume):
-                    raise serializers.ValidationError({"error": "NOT_ENOUGH_VOLUME"})
-
-                for lot in operation.details.all():
-                    if correction_volume == 0:
-                        break
-                    if lot.volume < abs(correction_volume):
-                        correction_volume += lot.volume
-                        new_lot_volume = lot.volume
-                    else:
-                        new_lot_volume = abs(correction_volume)
-                        correction_volume = 0
-
-                    OperationDetail.objects.create(
-                        operation=correction,
-                        lot_id=lot.lot_id,
-                        volume=new_lot_volume,
-                        emission_rate_per_mj=lot.emission_rate_per_mj,  # gCO2/MJ
-                    )
-        return correction

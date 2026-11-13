@@ -137,7 +137,7 @@ class CorrectedOperationIdsIntegrationTest(TestCase):
         self.assertEqual(self._retrieve(), [expected.pk])
 
     def test_other_types_and_nonpositive_correction_details_are_excluded(self):
-        """Ignore transfers, customs corrections and previous zero-volume GHG events."""
+        """Ignore transfers and previous zero-volume GHG events."""
         for operation_type, _ in Operation.OPERATION_TYPES:
             if operation_type not in Operation.CREDIT_TYPES + [Operation.CORRECTION, Operation.TENEUR]:
                 self._operation(type=operation_type)
