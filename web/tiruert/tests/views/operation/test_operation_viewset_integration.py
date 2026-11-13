@@ -1,22 +1,216 @@
-from datetime import date
+from datetime import date, timedelta
 from io import BytesIO
 
+from django.db import connection
 from django.db.models import F
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from django.utils import timezone
 from openpyxl import load_workbook
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 
-from core.models import Biocarburant, DeclarationPeriod, Entity, MatierePremiere
+from core.models import Biocarburant, DeclarationPeriod, Entity, ExternalAdminRights, MatierePremiere
 from core.tests_utils import setup_current_user
 from core.utils import truncate
+from entity.models import EntityScopeDepot
+from tiruert.factories.operation import OperationDetailFactory, OperationFactory
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.correction import CorrectionService
 from tiruert.views.operation.operation import OperationViewSet
 from transactions.factories import CarbureLotFactory
 from transactions.models import Depot
+
+
+class CorrectedOperationIdsIntegrationTest(TestCase):
+    fixtures = [
+        "json/biofuels.json",
+        "json/feedstock.json",
+        "json/countries.json",
+        "json/entities.json",
+        "json/depots.json",
+        "json/entities_sites.json",
+    ]
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
+        cls.other_entity = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(pk=cls.entity.pk).first()
+        cls.biofuel = Biocarburant.objects.get(code="ETH")
+        cls.depot = Depot.objects.first()
+        cls.lot = CarbureLotFactory.create(
+            carbure_client=cls.entity,
+            biofuel=cls.biofuel,
+            feedstock=MatierePremiere.biofuel.filter(category=MatierePremiere.CONV).first(),
+        )
+        cls.other_lot = CarbureLotFactory.create(carbure_client=cls.entity, biofuel=cls.biofuel, feedstock=cls.lot.feedstock)
+
+    def setUp(self):
+        self.user = setup_current_user(self, "corrected@carbure.local", "Tester", "gogogo", [(self.entity, "ADMIN")])
+        self.correction_date = timezone.now() - timedelta(hours=12)
+        self.correction = self._operation(
+            type=Operation.CORRECTION, status=Operation.VALIDATED, volume=0, delta=5, created_at=self.correction_date
+        )
+
+    def _operation(self, *, lot=None, volume=100, delta=None, created_at=None, **kwargs):
+        operation = OperationFactory.create(
+            **{
+                "type": Operation.INCORPORATION,
+                "status": Operation.CORRECTED,
+                "biofuel": self.biofuel,
+                "customs_category": MatierePremiere.CONV,
+                "credited_entity": self.entity,
+                "to_depot": self.depot,
+                **kwargs,
+            }
+        )
+        OperationDetailFactory.create(
+            operation=operation,
+            lot=lot or self.lot,
+            volume=volume,
+            emission_rate_per_mj=10,
+            emission_rate_per_mj_delta=delta,
+        )
+        operation.created_at = created_at or self.correction_date - timedelta(days=1)
+        Operation.objects.filter(pk=operation.pk).update(created_at=operation.created_at)
+        return operation
+
+    def _retrieve(self, operation=None, **query):
+        response = self.client.get(
+            reverse("operations-detail", kwargs={"pk": (operation or self.correction).pk}),
+            {"entity_id": self.entity.pk, **query},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        return response.json()["corrected_operation_ids"]
+
+    def test_initial_credits_and_positive_volume_corrections_are_candidates(self):
+        """Reconstruct every eligible type once, including debit volume corrections."""
+        expected = [self._operation(type=operation_type).pk for operation_type in Operation.CREDIT_TYPES]
+        expected.append(self._operation(type=Operation.CORRECTION).pk)
+        expected.append(self._operation(type=Operation.CORRECTION, credited_entity=None, debited_entity=self.entity).pk)
+        OperationDetailFactory.create(operation_id=expected[0], lot=self.lot, volume=10)
+
+        self.assertEqual(self._retrieve(), expected)
+
+    def test_only_currently_corrected_operations_are_candidates(self):
+        """Confirmed, pending and inactive statuses must not look like corrected history."""
+        for operation_status, _ in Operation.OPERATION_STATUSES:
+            if operation_status != Operation.CORRECTED:
+                self._operation(status=operation_status)
+        expected = self._operation()
+
+        self.assertEqual(self._retrieve(), [expected.pk])
+
+    def test_lot_category_and_booked_biofuel_must_match(self):
+        """Match the full ledger group, not just the physical lot."""
+        self._operation(lot=self.other_lot)
+        self._operation(customs_category=MatierePremiere.IXB)
+        self._operation(biofuel=Biocarburant.objects.get(code="EMAG"))
+        expected = self._operation()
+
+        self.assertEqual(self._retrieve(), [expected.pk])
+
+    def test_other_types_and_nonpositive_correction_details_are_excluded(self):
+        """Ignore transfers, customs corrections and previous zero-volume GHG events."""
+        for operation_type, _ in Operation.OPERATION_TYPES:
+            if operation_type not in Operation.CREDIT_TYPES + [Operation.CORRECTION]:
+                self._operation(type=operation_type)
+        self._operation(type=Operation.CORRECTION, volume=0, delta=5)
+        self._operation(type=Operation.CORRECTION, volume=-1)
+        mixed = self._operation(type=Operation.CORRECTION, volume=0)
+        OperationDetailFactory.create(operation=mixed, lot=self.other_lot, volume=100)
+        expected = self._operation(volume=0)
+
+        self.assertEqual(self._retrieve(), [expected.pk])
+
+    def test_creation_date_is_strictly_before_the_ghg_event(self):
+        """Do not link operations created at or after this correction."""
+        self._operation(created_at=self.correction_date)
+        self._operation(created_at=self.correction_date + timedelta(seconds=1))
+        expected = self._operation(created_at=self.correction_date - timedelta(seconds=1))
+
+        self.assertEqual(self._retrieve(), [expected.pk])
+
+    def test_only_operations_visible_to_the_request_entity_are_returned(self):
+        """Same-group history owned by another entity must not leak its IDs."""
+        self._operation(credited_entity=self.other_entity)
+        expected = self._operation()
+
+        self.assertEqual(self._retrieve(), [expected.pk])
+
+    def test_selected_entity_uses_the_existing_admin_scope(self):
+        """Admin selection must restrict candidates to the selected company."""
+        admin = Entity.objects.filter(entity_type=Entity.ADMIN).first()
+        setup_current_user(self, "corrected-admin@carbure.local", "Admin", "gogogo", [(admin, "ADMIN")], is_staff=True)
+        self._operation(credited_entity=self.other_entity)
+        expected = self._operation()
+
+        self.assertEqual(self._retrieve(entity_id=admin.pk, selected_entity_id=self.entity.pk), [expected.pk])
+
+    def test_operator_cannot_select_another_entity(self):
+        """Reconstruction must not bypass the existing selected-entity permission."""
+        response = self.client.get(
+            reverse("operations-detail", kwargs={"pk": self.correction.pk}),
+            {"entity_id": self.entity.pk, "selected_entity_id": self.other_entity.pk},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_selected_entity_uses_the_existing_national_customs_scope(self):
+        """National customs may select a company, without leaking another company's history."""
+        customs = Entity.objects.create(name="National correction customs", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=customs, right=ExternalAdminRights.DGDDI_NATIONAL)
+        setup_current_user(self, "corrected-national@carbure.local", "Customs", "gogogo", [(customs, "ADMIN")])
+        self._operation(credited_entity=self.other_entity)
+        expected = self._operation()
+
+        self.assertEqual(self._retrieve(entity_id=customs.pk, selected_entity_id=self.entity.pk), [expected.pk])
+
+    def test_customs_access_is_restricted_to_accessible_depots(self):
+        """Reuse depot permissions even when an inaccessible candidate has the same owner."""
+        customs = Entity.objects.create(name="Correction customs", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=customs, right=ExternalAdminRights.DGDDI)
+        EntityScopeDepot.objects.create(entity=customs, content_object=self.depot)
+        setup_current_user(self, "corrected-customs@carbure.local", "Customs", "gogogo", [(customs, "ADMIN")])
+        self._operation(to_depot=Depot.objects.exclude(pk=self.depot.pk).first())
+        expected = self._operation(credited_entity=self.other_entity)
+
+        self.assertEqual(self._retrieve(entity_id=customs.pk), [expected.pk])
+
+    def test_non_ghg_operations_return_an_empty_list(self):
+        """Ordinary operations, volume corrections and malformed GHG events have no links."""
+        self._operation()
+        operations = [
+            self._operation(status=Operation.VALIDATED),
+            self._operation(type=Operation.CORRECTION, volume=100, delta=5),
+            self._operation(type=Operation.CORRECTION, volume=0),
+        ]
+        multiple_details = self._operation(type=Operation.CORRECTION, volume=0, delta=5)
+        OperationDetailFactory.create(operation=multiple_details, lot=self.other_lot, volume=0)
+        operations.append(multiple_details)
+        for operation in operations:
+            with self.subTest(operation=operation.pk):
+                self.assertEqual(self._retrieve(operation), [])
+
+    def test_no_candidates_returns_an_empty_list(self):
+        """A valid GHG correction can have no currently visible corrected candidates."""
+        self.assertEqual(self._retrieve(), [])
+
+    def test_candidate_count_does_not_increase_query_count(self):
+        """Fetch all candidate IDs in one query without loading candidate details."""
+        self._operation()
+        with CaptureQueriesContext(connection) as first_queries:
+            first = self._retrieve()
+        for _ in range(10):
+            self._operation()
+        with CaptureQueriesContext(connection) as many_queries:
+            many = self._retrieve()
+
+        self.assertEqual(len(first), 1)
+        self.assertEqual(len(many), 11)
+        self.assertEqual(len(first_queries), len(many_queries))
 
 
 class OperationViewSetIntegrationTest(TestCase):
@@ -177,6 +371,10 @@ class OperationViewSetIntegrationTest(TestCase):
                 self.assertEqual(event["volume"], 0)
                 self.assertEqual(event["avoided_emissions"], 0)
                 self.assertIsNone(event["corrected_avoided_emissions"])
+                if detail:
+                    self.assertEqual(event["corrected_operation_ids"], [self.operation_incorporation.pk])
+                else:
+                    self.assertNotIn("corrected_operation_ids", event)
 
     def test_corrected_detail_keeps_historical_rate(self):
         """The detail API keeps its historical rate and does not expose internal deltas."""

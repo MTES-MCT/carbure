@@ -3,7 +3,7 @@ from copy import copy
 from decimal import Decimal
 
 from django.db import transaction
-from django.db.models import Q, Sum
+from django.db.models import Q, QuerySet, Sum
 
 from core.models import CarbureLot
 from core.utils import truncate
@@ -13,6 +13,27 @@ from tiruert.services.operation import OperationService
 
 
 class CorrectionService:
+    @staticmethod
+    def get_corrected_operation_ids(operation: Operation, accessible_operations: QuerySet[Operation]) -> list[int]:
+        """Reconstruct candidates from visible history; no correction link is persisted."""
+        if operation.type != Operation.CORRECTION or operation.ghg_delta is None:
+            return []
+
+        detail = next(iter(operation.details.all()))
+        return list(
+            accessible_operations.filter(
+                Q(type__in=Operation.CREDIT_TYPES) | Q(type=Operation.CORRECTION, details__volume__gt=0),
+                details__lot_id=detail.lot_id,
+                customs_category=operation.customs_category,
+                biofuel_id=operation.biofuel_id,
+                status=Operation.CORRECTED,
+                created_at__lt=operation.created_at,
+            )
+            .order_by("pk")
+            .values_list("pk", flat=True)
+            .distinct()
+        )
+
     @staticmethod
     @transaction.atomic
     def create_correction_operations_for_lot_update(lot_ids: list[int]):

@@ -108,6 +108,8 @@ class OperationListSerializer(BaseOperationSerializer):
 
 
 class OperationSerializer(BaseOperationSerializer):
+    corrected_operation_ids = serializers.ListField(child=serializers.IntegerField(), read_only=True, default=list)
+
     class Meta:
         model = Operation
         fields = [
@@ -135,6 +137,7 @@ class OperationSerializer(BaseOperationSerializer):
             "avoided_emissions",
             "corrected_avoided_emissions",
             "ghg_delta",
+            "corrected_operation_ids",
             "details",
             "year",
             "devaluation_type",
