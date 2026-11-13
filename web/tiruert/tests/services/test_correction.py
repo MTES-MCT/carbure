@@ -5,9 +5,10 @@ from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
-from tiruert.models import Operation, OperationDetail, TiruertDebt
+from tiruert.models import Objective, Operation, OperationDetail, TiruertDebt
 from tiruert.services.balance import BalanceService
 from tiruert.services.correction import CorrectionService
+from tiruert.services.objective import ObjectiveService
 from tiruert.services.operation import OperationService
 from transactions.factories import CarbureLotFactory
 from transactions.models import Depot
@@ -372,6 +373,7 @@ class CorrectionServiceVolumeTest(TestCase):
             with self.subTest(operation_id=operation.pk):
                 operation.refresh_from_db()
                 self.assertEqual(operation.status, Operation.CORRECTED)
+                self.assertTrue(operation.corrected)
                 detail = operation.details.get()
                 self.assertEqual(detail.emission_rate_per_mj, 20)
                 self.assertEqual(detail.emission_rate_per_mj_delta, 5)
@@ -467,9 +469,11 @@ class CorrectionServiceVolumeTest(TestCase):
         self.assertIsNone(other_detail.emission_rate_per_mj_delta)
         debit = Operation.objects.get(type=Operation.TENEUR)
         self.assertEqual(debit.status, Operation.ACCEPTED)
+        self.assertFalse(debit.corrected)
         self.assertIsNone(debit.details.get().emission_rate_per_mj_delta)
         self.assertIsNone(debit.corrected_avoided_emissions)
         original.refresh_from_db()
+        self.assertTrue(original.corrected)
         self.assertGreater(original.corrected_avoided_emissions, original.avoided_emissions)
 
     def test_combined_update_creates_volume_at_new_validated_rate(self):
@@ -515,3 +519,150 @@ class CorrectionServiceVolumeTest(TestCase):
             lot.save(update_fields=["ghg_total"])
             CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
             self.assertEqual(OperationService.get_emission_rates_by_lot([lot.id]), {lot.id: rate})
+
+    def _create_ghg_correction_teneur_scenario(self):
+        lot = self.create_lot(ghg_total=20)
+        other_lot = CarbureLotFactory.create(biofuel=self.biofuel_emag, ghg_total=30)
+        operations = {}
+        for operation_status in (Operation.PENDING, Operation.DECLARED, Operation.CORRECTED, Operation.CANCELED):
+            operation = Operation.objects.create(
+                type=Operation.TENEUR,
+                status=operation_status,
+                customs_category=lot.feedstock.category,
+                biofuel=lot.biofuel,
+                debited_entity=self.entity,
+            )
+            OperationDetail.objects.create(operation=operation, lot=lot, volume=100, emission_rate_per_mj=20)
+            OperationDetail.objects.create(operation=operation, lot=other_lot, volume=100, emission_rate_per_mj=30)
+            operations[operation_status] = operation
+
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        return lot, other_lot, operations
+
+    def test_ghg_correction_updates_teneur_status_and_corrected_flag(self):
+        """Correct active teneurs while preserving pending and canceled statuses."""
+        _, _, operations = self._create_ghg_correction_teneur_scenario()
+        expected_statuses = {
+            Operation.PENDING: Operation.PENDING,
+            Operation.DECLARED: Operation.CORRECTED,
+            Operation.CORRECTED: Operation.CORRECTED,
+            Operation.CANCELED: Operation.CANCELED,
+        }
+
+        for old_status, operation in operations.items():
+            with self.subTest(status=old_status):
+                operation.refresh_from_db()
+                self.assertEqual(operation.status, expected_statuses[old_status])
+                self.assertEqual(operation.corrected, old_status != Operation.CANCELED)
+
+    def test_ghg_correction_updates_only_affected_teneur_details(self):
+        """Update active details for the changed lot, but not unrelated lots or canceled operations."""
+        lot, other_lot, operations = self._create_ghg_correction_teneur_scenario()
+
+        for old_status, operation in operations.items():
+            with self.subTest(status=old_status):
+                operation.refresh_from_db()
+                target_detail = operation.details.get(lot=lot)
+                other_detail = operation.details.get(lot=other_lot)
+                self.assertEqual(
+                    target_detail.emission_rate_per_mj_delta,
+                    None if old_status == Operation.CANCELED else 5,
+                )
+                self.assertIsNone(other_detail.emission_rate_per_mj_delta)
+                if old_status != Operation.CANCELED:
+                    self.assertLess(operation.corrected_avoided_emissions, operation.avoided_emissions)
+
+    def test_ghg_correction_updates_teneur_balance(self):
+        """Use corrected emissions when calculating pending and declared balances."""
+        _, _, operations = self._create_ghg_correction_teneur_scenario()
+        balances = BalanceService.calculate_balance(
+            Operation.objects.filter(id__in=[operation.id for operation in operations.values()]),
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "mj",
+        )
+        sector = next(iter(balances.values()))
+        expected_saved = (
+            100 * self.biofuel_emag.pci_litre * (94 - 25) / 1_000_000
+            + 100 * self.biofuel_emag.pci_litre * (94 - 30) / 1_000_000
+        )
+        self.assertAlmostEqual(sector["pending_saved_emissions"], expected_saved)
+        self.assertAlmostEqual(sector["declared_saved_emissions"], expected_saved * 2)
+
+    def test_ghg_correction_updates_global_objective(self):
+        """Aggregate corrected pending and declared emissions into the global objective."""
+        _, _, operations = self._create_ghg_correction_teneur_scenario()
+        balances = BalanceService.calculate_balance(
+            Operation.objects.filter(id__in=[operation.id for operation in operations.values()]),
+            self.entity.id,
+            BalanceService.GROUP_BY_SECTOR,
+            "mj",
+        )
+        sector = next(iter(balances.values()))
+        objective = ObjectiveService.calculate_global_objective(
+            [sector],
+            {"available_balance": 0, "pending_teneur": 0, "declared_teneur": 0},
+            Objective.objects.none(),
+            0,
+        )
+        self.assertAlmostEqual(objective["pending_teneur"], sector["pending_saved_emissions"])
+        self.assertAlmostEqual(objective["declared_teneur"], sector["declared_saved_emissions"])
+
+    def test_teneur_successive_ghg_corrections_preserve_original_rate(self):
+        """Repeat corrections, including a return to the original rate, without changing pending status."""
+        lot = self.create_lot(ghg_total=20)
+        operation = Operation.objects.create(
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            customs_category=lot.feedstock.category,
+            biofuel=lot.biofuel,
+            debited_entity=self.entity,
+        )
+        detail = OperationDetail.objects.create(operation=operation, lot=lot, volume=500, emission_rate_per_mj=20)
+
+        for rate, expected_delta in ((25, 5), (25, 5), (0, -20), (20, 0)):
+            with self.subTest(rate=rate):
+                lot.ghg_total = rate
+                lot.save(update_fields=["ghg_total"])
+                CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+                operation.refresh_from_db()
+                detail.refresh_from_db()
+                self.assertEqual(operation.status, Operation.PENDING)
+                self.assertTrue(operation.corrected)
+                self.assertEqual(detail.emission_rate_per_mj, 20)
+                self.assertEqual(detail.emission_rate_per_mj_delta, expected_delta)
+                self.assertIsNotNone(operation.corrected_avoided_emissions)
+
+        self.assertEqual(self.corrections().count(), 3)
+
+    def test_ghg_correction_updates_all_teneurs_in_corrected_ledger_group(self):
+        """Correct every teneur in the group, even when its effective rate already matches."""
+        lot = self.create_lot(ghg_total=20)
+        operations = []
+        for category, rate in ((lot.feedstock.category, 25), (MatierePremiere.IXB, 20)):
+            operation = Operation.objects.create(
+                type=Operation.TENEUR,
+                status=Operation.DECLARED,
+                customs_category=category,
+                biofuel=lot.biofuel,
+                debited_entity=self.entity,
+            )
+            OperationDetail.objects.create(operation=operation, lot=lot, volume=100, emission_rate_per_mj=rate)
+            operations.append(operation)
+
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        corrected_teneur, other_category_teneur = operations
+        corrected_teneur.refresh_from_db()
+        other_category_teneur.refresh_from_db()
+        self.assertEqual(corrected_teneur.status, Operation.CORRECTED)
+        self.assertTrue(corrected_teneur.corrected)
+        self.assertEqual(corrected_teneur.details.get().emission_rate_per_mj_delta, 0)
+        self.assertEqual(other_category_teneur.status, Operation.DECLARED)
+        self.assertFalse(other_category_teneur.corrected)
+        self.assertIsNone(other_category_teneur.details.get().emission_rate_per_mj_delta)
