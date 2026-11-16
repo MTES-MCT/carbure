@@ -25,6 +25,7 @@ import {
 import { ActionFilterDisplay } from "traceability/hooks/use-action-filters"
 import { ActionColumn } from "traceability/hooks/action-columns"
 import { useCombinedQuery } from "traceability/hooks/use-combined-query"
+import { useStableQuery } from "traceability/hooks/use-stable-query"
 import { ActionTab, useActionTabs } from "traceability/hooks/use-action-tabs"
 import { ActionModal } from "traceability/components/action-modal"
 import { ActionExcelImportDialog } from "traceability/components/action-excel-import-dialog"
@@ -72,7 +73,7 @@ export const ActionsPage = ({
   listTitle,
   detailTitle,
   subpath,
-  fixedQuery,
+  fixedQuery: _fixedQuery,
   tabs,
   mainAction,
   renderDetailActions,
@@ -89,6 +90,7 @@ export const ActionsPage = ({
   const location = useLocation()
   const navigate = useNavigate()
   const actionTabs = useActionTabs(tabs)
+  const fixedQuery = useStableQuery(_fixedQuery)
   const pageQuery = useMemo(
     () => ({ ...fixedQuery, ...actionTabs.query }),
     [fixedQuery, actionTabs.query]
