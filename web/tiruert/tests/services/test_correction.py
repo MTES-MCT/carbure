@@ -3,6 +3,7 @@ from unittest.mock import patch
 from django.db import connection
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
+from rest_framework.exceptions import ValidationError
 
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere
 from tiruert.models import Objective, Operation, OperationDetail, TiruertDebt
@@ -65,6 +66,34 @@ class CorrectionServiceVolumeTest(TestCase):
 
     def corrections(self):
         return Operation.objects.filter(type=Operation.CORRECTION).order_by("id")
+
+    def create_transfer(
+        self,
+        lot,
+        recipient,
+        *,
+        sender=None,
+        status=Operation.ACCEPTED,
+        detail_lot=None,
+        category=None,
+        biofuel=None,
+        emission_rate=20,
+    ):
+        transfer = Operation.objects.create(
+            type=Operation.TRANSFERT,
+            status=status,
+            customs_category=category or lot.feedstock.category,
+            biofuel=biofuel or lot.biofuel,
+            debited_entity=sender or self.entity,
+            credited_entity=recipient,
+        )
+        OperationDetail.objects.create(
+            operation=transfer,
+            lot=detail_lot or lot,
+            volume=100,
+            emission_rate_per_mj=emission_rate,
+        )
+        return transfer
 
     def repay(self, debt, volume, status=Operation.VALIDATED):
         operation = Operation.objects.create(
@@ -666,3 +695,209 @@ class CorrectionServiceVolumeTest(TestCase):
         self.assertEqual(other_category_teneur.status, Operation.DECLARED)
         self.assertFalse(other_category_teneur.corrected)
         self.assertIsNone(other_category_teneur.details.get().emission_rate_per_mj_delta)
+
+    def test_ghg_decrease_copies_correction_once_per_recipient(self):
+        """Create one correction for each distinct recipient in the accepted transfer chain."""
+        lot = self.create_lot(ghg_total=20)
+        b, c = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=self.entity.id)[:2]
+        initial = Operation.objects.get(type=Operation.INCORPORATION)
+        initial.renewable_energy_share = 0.5
+        initial.durability_period = "2024"
+        initial.declaration_year = 2024
+        initial.save(update_fields=["renewable_energy_share", "durability_period", "declaration_year"])
+
+        self.create_transfer(lot, b)
+        self.create_transfer(lot, b)
+        self.create_transfer(lot, c, sender=b)
+        self.create_transfer(lot, self.entity, sender=c)
+
+        lot.ghg_total = 15
+        lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        self.assertEqual(self.corrections().count(), 3)
+        for entity in (self.entity, b, c):
+            with self.subTest(entity=entity.id):
+                correction = self.corrections().get(credited_entity=entity)
+                self.assertEqual(correction.status, Operation.VALIDATED)
+                self.assertEqual(
+                    (
+                        correction.customs_category,
+                        correction.biofuel_id,
+                        correction.renewable_energy_share,
+                        correction.durability_period,
+                        correction.declaration_year,
+                    ),
+                    (initial.customs_category, initial.biofuel_id, 0.5, "2024", 2024),
+                )
+                detail = correction.details.get()
+                self.assertEqual(
+                    (detail.lot_id, detail.volume, detail.emission_rate_per_mj, detail.emission_rate_per_mj_delta),
+                    (lot.id, 0, 20, -5),
+                )
+
+    def test_ghg_decrease_updates_only_matching_active_transfers(self):
+        """Update transfer details only for eligible statuses and the matching lot group."""
+        lot = self.create_lot(ghg_total=20)
+        other_lot = CarbureLotFactory.create(biofuel=self.biofuel_emag, ghg_total=20)
+        recipient = Entity.objects.create(name="Transfer recipient", entity_type=Entity.OPERATOR)
+        other_biofuel = Biocarburant.objects.get(code="ETH")
+        transfers = [
+            (self.create_transfer(lot, recipient, status=transfer_status), transfer_status, affected)
+            for transfer_status, affected in (
+                (Operation.ACCEPTED, True),
+                (Operation.DRAFT, True),
+                (Operation.PENDING, True),
+                (Operation.CORRECTED, True),
+                (Operation.CANCELED, False),
+                (Operation.REJECTED, False),
+            )
+        ]
+        transfers.extend(
+            [
+                (self.create_transfer(lot, recipient, detail_lot=other_lot), Operation.ACCEPTED, False),
+                (self.create_transfer(lot, recipient, category=MatierePremiere.IXB), Operation.ACCEPTED, False),
+                (self.create_transfer(lot, recipient, biofuel=other_biofuel), Operation.ACCEPTED, False),
+            ]
+        )
+
+        lot.ghg_total = 15
+        lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        for transfer, original_status, affected in transfers:
+            transfer.refresh_from_db()
+            detail = transfer.details.get()
+            with self.subTest(transfer_id=transfer.id):
+                expected_status = (
+                    Operation.CORRECTED if affected and original_status == Operation.ACCEPTED else original_status
+                )
+                self.assertEqual(transfer.status, expected_status)
+                self.assertEqual(transfer.corrected, affected)
+                self.assertEqual(detail.emission_rate_per_mj_delta, -5 if affected else None)
+
+    def test_ghg_draft_and_pending_transfers_do_not_create_recipient_corrections(self):
+        """Only accepted transfers should cause a correction event for their recipients."""
+        lot = self.create_lot(ghg_total=20)
+        draft_recipient = Entity.objects.create(name="Draft recipient", entity_type=Entity.OPERATOR)
+        pending_recipient = Entity.objects.create(name="Pending recipient", entity_type=Entity.OPERATOR)
+        self.create_transfer(lot, draft_recipient, status=Operation.DRAFT)
+        self.create_transfer(lot, pending_recipient, status=Operation.PENDING)
+
+        lot.ghg_total = 15
+        lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        self.assertEqual(self.corrections().count(), 1)
+        self.assertEqual(self.corrections().get().credited_entity_id, self.entity.id)
+        self.assertFalse(self.corrections().filter(credited_entity=draft_recipient).exists())
+        self.assertFalse(self.corrections().filter(credited_entity=pending_recipient).exists())
+
+    def test_ghg_decrease_is_idempotent_for_transfer_recipients(self):
+        """Repeated processing of one decrease must not duplicate recipient corrections."""
+        lot = self.create_lot(ghg_total=20)
+        recipient = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=self.entity.id).first()
+        self.create_transfer(lot, recipient)
+        lot.ghg_total = 15
+        lot.save(update_fields=["ghg_total"])
+
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        self.assertEqual(self.corrections().filter(credited_entity=self.entity).count(), 1)
+        self.assertEqual(self.corrections().filter(credited_entity=recipient).count(), 1)
+
+    def test_ghg_transfer_copies_each_successive_decrease(self):
+        """Create a recipient correction for each distinct decrease, but not for a repeated value."""
+        lot = self.create_lot(ghg_total=20)
+        recipient = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=self.entity.id).first()
+        self.create_transfer(lot, recipient, emission_rate=25)
+
+        for rate in (15, 15, 12):
+            lot.ghg_total = rate
+            lot.save(update_fields=["ghg_total"])
+            CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        self.assertEqual(
+            list(
+                self.corrections()
+                .filter(credited_entity=recipient)
+                .values_list("details__emission_rate_per_mj", "details__emission_rate_per_mj_delta")
+            ),
+            [(20, -5), (15, -3)],
+        )
+
+    def test_ghg_decrease_updates_transfer_emissions_without_changing_historical_rate(self):
+        """Keep the original transfer rate and use its delta for corrected emissions."""
+        lot = self.create_lot(ghg_total=20)
+        recipient = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=self.entity.id).first()
+        transfer = self.create_transfer(lot, recipient, emission_rate=25)
+        other_lot = CarbureLotFactory.create(biofuel=self.biofuel_emag, ghg_total=30)
+        other_detail = OperationDetail.objects.create(operation=transfer, lot=other_lot, volume=50, emission_rate_per_mj=30)
+
+        lot.ghg_total = 15
+        lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        transfer.refresh_from_db()
+        detail = transfer.details.get(lot=lot)
+        other_detail.refresh_from_db()
+        self.assertEqual(transfer.status, Operation.CORRECTED)
+        self.assertTrue(transfer.corrected)
+        self.assertEqual(detail.emission_rate_per_mj, 25)
+        self.assertEqual(detail.emission_rate_per_mj_delta, -10)
+        self.assertIsNone(other_detail.emission_rate_per_mj_delta)
+        self.assertGreater(transfer.corrected_avoided_emissions, transfer.avoided_emissions)
+
+    def test_ghg_increase_after_decrease_does_not_copy_transfer_correction(self):
+        """An increase after a decrease must not create another recipient correction."""
+        lot = self.create_lot(ghg_total=20)
+        recipient = Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=self.entity.id).first()
+        self.create_transfer(lot, recipient, emission_rate=25)
+
+        for rate in (15, 18):
+            lot.ghg_total = rate
+            lot.save(update_fields=["ghg_total"])
+            CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        self.assertEqual(
+            list(
+                self.corrections()
+                .filter(credited_entity=recipient)
+                .values_list("details__emission_rate_per_mj", "details__emission_rate_per_mj_delta")
+            ),
+            [(20, -5)],
+        )
+
+    def test_ghg_increase_does_not_correct_transfers(self):
+        """Leave transfer details and statuses unchanged when GHG emissions increase."""
+        lot = self.create_lot(ghg_total=20)
+        transfer = self.create_transfer(
+            lot,
+            Entity.objects.filter(entity_type=Entity.OPERATOR).exclude(id=self.entity.id).first(),
+        )
+
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        transfer.refresh_from_db()
+        detail = transfer.details.get()
+        self.assertEqual(transfer.status, Operation.ACCEPTED)
+        self.assertFalse(transfer.corrected)
+        self.assertIsNone(detail.emission_rate_per_mj_delta)
+
+    def test_ghg_correction_rejects_accepted_transfer_without_recipient(self):
+        """Roll back the event rather than silently losing a recipient's correction."""
+        lot = self.create_lot(ghg_total=20)
+        self.create_transfer(lot, None)
+        lot.ghg_total = 15
+        lot.save(update_fields=["ghg_total"])
+
+        with self.assertRaises(ValidationError):
+            CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        self.assertFalse(self.corrections().exists())
+        initial = Operation.objects.get(type=Operation.INCORPORATION)
+        self.assertEqual(initial.status, Operation.VALIDATED)
+        self.assertIsNone(initial.details.get().emission_rate_per_mj_delta)
