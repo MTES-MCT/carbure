@@ -1,4 +1,6 @@
+import { useRef } from "react"
 import { Navigate, useLocation, useParams } from "react-router-dom"
+import { equals } from "ramda"
 
 import { ActionQuery } from "traceability/types"
 
@@ -30,14 +32,25 @@ export function useActionTabs(tabs?: ActionTab[]) {
     label: tab.label,
     path: tabPathname(pathname, tabKey, tab.key),
   }))
+  const query = useStableQuery(activeTab?.query)
 
   return {
     activeTab,
     hasTabs: (tabs?.length ?? 0) > 0,
-    query: activeTab?.query,
+    query,
     redirect,
     links,
   }
+}
+
+// Pages rebuild `tabs` on each render. Keep the previous query while its
+// values stay the same, so the actions list does not refetch.
+function useStableQuery(query: Partial<ActionQuery> | undefined) {
+  const cache = useRef(query)
+  if (!equals(cache.current, query)) {
+    cache.current = query
+  }
+  return cache.current
 }
 
 function tabPathname(
