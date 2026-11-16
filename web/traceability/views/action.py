@@ -17,8 +17,8 @@ from traceability.handlers.action import ActionIndustryHandler
 from traceability.middlewares import ActionHandlerMiddleware
 from traceability.models import Action, ActionStatus
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
-from traceability.serializers.action_authorization import ActionAuthorizationSerializer
 from traceability.serializers.action_status import ActionStatusAuthorizationSerializer
+from traceability.serializers.creation import ActionCreateRequestSerializer, ActionCreationSerializer
 from traceability.services.delete import delete_action
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
@@ -90,31 +90,24 @@ class ActionViewset(
         return context
 
     @extend_schema(
-        request=ActionAuthorizationSerializer,
+        request=ActionCreateRequestSerializer,
         responses={201: ActionSerializer, 400: None, 403: None},
         description="Create an action.",
     )
     def create(self, request, *args, **kwargs):
         context = self.get_serializer_context()
-        authorization = ActionAuthorizationSerializer(data=request.data, context=context)
-        authorization.is_valid(raise_exception=True)
-
-        action_type = authorization.validated_data["type"]
+        action_type = request.data.get("type") if isinstance(request.data, dict) else None
         serializer_class = request.handler.get_action_creation_serializers().get(action_type)
         if serializer_class is None:
+            ActionCreationSerializer(data=request.data, context=context).is_valid(raise_exception=True)
             raise ValidationError({"type": _("Ce type d'action ne peut pas être créé.")})
 
         serializer = serializer_class(data=request.data, context=context)
         serializer.is_valid(raise_exception=True)
 
         with transaction.atomic():
-            action = serializer.save(
-                type=action_type,
-                holder=authorization.validated_data["holder"],
-                parent=authorization.validated_data.get("parent"),
-                industry=request.handler.industry,
-            )
-            ActionStatus.objects.create(action=action, status=authorization.validated_data["status"])
+            action = serializer.save()
+            ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
             action = Action.annotate_actions([action])[0]
             return Response(ActionSerializer(action, context=context).data, status=status.HTTP_201_CREATED)
 

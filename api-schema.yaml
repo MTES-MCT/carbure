@@ -13641,6 +13641,58 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedActionList"
           description: ""
+    post:
+      operationId: traceability_actions_create
+      description: Create an action.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequestRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequestRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequestRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Action"
+          description: ""
+        "400":
+          description: No response body
+        "403":
+          description: No response body
   /api/traceability/actions/{id}/:
     get:
       operationId: traceability_actions_retrieve
@@ -13721,6 +13773,67 @@ paths:
         - basicAuth: []
       responses:
         "204":
+          description: No response body
+  /api/traceability/actions/{id}/status/:
+    post:
+      operationId: traceability_actions_status_create
+      description: Change an action's status.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action.
+          required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionStatusAuthorizationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionStatusAuthorizationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionStatusAuthorizationRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionStatusAuthorization"
+          description: ""
+        "400":
+          description: No response body
+        "403":
+          description: No response body
+        "404":
           description: No response body
   /api/traceability/actions/filters/:
     get:
@@ -14495,6 +14608,110 @@ components:
         - certificate_id
         - certificate_type
         - id
+    ActionCreateRequestRequest:
+      type: object
+      description: >-
+        Schema of the create body. The view validates with the type serializer.
+
+
+        ``working_date`` is left out: the server fills it. ``industry`` comes
+        from
+
+        the query param. ``pos_id`` follows the model until it becomes optional.
+      properties:
+        type:
+          $ref: "#/components/schemas/ActionTypeEnum"
+        status:
+          $ref: "#/components/schemas/ActionStatusEnum"
+        holder:
+          type: integer
+        parent:
+          type: integer
+          nullable: true
+        pos_id:
+          type: string
+          minLength: 1
+          title: N° de POS
+          maxLength: 48
+        material:
+          type: string
+          minLength: 1
+          nullable: true
+        certificate:
+          type: string
+          minLength: 1
+          nullable: true
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          title: Quantité de matière
+        site:
+          type: string
+          minLength: 1
+          nullable: true
+        shipping_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date d'expédition
+        shipping_distance:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+          title: Distance de livraison
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          nullable: true
+          title: Mode de transport
+        file:
+          type: integer
+          nullable: true
+          title: Fichier
+        eec:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        el:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        ei:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        ep:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        etd:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eu:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        esca:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+        eccr:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+      required:
+        - holder
+        - pos_id
+        - quantity
+        - status
+        - type
     ActionExcelUploadRequest:
       type: object
       properties:
@@ -14567,6 +14784,20 @@ components:
       required:
         - id
         - name
+    ActionStatusAuthorization:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ActionStatusEnum"
+      required:
+        - status
+    ActionStatusAuthorizationRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ActionStatusEnum"
+      required:
+        - status
     ActionStatusEnum:
       enum:
         - CREATED
@@ -21821,12 +22052,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password
+          title: Mot de passe
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password confirmation
+          title: Confirmation du mot de passe
       required:
         - password1
         - password2
@@ -23177,12 +23408,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password
+          title: Mot de passe
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password confirmation
+          title: Confirmation du mot de passe
       required:
         - email
         - name
@@ -23331,7 +23562,7 @@ components:
           type: string
           format: email
           minLength: 1
-          title: Courriel
+          title: Adresse email
       required:
         - email
     UserRights:

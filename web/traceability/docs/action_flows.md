@@ -66,7 +66,7 @@ ActionStatus.can_transition(ActionStatus.PENDING, ActionStatus.ACCEPTED)  # True
 
 ## Permettre la création par l'API
 
-Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création. La base fournit celui d'`INIT` :
+Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création. Ce serializer hérite d'`ActionCreationSerializer`, qui vérifie la matrice puis les champs listés par l'enfant. `type`, `status`, `holder` et `parent` sont toujours relus, même s'ils ne figurent pas dans `Meta.fields`. Le schéma du POST décrit les champs envoyables, sans `working_date` : le serveur le renseigne. La base fournit le serializer d'`INIT` :
 
 ```python
 action_creation_serializers = {

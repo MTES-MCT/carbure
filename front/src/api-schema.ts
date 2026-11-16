@@ -3442,7 +3442,8 @@ export interface paths {
         /** @description Add a years action based on an action's working date. */
         get: operations["traceability_actions_list"];
         put?: never;
-        post?: never;
+        /** @description Create an action. */
+        post: operations["traceability_actions_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3462,6 +3463,23 @@ export interface paths {
         post?: never;
         /** @description Add a years action based on an action's working date. */
         delete: operations["traceability_actions_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/traceability/actions/{id}/status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Change an action's status. */
+        post: operations["traceability_actions_status_create"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3661,6 +3679,57 @@ export interface components {
             certificate_type: components["schemas"]["CertificateTypeEnum"];
             certificate_holder: string;
         };
+        /**
+         * @description Schema of the create body. The view validates with the type serializer.
+         *
+         *     ``working_date`` is left out: the server fills it. ``industry`` comes from
+         *     the query param. ``pos_id`` follows the model until it becomes optional.
+         */
+        ActionCreateRequestRequest: {
+            type: components["schemas"]["ActionTypeEnum"];
+            status: components["schemas"]["ActionStatusEnum"];
+            holder: number;
+            parent?: number | null;
+            /** N° de POS */
+            pos_id: string;
+            material?: string | null;
+            certificate?: string | null;
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            site?: string | null;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date?: string | null;
+            /** Distance de livraison */
+            shipping_distance?: number | null;
+            /** Mode de transport */
+            shipping_method?: components["schemas"]["ActionShippingMethodEnum"] | null;
+            /** Fichier */
+            file?: number | null;
+            /** Format: decimal */
+            eec?: string;
+            /** Format: decimal */
+            el?: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Format: decimal */
+            esca?: string;
+            /** Format: decimal */
+            eccr?: string;
+        };
         ActionExcelUploadRequest: {
             /** Format: binary */
             file: File;
@@ -3694,6 +3763,12 @@ export interface components {
             readonly id: number;
             name: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+        };
+        ActionStatusAuthorization: {
+            status: components["schemas"]["ActionStatusEnum"];
+        };
+        ActionStatusAuthorizationRequest: {
+            status: components["schemas"]["ActionStatusEnum"];
         };
         /**
          * @description * `CREATED` - CREATED
@@ -7013,9 +7088,9 @@ export interface components {
         ResetPasswordRequest: {
             uidb64: string;
             token: string;
-            /** Password */
+            /** Mot de passe */
             password1: string;
-            /** Password confirmation */
+            /** Confirmation du mot de passe */
             password2: string;
         };
         Response: {
@@ -7564,9 +7639,9 @@ export interface components {
              */
             email: string;
             name: string;
-            /** Password */
+            /** Mot de passe */
             password1: string;
-            /** Password confirmation */
+            /** Confirmation du mot de passe */
             password2: string;
         };
         UserEntity: {
@@ -7607,7 +7682,7 @@ export interface components {
         /** @description Resend the activation email for the pending account matching this address. */
         UserResendActivationLinkRequest: {
             /**
-             * Courriel
+             * Adresse email
              * Format: email
              */
             email: string;
@@ -16098,6 +16173,52 @@ export interface operations {
             };
         };
     };
+    traceability_actions_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionCreateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionCreateRequestRequest"];
+                "multipart/form-data": components["schemas"]["ActionCreateRequestRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"];
+                };
+            };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     traceability_actions_retrieve: {
         parameters: {
             query: {
@@ -16148,6 +16269,62 @@ export interface operations {
         responses: {
             /** @description No response body */
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    traceability_actions_status_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionStatusAuthorizationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionStatusAuthorizationRequest"];
+                "multipart/form-data": components["schemas"]["ActionStatusAuthorizationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionStatusAuthorization"];
+                };
+            };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
