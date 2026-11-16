@@ -9,5 +9,7 @@ export const useH2Permissions = () => {
 
   const canWriteStations = entity.canWrite() && !canAccessAdmin
 
-  return { canAccessAdmin, canWriteStations }
+  const canValidateCertificates = entity.canWrite() && !canAccessAdmin
+
+  return { canAccessAdmin, canWriteStations, canValidateCertificates }
 }

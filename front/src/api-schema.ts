@@ -3798,6 +3798,11 @@ export interface components {
             readonly id: number;
             /** N° de POS */
             pos_id?: string | null;
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
         };
         /**
          * @description * `ROAD` - Road transport

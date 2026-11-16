@@ -15049,8 +15049,13 @@ components:
           nullable: true
           title: N° de POS
           maxLength: 48
+        working_date:
+          type: string
+          format: date
+          title: Date de référence
       required:
         - id
+        - working_date
     ActionShippingMethodEnum:
       enum:
         - ROAD

@@ -28,7 +28,7 @@ class ActionParentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = ["id", "pos_id"]
+        fields = ["id", "pos_id", "working_date"]
 
 
 class ActionSerializer(serializers.ModelSerializer):
