@@ -14762,13 +14762,13 @@ components:
         id:
           type: integer
           readOnly: true
-        pos_id:
+        working_date:
           type: string
-          title: N° de POS
-          maxLength: 48
+          format: date
+          title: Date de référence
       required:
         - id
-        - pos_id
+        - working_date
     ActionShippingMethodEnum:
       enum:
         - ROAD

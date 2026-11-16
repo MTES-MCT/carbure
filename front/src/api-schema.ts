@@ -3756,8 +3756,11 @@ export interface components {
         /** @description Small representation used for the parent action relation. */
         ActionParent: {
             readonly id: number;
-            /** N° de POS */
-            pos_id: string;
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
         };
         /**
          * @description * `ROAD` - Transport routier

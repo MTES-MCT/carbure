@@ -9,6 +9,8 @@ export type ActionTab = {
   query?: Partial<ActionQuery>
 }
 
+const EMPTY_QUERY: Partial<ActionQuery> = {}
+
 export function useActionTabs(tabs?: ActionTab[]) {
   const { tab: tabKey } = useParams()
   const { pathname, search, hash } = useLocation()
@@ -31,7 +33,7 @@ export function useActionTabs(tabs?: ActionTab[]) {
     label: tab.label,
     path: tabPathname(pathname, tabKey, tab.key),
   }))
-  const query = useStableQuery(activeTab?.query)
+  const query = useStableQuery(activeTab?.query ?? EMPTY_QUERY)
 
   return {
     activeTab,

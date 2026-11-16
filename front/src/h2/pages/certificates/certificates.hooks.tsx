@@ -11,6 +11,11 @@ import {
 } from "traceability/types"
 import { ActionsPageProps } from "traceability/components/actions-page"
 import { EmptyCertificates } from "./components/empty-certificates"
+import { TransferCertificateDialog } from "./components/transfer-certificate-dialog"
+import { Button } from "common/components/button2"
+import { compact } from "common/utils/collection"
+import { useH2Permissions } from "h2/hooks/use-h2-permissions"
+import { usePortal } from "common/components/portal"
 
 const H2_CERTIFICATE_QUERY: Partial<ActionQuery> = {
   type: [ActionType.VALORIZE],
@@ -38,6 +43,8 @@ export function useH2CertificatesPage(): {
   const filters = useActionFilters()
   const columns = useActionColumns()
   const fields = useActionFields()
+  const { canValidateCertificates } = useH2Permissions()
+  const portal = usePortal()
 
   return {
     page: {
@@ -58,12 +65,29 @@ export function useH2CertificatesPage(): {
       ],
       emptyState: <EmptyCertificates />,
       filters: [filters.period, filters.origin_material],
-      columns: [
+      columns: compact([
         { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
         columns.period,
         columns.quantity,
         columns.total_emissions,
-      ],
+        canValidateCertificates && {
+          header: t("Actions"),
+          cell: (action) => (
+            <Button
+              captive
+              title={t("Céder")}
+              priority="secondary"
+              iconId="ri-send-plane-line"
+              size="small"
+              onClick={() =>
+                portal((close) => (
+                  <TransferCertificateDialog onClose={close} action={action} />
+                ))
+              }
+            />
+          ),
+        },
+      ]),
       fieldsets: [
         {
           legend: t("Certificat"),

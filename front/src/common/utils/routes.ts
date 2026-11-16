@@ -167,10 +167,13 @@ export const ROUTE_URLS = {
       ROOT: baseUrl,
       STATIONS: `${baseUrl}/stations`,
       LOTS: `${baseUrl}/lots/${year}`,
+      LOT: (actionId: number) => `${baseUrl}/lots/${year}#action/${actionId}`,
       CERTIFICATES: `${baseUrl}/certificates`,
       ADMIN: {
         STATIONS: `${baseUrl}/admin/stations`,
         LOTS: `${baseUrl}/admin/lots/${year}`,
+        LOT: (actionId: number) =>
+          `${baseUrl}/admin/lots/${year}#action/${actionId}`,
         CERTIFICATES: `${baseUrl}/admin/certificates/${year}`,
       },
     }

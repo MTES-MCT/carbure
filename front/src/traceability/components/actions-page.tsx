@@ -91,7 +91,7 @@ export const ActionsPage = ({
   const navigate = useNavigate()
   const actionTabs = useActionTabs(tabs)
   const fixedQuery = useStableQuery(_fixedQuery)
-  const pageQuery = useCombinedQuery(fixedQuery, actionTabs.query ?? {})
+  const pageQuery = useCombinedQuery(fixedQuery, actionTabs.query)
 
   const visibleColumns = columns.filter(
     (column) => column.condition?.(entity) ?? true

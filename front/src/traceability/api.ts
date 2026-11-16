@@ -1,6 +1,11 @@
 import { api } from "common/services/api-fetch"
 import { download } from "common/services/api"
-import { ActionFilter, ActionIndustry, ActionQuery } from "traceability/types"
+import {
+  ActionCreateRequest,
+  ActionFilter,
+  ActionIndustry,
+  ActionQuery,
+} from "traceability/types"
 
 export function getActionYears(
   entity_id: number,
@@ -35,6 +40,19 @@ export function getActionFilters(
 export function getActions(industry: ActionIndustry, query: ActionQuery) {
   return api.GET("/traceability/actions/", {
     params: { query: { ...query, industry } },
+  })
+}
+
+export function createAction(
+  entity_id: number,
+  industry: ActionIndustry,
+  action: ActionCreateRequest
+) {
+  return api.POST("/traceability/actions/", {
+    params: {
+      query: { entity_id, industry },
+    },
+    body: action,
   })
 }
 
