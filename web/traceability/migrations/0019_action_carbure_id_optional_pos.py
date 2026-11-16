@@ -2,14 +2,18 @@ import uuid
 
 from django.db import migrations, models
 
-import traceability.models.action
-
 
 def fill_carbure_ids(apps, schema_editor):
     Action = apps.get_model("traceability", "Action")
     for action in Action.objects.all():
-        action.carbure_id = str(uuid.uuid4())
+        action.carbure_id = uuid.uuid4()
         action.save(update_fields=["carbure_id"])
+
+
+def clear_valorize_pos_ids(apps, schema_editor):
+    """Valorize used to store a generated UUID in pos_id. That number is not a PoS."""
+    Action = apps.get_model("traceability", "Action")
+    Action.objects.filter(type="VALORIZE").update(pos_id=None)
 
 
 class Migration(migrations.Migration):
@@ -21,19 +25,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="action",
             name="carbure_id",
-            field=models.CharField(max_length=64, null=True, verbose_name="Identifiant Carbure"),
+            field=models.UUIDField(null=True, verbose_name="Identifiant Carbure"),
         ),
         migrations.RunPython(fill_carbure_ids, migrations.RunPython.noop),
         migrations.AlterField(
             model_name="action",
             name="carbure_id",
-            field=models.CharField(
-                default=traceability.models.action.generate_carbure_id,
-                editable=False,
-                max_length=64,
-                unique=True,
-                verbose_name="Identifiant Carbure",
-            ),
+            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True, verbose_name="Identifiant Carbure"),
         ),
         migrations.AlterField(
             model_name="action",
@@ -47,4 +45,5 @@ class Migration(migrations.Migration):
                 verbose_name="N° de POS",
             ),
         ),
+        migrations.RunPython(clear_valorize_pos_ids, migrations.RunPython.noop),
     ]

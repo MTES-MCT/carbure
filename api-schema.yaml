@@ -14514,6 +14514,7 @@ components:
           default: "0.000"
         carbure_id:
           type: string
+          format: uuid
           readOnly: true
           title: Identifiant Carbure
         pos_id:
@@ -14794,6 +14795,7 @@ components:
           readOnly: true
         carbure_id:
           type: string
+          format: uuid
           readOnly: true
           title: Identifiant Carbure
         pos_id:

@@ -114,6 +114,7 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         list_serializer_class = ActionExcelImportListSerializer
+        extra_kwargs = {"pos_id": {"required": True, "allow_null": False, "allow_blank": False}}
         fields = [
             "pos_id",
             "material",

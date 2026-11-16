@@ -3629,7 +3629,10 @@ export interface components {
              * @default 0.000
              */
             readonly quantity_available: string;
-            /** Identifiant Carbure */
+            /**
+             * Identifiant Carbure
+             * Format: uuid
+             */
             readonly carbure_id: string;
             /** N° de POS */
             pos_id?: string | null;
@@ -3764,7 +3767,10 @@ export interface components {
         /** @description Small representation used for the parent action relation. */
         ActionParent: {
             readonly id: number;
-            /** Identifiant Carbure */
+            /**
+             * Identifiant Carbure
+             * Format: uuid
+             */
             readonly carbure_id: string;
             /** N° de POS */
             pos_id?: string | null;

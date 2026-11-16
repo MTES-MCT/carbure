@@ -11,11 +11,6 @@ from traceability.services.quantities import quantity_available
 from .action_status import ActionStatus, latest_status
 
 
-def generate_carbure_id() -> str:
-    """Public identifier assigned once, when the action is created."""
-    return str(uuid.uuid4())
-
-
 class ActionManager(models.Manager):
     def get_queryset(self):
         return (
@@ -36,11 +31,10 @@ class ActionManager(models.Manager):
 
 
 class Action(models.Model):
-    carbure_id = models.CharField(
+    carbure_id = models.UUIDField(
         verbose_name="Identifiant Carbure",
-        max_length=64,
         unique=True,
-        default=generate_carbure_id,
+        default=uuid.uuid4,
         editable=False,
     )
     pos_id = models.CharField(
@@ -147,8 +141,6 @@ class Action(models.Model):
 
     def save(self, *args, **kwargs):
         self.pos_id = self.pos_id or None
-        if not self.carbure_id:
-            self.carbure_id = generate_carbure_id()
         super().save(*args, **kwargs)
 
     @staticmethod
@@ -156,8 +148,6 @@ class Action(models.Model):
     def bulk_create(actions: list["Action"], default_status=ActionStatus.CREATED) -> QuerySet["Action"]:
         for action in actions:
             action.pos_id = action.pos_id or None
-            if not action.carbure_id:
-                action.carbure_id = generate_carbure_id()
 
         Action.objects.bulk_create(actions)
         created_actions = Action.objects.filter(carbure_id__in=[action.carbure_id for action in actions])

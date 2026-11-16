@@ -32,12 +32,8 @@ class ActionIdentifierTest(TestCase):
         self.assertTrue(action.carbure_id)
 
     def test_several_actions_can_omit_pos_id(self):
-        first = ActionFactory.create(pos_id="POS-A")
-        second = ActionFactory.create(pos_id="POS-B")
-        first.pos_id = None
-        second.pos_id = ""
-        first.save()
-        second.save()
+        first = ActionFactory.create(pos_id=None)
+        second = ActionFactory.create(pos_id="")
         first.refresh_from_db()
         second.refresh_from_db()
 
