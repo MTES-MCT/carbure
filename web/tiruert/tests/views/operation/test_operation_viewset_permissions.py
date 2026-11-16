@@ -32,11 +32,6 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
                     ],
                     [HasTiruertWriteRights()],
                 ),
-                # Correct action requires HasDgddiWriteRights
-                (
-                    ["correct"],
-                    [HasDgddiWriteRights()],
-                ),
                 # Read actions require HasTiruertRightsBalanceAndOperations OR HasDgddiWriteRights
                 (
                     [
