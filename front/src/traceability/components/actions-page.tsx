@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useMemo } from "react"
+import { ReactNode, useCallback } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { isEmpty } from "ramda"
 
@@ -91,10 +91,7 @@ export const ActionsPage = ({
   const navigate = useNavigate()
   const actionTabs = useActionTabs(tabs)
   const fixedQuery = useStableQuery(_fixedQuery)
-  const pageQuery = useMemo(
-    () => ({ ...fixedQuery, ...actionTabs.query }),
-    [fixedQuery, actionTabs.query]
-  )
+  const pageQuery = useCombinedQuery(fixedQuery, actionTabs.query ?? {})
 
   const visibleColumns = columns.filter(
     (column) => column.condition?.(entity) ?? true
