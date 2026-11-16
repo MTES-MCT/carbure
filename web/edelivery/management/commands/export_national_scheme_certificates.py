@@ -42,6 +42,16 @@ def entity_names(entities):
     return f"{entities_label} {names}"
 
 
+def export_certificates(entities):
+    entity_certificates = EntityCertificate.all_for_entities_with_valid_national_scheme_certificate(entities)
+    if not entity_certificates:
+        raise RuntimeError(f"No valid NS certificate found for {entity_names(entities)}")
+
+    request = AddUpdateCertificateRequest(*entity_certificates)
+    requester = Requester(request, timeout=70)
+    return requester.do_request()
+
+
 def export_entities(entities):
     if not entities:
         return
@@ -84,38 +94,32 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        def export_certificates(entities, dry_run):
-            entity_certificates = EntityCertificate.all_for_entities_with_valid_national_scheme_certificate(entities)
-
-            if dry_run:
-                self.stdout.write(f"Would export {certificate_ids(entity_certificates)}…")
-
-            request = AddUpdateCertificateRequest(*entity_certificates)
-            if dry_run:
-                self.stdout.write(f"""\
-Would send UDB request with body being:
-{request.body}
-…""")
-                return {"result": "Got to the end of the dry run"}
-
-            self.stdout.write(f"Exporting {certificate_ids(entity_certificates)}…")
-            requester = Requester(request, timeout=70)
-            result = requester.do_request()
-            return result
-
         dry_run = options["dry_run"]
         fetch_all = options["all"]
         entity_name = options["entity_name"]
 
         entities = carbure_entities(fetch_all=fetch_all, entity_name=entity_name)
+        entity_certificates = EntityCertificate.all_for_entities_with_valid_national_scheme_certificate(entities)
+        request = AddUpdateCertificateRequest(*entity_certificates)
+
         if dry_run:
             self.stdout.write(f"Would check if {entity_names(entities)} present in UDB… (assuming not)")
             self.stdout.write(f"Would create {entity_names(entities)} in UDB…")
-        else:
-            self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
-            entities_not_in_udb = find_entities_not_in_udb(entities)
-            self.stdout.write(f"Creating {entity_names(entities)} in UDB…")
-            export_entities(entities_not_in_udb)
+            self.stdout.write(f"Would export {certificate_ids(entity_certificates)}…")
+            if entity_certificates:
+                self.stdout.write(f"""\
+Would send UDB request with body being:
+{request.body}
+…""")
+            self.stdout.write("End of dry run")
+            exit(0)
 
-        result = export_certificates(entities, dry_run)
+        self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
+        entities_not_in_udb = find_entities_not_in_udb(entities)
+
+        self.stdout.write(f"Creating {entity_names(entities)} in UDB…")
+        export_entities(entities_not_in_udb)
+
+        self.stdout.write(f"Exporting {certificate_ids(entity_certificates)}…")
+        result = export_certificates(entities)
         self.stdout.write(str(result))

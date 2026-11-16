@@ -5,6 +5,7 @@ from edelivery.management.commands.export_national_scheme_certificates import (
     carbure_entities,
     certificate_ids,
     entity_names,
+    export_certificates,
     export_entities,
     find_entities_not_in_udb,
 )
@@ -133,6 +134,53 @@ class EntitiesNotInUDBTest(TestCase):
 
         result = find_entities_not_in_udb(entities)
         self.assertEqual(["NTR_ID_1"], [e.ntr_id() for e in result])
+
+
+class ExportCertificates(TestCase):
+    def setUp(self):
+        module = "edelivery.management.commands.export_national_scheme_certificates"
+        self.patched_EntityCertificate = patch(f"{module}.EntityCertificate").start()
+        self.patched_AddUpdateCertificateRequest = patch(f"{module}.AddUpdateCertificateRequest").start()
+        self.patched_Requester = patch(f"{module}.Requester").start()
+
+    def tearDown(self):
+        patch.stopall()
+
+    def test_export_national_scheme_certificates(self):
+        patched_fetch = self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate
+        patched_fetch.return_value = [
+            "entity_certificate_1",
+            "entity_certificate_2",
+        ]
+        request = "request"
+        self.patched_AddUpdateCertificateRequest.return_value = request
+        patched_do_request = self.patched_Requester.return_value.do_request
+        patched_do_request.return_value = {"responseStatus": "success"}
+
+        patched_fetch.assert_not_called()
+        self.patched_AddUpdateCertificateRequest.assert_not_called()
+        self.patched_Requester.assert_not_called()
+        patched_do_request.assert_not_called()
+
+        entities = ["entity_1", "entity_2"]
+        result = export_certificates(entities)
+        patched_fetch.assert_called_with(entities)
+        self.patched_AddUpdateCertificateRequest.assert_called_with("entity_certificate_1", "entity_certificate_2")
+        self.patched_Requester.assert_called()
+        call_args = self.patched_Requester.call_args
+        self.assertEqual((request,), call_args.args)
+        patched_do_request.assert_called()
+        self.assertEqual({"responseStatus": "success"}, result)
+
+    def test_raises_error_if_no_certificate_to_export(self):
+        patched_fetch = self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate
+        patched_fetch.return_value = []
+
+        with self.assertRaises(RuntimeError) as context:
+            entities = [EntityFactory.build(name="entity_1")]
+            export_certificates(entities)
+
+        self.assertEqual("No valid NS certificate found for entity 'entity_1'", context.exception.args[0])
 
 
 class ExportEntitiesTest(TestCase):
