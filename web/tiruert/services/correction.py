@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django.db import transaction
 from django.db.models import Q, QuerySet, Sum
+from rest_framework.exceptions import ValidationError
 
 from core.models import CarbureLot
 from core.utils import truncate
@@ -15,17 +16,23 @@ from tiruert.services.operation import OperationService
 class CorrectionService:
     @staticmethod
     def get_corrected_operation_ids(operation: Operation, accessible_operations: QuerySet[Operation]) -> list[int]:
-        """Return visible operations marked corrected in the same ledger group."""
-        if operation.type != Operation.CORRECTION or operation.ghg_delta is None:
+        """Return visible operations associated with a GHG correction."""
+        ghg_delta = operation.ghg_delta
+        if operation.type != Operation.CORRECTION or ghg_delta is None:
             return []
+
+        candidates = Q(corrected=True) & (
+            Q(type__in=Operation.CREDIT_TYPES)
+            | Q(type=Operation.CORRECTION, details__volume__gt=0)
+            | Q(type=Operation.TENEUR)
+        )
+        if ghg_delta < 0:
+            candidates |= Q(type=Operation.TRANSFERT) & (Q(corrected=True) | Q(status=Operation.ACCEPTED))
 
         detail = next(iter(operation.details.all()))
         return list(
             accessible_operations.filter(
-                Q(type__in=Operation.CREDIT_TYPES)
-                | Q(type=Operation.CORRECTION, details__volume__gt=0)
-                | Q(type=Operation.TENEUR),
-                corrected=True,
+                candidates,
                 details__lot_id=detail.lot_id,
                 customs_category=operation.customs_category,
                 biofuel_id=operation.biofuel_id,
@@ -45,7 +52,7 @@ class CorrectionService:
     @staticmethod
     @transaction.atomic
     def create_correction_operations_for_lot_ghg_update(lot_ids: list[int]):
-        """Correct confirmed credits and affected teneurs after lot emission-rate changes."""
+        """Correct confirmed credits and affected debits after lot emission-rate changes."""
         lot_ids = OperationService.lock_lots_for_update(lot_ids)
         if not lot_ids:
             return
@@ -65,6 +72,10 @@ class CorrectionService:
                 | Q(
                     operation__type=Operation.TENEUR,
                     operation__status__in=[Operation.PENDING, Operation.DECLARED, Operation.CORRECTED],
+                )
+                | Q(
+                    operation__type=Operation.TRANSFERT,
+                    operation__status__in=[Operation.DRAFT, Operation.PENDING, Operation.ACCEPTED, Operation.CORRECTED],
                 )
             )
             .select_related(None)
@@ -95,36 +106,68 @@ class CorrectionService:
         updated_details = []
         corrected_operation_ids = set()
         for grouped_details in details_by_lot_category_biofuel.values():
-            if not CorrectionService._apply_ghg_correction(grouped_details):
-                continue
-            updated_details.extend(grouped_details)
-            corrected_operation_ids.update(detail.operation_id for detail in grouped_details)
+            corrected_details = CorrectionService._apply_ghg_correction(grouped_details)
+            updated_details.extend(corrected_details)
+            corrected_operation_ids.update(detail.operation_id for detail in corrected_details)
 
         OperationDetail.objects.bulk_update(updated_details, ["emission_rate_per_mj_delta"])
         Operation.objects.filter(id__in=corrected_operation_ids).update(corrected=True)
         Operation.objects.filter(id__in=corrected_operation_ids).exclude(
-            type=Operation.TENEUR, status=Operation.PENDING
+            Q(type=Operation.TENEUR, status=Operation.PENDING)
+            | Q(type=Operation.TRANSFERT, status__in=[Operation.DRAFT, Operation.PENDING])
         ).update(status=Operation.CORRECTED)
 
     @staticmethod
-    def _apply_ghg_correction(grouped_details: list[OperationDetail]) -> bool:
+    def _apply_ghg_correction(grouped_details: list[OperationDetail]) -> list[OperationDetail]:
         initial = next((detail for detail in grouped_details if detail.operation.type in Operation.CREDIT_TYPES), None)
         if initial is None:
-            return False
+            return []
 
         previous_rate = Decimal(str(initial.effective_emission_rate_per_mj))
         current_rate = Decimal(str(initial.lot.ghg_total))
         delta = current_rate - previous_rate
         if delta == 0:
-            return False
+            return []
 
-        CorrectionService._create_ghg_correction(initial, previous_rate, delta)
-        for detail in grouped_details:
+        source = initial.operation
+        CorrectionService._create_ghg_correction(initial, previous_rate, delta, source.credited_entity_id)
+        if delta < 0:
+            CorrectionService._copy_ghg_correction_to_transfer_recipients(initial, previous_rate, delta)
+
+        corrected_details = [
+            detail for detail in grouped_details if delta < 0 or detail.operation.type != Operation.TRANSFERT
+        ]
+        for detail in corrected_details:
             detail.emission_rate_per_mj_delta = float(current_rate - Decimal(str(detail.emission_rate_per_mj)))
-        return True
+        return corrected_details
 
     @staticmethod
-    def _create_ghg_correction(initial: OperationDetail, previous_rate: Decimal, delta: Decimal) -> Operation:
+    def _copy_ghg_correction_to_transfer_recipients(
+        initial: OperationDetail, previous_rate: Decimal, delta: Decimal
+    ) -> None:
+        source = initial.operation
+        recipients = (
+            Operation.objects.filter(
+                Q(status=Operation.ACCEPTED) | Q(status=Operation.CORRECTED, corrected=True),
+                type=Operation.TRANSFERT,
+                details__lot_id=initial.lot_id,
+                customs_category=source.customs_category,
+                biofuel_id=source.biofuel_id,
+            )
+            .order_by()
+            .values_list("credited_entity_id", flat=True)
+            .distinct()
+        )
+        for recipient_id in recipients:
+            if recipient_id is None:
+                raise ValidationError({"credited_entity": "TRANSFER_RECIPIENT_REQUIRED"})
+            if recipient_id != source.credited_entity_id:
+                CorrectionService._create_ghg_correction(initial, previous_rate, delta, recipient_id)
+
+    @staticmethod
+    def _create_ghg_correction(
+        initial: OperationDetail, previous_rate: Decimal, delta: Decimal, credited_entity_id: int | None
+    ) -> Operation:
         """Create a zero-volume GHG correction based on the initial credit operation."""
         source = initial.operation
         return OperationService.create_operation_with_details(
@@ -133,7 +176,7 @@ class CorrectionService:
                 "status": Operation.VALIDATED,
                 "customs_category": source.customs_category,
                 "biofuel_id": source.biofuel_id,
-                "credited_entity_id": source.credited_entity_id,
+                "credited_entity_id": credited_entity_id,
                 "renewable_energy_share": source.renewable_energy_share,
                 "durability_period": source.durability_period,
                 "declaration_year": source.declaration_year,
