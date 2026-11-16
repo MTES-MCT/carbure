@@ -1,3 +1,4 @@
+from decimal import Decimal
 from unittest.mock import Mock, patch
 
 from django.test import SimpleTestCase
@@ -5,7 +6,8 @@ from django.test import SimpleTestCase
 from core.models import Entity
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.models import Action, ActionStatus
-from traceability.serializers.action_authorization import ActionAuthorizationSerializer
+from traceability.serializers.creation import ActionCreationSerializer
+from traceability.serializers.creation.authorization import ActionAuthorizationSerializer
 
 
 def is_holder(actor, holder, parent_holder):
@@ -30,7 +32,7 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         self.parent = Action(id=3, type=Action.INIT, industry=GenericActionHandler.industry, holder=self.holder)
         self.parent.status = ActionStatus.PENDING
 
-    def validate_action(self, data, parent=None, holder=None, actor=None):
+    def validate_action(self, data, parent=None, holder=None, actor=None, missing_parent=False):
         serializer = ActionAuthorizationSerializer(
             data=data,
             context={"handler": GenericActionHandler(), "entity": actor or self.holder},
@@ -38,7 +40,10 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         holder_queryset = Mock()
         holder_queryset.get.return_value = holder or self.holder
         parent_queryset = Mock()
-        parent_queryset.get.return_value = parent or self.parent
+        if missing_parent:
+            parent_queryset.get.side_effect = Action.DoesNotExist
+        else:
+            parent_queryset.get.return_value = parent or self.parent
         with (
             patch.object(serializer.fields["holder"], "get_queryset", return_value=holder_queryset),
             patch.object(serializer.fields["parent"], "get_queryset", return_value=parent_queryset),
@@ -92,6 +97,15 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
 
         self.assertFalse(unknown_edge.is_valid())
 
+    def test_missing_parent_fails_on_the_field_before_authorization(self):
+        serializer = self.validate_action(
+            {"type": Action.VALORIZE, "status": ActionStatus.PENDING, "holder": 1, "parent": 999},
+            missing_parent=True,
+        )
+
+        self.assertIn("parent", serializer.errors)
+        self.assertNotIn("non_field_errors", serializer.errors)
+
     def test_rejects_parent_from_another_industry(self):
         self.parent.industry = "OTHER"
         serializer = self.validate_action(
@@ -128,3 +142,91 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
                 serializer = self.validate_action(data)
 
                 self.assertIn("non_field_errors", serializer.errors)
+
+
+class QuantitySerializer(ActionCreationSerializer):
+    class Meta(ActionCreationSerializer.Meta):
+        fields = ["quantity"]
+
+
+class MaterialOnlySerializer(ActionCreationSerializer):
+    class Meta(ActionCreationSerializer.Meta):
+        fields = ["material"]
+
+
+class RelaxedQuantitySerializer(QuantitySerializer):
+    def check_quantity(self, quantity, attrs):
+        return quantity
+
+
+class ActionCreationFieldTest(ActionAuthorizationSerializerTest):
+    def test_child_field_list_keeps_authorization_fields(self):
+        serializer = QuantitySerializer(
+            data={"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1, "quantity": "1.000"},
+            context={"handler": GenericActionHandler(), "entity": self.holder},
+        )
+
+        self.assertTrue(self._is_valid(serializer), serializer.errors)
+        self.assertEqual(serializer.validated_data["type"], Action.INIT)
+        self.assertEqual(serializer.validated_data["status"], ActionStatus.PENDING)
+        self.assertIs(serializer.validated_data["holder"], self.holder)
+        self.assertEqual(serializer.validated_data["quantity"], Decimal("1.000"))
+
+    def test_rejects_quantity_that_is_not_strictly_positive(self):
+        serializer = QuantitySerializer(
+            data={"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1, "quantity": "0"},
+            context={"handler": GenericActionHandler(), "entity": self.holder},
+        )
+
+        self.assertFalse(self._is_valid(serializer))
+        self.assertIn("quantity", serializer.errors)
+
+    def test_rejects_quantity_above_the_parent_remainder(self):
+        self.parent.quantity_available = Decimal("10.000")
+        serializer = QuantitySerializer(
+            data={
+                "type": Action.VALORIZE,
+                "status": ActionStatus.CREATED,
+                "holder": 1,
+                "parent": 3,
+                "quantity": "10.001",
+            },
+            context={"handler": GenericActionHandler(), "entity": self.holder},
+        )
+
+        self.assertFalse(self._is_valid(serializer))
+        self.assertIn("quantity", serializer.errors)
+
+    def test_quantity_in_attrs_is_not_checked_unless_the_field_is_declared(self):
+        serializer = MaterialOnlySerializer(context={"handler": GenericActionHandler(), "entity": self.holder})
+
+        attrs = serializer.validate(
+            {
+                "type": Action.INIT,
+                "status": ActionStatus.PENDING,
+                "holder": self.holder,
+                "quantity": Decimal("0"),
+            }
+        )
+
+        self.assertEqual(attrs["quantity"], Decimal("0"))
+
+    def test_child_can_replace_the_shared_quantity_check(self):
+        serializer = RelaxedQuantitySerializer(
+            data={"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1, "quantity": "0"},
+            context={"handler": GenericActionHandler(), "entity": self.holder},
+        )
+
+        self.assertTrue(self._is_valid(serializer), serializer.errors)
+        self.assertEqual(serializer.validated_data["quantity"], Decimal("0"))
+
+    def _is_valid(self, serializer):
+        holder_queryset = Mock()
+        holder_queryset.get.return_value = self.holder
+        parent_queryset = Mock()
+        parent_queryset.get.return_value = self.parent
+        with (
+            patch.object(serializer.fields["holder"], "get_queryset", return_value=holder_queryset),
+            patch.object(serializer.fields["parent"], "get_queryset", return_value=parent_queryset),
+        ):
+            return serializer.is_valid()
