@@ -44,7 +44,8 @@ class Action(models.Model):
 
     INIT = "INIT"
     VALORIZE = "VALORIZE"
-    TYPES = [(INIT, "INIT"), (VALORIZE, "VALORIZE")]
+    TRANSFER = "TRANSFER"
+    TYPES = [(INIT, "INIT"), (VALORIZE, "VALORIZE"), (TRANSFER, "TRANSFER")]
     type = models.CharField(verbose_name="Type d'action", choices=TYPES, max_length=16)
 
     parent = models.ForeignKey(

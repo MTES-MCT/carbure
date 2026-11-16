@@ -13,6 +13,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 ## Choix de conception
 
 - **La valorisation recopie la quantité.** `valorize()` crée un enfant `VALORIZE` avec la `quantity` du parent et sans matière. Rien n’est converti ni figé en MJ.
+- **Un transfert prend une partie de la quantité valorisée.** `TRANSFER` naît en `PENDING` depuis une `VALORIZE` en `CREATED`. Dans H2, seule la station qui détient le parent peut le créer, au profit d'un autre détenteur. Le client envoie la quantité ; `pos_id` est généré et `working_date` est recopiée du parent.
 - **`quantity` est strictement positive.** Contrainte SQL `action_quantity_positive` (`quantity > 0`), en plus du contrôle à la création.
 - **`quantity` et `quantity_available` sont renvoyés tels quels.** `quantity` est la valeur stockée. `quantity_available` vaut `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED`. Même unité que `quantity`. Pas de conversion en masse, volume ou énergie. `quantity_available` est toujours renvoyée : 0 si elle n'a pas été calculée.
 - **La liste filtre la quantité restante en trois états.** `quantity_available=true` ne garde que `> 0`. `quantity_available=false` ne garde que `= 0`. Sans paramètre, toutes les actions sont renvoyées. Le manager ne retire pas ces lignes.

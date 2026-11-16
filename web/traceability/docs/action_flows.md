@@ -10,10 +10,11 @@ Chaque filière configure son handler, qui hérite d'`ActionIndustryHandler`. L'
 action_creation_flow = [
     (None, (Action.INIT, ActionStatus.PENDING)),
     ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
+    ((Action.VALORIZE, ActionStatus.CREATED), (Action.TRANSFER, ActionStatus.PENDING)),
 ]
 ```
 
-Le premier lien permet de créer une action `INIT` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `INIT` actuellement en `PENDING` comme parent.
+Le premier lien permet de créer une action `INIT` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `INIT` actuellement en `PENDING` comme parent. Le troisième permet de créer une action `TRANSFER` en `PENDING`, avec une action `VALORIZE` actuellement en `CREATED` comme parent.
 
 La création est refusée si aucun lien ne correspond exactement au parent, au type et au statut demandés. Le parent doit aussi appartenir à la même filière.
 
@@ -28,10 +29,11 @@ action_status_authorizations = {
     (Action.INIT, ActionStatus.REJECTED): is_h2_admin,
     (Action.INIT, ActionStatus.BLOCKED): is_h2_admin,
     (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
+    (Action.TRANSFER, ActionStatus.PENDING): is_hrs_parent_holder,
 }
 ```
 
-Ici, une station HRS peut créer sa propre action `INIT` en `PENDING`. Les statuts `ACCEPTED`, `REJECTED` et `BLOCKED` sont réservés à l'administration H2. La création d'une `VALORIZE` en `CREATED` lui est aussi réservée.
+Ici, une station HRS peut créer sa propre action `INIT` en `PENDING`. Les statuts `ACCEPTED`, `REJECTED` et `BLOCKED` sont réservés à l'administration H2. La création d'une `VALORIZE` en `CREATED` lui est aussi réservée. Une `TRANSFER` en `PENDING` est créée par la station HRS qui détient le parent : [`is_hrs_parent_holder`](../../h2/handlers/authorization.py) compare l'acteur au détenteur du parent, pas au destinataire.
 
 Chaque clé est un tuple contenant le type d'action et le statut à attribuer.
 
@@ -66,15 +68,16 @@ ActionStatus.can_transition(ActionStatus.PENDING, ActionStatus.ACCEPTED)  # True
 
 ## Permettre la création par l'API
 
-Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit celui d'`INIT` :
+Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit ceux d'`INIT` et de `TRANSFER` :
 
 ```python
 action_creation_serializers = {
     Action.INIT: ConsumptionSerializer,
+    Action.TRANSFER: TransferSerializer,
 }
 ```
 
-La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2.
+La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2. [`TransferSerializer`](../serializers/transfer.py) n'accepte que `quantity` : il génère `pos_id` et recopie `working_date` du parent.
 
 Les endpoints de création et de changement de statut exigent aussi la `write_permission` du handler. Dans H2, elle vaut actuellement `HasHRSWriteRights` : autoriser `is_h2_admin` dans les règles ne donne donc pas, à lui seul, accès à ces endpoints aux administrateurs.
 
@@ -99,7 +102,7 @@ Un `POST` d'`INIT` doit donc quand même envoyer `type`, `status` et `holder`. C
 Remplacer la règle pour un type :
 
 ```python
-class TransferSerializer(ActionCreationSerializer):
+class ChildSerializer(ActionCreationSerializer):
     class Meta(ActionCreationSerializer.Meta):
         fields = ["quantity"]
 

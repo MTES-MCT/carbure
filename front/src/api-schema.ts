@@ -3814,6 +3814,7 @@ export interface components {
         /**
          * @description * `INIT` - INIT
          *     * `VALORIZE` - VALORIZE
+         *     * `TRANSFER` - TRANSFER
          * @enum {string}
          */
         ActionTypeEnum: PathsApiTraceabilityActionsGetParametersQueryType;
@@ -16137,7 +16138,7 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16160,6 +16161,7 @@ export interface operations {
                 /**
                  * @description * `INIT` - INIT
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -16376,7 +16378,7 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16399,6 +16401,7 @@ export interface operations {
                 /**
                  * @description * `INIT` - INIT
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -16521,7 +16524,7 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16544,6 +16547,7 @@ export interface operations {
                 /**
                  * @description * `INIT` - INIT
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -17107,6 +17111,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
     INIT = "INIT",
+    TRANSFER = "TRANSFER",
     VALORIZE = "VALORIZE"
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {

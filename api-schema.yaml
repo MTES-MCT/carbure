@@ -13552,7 +13552,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -13618,10 +13617,12 @@ paths:
               title: Type d'action
               enum:
                 - INIT
+                - TRANSFER
                 - VALORIZE
           description: |-
             * `INIT` - INIT
             * `VALORIZE` - VALORIZE
+            * `TRANSFER` - TRANSFER
           explode: true
           style: form
         - in: query
@@ -13958,7 +13959,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -14024,10 +14024,12 @@ paths:
               title: Type d'action
               enum:
                 - INIT
+                - TRANSFER
                 - VALORIZE
           description: |-
             * `INIT` - INIT
             * `VALORIZE` - VALORIZE
+            * `TRANSFER` - TRANSFER
           explode: true
           style: form
         - in: query
@@ -14257,7 +14259,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -14323,10 +14324,12 @@ paths:
               title: Type d'action
               enum:
                 - INIT
+                - TRANSFER
                 - VALORIZE
           description: |-
             * `INIT` - INIT
             * `VALORIZE` - VALORIZE
+            * `TRANSFER` - TRANSFER
           explode: true
           style: form
         - in: query
@@ -14891,10 +14894,12 @@ components:
       enum:
         - INIT
         - VALORIZE
+        - TRANSFER
       type: string
       description: |-
         * `INIT` - INIT
         * `VALORIZE` - VALORIZE
+        * `TRANSFER` - TRANSFER
     ActivateAccountRequest:
       type: object
       properties:

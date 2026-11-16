@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from core.models import Entity, ExternalAdminRights
-from h2.handlers.authorization import is_h2_admin, is_hrs_holder
+from h2.handlers.authorization import is_h2_admin, is_hrs_holder, is_hrs_parent_holder
 
 
 class ActionAuthorizationTest(SimpleTestCase):
@@ -15,6 +15,16 @@ class ActionAuthorizationTest(SimpleTestCase):
         self.assertTrue(is_hrs_holder(hrs, hrs, None))
         self.assertFalse(is_hrs_holder(other_hrs, hrs, None))
         self.assertFalse(is_hrs_holder(operator, operator, None))
+
+    def test_transfer_creation_requires_the_hrs_that_holds_the_parent(self):
+        hrs = Entity(id=1, entity_type=Entity.HRS)
+        other_hrs = Entity(id=2, entity_type=Entity.HRS)
+        recipient = Entity(id=3, entity_type=Entity.OPERATOR)
+
+        self.assertTrue(is_hrs_parent_holder(hrs, recipient, hrs))
+        self.assertFalse(is_hrs_parent_holder(other_hrs, recipient, hrs))
+        self.assertFalse(is_hrs_parent_holder(recipient, recipient, hrs))
+        self.assertFalse(is_hrs_parent_holder(hrs, hrs, None))
 
     def test_status_assignment_requires_an_admin_or_h2_admin_right(self):
         admin = Entity(id=1, entity_type=Entity.ADMIN)
