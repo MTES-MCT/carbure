@@ -120,6 +120,78 @@ class CorrectedOperationIdsIntegrationTest(TestCase):
 
         self.assertEqual(self._retrieve(), expected)
 
+    def test_decrease_links_accepted_transfers_for_each_visible_entity(self):
+        """Link matching accepted transfers to both the original and copied GHG corrections."""
+        third_entity = Entity.objects.create(name="Third operator", entity_type=Entity.OPERATOR)
+        initial = self._operation(status=Operation.VALIDATED, corrected=False)
+        transfer = self._operation(
+            type=Operation.TRANSFERT,
+            status=Operation.ACCEPTED,
+            credited_entity=self.other_entity,
+            debited_entity=self.entity,
+        )
+        OperationDetailFactory.create(operation=transfer, lot=self.lot, volume=10)
+        onward_transfer = self._operation(
+            type=Operation.TRANSFERT,
+            status=Operation.ACCEPTED,
+            credited_entity=third_entity,
+            debited_entity=self.other_entity,
+        )
+        other_transfers = {}
+        for transfer_status in (Operation.DRAFT, Operation.PENDING, Operation.REJECTED):
+            other_transfers[transfer_status] = self._operation(
+                type=Operation.TRANSFERT,
+                status=transfer_status,
+                credited_entity=self.other_entity,
+                debited_entity=self.entity,
+            )
+        for mismatch in (
+            {"lot": self.other_lot},
+            {"customs_category": MatierePremiere.IXB},
+            {"biofuel": Biocarburant.objects.get(code="EMAG")},
+            {"created_at": timezone.now() + timedelta(days=1)},
+        ):
+            self._operation(
+                type=Operation.TRANSFERT,
+                status=Operation.ACCEPTED,
+                credited_entity=self.other_entity,
+                debited_entity=self.entity,
+                **mismatch,
+            )
+
+        self.lot.ghg_total = 5
+        self.lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([self.lot.pk])
+        corrections = Operation.objects.filter(type=Operation.CORRECTION, details__emission_rate_per_mj_delta=-5)
+        original = corrections.get(credited_entity=self.entity)
+        copy = corrections.get(credited_entity=self.other_entity)
+
+        self.assertEqual(
+            self._retrieve(original),
+            [initial.pk, transfer.pk, other_transfers[Operation.DRAFT].pk, other_transfers[Operation.PENDING].pk],
+        )
+        setup_current_user(self, "recipient@carbure.local", "Recipient", "gogogo", [(self.other_entity, "ADMIN")])
+        response = self.client.get(
+            reverse("operations-detail", kwargs={"pk": copy.pk}),
+            {"entity_id": self.other_entity.pk},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json()["corrected_operation_ids"],
+            [transfer.pk, onward_transfer.pk, other_transfers[Operation.PENDING].pk],
+        )
+
+    def test_increase_does_not_link_uncorrected_transfers(self):
+        """An increase does not affect transfers in the current correction step."""
+        self._operation(
+            type=Operation.TRANSFERT,
+            status=Operation.ACCEPTED,
+            credited_entity=self.other_entity,
+            debited_entity=self.entity,
+        )
+
+        self.assertEqual(self._retrieve(), [])
+
     def test_corrected_flag_determines_candidate_independently_of_status(self):
         """Only operations marked corrected are candidates, regardless of their status."""
         expected = self._operation(status=Operation.VALIDATED, corrected=True)
