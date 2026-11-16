@@ -99,10 +99,11 @@ class ActionViewset(
         context = self.get_serializer_context()
 
         # Validate the request data against the authorization rules
-        ActionAuthorizationSerializer(data=request.data, context=context).is_valid(raise_exception=True)
+        authorization_serializer = ActionAuthorizationSerializer(data=request.data, context=context)
+        authorization_serializer.is_valid(raise_exception=True)
 
         # Get the serializer class for the action type, throw an error if the action type is not supported
-        action_type = request.data.get("type") if isinstance(request.data, dict) else None
+        action_type = authorization_serializer.validated_data["type"]
         serializer_class = request.handler.get_action_creation_serializers().get(action_type)
 
         if serializer_class is None:
