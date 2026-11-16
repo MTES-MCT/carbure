@@ -3854,6 +3854,7 @@ export interface components {
         /**
          * @description * `CONSUME` - CONSUME
          *     * `VALORIZE` - VALORIZE
+         *     * `TRANSFER` - TRANSFER
          * @enum {string}
          */
         ActionTypeEnum: PathsApiTraceabilityActionsGetParametersQueryType;
@@ -16361,6 +16362,7 @@ export interface operations {
                 /**
                  * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -16617,6 +16619,7 @@ export interface operations {
                 /**
                  * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -16773,6 +16776,7 @@ export interface operations {
                 /**
                  * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -17342,6 +17346,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
     CONSUME = "CONSUME",
+    TRANSFER = "TRANSFER",
     VALORIZE = "VALORIZE"
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {

@@ -9,6 +9,7 @@ from traceability.handlers.excel import ACTION_EXCEL_COLUMNS, excel_column
 from traceability.models import Action
 from traceability.serializers.action import ActionExcelImportSerializer
 from traceability.serializers.consumption import ConsumptionSerializer
+from traceability.serializers.transfer import TransferSerializer
 
 ActionFlowEdge = tuple[tuple[str, str] | None, tuple[str, str]]
 
@@ -22,6 +23,7 @@ class ActionIndustryHandler:
 
     action_creation_serializers = {
         Action.CONSUME: ConsumptionSerializer,
+        Action.TRANSFER: TransferSerializer,
     }
 
     action_status_authorizations: dict[tuple[str, str], Callable[[Entity, Entity, Entity | None], bool]] = {}
