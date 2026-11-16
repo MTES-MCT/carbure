@@ -11,10 +11,10 @@ const COMBINABLE_FILTERS = [
   ActionFilter.site,
 ] as const
 
-export function useCombinedQuery(
+export function useCombinedQuery<Q extends Partial<ActionQuery>>(
   fixedQuery: Partial<ActionQuery>,
-  localQuery: ActionQuery
-) {
+  localQuery: Q
+): Q {
   return useMemo(() => {
     const combinedFilters = Object.fromEntries(
       COMBINABLE_FILTERS.map((filter) => [

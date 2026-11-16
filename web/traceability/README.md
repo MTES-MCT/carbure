@@ -15,6 +15,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 - **La valorisation recopie la quantité.** `valorize()` crée un enfant `VALORIZE` avec la `quantity` du parent et sans matière. Rien n’est converti ni figé en MJ.
 - **`quantity` est strictement positive.** Contrainte SQL `action_quantity_positive` (`quantity > 0`), en plus du contrôle à la création.
 - **`quantity` et `quantity_available` sont renvoyés tels quels.** `quantity` est la valeur stockée. `quantity_available` vaut `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED`. Même unité que `quantity`. Pas de conversion en masse, volume ou énergie. `quantity_available` est toujours renvoyée : 0 si elle n'a pas été calculée.
+- **La liste filtre la quantité restante en trois états.** `quantity_available=true` ne garde que `> 0`. `quantity_available=false` ne garde que `= 0`. Sans paramètre, toutes les actions sont renvoyées. Le manager ne retire pas ces lignes.
 
 ## Modèle
 
@@ -57,7 +58,7 @@ Le `POST` de création utilise `action_creation_flow` pour valider le lien de cr
 
 Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 
-Côté front, les catalogues (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.). Une page peut passer `emptyState` à `ActionsPage` : il remplace la liste quand elle est chargée, sans filtre, et sans résultat.
+Côté front, les catalogues (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.). Une page peut passer `tabs` à `ActionsPage`. La route de la page est alors `:year/:tab?` : `tab` est la clé de l’onglet, et sa `query` s’ajoute à `fixedQuery`. Sans `tab`, ou avec une clé inconnue, la page ouvre le premier onglet. Une page peut passer `emptyState` : il remplace la liste quand elle est chargée, sans filtre, et sans résultat.
 
 `quantity` affiche la quantité **stockée** avec l’unité de la matière stockée, ou celle de `previous_material` quand l’action n’en a pas.
 

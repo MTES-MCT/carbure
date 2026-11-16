@@ -43,7 +43,7 @@ Pour une action, la requête produit une ligne par cran. On garde celle dont le 
 | `GET /filters/?filter=origin_material` | `chain_column` sur le queryset déjà filtré par les autres paramètres. Une ligne par action, puis les libellés sont dédoublonnés. Tant que `origin_material` est dans l'URL, les options d'un autre filtre rejouent aussi cette remontée. |
 | `/years/` | Pas de parcours. |
 
-La liste et le détail appellent `Action.annotate_actions`. Elle lance `annotate_parent_chain` sur les lignes demandées et charge les matières héritées. `quantity_available` vient de l'annotation du manager. `annotate_total_emissions` et `annotate_inherited_fields` ne demandent qu'un groupe. Ce ne sont pas le chemin de la liste.
+La liste et le détail appellent `Action.annotate_actions`. Elle lance `annotate_parent_chain` sur les lignes demandées et charge les matières héritées. `quantity_available` vient de l'annotation du manager. La liste part de `Action.objects`. `quantity_available=true` ne garde que `> 0`, `false` ne garde que `= 0`, et l'absence du paramètre ne filtre pas. Le rechargement de la page ne réapplique pas ce seuil. `annotate_total_emissions` et `annotate_inherited_fields` ne demandent qu'un groupe. Ce ne sont pas le chemin de la liste.
 
 Ne pas poser cette annotation sur `Action.objects`. La CTE lit `Action.unannotated`. Un manager déjà annoté s'imbriquerait dans la récursion.
 
@@ -51,7 +51,7 @@ Ne pas poser cette annotation sur `Action.objects`. La CTE lit `Action.unannotat
 
 | Dans le code | Pourquoi |
 |---|---|
-| `Action.unannotated.all().order_by()` | `ORDER BY`, `DISTINCT` et les sous-requêtes de statut sont interdits dans la CTE. Le manager filtre `quantity_available` avec une sous-requête de statut. Les ids du queryset appelant sont donc lus en liste Python avant le parcours. |
+| `Action.unannotated.all().order_by()` | `ORDER BY`, `DISTINCT` et les sous-requêtes de statut sont interdits dans la CTE. Le manager annote `quantity_available` avec une sous-requête de statut. Les ids du queryset appelant sont donc lus en liste Python avant le parcours. |
 | `ei_sum` | Au `JOIN`, `ei` serait à la fois la somme transportée et la colonne de l'action. |
 | `next_parent_id` | Même collision avec `parent_id`. |
 | `_next_parent_id` | Une fois la CTE jointe à `Action`, le champ du modèle reprend le nom. On filtre la copie. |
