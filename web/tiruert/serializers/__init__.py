@@ -10,7 +10,6 @@ from .elec_operation import (
 from .mac_fossil_fuel import MacFossilFuelInputSerializer, MacFossilFuelSerializer
 from .objective import ObjectiveInputSerializer, ObjectiveOutputSerializer
 from .operation import (
-    OperationCorrectionSerializer,
     OperationExcelImportRequestSerializer,
     OperationImportGroupSerializer,
     OperationImportResponseSerializer,
