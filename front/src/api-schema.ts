@@ -3682,24 +3682,30 @@ export interface components {
         /**
          * @description Schema of the create body. The view validates with the type serializer.
          *
-         *     ``working_date`` is left out: the server fills it. ``industry`` comes from
-         *     the query param. ``pos_id`` follows the model until it becomes optional.
+         *     ``working_date`` is optional: the client sends it when it knows the date,
+         *     otherwise the server fills it. ``industry`` comes from the query param.
+         *     ``pos_id`` follows the model until it becomes optional.
          */
         ActionCreateRequestRequest: {
+            /** Type d'action */
             type: components["schemas"]["ActionTypeEnum"];
-            status: components["schemas"]["ActionStatusEnum"];
+            /** Entité détentrice de la quantité de l'action */
             holder: number;
+            /** Action parente */
             parent?: number | null;
             /** N° de POS */
             pos_id: string;
-            material?: string | null;
-            certificate?: string | null;
+            /** Matière */
+            material?: number | null;
+            status: components["schemas"]["ActionStatusEnum"];
+            /** Certificat */
+            certificate?: number | null;
             /**
              * Quantité de matière
              * Format: decimal
              */
             quantity: string;
-            site?: string | null;
+            site?: number | null;
             /**
              * Date d'expédition
              * Format: date
@@ -3709,6 +3715,8 @@ export interface components {
             shipping_distance?: number | null;
             /** Mode de transport */
             shipping_method?: components["schemas"]["ActionShippingMethodEnum"] | null;
+            /** Format: date */
+            working_date?: string;
             /** Fichier */
             file?: number | null;
             /** Format: decimal */

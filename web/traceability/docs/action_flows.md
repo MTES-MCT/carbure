@@ -128,4 +128,4 @@ La méthode lève un message, pas un dictionnaire de champs. `validate` range l'
 
 ### Ce que le front voit
 
-Le schéma du `POST` est [`ActionCreateRequestSerializer`](../serializers/creation/serializer.py). Il ne valide pas. Il décrit les champs envoyables : les quatre champs de la matrice, plus les champs d'action, sans `working_date` ni `industry`. `working_date` est rempli par le serveur. `industry` est le query param. `status` y est obligatoire et envoyable.
+Le schéma du `POST` est [`ActionCreateRequestSerializer`](../serializers/creation/serializer.py). Il ne valide pas. Il décrit les champs envoyables : les quatre champs de la matrice, plus les champs d'action, sans `industry`. `working_date` est optionnel : le front l'envoie quand il connaît la date, sinon le serveur la remplit. `industry` est le query param. `status` y est obligatoire et envoyable.

@@ -14614,41 +14614,46 @@ components:
         Schema of the create body. The view validates with the type serializer.
 
 
-        ``working_date`` is left out: the server fills it. ``industry`` comes
-        from
+        ``working_date`` is optional: the client sends it when it knows the
+        date,
 
-        the query param. ``pos_id`` follows the model until it becomes optional.
+        otherwise the server fills it. ``industry`` comes from the query param.
+
+        ``pos_id`` follows the model until it becomes optional.
       properties:
         type:
-          $ref: "#/components/schemas/ActionTypeEnum"
-        status:
-          $ref: "#/components/schemas/ActionStatusEnum"
+          allOf:
+            - $ref: "#/components/schemas/ActionTypeEnum"
+          title: Type d'action
         holder:
           type: integer
+          title: Entité détentrice de la quantité de l'action
         parent:
           type: integer
           nullable: true
+          title: Action parente
         pos_id:
           type: string
           minLength: 1
           title: N° de POS
           maxLength: 48
         material:
-          type: string
-          minLength: 1
+          type: integer
           nullable: true
+          title: Matière
+        status:
+          $ref: "#/components/schemas/ActionStatusEnum"
         certificate:
-          type: string
-          minLength: 1
+          type: integer
           nullable: true
+          title: Certificat
         quantity:
           type: string
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           title: Quantité de matière
         site:
-          type: string
-          minLength: 1
+          type: integer
           nullable: true
         shipping_date:
           type: string
@@ -14666,6 +14671,9 @@ components:
             - $ref: "#/components/schemas/ActionShippingMethodEnum"
           nullable: true
           title: Mode de transport
+        working_date:
+          type: string
+          format: date
         file:
           type: integer
           nullable: true

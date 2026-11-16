@@ -64,21 +64,30 @@ class ActionCreationSerializer(serializers.ModelSerializer):
 class ActionCreateRequestSerializer(serializers.ModelSerializer):
     """Schema of the create body. The view validates with the type serializer.
 
-    ``working_date`` is left out: the server fills it. ``industry`` comes from
-    the query param. ``pos_id`` follows the model until it becomes optional.
+    ``working_date`` is optional: the client sends it when it knows the date,
+    otherwise the server fills it. ``industry`` comes from the query param.
+    ``pos_id`` follows the model until it becomes optional.
     """
+
+    working_date = serializers.DateField(required=False)
+    status = serializers.ChoiceField(choices=ActionStatus.STATUSES)
 
     class Meta:
         model = Action
         fields = [
+            "type",
+            "holder",
+            "parent",
             "pos_id",
             "material",
+            "status",
             "certificate",
             "quantity",
             "site",
             "shipping_date",
             "shipping_distance",
             "shipping_method",
+            "working_date",
             "file",
             "eec",
             "el",
