@@ -3190,23 +3190,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/tiruert/operations/{id}/correct/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or remove */
-        post: operations["correct_operation"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/tiruert/operations/{id}/export/": {
         parameters: {
             query?: never;
@@ -6479,10 +6462,6 @@ export interface components {
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
             readonly debt: components["schemas"]["OperationDebt"] | null;
             readonly transaction: string;
-        };
-        OperationCorrectionRequest: {
-            /** Format: double */
-            correction_volume: number;
         };
         OperationDebt: {
             id: number;
@@ -15472,47 +15451,6 @@ export interface operations {
                 };
             };
             /** @description Operation not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    correct_operation: {
-        parameters: {
-            query: {
-                /** @description Authorised entity ID. */
-                entity_id: number;
-            };
-            header?: never;
-            path: {
-                /** @description A unique integer value identifying this Opération. */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["OperationCorrectionRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["OperationCorrectionRequest"];
-                "multipart/form-data": components["schemas"]["OperationCorrectionRequest"];
-            };
-        };
-        responses: {
-            /** @description Success message */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Error message */
             404: {
                 headers: {
                     [name: string]: unknown;

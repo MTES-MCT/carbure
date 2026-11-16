@@ -12311,54 +12311,6 @@ paths:
               schema:
                 detail: Not found.
           description: Operation not found
-  /api/tiruert/operations/{id}/correct/:
-    post:
-      operationId: correct_operation
-      description: Create a new operation 'CUSTOMS_CORRECTION' with a volume to add or
-        remove
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Authorised entity ID.
-          required: true
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: A unique integer value identifying this Opération.
-          required: true
-      tags:
-        - tiruert
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/OperationCorrectionRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/OperationCorrectionRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/OperationCorrectionRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                status: corected
-          description: Success message
-        "404":
-          content:
-            application/json:
-              schema:
-                error: NOT_ENOUGH_VOLUME
-          description: Error message
   /api/tiruert/operations/{id}/export/:
     get:
       operationId: export_tiruert_operation_details_excel
@@ -21005,14 +20957,6 @@ components:
         - type
         - volume
         - year
-    OperationCorrectionRequest:
-      type: object
-      properties:
-        correction_volume:
-          type: number
-          format: double
-      required:
-        - correction_volume
     OperationDebt:
       type: object
       properties:
