@@ -1,3 +1,4 @@
+import uuid
 from decimal import Decimal
 
 from django.db import models, transaction
@@ -8,6 +9,11 @@ from django.utils.translation import gettext_lazy as _
 from traceability.services.quantities import quantity_available
 
 from .action_status import ActionStatus, latest_status
+
+
+def generate_carbure_id() -> str:
+    """Public identifier assigned once, when the action is created."""
+    return str(uuid.uuid4())
 
 
 class ActionManager(models.Manager):
@@ -30,8 +36,20 @@ class ActionManager(models.Manager):
 
 
 class Action(models.Model):
+    carbure_id = models.CharField(
+        verbose_name="Identifiant Carbure",
+        max_length=64,
+        unique=True,
+        default=generate_carbure_id,
+        editable=False,
+    )
     pos_id = models.CharField(
-        verbose_name="N° de POS", max_length=48, unique=True, error_messages={"unique": _("Ce N° de POS existe déjà.")}
+        verbose_name="N° de POS",
+        max_length=48,
+        unique=True,
+        null=True,
+        blank=True,
+        error_messages={"unique": _("Ce N° de POS existe déjà.")},
     )
 
     holder = models.ForeignKey(
@@ -127,11 +145,22 @@ class Action(models.Model):
         attach_inherited_fields(ordered)
         return ordered
 
+    def save(self, *args, **kwargs):
+        self.pos_id = self.pos_id or None
+        if not self.carbure_id:
+            self.carbure_id = generate_carbure_id()
+        super().save(*args, **kwargs)
+
     @staticmethod
     @transaction.atomic
     def bulk_create(actions: list["Action"], default_status=ActionStatus.CREATED) -> QuerySet["Action"]:
+        for action in actions:
+            action.pos_id = action.pos_id or None
+            if not action.carbure_id:
+                action.carbure_id = generate_carbure_id()
+
         Action.objects.bulk_create(actions)
-        created_actions = Action.objects.filter(pos_id__in=[a.pos_id for a in actions])
+        created_actions = Action.objects.filter(carbure_id__in=[action.carbure_id for action in actions])
 
         created_statuses = [ActionStatus(status=default_status, action=a) for a in created_actions]
         ActionStatus.objects.bulk_create(created_statuses)

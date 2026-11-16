@@ -62,7 +62,7 @@ class ActionCreateTest(SimpleTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("quantity", response.data)
-        self.assertIn("pos_id", response.data)
+        self.assertNotIn("pos_id", response.data)
 
     def test_missing_serializer_is_reported_as_validation_error(self):
         with patch.object(GenericActionHandler, "get_action_creation_serializers", return_value={}):
@@ -131,7 +131,17 @@ class ActionCreateIntegrationTest(TestCase):
         self.assertIsNone(action.parent)
         self.assertEqual(action.status, ActionStatus.PENDING)
         self.assertEqual(response.data["status"], ActionStatus.PENDING)
+        self.assertEqual(response.data["carbure_id"], action.carbure_id)
         self.assertEqual(ActionStatus.objects.filter(action=action).count(), 1)
+
+    def test_creates_action_without_pos_id(self):
+        payload = {key: value for key, value in self.payload.items() if key != "pos_id"}
+        response = self.post(payload)
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        action = Action.objects.get(pk=response.data["id"])
+        self.assertIsNone(action.pos_id)
+        self.assertEqual(response.data["carbure_id"], action.carbure_id)
 
     def test_status_without_matching_edge_does_not_create_action(self):
         response = self.post({**self.payload, "status": ActionStatus.ACCEPTED})

@@ -5,6 +5,8 @@ Comment une filière **étend** le template et l’import, sans recopier le noya
 Flux : `excel_columns` (template) → parse (`header` → `key`) → serializer du handler → `create`.  
 Les clés qui ne sont pas des champs du modèle `Action` sont **écartées** au `create` générique.
 
+`pos_id` est obligatoire dans le fichier : une cellule vide est une erreur de ligne. Le champ reste optionnel sur le modèle. `carbure_id` n’est pas une colonne, il est généré à la création de l’action.
+
 Un import **réussi** enregistre le fichier Excel en `core.StoredFile` (S3 privé, `traceability/actions/{entity_id}/{YYYYMMDD_HHMMSS}_…`) et le lie à toutes les actions créées (`Action.file`). Un import en erreur (fichier vide, invalide, ou `validation_errors`) ne persiste rien. Si la création des actions échoue après l’upload, la transaction SQL est annulée et le fichier est retiré du storage.
 
 ---

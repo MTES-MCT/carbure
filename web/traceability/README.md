@@ -21,7 +21,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 | Concept        | Rôle                                                                                                                                                            |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Action`       | POS, détenteur, matière, quantité, site, logistique, GES. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
+| `Action`       | `carbure_id` (obligatoire, unique, UUID généré à la création, non saisissable), `pos_id` (PoS optionnel, unique s’il est renseigné), détenteur, matière, quantité, site, logistique, GES. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
 | `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset                                                                  |
 | `Material`     | Catalogue (`code`, `name`, `unit`, `lhv`, `density`). L’unité native de `quantity` vit ici. Facteurs optionnels, ou strictement > 0                             |
 

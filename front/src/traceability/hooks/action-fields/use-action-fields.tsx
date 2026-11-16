@@ -137,8 +137,11 @@ export function useActionFields() {
     pos_id,
 
     carbure_id: {
-      ...pos_id,
+      key: "carbure_id",
       label: t("N° d'identifiant Carbure"),
+      field: ({ form, props }: ActionFieldConfig) => (
+        <TextInput {...props} readOnly {...form.bind("carbure_id")} />
+      ),
     },
 
     certificate: {

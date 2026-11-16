@@ -29,6 +29,7 @@ class ActionFilter(RecursiveFilterSet):
 
     order_by = OrderingFilter(
         fields=(
+            ("carbure_id", "carbure_id"),
             ("pos_id", "pos_id"),
             ("holder__name", "holder"),
             ("material__name", "material"),

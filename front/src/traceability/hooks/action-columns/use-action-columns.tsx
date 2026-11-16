@@ -94,8 +94,9 @@ export function useActionColumns() {
     pos_id,
 
     carbure_id: {
-      ...pos_id,
+      key: "carbure_id",
       header: t("Identifiant Carbure"),
+      cell: (action) => <Cell text={action.carbure_id} />,
     },
 
     period: {

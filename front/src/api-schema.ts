@@ -3629,8 +3629,10 @@ export interface components {
              * @default 0.000
              */
             readonly quantity_available: string;
+            /** Identifiant Carbure */
+            readonly carbure_id: string;
             /** N° de POS */
-            pos_id: string;
+            pos_id?: string | null;
             /** Filière */
             industry: components["schemas"]["IndustryEnum"];
             /** Type d'action */
@@ -3672,6 +3674,12 @@ export interface components {
             esca?: string;
             /** Format: decimal */
             eccr?: string;
+        };
+        ActionAuthorizationRequest: {
+            parent?: number | null;
+            type: components["schemas"]["ActionTypeEnum"];
+            status: components["schemas"]["ActionStatusEnum"];
+            holder: number;
         };
         ActionCertificate: {
             readonly id: number;
@@ -3756,8 +3764,10 @@ export interface components {
         /** @description Small representation used for the parent action relation. */
         ActionParent: {
             readonly id: number;
+            /** Identifiant Carbure */
+            readonly carbure_id: string;
             /** N° de POS */
-            pos_id: string;
+            pos_id?: string | null;
         };
         /**
          * @description * `ROAD` - Transport routier
@@ -16111,6 +16121,8 @@ export interface operations {
                 /**
                  * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -16354,6 +16366,8 @@ export interface operations {
                 /**
                  * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -16499,6 +16513,8 @@ export interface operations {
                 /**
                  * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -17074,6 +17090,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryIndustry {
     H2 = "H2"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
+    ValueMinuscarbure_id = "-carbure_id",
     ValueMinusholder = "-holder",
     ValueMinusmaterial = "-material",
     ValueMinuspos_id = "-pos_id",
@@ -17082,6 +17099,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinussite = "-site",
     ValueMinusstatus = "-status",
     ValueMinusworking_date = "-working_date",
+    carbure_id = "carbure_id",
     holder = "holder",
     material = "material",
     pos_id = "pos_id",

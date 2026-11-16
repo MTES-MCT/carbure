@@ -1,5 +1,3 @@
-import uuid
-
 from django.db import transaction
 from django.db.models import QuerySet
 
@@ -23,7 +21,6 @@ def valorize(actions: QuerySet[Action]) -> list[Action]:
     children = Action.bulk_create(
         [
             Action(
-                pos_id=str(uuid.uuid4()),
                 type=Action.VALORIZE,
                 holder=action.holder,
                 industry=action.industry,

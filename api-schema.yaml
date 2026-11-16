@@ -13477,6 +13477,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -13485,6 +13486,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -13496,6 +13498,8 @@ paths:
           description: |-
             Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -13895,6 +13899,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -13903,6 +13908,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -13914,6 +13920,8 @@ paths:
           description: |-
             Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -14194,6 +14202,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -14202,6 +14211,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -14213,6 +14223,8 @@ paths:
           description: |-
             Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -14500,8 +14512,13 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
           default: "0.000"
+        carbure_id:
+          type: string
+          readOnly: true
+          title: Identifiant Carbure
         pos_id:
           type: string
+          nullable: true
           title: N° de POS
           maxLength: 48
         industry:
@@ -14574,6 +14591,7 @@ components:
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
       required:
+        - carbure_id
         - certificate
         - holder
         - id
@@ -14581,7 +14599,6 @@ components:
         - inherited_fields
         - material
         - parent
-        - pos_id
         - quantity
         - quantity_available
         - site
@@ -14589,6 +14606,22 @@ components:
         - total_emissions
         - type
         - working_date
+    ActionAuthorizationRequest:
+      type: object
+      properties:
+        parent:
+          type: integer
+          nullable: true
+        type:
+          $ref: "#/components/schemas/ActionTypeEnum"
+        status:
+          $ref: "#/components/schemas/ActionStatusEnum"
+        holder:
+          type: integer
+      required:
+        - holder
+        - status
+        - type
     ActionCertificate:
       type: object
       properties:
@@ -14759,13 +14792,18 @@ components:
         id:
           type: integer
           readOnly: true
+        carbure_id:
+          type: string
+          readOnly: true
+          title: Identifiant Carbure
         pos_id:
           type: string
+          nullable: true
           title: N° de POS
           maxLength: 48
       required:
+        - carbure_id
         - id
-        - pos_id
     ActionShippingMethodEnum:
       enum:
         - ROAD

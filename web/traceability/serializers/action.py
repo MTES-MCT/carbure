@@ -21,7 +21,7 @@ class ActionParentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = ["id", "pos_id"]
+        fields = ["id", "carbure_id", "pos_id"]
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -45,7 +45,7 @@ class ActionInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         exclude = ["file"]
-        read_only_fields = ["id", "industry", "holder", "parent"]
+        read_only_fields = ["id", "carbure_id", "industry", "holder", "parent"]
 
     def create(self, validated_data):
         validated_data["industry"] = self.context["handler"].industry
