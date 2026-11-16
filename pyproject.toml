@@ -99,6 +99,8 @@ ignore = [
 [tool.uv]
 package = false
 default-groups = "all"
+# Transitive dep of beautifulsoup4. Pinned for CVE-2026-126190 (fixed in 4.0).
+constraint-dependencies = ["soupsieve==4.1.1"]
 
 [[tool.uv.index]]
 name = "pypi"
