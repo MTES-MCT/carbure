@@ -2,47 +2,46 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-16 18:44+0200\n"
+"POT-Creation-Date: 2026-11-12 16:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: FRENCH <LL@li.org>\n"
-"Language: \n"
+"Language-Team: English\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: web/auth/serializers/request_activation_link.py:10
-msgid "Email"
+#: web/auth/serializers/credentials.py:18
+msgid "Les deux mots de passe ne correspondent pas."
+msgstr "The two password fields didn't match."
+
+#: web/auth/serializers/request_activation_link.py:8
+msgid "Adresse email"
 msgstr "Email"
 
 #: web/auth/serializers/reset_password.py:10
 #: web/auth/serializers/user_creation.py:16
-msgid "Password"
-msgstr ""
+msgid "Mot de passe"
+msgstr "Password"
 
 #: web/auth/serializers/reset_password.py:11
 #: web/auth/serializers/user_creation.py:17
-msgid "Password confirmation"
-msgstr ""
+msgid "Confirmation du mot de passe"
+msgstr "Password confirmation"
 
-#: web/auth/serializers/reset_password.py:15
-#: web/auth/serializers/user_creation.py:38
-msgid "The two password fields didn't match."
-msgstr ""
+#: web/auth/validators.py:11 web/auth/validators.py:30
+msgid "Le nom doit contenir au moins une lettre."
+msgstr "The name must contain at least one letter."
 
-#: web/auth/validators.py:16
+#: web/auth/validators.py:24
 msgid ""
 "Le nom ne peut contenir que des lettres, espaces, tirets (-) et apostrophes "
 "(')."
 msgstr ""
 "The name can only contain letters, spaces, hyphens (-), and apostrophes (')."
 
-#: web/auth/validators.py:22
-msgid "Le nom doit contenir au moins une lettre."
-msgstr ""
-
-#: web/auth/views/mixins/change_email.py:38
+#: web/auth/views/mixins/change_email.py:40
 msgid "Carbure - Confirmation de changement d'email"
 msgstr "Carbure - Email Change Confirmation"
 
@@ -63,92 +62,95 @@ msgstr "The security code has expired. Please request a new code."
 msgid "Le code de sécurité est incorrect."
 msgstr "The security code is incorrect."
 
-#: web/biomethane/serializers/contract/contract.py:67
-msgid ""
-"Le champ cmax_annualized_value est obligatoire si cmax_annualized est vrai."
-msgstr ""
-"The cmax_annualized_value field is mandatory if cmax_annualized is true."
-
-#: web/biomethane/serializers/contract/contract.py:83
-#: web/biomethane/serializers/contract/contract_amendment.py:44
-msgid "La date d'effet doit être postérieure à la date de signature."
-msgstr ""
-
-#: web/biomethane/serializers/contract/contract.py:124
-msgid ""
-"Pour la référence tarifaire 2023, la date de signature doit être postérieure "
-"au 10/06/2023."
-msgstr ""
-
-#: web/biomethane/serializers/contract/contract.py:129
-#: web/biomethane/serializers/injection_site/injection_site.py:24
-#: web/biomethane/serializers/injection_site/injection_site.py:30
-msgid "Ce champ est obligatoire."
-msgstr "This field is mandatory."
-
-#: web/biomethane/serializers/contract/contract_amendment.py:37
-msgid "Ce champ est obligatoire si amendment_object contient 'OTHER'."
-msgstr "This field is mandatory if amendment_object contains 'OTHER'."
-
-#: web/biomethane/serializers/contract/contract_amendment.py:56
+#: web/biomethane/serializers/contract/contract_amendment.py:59
 msgid "Cette entité n'a pas de contrat associé."
 msgstr "This entity has no associated contract."
 
-#: web/biomethane/serializers/digestate/digestate.py:45
-msgid "Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné."
-msgstr "This field is mandatory when 'External platform' is selected."
-
-#: web/biomethane/serializers/digestate/digestate.py:51
-msgid "Ce champ est obligatoire lorsque 'Sur site' est sélectionné."
-msgstr "This field is mandatory when 'On site' is selected."
-
-#: web/biomethane/serializers/digestate/spreading.py:26
+#: web/biomethane/serializers/digestate/spreading.py:29
 msgid "Digestat manquant."
 msgstr "Missing digestate."
 
-#: web/biomethane/serializers/energy/monthly_report.py:31
-#, fuzzy
-#| msgid "Cette entité n'a pas de contrat associé."
+#: web/biomethane/serializers/energy/monthly_report.py:25
+msgid "Chaque mois ne peut apparaître qu'une seule fois"
+msgstr "Each month can only appear once"
+
+#: web/biomethane/serializers/energy/monthly_report.py:30
 msgid "Cette entité n'a pas de déclaration énergétique pour cette année."
-msgstr "This entity has no associated contract."
+msgstr "This entity has no energy report for this year."
 
-#: web/biomethane/serializers/production_unit/production_unit.py:38
-msgid "Ce champ est obligatoire lorsque l'agrément sanitaire est activé."
-msgstr "This field is mandatory when sanitary approval is enabled."
-
-#: web/biomethane/serializers/production_unit/production_unit.py:43
+#: web/biomethane/services/contract.py:69
 msgid ""
-"Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est activée."
-msgstr "This field is mandatory when the hygienization exemption is enabled."
+"Pour la référence tarifaire 2011, la date de signature doit être entre le "
+"23/11/2011 et le 23/11/2020."
+msgstr ""
+"For the 2011 tariff reference, the signing date must be between 23/11/2011 "
+"and 23/11/2020."
 
-#: web/core/admin.py:338
+#: web/biomethane/services/contract.py:74
+msgid ""
+"Pour la référence tarifaire 2020, la date de signature doit être entre le "
+"23/11/2020 et le 13/12/2021."
+msgstr ""
+"For the 2020 tariff reference, the signing date must be between 23/11/2020 "
+"and 13/12/2021."
+
+#: web/biomethane/services/contract.py:79
+msgid ""
+"Pour la référence tarifaire 2021, la date de signature doit être entre le "
+"13/12/2021 et le 10/06/2023."
+msgstr ""
+"For the 2021 tariff reference, the signing date must be between 13/12/2021 "
+"and 10/06/2023."
+
+#: web/biomethane/services/contract.py:101
+msgid "La date d'effet doit être postérieure à la date de signature."
+msgstr "The effective date must be after the signing date."
+
+#: web/biomethane/services/contract.py:118
+msgid ""
+"Pour la référence tarifaire 2023, la date de signature doit être "
+"postérieure au 10/06/2023."
+msgstr ""
+"For the 2023 tariff reference, the signing date must be after 10/06/2023."
+
+#: web/core/admin.py:335
 msgid "Tous"
 msgstr "All"
 
 #: web/core/exceptions.py:7
-#, fuzzy
 msgid "Impossible de supprimer cette ressource car elle est liée à d'autres."
-msgstr "Unable to delete this resource, it is already bound to others."
+msgstr "Unable to delete this resource because it is linked to others."
+
+#: web/core/models/file.py:13
+msgid "Une entité est requise pour enregistrer un fichier."
+msgstr "An entity is required to save a file."
+
+#: web/core/serializer_validators.py:13
+#: web/core/tests/test_serializer_validators.py:35
+msgid "Cette valeur est déjà utilisée ailleurs dans le fichier."
+msgstr "This value is already used elsewhere in the file."
+
+#: web/core/serializers.py:815
+msgid "Ce champ est obligatoire"
+msgstr "This field is mandatory"
 
 #: web/elec/api/cpo/charge_points/check_application.py:53
-#, fuzzy, python-format
+#, python-format
 msgid "Le point de recharge %(charge_point_id)s existe déjà"
 msgstr "Charge point %(charge_point_id)s already exists"
 
 #: web/elec/services/import_charge_point_excel.py:150
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Le point de recharge %(charge_point_id)s n'est pas listé dans les données "
 "consolidées de transport.data.gouv.fr"
 msgstr ""
 "The charge point %(charge_point_id)s is not listed in the consolidated data "
-"of transport.data.gouv.fr"
+"from transport.data.gouv.fr"
 
 #: web/elec/services/import_charge_point_excel.py:156
-#, fuzzy
-#| msgid "La date du dernier relevé est obligatoire."
 msgid "La puissance nominale est obligatoire"
-msgstr "The nominal power is mandatory."
+msgstr "The nominal power is mandatory"
 
 #: web/elec/services/import_charge_point_excel.py:162
 msgid ""
@@ -171,54 +173,53 @@ msgid "L'énergie mesurée lors du dernier relevé est obligatoire."
 msgstr "Mesured energy during the last reading is mandatory."
 
 #: web/elec/services/import_elec_audit_report_excel.py:98
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Le point de charge %(charge_point_id)s ne fait pas partie de l'échantillon "
 "sélectionné pour cet audit."
 msgstr ""
-"The charge point %(charge_point_id)s is not listed in the consolidated data "
-"of transport.data.gouv.fr"
+"The charge point %(charge_point_id)s is not part of the sample selected for "
+"this audit."
 
 #: web/elec/services/import_elec_audit_report_excel.py:117
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Les informations relatives au point de charge %(charge_point_id)s sont "
 "incomplètes ou absentes."
 msgstr ""
-"Information related to the charge point %(charge_point_id)s is incomplete or "
-"missing."
+"Information about charge point %(charge_point_id)s is incomplete or missing."
 
-#: web/elec/services/import_meter_reading_excel.py:144
+#: web/elec/services/import_meter_reading_excel.py:140
 msgid "Le point de recharge n'a pas encore été inscrit sur la plateforme."
 msgstr "The charge point has not yet been registered on the platform."
 
-#: web/elec/services/import_meter_reading_excel.py:150
-#, fuzzy
-#| msgid "Le point de recharge n'a pas encore été inscrit sur la plateforme."
+#: web/elec/services/import_meter_reading_excel.py:146
 msgid ""
 "Ce point de recharge n'a pas de compteur associé, veuillez en ajouter un "
 "depuis la page dédiée."
-msgstr "The charge point has not yet been registered on the platform."
+msgstr ""
+"This charge point has no associated meter. Please add one from the "
+"dedicated page."
 
-#: web/elec/services/import_meter_reading_excel.py:156
+#: web/elec/services/import_meter_reading_excel.py:150
 msgid "La quantité d'énergie soutirée est inférieure au précédent relevé."
 msgstr "The amount of energy withdrawn is less than the previous reading."
 
-#: web/elec/services/import_meter_reading_excel.py:162
-#, fuzzy, python-format
+#: web/elec/services/import_meter_reading_excel.py:155
+#, python-format
 msgid "Ce point de recharge a été défini %(count)d fois (lignes %(lines)s)"
 msgstr "This charge point has been defined %(count)d times (lines %(lines)s)"
 
-#: web/elec/services/import_meter_reading_excel.py:169
-#, fuzzy, python-format
+#: web/elec/services/import_meter_reading_excel.py:162
+#, python-format
 msgid ""
 "Un relevé plus récent est déjà enregistré pour ce point de recharge: "
-"%(energy)skWh, %(date)s"
+"%(energy)gkWh, %(date)s"
 msgstr ""
 "A more recent reading is already recorded for this charge point: "
-"%(energy)skWh, %(date)s"
+"%(energy)gkWh, %(date)s"
 
-#: web/elec/services/import_meter_reading_excel.py:177
+#: web/elec/services/import_meter_reading_excel.py:170
 msgid ""
 "Le facteur de charge estimé depuis le dernier relevé enregistré est "
 "supérieur à 100%. Veuillez vérifier les valeurs du relevé ainsi que la "
@@ -228,38 +229,63 @@ msgstr ""
 "100%. Please check the values of the reading as well as the power of your "
 "charge point, entered on TDG."
 
-#: web/elec/services/import_meter_reading_excel.py:184
+#: web/elec/services/import_meter_reading_excel.py:177
+msgid ""
+"Ce point de recharge n'est pas soumis aux relevés trimestriels, veuillez le "
+"supprimer du fichier."
+msgstr ""
+"This charge point is not subject to quarterly readings. Please remove it "
+"from the file."
+
+#: web/elec/services/import_meter_reading_excel.py:183
 msgid "La date du relevé ne correspond pas au trimestre traité actuellement."
 msgstr "The reading date does not correspond to the current quarter."
 
-#: web/entity/views/production_sites/production_sites.py:71
+#: web/entity/views/production_sites/production_sites.py:79
 msgid ""
 "Impossible de supprimer ce site de production, des lots de biocarburant y "
 "sont associés."
 msgstr ""
 "Unable to delete this production site, biofuel batches are linked to it."
 
-#: web/saf/views/ticket/mixins/export.py:48
+#: web/entity/views/registration/search_company.py:30
+msgid "Entreprise introuvable"
+msgstr "Company not found"
+
+#: web/h2/serializers/action.py:40
+msgid "La valeur doit être Oui ou Non."
+msgstr "The value must be Yes or No."
+
+#: web/h2/serializers/action.py:52
+msgid "La valeur doit être l'une des options proposées."
+msgstr "The value must be one of the available options."
+
+#: web/saf/views/ticket/mixins/export.py:89
 msgid "tickets"
 msgstr "tickets"
 
-#: web/saf/views/ticket/mixins/export.py:86
+#: web/saf/views/ticket/mixins/export.py:94
 msgid "aeroports"
 msgstr "airports"
 
-#: web/templates/admin/otp_verify.html:4 web/templates/admin/otp_verify.html:14
-msgid "Vérification OTP"
-msgstr ""
+#: web/saf/views/ticket/mixins/export.py:104
+msgid "biocarburants"
+msgstr "biofuels"
 
 #: web/templates/admin/otp_verify.html:4
-msgid "Django site admin"
-msgstr ""
+#: web/templates/admin/otp_verify.html:14
+msgid "Vérification OTP"
+msgstr "OTP verification"
+
+#: web/templates/admin/otp_verify.html:4
+msgid "Site d'administration de Django"
+msgstr "Django site admin"
 
 #: web/templates/admin/otp_verify.html:19
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgid "Veuillez corriger l'erreur ci-dessous."
+msgid_plural "Veuillez corriger les erreurs ci-dessous."
+msgstr[0] "Please correct the error below."
+msgstr[1] "Please correct the errors below."
 
 #: web/templates/admin/otp_verify.html:34
 msgid ""
@@ -277,29 +303,145 @@ msgstr "Verify"
 msgid "Retour à la connexion"
 msgstr "Back to login"
 
-#: web/tiruert/serializers/elec_operation.py:69
-msgid "Only debit operations can be created"
-msgstr ""
+#: web/tiruert/serializers/elec_operation.py:70
+msgid "Seules les opérations de débit peuvent être créées."
+msgstr "Only debit operations can be created"
 
-#: web/tiruert/serializers/elec_operation.py:89
-msgid "Only debit operations can be updated"
-msgstr ""
+#: web/tiruert/serializers/elec_operation.py:90
+msgid "Seules les opérations de débit peuvent être modifiées."
+msgstr "Only debit operations can be updated"
 
-#: web/tiruert/serializers/elec_operation.py:94
-msgid "Operation cannot be modified anymore"
-msgstr ""
+#: web/tiruert/serializers/elec_operation.py:95
+msgid "Cette opération ne peut plus être modifiée."
+msgstr "Operation cannot be modified anymore"
 
-#: web/tiruert/serializers/elec_operation.py:97
-msgid "Cannot modify debited entity"
-msgstr ""
+#: web/tiruert/serializers/elec_operation.py:98
+msgid "L'entité débitée ne peut pas être modifiée."
+msgstr "Cannot modify debited entity"
+
+#: web/tiruert/serializers/operation.py:166
+msgid "Id de lot invalide"
+msgstr "Invalid lot ID"
+
+#: web/tiruert/serializers/operation.py:175
+msgid "Destinataire inconu"
+msgstr "Unknown recipient"
+
+#: web/tiruert/serializers/operation.py:185
+msgid "Biocarburant inconnu"
+msgstr "Unknown biofuel"
+
+#: web/tiruert/serializers/operation.py:190
+msgid "La valeur du volume doit être supérieure à zéro."
+msgstr "The volume must be greater than zero."
+
+#: web/tiruert/serializers/operation.py:196
+msgid "Le type d'opération doit être 'TRANSFERT' ou 'TENEUR'."
+msgstr "The operation type must be 'TRANSFERT' or 'TENEUR'."
+
+#: web/tiruert/serializers/operation.py:202
+msgid "Destinataire requis pour les opérations de type TRANSFERT."
+msgstr "A recipient is required for TRANSFERT operations."
 
 #: web/tiruert/services/elec_operation.py:70
-msgid "Quantity is greater than the available balance"
-msgstr ""
+msgid "La quantité est supérieure au solde disponible."
+msgstr "Quantity is greater than the available balance"
 
-#: web/transactions/api/lots/add.py:14
+#: web/traceability/models/action.py:35
+msgid "Ce N° de POS existe déjà."
+msgstr "This POS number already exists."
+
+#: web/traceability/models/action.py:78
+msgid "Transport routier"
+msgstr "Road transport"
+
+#: web/traceability/models/action.py:79
+msgid "Pipeline"
+msgstr "Pipeline"
+
+#: web/traceability/models/action.py:80
+msgid "Rail"
+msgstr "Rail"
+
+#: web/traceability/models/action.py:81
+msgid "Transport maritime"
+msgstr "Maritime transport"
+
+#: web/traceability/serializers/action.py:105
+msgid "La date doit être au format jour/mois/année."
+msgstr "The date must be in day/month/year format."
+
+#: web/traceability/serializers/action.py:110
+msgid "La période doit être au format mois/année."
+msgstr "The period must be in month/year format."
+
+#: web/traceability/serializers/action_authorization.py:19
+#: web/traceability/serializers/action_authorization.py:22
+#: web/traceability/serializers/action_authorization.py:25
+#: web/traceability/serializers/action_status.py:18
+msgid "Opération non autorisée."
+msgstr "Operation not allowed."
+
+#: web/traceability/serializers/action_status.py:15
+msgid "Changement de statut non autorisé."
+msgstr "Status change not allowed."
+
+#: web/traceability/serializers/lookups.py:9
+msgid "Matière inconnue"
+msgstr "Unknown material"
+
+#: web/traceability/serializers/lookups.py:15
+msgid "Certificat inconnu"
+msgstr "Unknown certificate"
+
+#: web/traceability/serializers/lookups.py:21
+msgid "Site inconnu"
+msgstr "Unknown site"
+
+#: web/traceability/views/action.py:105
+msgid "Ce type d'action ne peut pas être créé."
+msgstr "This type of action cannot be created."
+
+#: web/transactions/api/lots/add.py:10
 msgid "Le lot n'a pas pu être créé."
 msgstr "The lot could not be created."
+
+#: web/transactions/models/depot.py:62
+msgid "Ce champ est obligatoire pour les dépots."
+msgstr "This field is mandatory for depots."
+
+#: web/transactions/models/depot.py:65
+msgid "Ce numéro de douane est déjà utilisé."
+msgstr "This customs number is already in use."
+
+#: web/transactions/models/depot.py:68
+msgid "Ce nom de dépôt est déjà utilisé."
+msgstr "This depot name is already in use."
+
+#~ msgid ""
+#~ "Le champ cmax_annualized_value est obligatoire si cmax_annualized est "
+#~ "vrai."
+#~ msgstr ""
+#~ "The cmax_annualized_value field is mandatory if cmax_annualized is true."
+
+#~ msgid "Ce champ est obligatoire si amendment_object contient 'OTHER'."
+#~ msgstr "This field is mandatory if amendment_object contains 'OTHER'."
+
+#~ msgid ""
+#~ "Ce champ est obligatoire lorsque 'Plateforme externe' est sélectionné."
+#~ msgstr "This field is mandatory when 'External platform' is selected."
+
+#~ msgid "Ce champ est obligatoire lorsque 'Sur site' est sélectionné."
+#~ msgstr "This field is mandatory when 'On site' is selected."
+
+#~ msgid "Ce champ est obligatoire lorsque l'agrément sanitaire est activé."
+#~ msgstr "This field is mandatory when sanitary approval is enabled."
+
+#~ msgid ""
+#~ "Ce champ est obligatoire lorsque la dérogation à l'hygiénisation est "
+#~ "activée."
+#~ msgstr ""
+#~ "This field is mandatory when the hygienization exemption is enabled."
 
 #~ msgid "Un site contract existe déjà pour cette entité."
 #~ msgstr "A contract site already exists for this entity."
@@ -315,8 +457,6 @@ msgstr "The lot could not be created."
 #~ msgstr "The {field} field is mandatory."
 
 #, python-brace-format
-#~ msgid "Le champ {field} ne peut pas être modifié une fois le contrat signé."
+#~ msgid ""
+#~ "Le champ {field} ne peut pas être modifié une fois le contrat signé."
 #~ msgstr "The {field} field cannot be modified once the contract is signed."
-
-#~ msgid "Utilisateur inconnu."
-#~ msgstr "Unknown user."

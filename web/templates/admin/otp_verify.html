@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block title %}{% trans 'Vérification OTP' %} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block title %}{% trans 'Vérification OTP' %} | {{ site_title|default:_("Site d'administration de Django") }}{% endblock %}
 
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'admin/css/login.css' %}">
 {% endblock %}
@@ -16,7 +16,7 @@
 
 {% if form.errors and not form.non_field_errors %}
     <p class="errornote">
-{% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+{% blocktranslate count counter=form.errors.items|length %}Veuillez corriger l'erreur ci-dessous.{% plural %}Veuillez corriger les erreurs ci-dessous.{% endblocktranslate %}
     </p>
 {% endif %}
 

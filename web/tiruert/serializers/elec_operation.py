@@ -67,7 +67,7 @@ class ElecOperationInputSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get("request")
         if validated_data.get("debited_entity") != request.entity:
-            raise serializers.ValidationError(_("Only debit operations can be created"))
+            raise serializers.ValidationError(_("Seules les opérations de débit peuvent être créées."))
         ElecOperationService.perform_checks_before_create(request, validated_data)
         return super().create(validated_data)
 
@@ -87,15 +87,15 @@ class ElecOperationUpdateSerializer(serializers.ModelSerializer):
         entity = request.entity
 
         if instance.debited_entity != entity:
-            raise serializers.ValidationError(_("Only debit operations can be updated"))
+            raise serializers.ValidationError(_("Seules les opérations de débit peuvent être modifiées."))
 
         allowed_types = [ElecOperation.CESSION, ElecOperation.TENEUR]
         allowed_statuses = [ElecOperation.PENDING, ElecOperation.REJECTED]
         if instance.type not in allowed_types or instance.status not in allowed_statuses:
-            raise serializers.ValidationError(_("Operation cannot be modified anymore"))
+            raise serializers.ValidationError(_("Cette opération ne peut plus être modifiée."))
 
         if "debited_entity" in validated_data and validated_data["debited_entity"] != entity:
-            raise serializers.ValidationError(_("Cannot modify debited entity"))
+            raise serializers.ValidationError(_("L'entité débitée ne peut pas être modifiée."))
 
         ElecOperationService.perform_checks_before_create(request, validated_data, instance)
         return super().update(instance, validated_data)
