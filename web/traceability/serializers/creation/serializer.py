@@ -2,19 +2,22 @@ from rest_framework import serializers
 
 from core.models import Entity
 from traceability.models import Action, ActionStatus
-from traceability.serializers.creation.authorization import AUTHORIZATION_FIELDS, validate_authorization
 from traceability.serializers.creation.rules import check_quantity
 from traceability.serializers.lookups import CertificateLookupField, MaterialLookupField, SiteLookupField
+
+AUTHORIZATION_FIELDS = ("type", "status", "holder", "parent")
 
 
 class ActionCreationSerializer(serializers.ModelSerializer):
     """Creation body shared by every action type.
 
-    ``type``, ``status``, ``holder`` and ``parent`` are always validated, even
-    when a child replaces ``Meta.fields``. A child lists the payload fields it
-    accepts. ``field_checks`` runs for those fields only. A child overrides
-    ``check_<field>`` to replace a shared rule, or extends ``field_checks`` to
-    add one. A check raises a message, not a field dict.
+    ``type``, ``status``, ``holder`` and ``parent`` stay in ``validated_data``,
+    even when a child replaces ``Meta.fields``. The view has already authorized
+    them through ``ActionAuthorizationSerializer``, which declares the same four
+    fields. A child lists the payload fields it accepts. ``field_checks`` runs
+    for those fields only. A child overrides ``check_<field>`` to replace a
+    shared rule, or extends ``field_checks`` to add one. A check raises a
+    message, not a field dict.
     """
 
     parent = serializers.PrimaryKeyRelatedField(queryset=Action.objects.all(), required=False, allow_null=True)
@@ -40,10 +43,9 @@ class ActionCreationSerializer(serializers.ModelSerializer):
         return check_quantity(quantity, attrs.get("parent"))
 
     def validate(self, attrs):
-        validate_authorization(attrs, self.context)
         errors = {}
         for field, check in self.field_checks().items():
-            if field not in attrs:
+            if field not in self.fields or field not in attrs:
                 continue
             try:
                 attrs[field] = check(attrs[field], attrs)
@@ -59,14 +61,15 @@ class ActionCreationSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-class ActionCreateRequestSerializer(ActionCreationSerializer):
+class ActionCreateRequestSerializer(serializers.ModelSerializer):
     """Schema of the create body. The view validates with the type serializer.
 
     ``working_date`` is left out: the server fills it. ``industry`` comes from
     the query param. ``pos_id`` follows the model until it becomes optional.
     """
 
-    class Meta(ActionCreationSerializer.Meta):
+    class Meta:
+        model = Action
         fields = [
             "pos_id",
             "material",

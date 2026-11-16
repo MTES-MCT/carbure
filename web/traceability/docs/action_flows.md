@@ -66,7 +66,7 @@ ActionStatus.can_transition(ActionStatus.PENDING, ActionStatus.ACCEPTED)  # True
 
 ## Permettre la création par l'API
 
-Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création. Ce serializer hérite d'`ActionCreationSerializer`, qui vérifie la matrice puis les champs listés par l'enfant. `type`, `status`, `holder` et `parent` sont toujours relus, même s'ils ne figurent pas dans `Meta.fields`. Le schéma du POST décrit les champs envoyables, sans `working_date` : le serveur le renseigne. La base fournit le serializer d'`INIT` :
+Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit celui d'`INIT` :
 
 ```python
 action_creation_serializers = {
@@ -77,3 +77,55 @@ action_creation_serializers = {
 La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2.
 
 Les endpoints de création et de changement de statut exigent aussi la `write_permission` du handler. Dans H2, elle vaut actuellement `HasHRSWriteRights` : autoriser `is_h2_admin` dans les règles ne donne donc pas, à lui seul, accès à ces endpoints aux administrateurs.
+
+### La matrice est toujours validée
+
+[`create`](../views/action.py) appelle [`ActionAuthorizationSerializer`](../serializers/creation/authorization.py) sur le corps avant le serializer du type. `validate` ne voit que des valeurs déjà lues : un parent introuvable reste l'erreur du champ. Une fois le parent chargé, un flow refusé ou un `can_assign_status` refusé répondent `Opération non autorisée.`
+
+L'enfant ne liste que les champs métier. `type`, `status`, `holder` et `parent` sont quand même relus ensuite, pour les écrire dans `validated_data`.
+
+```python
+class ConsumptionSerializer(ActionCreationSerializer):
+    class Meta(ActionCreationSerializer.Meta):
+        fields = ["pos_id", "quantity", "working_date", ...]
+```
+
+Un `POST` d'`INIT` doit donc quand même envoyer `type`, `status` et `holder`. Ces trois valeurs, plus `parent` s'il est présent, se retrouvent dans `validated_data` sans être déclarées par l'enfant.
+
+### Seuls les champs listés sont contrôlés
+
+[`field_checks`](../serializers/creation/serializer.py) associe un champ à une méthode. La méthode ne tourne que si l'enfant a mis le champ dans `Meta.fields`. Aujourd'hui, la règle commune est la quantité : strictement positive, et au plus égale à la quantité restante du parent.
+
+Remplacer la règle pour un type :
+
+```python
+class TransferSerializer(ActionCreationSerializer):
+    class Meta(ActionCreationSerializer.Meta):
+        fields = ["quantity"]
+
+    def check_quantity(self, quantity, attrs):
+        quantity = super().check_quantity(quantity, attrs)
+        ...
+        return quantity
+```
+
+Ajouter une règle pour un autre champ :
+
+```python
+def field_checks(self):
+    return {**super().field_checks(), "shipping_distance": self.check_shipping_distance}
+
+def check_shipping_distance(self, distance, attrs):
+    ...
+    return distance
+```
+
+La méthode lève un message, pas un dictionnaire de champs. `validate` range l'erreur sous le nom du champ. Plusieurs champs en erreur reviennent ensemble.
+
+### Ce que le serializer écrit
+
+`type`, `holder` et `parent` sont des colonnes : ils sont enregistrés tels que le client les a envoyés. `status` n'est pas une colonne. `create` le retire du modèle, et la vue crée l'`ActionStatus` avec `serializer.validated_data["status"]`. `industry` vient du handler, pas du corps.
+
+### Ce que le front voit
+
+Le schéma du `POST` est [`ActionCreateRequestSerializer`](../serializers/creation/serializer.py). Il ne valide pas. Il décrit les champs envoyables : les quatre champs de la matrice, plus les champs d'action, sans `working_date` ni `industry`. `working_date` est rempli par le serveur. `industry` est le query param. `status` y est obligatoire et envoyable.

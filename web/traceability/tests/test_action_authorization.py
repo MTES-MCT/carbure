@@ -7,6 +7,7 @@ from core.models import Entity
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.models import Action, ActionStatus
 from traceability.serializers.creation import ActionCreationSerializer
+from traceability.serializers.creation.authorization import ActionAuthorizationSerializer
 
 
 def is_holder(actor, holder, parent_holder):
@@ -31,15 +32,18 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         self.parent = Action(id=3, type=Action.INIT, industry=GenericActionHandler.industry, holder=self.holder)
         self.parent.status = ActionStatus.PENDING
 
-    def validate_action(self, data, parent=None, holder=None, actor=None):
-        serializer = ActionCreationSerializer(
+    def validate_action(self, data, parent=None, holder=None, actor=None, missing_parent=False):
+        serializer = ActionAuthorizationSerializer(
             data=data,
             context={"handler": GenericActionHandler(), "entity": actor or self.holder},
         )
         holder_queryset = Mock()
         holder_queryset.get.return_value = holder or self.holder
         parent_queryset = Mock()
-        parent_queryset.get.return_value = parent or self.parent
+        if missing_parent:
+            parent_queryset.get.side_effect = Action.DoesNotExist
+        else:
+            parent_queryset.get.return_value = parent or self.parent
         with (
             patch.object(serializer.fields["holder"], "get_queryset", return_value=holder_queryset),
             patch.object(serializer.fields["parent"], "get_queryset", return_value=parent_queryset),
@@ -93,6 +97,15 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
 
         self.assertFalse(unknown_edge.is_valid())
 
+    def test_missing_parent_fails_on_the_field_before_authorization(self):
+        serializer = self.validate_action(
+            {"type": Action.VALORIZE, "status": ActionStatus.PENDING, "holder": 1, "parent": 999},
+            missing_parent=True,
+        )
+
+        self.assertIn("parent", serializer.errors)
+        self.assertNotIn("non_field_errors", serializer.errors)
+
     def test_rejects_parent_from_another_industry(self):
         self.parent.industry = "OTHER"
         serializer = self.validate_action(
@@ -134,6 +147,11 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
 class QuantitySerializer(ActionCreationSerializer):
     class Meta(ActionCreationSerializer.Meta):
         fields = ["quantity"]
+
+
+class MaterialOnlySerializer(ActionCreationSerializer):
+    class Meta(ActionCreationSerializer.Meta):
+        fields = ["material"]
 
 
 class RelaxedQuantitySerializer(QuantitySerializer):
@@ -178,6 +196,20 @@ class ActionCreationFieldTest(ActionAuthorizationSerializerTest):
 
         self.assertFalse(self._is_valid(serializer))
         self.assertIn("quantity", serializer.errors)
+
+    def test_quantity_in_attrs_is_not_checked_unless_the_field_is_declared(self):
+        serializer = MaterialOnlySerializer(context={"handler": GenericActionHandler(), "entity": self.holder})
+
+        attrs = serializer.validate(
+            {
+                "type": Action.INIT,
+                "status": ActionStatus.PENDING,
+                "holder": self.holder,
+                "quantity": Decimal("0"),
+            }
+        )
+
+        self.assertEqual(attrs["quantity"], Decimal("0"))
 
     def test_child_can_replace_the_shared_quantity_check(self):
         serializer = RelaxedQuantitySerializer(
