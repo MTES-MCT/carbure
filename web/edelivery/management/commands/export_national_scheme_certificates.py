@@ -1,3 +1,5 @@
+from functools import reduce
+
 from django.core.management.base import BaseCommand
 
 from core.models.entity import Entity
@@ -62,13 +64,23 @@ def export_entities(entities):
 
 
 def find_entities_not_in_udb(entities):
-    ntr_ids = [e.ntr_id() for e in entities]
+    def fetch_ntr_id(acc, e):
+        try:
+            ntr_id = e.ntr_id()
+            acc[0].append(ntr_id)
+            acc[1].append(e)
+        except Exception as e:
+            acc[2].append(e.args[0])
+
+        return acc
+
+    ntr_ids, valid_entities, errors = reduce(fetch_ntr_id, entities, ([], [], []))
     request = GetOrganisationByIDRequest(*ntr_ids)
     requester = Requester(request, timeout=70)
     result = requester.do_request()
 
     found_organisations = result.get("found_organisations", [])
-    return [e for e in entities if e.ntr_id() not in found_organisations]
+    return ([e for e in valid_entities if e.ntr_id() not in found_organisations], errors)
 
 
 class Command(BaseCommand):
@@ -115,7 +127,7 @@ Would send UDB request with body being:
             exit(0)
 
         self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
-        entities_not_in_udb = find_entities_not_in_udb(entities)
+        (entities_not_in_udb, errors) = find_entities_not_in_udb(entities)
 
         self.stdout.write(f"Creating {entity_names(entities)} in UDB…")
         export_entities(entities_not_in_udb)
@@ -123,3 +135,6 @@ Would send UDB request with body being:
         self.stdout.write(f"Exporting {certificate_ids(entity_certificates)}…")
         result = export_certificates(entities)
         self.stdout.write(str(result))
+
+        if errors:
+            self.stderr.write(f"Errors encountered: {errors}")

@@ -122,7 +122,7 @@ class EntitiesNotInUDBTest(TestCase):
         self.patched_GetOrganisationByIDRequest.assert_not_called()
         self.patched_Requester.assert_not_called()
 
-        result = find_entities_not_in_udb(entities)
+        (result, _) = find_entities_not_in_udb(entities)
         self.patched_GetOrganisationByIDRequest.assert_called_with("NTR_ID_1", "NTR_ID_2", "NTR_ID_3")
         call_args = self.patched_Requester.call_args
         self.assertEqual((request,), call_args.args)
@@ -132,8 +132,24 @@ class EntitiesNotInUDBTest(TestCase):
         entities = [MagicMock(**{"ntr_id.return_value": "NTR_ID_1"})]
         self.patched_Requester.return_value.do_request.return_value = {}
 
-        result = find_entities_not_in_udb(entities)
+        (result, _) = find_entities_not_in_udb(entities)
         self.assertEqual(["NTR_ID_1"], [e.ntr_id() for e in result])
+
+    def test_returns_no_error_when_none_occured(self):
+        entities = [MagicMock(**{"ntr_id.return_value": "NTR_ID_1"})]
+        (_, errors) = find_entities_not_in_udb(entities)
+        self.assertEqual([], errors)
+
+    def test_handles_errors_on_ntr_id(self):
+        entities = [
+            MagicMock(**{"ntr_id.side_effect": RuntimeError("Oops")}),
+            MagicMock(**{"ntr_id.return_value": "NTR_ID_1"}),
+        ]
+        self.patched_Requester.return_value.do_request.return_value = {}
+
+        (result, errors) = find_entities_not_in_udb(entities)
+        self.assertEqual(["NTR_ID_1"], [e.ntr_id() for e in result])
+        self.assertEqual(["Oops"], errors)
 
 
 class ExportCertificates(TestCase):
