@@ -93,6 +93,8 @@ Un `POST` d'`CONSUME` doit donc quand même envoyer `type`, `status` et `holder`
 
 [`field_checks`](../serializers/creation/serializer.py) associe un champ à une méthode. La méthode ne tourne que si l'enfant a mis le champ dans `Meta.fields`. Aujourd'hui, la règle commune est la quantité : strictement positive, et au plus égale à la quantité restante du parent.
 
+Quand le corps contient un `parent`, [`create`](../views/action.py) verrouille cette ligne avant de contrôler la quantité. La création suivante attend la fin de la première, puis relit `quantity_available`. Deux créations simultanées du même parent ne peuvent plus dépasser le reste.
+
 Remplacer la règle pour un type :
 
 ```python
