@@ -68,7 +68,6 @@ export function useH2CertificatesPage(): {
       columns: compact([
         { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
         columns.period,
-        columns.quantity,
         columns.quantity_available,
         columns.total_emissions,
         canValidateCertificates && {
