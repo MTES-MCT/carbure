@@ -1,7 +1,7 @@
 from django_filters import BooleanFilter, MultipleChoiceFilter, NumberFilter, OrderingFilter
 
 from core.filters import MultiValueInFilter
-from traceability.filters.recursive import OriginMaterialFilter, RecursiveFilterSet
+from traceability.filters.recursive import OriginMaterialFilter, PreviousMaterialFilter, RecursiveFilterSet
 from traceability.models import Action, ActionStatus
 
 
@@ -19,6 +19,7 @@ class ActionFilter(RecursiveFilterSet):
     site = MultiValueInFilter(field_name="site__name")
     shipping_method = MultipleChoiceFilter(field_name="shipping_method", choices=Action.SHIPPING_METHODS, distinct=False)
     origin_material = OriginMaterialFilter()
+    previous_material = PreviousMaterialFilter()
     # true keeps quantity_available > 0, false keeps = 0. Absent skips the cutoff.
     quantity_available = BooleanFilter(method="filter_quantity_available")
 

@@ -92,11 +92,8 @@ class RecursiveFilterSet(FilterSet):
         return filter_by_chain(queryset, columns, groups)
 
 
-class OriginMaterialFilter(RecursiveColumnFilter):
-    """First declared material from the root. The query param is a material code."""
-
-    column = "origin_material_id"
-    group = "inherited_fields"
+class MaterialCodeFilter(RecursiveColumnFilter):
+    """The query param is a material code. The stored value is the material id."""
 
     def to_values(self, codes):
         return list(Material.objects.filter(code__in=codes).values_list("pk", flat=True))
@@ -104,3 +101,17 @@ class OriginMaterialFilter(RecursiveColumnFilter):
     def to_labels(self, material_ids):
         codes = Material.objects.filter(pk__in=material_ids).order_by("code")
         return codes.values_list("code", flat=True)
+
+
+class OriginMaterialFilter(MaterialCodeFilter):
+    """First declared material from the root."""
+
+    column = "origin_material_id"
+    group = "inherited_fields"
+
+
+class PreviousMaterialFilter(MaterialCodeFilter):
+    """Nearest declared material above the action. The action's own material is ignored."""
+
+    column = "previous_material_id"
+    group = "inherited_fields"

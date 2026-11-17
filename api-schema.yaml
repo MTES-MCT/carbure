@@ -13789,6 +13789,14 @@ paths:
           explode: true
           style: form
         - in: query
+          name: previous_material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: quantity_available
           schema:
             type: boolean
@@ -14109,6 +14117,7 @@ paths:
               - order_by
               - origin_material
               - period
+              - previous_material
               - shipping_method
               - site
               - status
@@ -14208,6 +14217,14 @@ paths:
           style: form
         - in: query
           name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: previous_material
           schema:
             type: array
             items:
@@ -14521,6 +14538,14 @@ paths:
           style: form
         - in: query
           name: period
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: previous_material
           schema:
             type: array
             items:

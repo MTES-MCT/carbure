@@ -39,8 +39,8 @@ Pour une action, la requête produit une ligne par cran. On garde celle dont le 
 |---|---|
 | Liste | Filtres ordinaires, puis pagination. Le `COUNT` ne lance pas la CTE. `annotate_parent_chain` ne voit que les ids de la page, avec les deux groupes. MySQL interdit un `LIMIT` dans la sous-requête de la CTE. |
 | Détail | `annotate_parent_chain` sur l'action demandée, avec les deux groupes. |
-| `origin_material` | Avant la pagination, sur le queryset déjà filtré. `RecursiveFilterSet` ne part qu'une fois, après les filtres ordinaires, pour tous les filtres récursifs de l'URL. Il ne charge que les groupes nommés : ici `inherited_fields`, pas les GES. Les ids sont figés dans une liste Python, pour que le `COUNT` ne relance pas la CTE. La page refait ensuite le parcours complet, GES compris. |
-| `GET /filters/?filter=origin_material` | `chain_column` sur le queryset déjà filtré par les autres paramètres. Une ligne par action, puis les libellés sont dédoublonnés. Tant que `origin_material` est dans l'URL, les options d'un autre filtre rejouent aussi cette remontée. |
+| `origin_material`, `previous_material` | Avant la pagination, sur le queryset déjà filtré. `RecursiveFilterSet` ne part qu'une fois, après les filtres ordinaires, pour tous les filtres récursifs de l'URL. Il ne charge que les groupes nommés : ici `inherited_fields`, pas les GES. Les ids sont figés dans une liste Python, pour que le `COUNT` ne relance pas la CTE. La page refait ensuite le parcours complet, GES compris. |
+| `GET /filters/?filter=origin_material` | `chain_column` sur le queryset déjà filtré par les autres paramètres. Une ligne par action, puis les libellés sont dédoublonnés. `previous_material` suit le même chemin. Tant qu'un de ces filtres est dans l'URL, les options d'un autre filtre rejouent aussi cette remontée. |
 | `/years/` | Pas de parcours. |
 
 La liste et le détail appellent `Action.annotate_actions`. Elle lance `annotate_parent_chain` sur les lignes demandées et charge les matières héritées. `quantity_available` vient de l'annotation du manager. La liste part de `Action.objects`. `quantity_available=true` ne garde que `> 0`, `false` ne garde que `= 0`, et l'absence du paramètre ne filtre pas. Le rechargement de la page ne réapplique pas ce seuil. `annotate_total_emissions` et `annotate_inherited_fields` ne demandent qu'un groupe. Ce ne sont pas le chemin de la liste.
@@ -88,7 +88,7 @@ Pas de nouveau groupe. `PAGE_COLUMN_GROUPS` charge déjà `inherited_fields`.
 
 ## Ajouter un filtre
 
-Modèle : `OriginMaterialFilter`. C'est aujourd'hui le seul filtre de ce parcours. Le paramètre est un code matière.
+Modèles : `OriginMaterialFilter` et `PreviousMaterialFilter`. Les deux passent par `MaterialCodeFilter`. Le paramètre est un code matière.
 
 1. Sous-classer `RecursiveColumnFilter`. Poser `column` (une clé de `start()`) et `group`. À l'import, la classe vérifie que le groupe existe et que `start()` produit cette colonne.
 2. `to_values` traduit le paramètre d'URL vers la valeur stockée. `to_labels` fait l'inverse pour `GET /filters/`. Sans ces deux méthodes, l'URL et le menu parlent la valeur brute.

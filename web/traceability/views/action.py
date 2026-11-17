@@ -106,7 +106,7 @@ class ActionViewset(
         if not page:
             return page
 
-        # origin_material has already reduced this queryset to the matching ids.
+        # A recursive filter has already reduced this queryset to the matching ids.
         return Action.annotate_actions(page)
 
     def get_serializer_context(self):

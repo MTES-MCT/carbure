@@ -258,6 +258,64 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertNotIn("action_status", recursive[0].lower())
         self.assertIn("ei_sum", recursive[1].lower())
 
+    def test_list_filters_by_previous_material(self):
+        methane = MaterialFactory(code="CH4", name="Méthane")
+        middle = ActionFactory.create(
+            holder=self.entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=methane,
+        )
+        leaf = ActionFactory.create(
+            holder=self.entity,
+            industry=Action.H2,
+            parent=middle,
+            material=None,
+        )
+
+        nearest = self.client.get(
+            self.list_url,
+            {**self.base_params, "previous_material": methane.code},
+        )
+        above = self.client.get(
+            self.list_url,
+            {**self.base_params, "previous_material": self.own_action.material.code},
+        )
+        missing = self.client.get(self.list_url, {**self.base_params, "previous_material": "ABSENT"})
+
+        self.assertEqual(nearest.status_code, status.HTTP_200_OK)
+        self.assertEqual([item["id"] for item in nearest.data["results"]], [leaf.id])
+        self.assertEqual(above.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [item["id"] for item in above.data["results"]],
+            [middle.id, self.child_of_own_action.id],
+        )
+        self.assertEqual(missing.status_code, status.HTTP_200_OK)
+        self.assertEqual(missing.data["results"], [])
+
+    def test_filters_lists_previous_material_codes(self):
+        methane = MaterialFactory(code="CH4", name="Méthane")
+        middle = ActionFactory.create(
+            holder=self.entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=methane,
+        )
+        ActionFactory.create(
+            holder=self.entity,
+            industry=Action.H2,
+            parent=middle,
+            material=None,
+        )
+
+        response = self.client.get(
+            reverse("traceability-action-filters"),
+            {**self.base_params, "filter": "previous_material"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, sorted({self.own_action.material.code, methane.code}))
+
     def test_filters_lists_origin_material_codes(self):
         other = MaterialFactory(code="CH4", name="Méthane")
         ActionFactory.create(
