@@ -54,7 +54,8 @@ class H2ActionCreationTest(SimpleTestCase):
     def test_only_the_hrs_holding_the_certificate_can_create_a_transfer(self):
         hrs = Entity(id=1, entity_type=Entity.HRS)
         other_hrs = Entity(id=2, entity_type=Entity.HRS)
-        recipient = Entity(id=3, entity_type=Entity.OPERATOR)
+        recipient = Entity(id=3, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        other_operator = Entity(id=4, entity_type=Entity.OPERATOR, is_tiruert_liable=False)
         certificate = SimpleNamespace(type=Action.VALORIZE, status=ActionStatus.CREATED, holder=hrs)
 
         self.assertTrue(self.handler.can_assign_status(hrs, Action.TRANSFER, ActionStatus.PENDING, recipient, certificate))
@@ -65,3 +66,6 @@ class H2ActionCreationTest(SimpleTestCase):
             self.handler.can_assign_status(recipient, Action.TRANSFER, ActionStatus.PENDING, recipient, certificate)
         )
         self.assertFalse(self.handler.can_assign_status(hrs, Action.TRANSFER, ActionStatus.CREATED, recipient, certificate))
+        self.assertFalse(
+            self.handler.can_assign_status(hrs, Action.TRANSFER, ActionStatus.PENDING, other_operator, certificate)
+        )

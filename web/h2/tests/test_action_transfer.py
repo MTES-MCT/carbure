@@ -16,7 +16,7 @@ class TransferCreateTest(TestCase):
 
     def setUp(self):
         self.hrs = Entity.objects.create(name="Station", entity_type=Entity.HRS)
-        self.recipient = Entity.objects.create(name="Opérateur", entity_type=Entity.OPERATOR)
+        self.recipient = Entity.objects.create(name="Opérateur", entity_type=Entity.OPERATOR, is_tiruert_liable=True)
         setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.hrs, "RW")])
         self.certificate = ActionFactory(
             holder=self.hrs,
@@ -58,6 +58,14 @@ class TransferCreateTest(TestCase):
         self.assertEqual(transfer.working_date, self.certificate.working_date)
         self.assertEqual(transfer.industry, Action.H2)
         self.assertTrue(transfer.pos_id)
+
+    def test_refuses_a_recipient_that_is_not_tiruert_liable(self):
+        other = Entity.objects.create(name="Autre", entity_type=Entity.OPERATOR, is_tiruert_liable=False)
+
+        response = self.post(self.payload(holder=other.id))
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Action.objects.filter(type=Action.TRANSFER).exists())
 
     def test_refuses_a_quantity_that_is_not_strictly_positive(self):
         response = self.post(self.payload(quantity="0"))

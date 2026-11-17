@@ -1,5 +1,5 @@
 import h2.handlers.lookups as lookups
-from h2.handlers.authorization import is_h2_admin, is_hrs_holder, is_hrs_parent_holder
+from h2.handlers.authorization import can_hrs_transfer, is_h2_admin, is_hrs_holder
 from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 from h2.serializers.action import SHIPPING_FUEL_TYPES, H2ActionExcelImportSerializer
 from traceability.handlers.action import ActionIndustryHandler
@@ -26,7 +26,7 @@ class H2ActionHandler(ActionIndustryHandler):
         (Action.INIT, ActionStatus.REJECTED): is_h2_admin,
         (Action.INIT, ActionStatus.BLOCKED): is_h2_admin,
         (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
-        (Action.TRANSFER, ActionStatus.PENDING): is_hrs_parent_holder,
+        (Action.TRANSFER, ActionStatus.PENDING): can_hrs_transfer,
     }
 
     lookups = lookups
