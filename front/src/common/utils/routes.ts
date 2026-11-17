@@ -224,6 +224,7 @@ export const ROUTE_URLS = {
     REGISTER: "/auth/register",
     REGISTER_PENDING: "/auth/register#pending",
     ACTIVATE_REQUEST: "/auth/register#activate-request",
+    JOIN: "/auth/join",
     LOGOUT: "/auth/logout",
     RESET_PASSWORD_REQUEST: "/auth/login#reset-password-request",
     RESET_PASSWORD_PENDING: "/auth/login#reset-password-pending",

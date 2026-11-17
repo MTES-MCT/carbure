@@ -1,3 +1,4 @@
+from io import StringIO
 from unittest.mock import patch
 
 from django.core.management import call_command
@@ -25,10 +26,14 @@ class ReopenBiomethaneDeclarationsTests(TestCase):
         setup_current_user(self, "writer@example.com", "Writer", "pass", [(self.producer, UserRights.RW)])
         setup_current_user(self, "reader@example.com", "Reader", "pass", [(self.producer, UserRights.RO)])
 
+    def _call_command(self, **options):
+        out = StringIO()
+        call_command("reopen_biomethane_declarations", stdout=out, **options)
+        return out.getvalue()
+
     @patch("biomethane.services.annual_declaration.notification.send_mail")
     def test_reopens_declaration_and_emails_admin_and_writer(self, send_mail):
-        call_command(
-            "reopen_biomethane_declarations",
+        self._call_command(
             year=self.year,
             entity_ids=str(self.producer.id),
             dry_run="false",
@@ -51,8 +56,7 @@ class ReopenBiomethaneDeclarationsTests(TestCase):
 
     @patch("biomethane.services.annual_declaration.notification.send_mail")
     def test_skips_entity_without_declaration(self, send_mail):
-        call_command(
-            "reopen_biomethane_declarations",
+        self._call_command(
             year=self.year + 1,
             entity_ids=str(self.producer.id),
             dry_run="false",
@@ -66,8 +70,7 @@ class ReopenBiomethaneDeclarationsTests(TestCase):
     @patch("biomethane.services.annual_declaration.notification.send_mail", side_effect=OSError("smtp down"))
     def test_reopen_rolls_back_when_email_fails(self, send_mail):
         with self.assertRaises(OSError):
-            call_command(
-                "reopen_biomethane_declarations",
+            self._call_command(
                 year=self.year,
                 entity_ids=str(self.producer.id),
                 dry_run="false",

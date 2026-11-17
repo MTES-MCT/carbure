@@ -10,7 +10,6 @@ class CarbureError:
     PASSWORD_RESET_USER_NOT_FOUND = "User not found"
     PASSWORD_RESET_INVALID_FORM = "Password reset invalid form"
     PASSWORD_RESET_MISMATCH = "Passwords do not match"
-    ACTIVATION_LINK_ERROR = "Could not send activation link"
     ACTIVATION_LINK_INVALID_FORM = "Activation link invalid form"
     ACTIVATION_COULD_NOT_ACTIVATE_USER = "Could not activate user account"
     YEAR_LOCKED = "YEAR_LOCKED"

@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.utils.crypto import get_random_string
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, OpenApiTypes, extend_schema
 from rest_framework import serializers, status
 from rest_framework.decorators import action
@@ -82,14 +81,12 @@ class InviteUserActionMixin:
             user = User.objects.get(email=email)
             user_already_exists = True
 
-        except Exception:
-            # Create a new user (non active) with a random password
+        except User.DoesNotExist:
             user = User.objects.create_user(
                 email=email,
-                password=get_random_string(length=20),
+                password=None,
                 is_active=False,
             )
-            user.save()
 
         # Update rights and requests
         check_user_rights = UserRights.objects.filter(user=user, entity=entity).first()

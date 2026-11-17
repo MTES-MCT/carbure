@@ -35,6 +35,17 @@ class UserCreationSerializerTest(TestCase):
         assert "password2" in serializer.errors
         assert serializer.errors["password2"][0] == "The two password fields didn't match."
 
+    def test_invalidates_a_too_common_password(self):
+        data = {
+            "name": "John Smith",
+            "password1": "password",
+            "password2": "password",
+            "email": "newuser@example.com",
+        }
+        serializer = UserCreationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert "password2" in serializer.errors
+
     def test_invalidates_user_when_email_already_exists(self):
         User.objects.create(name="Some user", email="existing@example.com")
         data = {

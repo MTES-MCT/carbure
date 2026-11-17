@@ -8,7 +8,7 @@ import {
   ResetPassword,
 } from "./components/password"
 import { Register, RegisterPending } from "./components/register"
-import { Activate, ActivateRequest } from "./components/activate"
+import { Activate, Join } from "./components/activate"
 import { Logout } from "./components/logout"
 import useTitle from "common/hooks/title"
 
@@ -23,8 +23,8 @@ const Auth = () => {
       <Route path="logout" element={<Logout />} />
       <Route path="register" element={<Register />} />
       <Route path="register-pending" element={<RegisterPending />} />
-      <Route path="activate-request" element={<ActivateRequest />} />
       <Route path="activate" element={<Activate />} />
+      <Route path="join" element={<Join />} />
       <Route path="reset-password-request" element={<ResetPasswordRequest />} />
       <Route path="reset-password-pending" element={<ResetPasswordPending />} />
       <Route path="reset-password" element={<ResetPassword />} />
