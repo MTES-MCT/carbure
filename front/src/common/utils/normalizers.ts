@@ -260,7 +260,9 @@ export function getEntityTypeLabel(type: EntityType) {
     case EntityType.CPO:
       return i18next.t("Aménageur de bornes électriques")
     case EntityType.PowerOrHeatProducer:
-      return i18next.t("Producteur d'électricité ou de chaleur")
+      return i18next.t(
+        "Producteur d'électricité ou de chaleur (biomasse liquide)"
+      )
     case EntityType.SolidBiomassEnergyProducer:
       return i18next.t(
         "Producteur d'électricité ou de chaleur (biomasse solide)"
