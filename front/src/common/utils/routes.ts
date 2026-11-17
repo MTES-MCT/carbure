@@ -197,6 +197,7 @@ export const ROUTE_URLS = {
       OPTIONS: `${baseUrl}/options`,
       INFO: `${baseUrl}/info`,
       CERTIFICATES: `${baseUrl}/certificates`,
+      INSTALLATION: `${baseUrl}/installation`,
       PRODUCTION: `${baseUrl}/production`,
       DEPOT: `${baseUrl}/depot`,
       USERS: `${baseUrl}/users`,

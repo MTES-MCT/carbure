@@ -4,7 +4,7 @@ import DeliverySitesSettings from "./pages/delivery-site"
 import ProductionSitesSettings from "./pages/production-site"
 
 import useEntity from "common/hooks/entity"
-import { ExternalAdminPages, UserRole } from "common/types"
+import { EntityType, ExternalAdminPages, UserRole } from "common/types"
 import { Content, Main } from "common/components/scaffold"
 import { Tabs } from "common/components/tabs2"
 import useTitle from "common/hooks/title"
@@ -16,6 +16,7 @@ import { EntityUserRights } from "./pages/user-rights"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useRoutes } from "common/hooks/routes"
 import { Navigate, Route, Routes } from "react-router-dom"
+import EnergyInstallationPage from "./pages/energy-installation"
 import { BiomethaneSettingsRoutes } from "biomethane/routes"
 
 const Settings = () => {
@@ -33,9 +34,13 @@ const Settings = () => {
     hasAdminRight,
   } = entity
 
+  const isSolidBiomassProducer =
+    entity.entity_type === EntityType.SolidBiomassEnergyProducer
+
   const hasCertificates =
     isIndustry ||
     isPowerOrHeatProducer ||
+    isSolidBiomassProducer ||
     (isBiomethaneProducer && entity.is_red_ii)
 
   const hasDepot =
@@ -98,6 +103,13 @@ const Settings = () => {
             icon: "ri-file-text-line",
             iconActive: "ri-file-text-fill",
           },
+          isSolidBiomassProducer && {
+            path: routes.SETTINGS.INSTALLATION,
+            key: "installation",
+            label: t("Installation"),
+            icon: "ri-file-text-line",
+            iconActive: "ri-file-text-fill",
+          },
           isProducer && {
             path: routes.SETTINGS.PRODUCTION,
             key: "production",
@@ -126,6 +138,9 @@ const Settings = () => {
               path="depot"
               element={<DeliverySitesSettings entity={entity} />}
             />
+          )}
+          {isSolidBiomassProducer && (
+            <Route path="installation" element={<EnergyInstallationPage />} />
           )}
           {isProducer && (
             <Route
