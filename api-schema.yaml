@@ -5772,7 +5772,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -5943,7 +5944,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -6114,7 +6116,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -6294,7 +6297,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -7092,6 +7096,58 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
+  /api/entities/energy-installation/:
+    get:
+      operationId: entities_energy_installation_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - entities
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyInstallation"
+          description: ""
+    put:
+      operationId: entities_energy_installation_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - entities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyInstallation"
+          description: ""
   /api/entities/notifications/:
     get:
       operationId: entities_notifications_list
@@ -9694,7 +9750,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10151,7 +10208,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10406,7 +10464,8 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -19100,6 +19159,94 @@ components:
         empty:
           type: string
           minLength: 1
+    EnergyInstallation:
+      type: object
+      properties:
+        production_type:
+          allOf:
+            - $ref: "#/components/schemas/ProductionTypeEnum"
+          nullable: true
+        heat_type:
+          allOf:
+            - $ref: "#/components/schemas/HeatTypeEnum"
+          nullable: true
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        icpe_number:
+          nullable: true
+          oneOf:
+            - type: string
+              pattern: ^\d{10}$
+              maxLength: 10
+            - type: string
+              maxLength: 0
+        icpe_regime:
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
+    EnergyInstallationRequest:
+      type: object
+      properties:
+        production_type:
+          allOf:
+            - $ref: "#/components/schemas/ProductionTypeEnum"
+          nullable: true
+        heat_type:
+          allOf:
+            - $ref: "#/components/schemas/HeatTypeEnum"
+          nullable: true
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        icpe_number:
+          nullable: true
+          oneOf:
+            - type: string
+              pattern: ^\d{10}$
+              maxLength: 10
+            - type: string
+              maxLength: 0
+        icpe_regime:
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
     EnergyTypesEnum:
       enum:
         - PRODUCED_BIOGAS
@@ -19737,7 +19884,8 @@ components:
 
         * `Unknown` - Unknown
 
-        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        (biomasse liquide)
 
         * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
         chaleur (biomasse solide)
@@ -20294,6 +20442,18 @@ components:
         - distribution_capacity
         - name
         - storage_capacity
+    HeatTypeEnum:
+      enum:
+        - HOT_WATER
+        - STEAM
+        - HOT_WATER_STEAM
+        - INDUSTRIAL_PROCESS
+      type: string
+      description: |-
+        * `HOT_WATER` - Eau chaude
+        * `STEAM` - Vapeur
+        * `HOT_WATER_STEAM` - Eau chaude et vapeur
+        * `INDUSTRIAL_PROCESS` - Process industriel
     HygienizationExemptionTypeEnum:
       enum:
         - TOTAL
@@ -22027,6 +22187,16 @@ components:
       required:
         - certificate_id
         - type
+    ProductionTypeEnum:
+      enum:
+        - ELECTRICITY
+        - HEAT
+        - COGENERATION
+      type: string
+      description: |-
+        * `ELECTRICITY` - Électricité seule
+        * `HEAT` - Chaleur/Froid seul
+        * `COGENERATION` - Cogénération
     ProvisionCertificateBulkRequest:
       type: object
       properties:
@@ -23106,6 +23276,7 @@ components:
         - name
     SiteTypeEnum:
       enum:
+        - ENERGY INSTALLATION
         - OTHER
         - EFS
         - EFPE
@@ -23121,6 +23292,7 @@ components:
         - H2 REFUELING STATION
       type: string
       description: |-
+        * `ENERGY INSTALLATION` - Installation de chaleur et d’électricité
         * `OTHER` - Autre
         * `EFS` - EFS
         * `EFPE` - EFPE

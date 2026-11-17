@@ -2015,6 +2015,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/entities/energy-installation/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["entities_energy_installation_retrieve"];
+        put: operations["entities_energy_installation_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/entities/notifications/": {
         parameters: {
             query?: never;
@@ -5721,6 +5737,40 @@ export interface components {
         EmptyResponseRequest: {
             empty?: string;
         };
+        EnergyInstallation: {
+            production_type?: components["schemas"]["ProductionTypeEnum"] | null;
+            heat_type?: components["schemas"]["HeatTypeEnum"] | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Format: double */
+            useful_temperature?: number | null;
+            /** Format: double */
+            electrical_efficiency?: number | null;
+            /** Format: double */
+            thermal_efficiency?: number | null;
+            icpe_number?: (string) | null;
+            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+        };
+        EnergyInstallationRequest: {
+            production_type?: components["schemas"]["ProductionTypeEnum"] | null;
+            heat_type?: components["schemas"]["HeatTypeEnum"] | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Format: double */
+            useful_temperature?: number | null;
+            /** Format: double */
+            electrical_efficiency?: number | null;
+            /** Format: double */
+            thermal_efficiency?: number | null;
+            icpe_number?: (string) | null;
+            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+        };
         /**
          * @description * `PRODUCED_BIOGAS` - Biogaz produit par l'installation
          *     * `PRODUCED_BIOMETHANE` - Biométhane produit par l'installation
@@ -6178,6 +6228,14 @@ export interface components {
             /** Pays */
             country?: number | null;
         };
+        /**
+         * @description * `HOT_WATER` - Eau chaude
+         *     * `STEAM` - Vapeur
+         *     * `HOT_WATER_STEAM` - Eau chaude et vapeur
+         *     * `INDUSTRIAL_PROCESS` - Process industriel
+         * @enum {string}
+         */
+        HeatTypeEnum: HeatTypeEnum;
         /**
          * @description * `TOTAL` - Totale
          *     * `PARTIAL` - Partielle
@@ -7033,6 +7091,13 @@ export interface components {
             readonly type: string;
             readonly certificate_id: string;
         };
+        /**
+         * @description * `ELECTRICITY` - Électricité seule
+         *     * `HEAT` - Chaleur/Froid seul
+         *     * `COGENERATION` - Cogénération
+         * @enum {string}
+         */
+        ProductionTypeEnum: ProductionTypeEnum;
         ProvisionCertificateBulkRequest: {
             entity: string;
             siren: string;
@@ -7434,7 +7499,8 @@ export interface components {
             name: string;
         };
         /**
-         * @description * `OTHER` - Autre
+         * @description * `ENERGY INSTALLATION` - Installation de chaleur et d’électricité
+         *     * `OTHER` - Autre
          *     * `EFS` - EFS
          *     * `EFPE` - EFPE
          *     * `OIL DEPOT` - OIL DEPOT
@@ -12304,6 +12370,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    entities_energy_installation_retrieve: {
+        parameters: {
+            query: {
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyInstallation"];
+                };
+            };
+        };
+    };
+    entities_energy_installation_update: {
+        parameters: {
+            query: {
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EnergyInstallationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EnergyInstallationRequest"];
+                "multipart/form-data": components["schemas"]["EnergyInstallationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyInstallation"];
                 };
             };
         };
@@ -17301,6 +17415,12 @@ export enum GesOptionEnum {
     Actual = "Actual",
     NUTS2 = "NUTS2"
 }
+export enum HeatTypeEnum {
+    HOT_WATER = "HOT_WATER",
+    STEAM = "STEAM",
+    HOT_WATER_STEAM = "HOT_WATER_STEAM",
+    INDUSTRIAL_PROCESS = "INDUSTRIAL_PROCESS"
+}
 export enum HygienizationExemptionTypeEnum {
     TOTAL = "TOTAL",
     PARTIAL = "PARTIAL"
@@ -17386,6 +17506,11 @@ export enum ProcessTypeEnum {
     LIQUID_PROCESS = "LIQUID_PROCESS",
     DRY_PROCESS = "DRY_PROCESS"
 }
+export enum ProductionTypeEnum {
+    ELECTRICITY = "ELECTRICITY",
+    HEAT = "HEAT",
+    COGENERATION = "COGENERATION"
+}
 export enum RoleEnum {
     ReadOnly = "RO",
     ReadWrite = "RW",
@@ -17393,6 +17518,7 @@ export enum RoleEnum {
     Auditor = "AUDITOR"
 }
 export enum SiteTypeEnum {
+    ENERGY_INSTALLATION = "ENERGY INSTALLATION",
     OTHER = "OTHER",
     EFS = "EFS",
     EFPE = "EFPE",
