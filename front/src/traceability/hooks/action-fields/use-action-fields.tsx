@@ -3,18 +3,11 @@ import { useTranslation } from "react-i18next"
 import { findEnabledEntities, findSites } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { FormManager } from "common/components/form2"
-import {
-  DateInput,
-  DecimalInput,
-  DecimalInputProps,
-  NumberInput,
-  TextInput,
-} from "common/components/inputs2"
+import { DateInput, NumberInput, TextInput } from "common/components/inputs2"
 import { Select } from "common/components/selects2"
 import { EntityManager } from "common/hooks/entity"
 import { EntityPreview } from "common/types"
 import { normalizeEntityPreview } from "common/utils/normalizers"
-import { getStepFromFractionDigits } from "common/utils/formatters"
 import { SiteTypeEnum } from "api-schema"
 import {
   Action,
@@ -24,18 +17,13 @@ import {
   InheritedFieldKey,
 } from "traceability/types"
 import { normalizeActionSite } from "traceability/normalizers"
+import { ActionDecimalInput } from "traceability/components/action-decimal-input"
 import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
 import { materialField } from "./material-field"
 import {
   ACTION_EMISSIONS_UNIT,
   formatUnitActionDecimal,
 } from "traceability/utils/formatters"
-
-const ACTION_DECIMAL_STEP = getStepFromFractionDigits(3)
-
-const ActionDecimalInput = (props: DecimalInputProps) => (
-  <DecimalInput step={ACTION_DECIMAL_STEP} {...props} />
-)
 
 export type ActionFieldConfig = {
   form: FormManager<Partial<Action>>
@@ -102,7 +90,6 @@ export function useActionFields() {
         const unit =
           form.value.material?.unit ??
           form.value.inherited_fields?.previous_material?.unit
-
         return (
           <ActionDecimalInput
             readOnlyValue={
