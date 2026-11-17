@@ -22,8 +22,10 @@ class Site(models.Model):
     EFCA = "EFCA"
     AIRPORT = "AIRPORT"
     H2_REFUELING_STATION = "H2 REFUELING STATION"
+    ENERGY_INSTALLATION = "ENERGY INSTALLATION"
 
     SITE_TYPE = (
+        (ENERGY_INSTALLATION, "Installation de chaleur et d’électricité"),
         (OTHER, "Autre"),
         (EFS, "EFS"),
         (EFPE, "EFPE"),
