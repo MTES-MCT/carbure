@@ -136,7 +136,7 @@ Would send UDB request with body being:
         self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
         entities_not_in_udb = find_entities_not_in_udb(entities)
 
-        self.stdout.write(f"Creating {entity_names(entities)} in UDB…")
+        self.stdout.write(f"Creating {entity_names(entities_not_in_udb)} in UDB…")
         export_entities(entities_not_in_udb)
 
         self.stdout.write(f"Exporting {certificate_ids(entity_certificates)}…")
