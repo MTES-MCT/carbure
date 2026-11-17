@@ -79,6 +79,23 @@ export function useActionColumns() {
       },
     },
 
+    quantity_available: {
+      header: t("Quantité restante"),
+      cell: (action) => {
+        const text = formatActionDecimal(action.quantity_available)
+        const unit =
+          action.material?.unit ??
+          action.inherited_fields?.previous_material?.unit
+
+        return (
+          <Cell
+            text={text || "-"}
+            sub={text && unit ? formatUnitOnly(unit) : undefined}
+          />
+        )
+      },
+    },
+
     site: {
       key: "site",
       header: t("Site"),
