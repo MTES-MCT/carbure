@@ -12,6 +12,7 @@ from entity.views import (
     add_company_view,
     search_company_view,
 )
+from entity.views.energy_installation import EnergyInstallationView
 
 router = SimpleRouter()
 router.register("users", UserViewSet, basename="api-entity-users")
@@ -23,6 +24,7 @@ router.register("production-sites", ProductionSiteViewSet, basename="api-entity-
 router.register(r"", EntityViewSet, basename="entity")
 
 urlpatterns = [
+    path("energy-installation/", EnergyInstallationView.as_view(), name="energy-installation"),
     path(
         "search-company/",
         search_company_view,
