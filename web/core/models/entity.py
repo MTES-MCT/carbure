@@ -28,6 +28,7 @@ class Entity(models.Model):
     UNKNOWN = "Unknown"
     CPO = "Charge Point Operator"
     POWER_OR_HEAT_PRODUCER = "Power or Heat Producer"
+    SOLID_BIOMASS_ENERGY_PRODUCER = "Solid Biomass Energy Producer"
     SAF_TRADER = "SAF Trader"
     BIOMETHANE_PRODUCER = "Producteur de biométhane"
     BIOMETHANE_PROVIDER = "Fournisseur de biométhane"
@@ -43,6 +44,7 @@ class Entity(models.Model):
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
         (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
+        (SOLID_BIOMASS_ENERGY_PRODUCER, "Producteur d'électricité ou de chaleur (biomasse solide)"),
         (SAF_TRADER, "Trader de SAF"),
         (BIOMETHANE_PRODUCER, "Producteur de biométhane"),
         (BIOMETHANE_PROVIDER, "Fournisseur de biométhane"),
