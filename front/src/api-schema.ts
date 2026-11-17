@@ -5949,7 +5949,7 @@ export interface components {
          *     * `Charge Point Operator` - Charge Point Operator
          *     * `Compagnie aérienne` - Compagnie aérienne
          *     * `Unknown` - Unknown
-         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
          *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
          *     * `SAF Trader` - Trader de SAF
          *     * `Producteur de biométhane` - Producteur de biométhane
@@ -11507,7 +11507,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -11584,7 +11584,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -11663,7 +11663,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -11738,7 +11738,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -14033,7 +14033,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -14297,7 +14297,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -14390,7 +14390,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane

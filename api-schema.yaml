@@ -5772,7 +5772,7 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -5943,7 +5943,7 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -6114,7 +6114,7 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -6294,7 +6294,7 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -9694,7 +9694,7 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10151,7 +10151,7 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10406,7 +10406,7 @@ paths:
 
             * `Unknown` - Unknown
 
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -19737,7 +19737,7 @@ components:
 
         * `Unknown` - Unknown
 
-        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
 
         * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
         chaleur (biomasse solide)
