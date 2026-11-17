@@ -6,7 +6,9 @@ def is_hrs_holder(actor: Entity, holder: Entity, parent_holder: Entity | None) -
 
 
 def can_hrs_transfer(actor: Entity, holder: Entity, parent_holder: Entity | None) -> bool:
-    return actor.entity_type == Entity.HRS and parent_holder == actor and holder.is_tiruert_liable
+    return (
+        actor.entity_type == Entity.HRS and parent_holder == actor and holder != parent_holder and holder.is_tiruert_liable
+    )
 
 
 def is_h2_admin(actor: Entity, holder: Entity, parent_holder: Entity | None) -> bool:
