@@ -11,16 +11,25 @@ function withoutUndefined<T extends Partial<ActionQuery>>(query: T): T {
   return defined
 }
 
-export function combineQueries<
-  Base extends Partial<ActionQuery>,
-  Override extends Partial<ActionQuery>,
->(base: Base, override: Override) {
-  return { ...withoutUndefined(base), ...withoutUndefined(override) }
-}
+// Later queries override earlier ones. A lone query is kept as given.
+type MergedQueries<T extends readonly Partial<ActionQuery>[]> =
+  T extends readonly [infer Head, ...infer Tail]
+    ? Tail extends readonly [Partial<ActionQuery>, ...Partial<ActionQuery>[]]
+      ? Omit<Head, keyof MergedQueries<Tail>> & MergedQueries<Tail>
+      : Head
+    : Partial<ActionQuery>
 
-export function useCombinedQuery<
-  Base extends Partial<ActionQuery>,
-  Override extends Partial<ActionQuery>,
->(base: Base, override: Override) {
-  return useMemo(() => combineQueries(base, override), [base, override])
+export function useCombinedQuery<T extends Partial<ActionQuery>[]>(
+  ...queries: T
+): MergedQueries<T> {
+  return useMemo(
+    () =>
+      queries.reduce<Partial<ActionQuery>>(
+        (combined, query) => ({ ...combined, ...withoutUndefined(query) }),
+        {}
+      ),
+    // The rest array is new every render; React compares each query object.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    queries
+  ) as MergedQueries<T>
 }
