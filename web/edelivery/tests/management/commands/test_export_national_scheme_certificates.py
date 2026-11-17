@@ -30,12 +30,15 @@ class CarbureEntitiesTest(TestCase):
         )
 
     def test_fetches_concerned_carbure_entities_through_all_valid_national_scheme_certificates(self):
-        query_result = ["entity1", "entity2"]
+        query_result = [
+            MagicMock(name="Entity 1", **{"ntr_id.return_value": "NTR_ID_1"}),
+            MagicMock(name="Entity 2", **{"ntr_id.return_value": "NTR_ID_2"}),
+        ]
         patched_all_currently_certified = self.patched_Entity.all_currently_certified_under_national_scheme
         patched_all_currently_certified.return_value = query_result
         patched_all_currently_certified.assert_not_called()
 
-        entities = carbure_entities(fetch_all=True)
+        (entities, _) = carbure_entities(fetch_all=True)
         patched_all_currently_certified.assert_called()
         self.assertEqual(query_result, entities)
 
@@ -51,13 +54,24 @@ class CarbureEntitiesTest(TestCase):
             context.exception.args[0],
         )
 
+    def test_adds_error_messages_if_fetched_entities_in_error(self):
+        self.patched_Entity.all_currently_certified_under_national_scheme.return_value = [
+            MagicMock(**{"ntr_id.side_effect": RuntimeError("Oops")}),
+            MagicMock(**{"ntr_id.side_effect": RuntimeError("Boom")}),
+        ]
+
+        with self.assertRaises(RuntimeError) as context:
+            carbure_entities(fetch_all=True)
+
+        self.assertEqual("No valid entity found: Oops; Boom", context.exception.args[0])
+
     def test_can_fetch_one_specific_carbure_entity_instead(self):
-        query_result = ["Some entity"]
+        query_result = [MagicMock(**{"ntr_id.return_value": "NTR_ID_1"})]
         patched_filter = self.patched_Entity.objects.filter
         patched_filter.return_value = query_result
         patched_filter.assert_not_called()
 
-        entity = carbure_entities(entity_name="SOME ENTITY")
+        (entity, _) = carbure_entities(entity_name="SOME ENTITY")
         patched_filter.assert_called_with(name="SOME ENTITY")
         self.assertEqual(query_result, entity)
 
@@ -65,10 +79,34 @@ class CarbureEntitiesTest(TestCase):
         patched_filter = self.patched_Entity.objects.filter
         patched_filter.return_value = []
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(RuntimeError) as context:
             carbure_entities(entity_name="SOME ENTITY")
 
-        self.assertEqual("Value error: Entity 'SOME ENTITY' not found in CarbuRe", context.exception.args[0])
+        self.assertEqual("No entity to process: Entity 'SOME ENTITY' not found in CarbuRe", context.exception.args[0])
+
+    def test_raises_an_error_when_error_encountered_on_single_fetched_entity(self):
+        self.patched_Entity.objects.filter.return_value = [MagicMock(**{"ntr_id.side_effect": RuntimeError("Oops")})]
+
+        with self.assertRaises(RuntimeError) as context:
+            carbure_entities(entity_name="SOME ENTITY")
+
+        self.assertEqual("No entity to process: Oops", context.exception.args[0])
+
+    def test_returns_empty_error_log_if_no_error_encountered(self):
+        self.patched_Entity.objects.filter.return_value = [MagicMock(**{"ntr_id.return_value": "NTR_ID_1"})]
+
+        (_, errors) = carbure_entities(entity_name="SOME ENTITY")
+        self.assertEqual([], errors)
+
+    def test_handles_error_encountered(self):
+        self.patched_Entity.all_currently_certified_under_national_scheme.return_value = [
+            MagicMock(name="Entity 1", **{"ntr_id.side_effect": RuntimeError("Oops")}),
+            MagicMock(name="Entity 2", **{"ntr_id.return_value": "NTR_ID_2"}),
+        ]
+
+        (result, errors) = carbure_entities(fetch_all=True)
+        self.assertEqual(["NTR_ID_2"], [e.ntr_id() for e in result])
+        self.assertEqual(["Oops"], errors)
 
 
 class CertificateIdsTest(TestCase):
@@ -122,7 +160,7 @@ class EntitiesNotInUDBTest(TestCase):
         self.patched_GetOrganisationByIDRequest.assert_not_called()
         self.patched_Requester.assert_not_called()
 
-        (result, _) = find_entities_not_in_udb(entities)
+        result = find_entities_not_in_udb(entities)
         self.patched_GetOrganisationByIDRequest.assert_called_with("NTR_ID_1", "NTR_ID_2", "NTR_ID_3")
         call_args = self.patched_Requester.call_args
         self.assertEqual((request,), call_args.args)
@@ -132,24 +170,8 @@ class EntitiesNotInUDBTest(TestCase):
         entities = [MagicMock(**{"ntr_id.return_value": "NTR_ID_1"})]
         self.patched_Requester.return_value.do_request.return_value = {}
 
-        (result, _) = find_entities_not_in_udb(entities)
+        result = find_entities_not_in_udb(entities)
         self.assertEqual(["NTR_ID_1"], [e.ntr_id() for e in result])
-
-    def test_returns_no_error_when_none_occured(self):
-        entities = [MagicMock(**{"ntr_id.return_value": "NTR_ID_1"})]
-        (_, errors) = find_entities_not_in_udb(entities)
-        self.assertEqual([], errors)
-
-    def test_handles_errors_on_ntr_id(self):
-        entities = [
-            MagicMock(**{"ntr_id.side_effect": RuntimeError("Oops")}),
-            MagicMock(**{"ntr_id.return_value": "NTR_ID_1"}),
-        ]
-        self.patched_Requester.return_value.do_request.return_value = {}
-
-        (result, errors) = find_entities_not_in_udb(entities)
-        self.assertEqual(["NTR_ID_1"], [e.ntr_id() for e in result])
-        self.assertEqual(["Oops"], errors)
 
 
 class ExportCertificates(TestCase):

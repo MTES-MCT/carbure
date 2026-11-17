@@ -11,19 +11,36 @@ from edelivery.soap.requester import Requester
 
 
 def carbure_entities(fetch_all=False, entity_name=None):
+    def check_validity(acc, entity):
+        try:
+            entity.ntr_id()
+            acc[0].append(entity)
+        except Exception as e:
+            acc[1].append(e.args[0])
+
+        return acc
+
     if fetch_all:
-        entities = Entity.all_currently_certified_under_national_scheme()
+        fetched_entities = Entity.all_currently_certified_under_national_scheme()
+        (entities, errors) = reduce(check_validity, fetched_entities, ([], []))
         if not entities:
-            raise RuntimeError("No entity found with currently valid national scheme certificate")
-        return entities
+            error_message = (
+                f"No valid entity found: {'; '.join(errors)}"
+                if errors
+                else "No entity found with currently valid national scheme certificate"
+            )
+            raise RuntimeError(error_message)
+        return (entities, errors)
 
     if not entity_name:
         raise ValueError("Missing parameter: if --all option not set, an entity name should be provided")
 
-    entities = Entity.objects.filter(name=entity_name)
+    fetched_entities = Entity.objects.filter(name=entity_name)
+    (entities, errors) = reduce(check_validity, fetched_entities, ([], []))
     if not entities:
-        raise ValueError(f"Value error: Entity '{entity_name}' not found in CarbuRe")
-    return entities
+        errors = errors or [f"Entity '{entity_name}' not found in CarbuRe"]
+        raise RuntimeError(f"No entity to process: {'; '.join(errors)}")
+    return (entities, [])
 
 
 def certificate_ids(entity_certificates):
@@ -64,23 +81,13 @@ def export_entities(entities):
 
 
 def find_entities_not_in_udb(entities):
-    def fetch_ntr_id(acc, e):
-        try:
-            ntr_id = e.ntr_id()
-            acc[0].append(ntr_id)
-            acc[1].append(e)
-        except Exception as e:
-            acc[2].append(e.args[0])
-
-        return acc
-
-    ntr_ids, valid_entities, errors = reduce(fetch_ntr_id, entities, ([], [], []))
+    ntr_ids = [e.ntr_id() for e in entities]
     request = GetOrganisationByIDRequest(*ntr_ids)
     requester = Requester(request, timeout=70)
     result = requester.do_request()
 
     found_organisations = result.get("found_organisations", [])
-    return ([e for e in valid_entities if e.ntr_id() not in found_organisations], errors)
+    return [e for e in entities if e.ntr_id() not in found_organisations]
 
 
 class Command(BaseCommand):
@@ -110,7 +117,7 @@ class Command(BaseCommand):
         fetch_all = options["all"]
         entity_name = options["entity_name"]
 
-        entities = carbure_entities(fetch_all=fetch_all, entity_name=entity_name)
+        (entities, errors) = carbure_entities(fetch_all=fetch_all, entity_name=entity_name)
         entity_certificates = EntityCertificate.all_for_entities_with_valid_national_scheme_certificate(entities)
         request = AddUpdateCertificateRequest(*entity_certificates)
 
@@ -127,7 +134,7 @@ Would send UDB request with body being:
             exit(0)
 
         self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
-        (entities_not_in_udb, errors) = find_entities_not_in_udb(entities)
+        entities_not_in_udb = find_entities_not_in_udb(entities)
 
         self.stdout.write(f"Creating {entity_names(entities)} in UDB…")
         export_entities(entities_not_in_udb)
