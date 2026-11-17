@@ -67,6 +67,7 @@ export const TransferCertificateDialog = ({
           {...quantity}
           required
           min={0.001}
+          max={action.quantity_available}
           label={t("Quantité d'énergie")}
           hintText={
             dialog.unit
