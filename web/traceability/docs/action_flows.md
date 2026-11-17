@@ -26,16 +26,10 @@ La création est refusée si aucun lien ne correspond exactement au parent, au t
 action_status_authorizations = {
     (Action.CONSUME, ActionStatus.PENDING): is_hrs_holder,
     (Action.CONSUME, ActionStatus.ACCEPTED): is_h2_admin,
-    (Action.CONSUME, ActionStatus.REJECTED): is_h2_admin,
-    (Action.CONSUME, ActionStatus.BLOCKED): is_h2_admin,
-    (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
-    (Action.TRANSFER, ActionStatus.PENDING): is_hrs_parent_holder,
 }
 ```
 
-Ici, une station HRS peut créer sa propre action `CONSUME` en `PENDING`. Les statuts `ACCEPTED`, `REJECTED` et `BLOCKED` sont réservés à l'administration H2. La création d'une `VALORIZE` en `CREATED` lui est aussi réservée. Une `TRANSFER` en `PENDING` est créée par la station HRS qui détient le parent : [`is_hrs_parent_holder`](../../h2/handlers/authorization.py) compare l'acteur au détenteur du parent, pas au destinataire.
-
-Chaque clé est un tuple contenant le type d'action et le statut à attribuer.
+Chaque clé est un couple `(type, statut)`. La fonction dit qui peut l'attribuer. La liste complète est celle du handler de la filière.
 
 La fonction reçoit trois entités : l'entité qui agit, le détenteur de l'action et le détenteur du parent (`None` sans parent). Par exemple, [`is_hrs_holder`](../../h2/handlers/authorization.py) vérifie que l'entité est une station HRS et agit pour elle-même :
 
