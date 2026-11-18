@@ -4,7 +4,7 @@
 	makemigrations migrate seed ipython \
 	lint-fix translate translate-missing \
 	check-diff check-types generate-and-check-types \
-	flush
+	flush reset-db
 
 -include .env
 export
@@ -54,7 +54,10 @@ migrate:
 	$(django_cmd) migrate
 
 seed:
-	$(django_cmd) create_sample_data $(app)
+	$(django_cmd) create_sample_data $(app) $(if $(reset),--reset)
+
+reset-db:
+	$(django_cmd) create_sample_data --reset
 
 ipython:
 	$(django_cmd) shell --interface ipython
