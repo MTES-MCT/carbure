@@ -7096,58 +7096,6 @@ paths:
                     message: ""
                   summary: Bad request
           description: Bad request.
-  /api/entities/energy-installation/:
-    get:
-      operationId: entities_energy_installation_retrieve
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          required: true
-      tags:
-        - entities
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EnergyInstallation"
-          description: ""
-    put:
-      operationId: entities_energy_installation_update
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          required: true
-      tags:
-        - entities
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/EnergyInstallationRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/EnergyInstallationRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/EnergyInstallationRequest"
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EnergyInstallation"
-          description: ""
   /api/entities/notifications/:
     get:
       operationId: entities_notifications_list
@@ -10733,6 +10681,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/solid-biomass/energy-installation/:
+    get:
+      operationId: solid_biomass_energy_installation_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - solid-biomass
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyInstallation"
+          description: ""
+    put:
+      operationId: solid_biomass_energy_installation_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - solid-biomass
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyInstallation"
           description: ""
   /api/tiruert/declaration-period/:
     get:

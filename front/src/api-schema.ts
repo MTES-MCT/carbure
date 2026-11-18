@@ -2015,22 +2015,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/entities/energy-installation/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["entities_energy_installation_retrieve"];
-        put: operations["entities_energy_installation_update"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/entities/notifications/": {
         parameters: {
             query?: never;
@@ -2888,6 +2872,22 @@ export interface paths {
         };
         get: operations["saf_years_retrieve"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/solid-biomass/energy-installation/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["solid_biomass_energy_installation_retrieve"];
+        put: operations["solid_biomass_energy_installation_update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -12374,54 +12374,6 @@ export interface operations {
             };
         };
     };
-    entities_energy_installation_retrieve: {
-        parameters: {
-            query: {
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EnergyInstallation"];
-                };
-            };
-        };
-    };
-    entities_energy_installation_update: {
-        parameters: {
-            query: {
-                entity_id: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["EnergyInstallationRequest"];
-                "application/x-www-form-urlencoded": components["schemas"]["EnergyInstallationRequest"];
-                "multipart/form-data": components["schemas"]["EnergyInstallationRequest"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EnergyInstallation"];
-                };
-            };
-        };
-    };
     entities_notifications_list: {
         parameters: {
             query: {
@@ -14611,6 +14563,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    solid_biomass_energy_installation_retrieve: {
+        parameters: {
+            query: {
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyInstallation"];
+                };
+            };
+        };
+    };
+    solid_biomass_energy_installation_update: {
+        parameters: {
+            query: {
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EnergyInstallationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EnergyInstallationRequest"];
+                "multipart/form-data": components["schemas"]["EnergyInstallationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyInstallation"];
                 };
             };
         };
