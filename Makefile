@@ -2,7 +2,7 @@
 	up down restart logs-django_cmd open restart-backend restart-frontend \
 	test-backend test-frontend \
 	makemigrations migrate seed ipython \
-	lint-fix translate translate-missing \
+	lint lint-fix translate translate-missing \
 	check-diff check-types generate-and-check-types \
 	flush reset-db
 
@@ -62,13 +62,16 @@ reset-db:
 ipython:
 	$(django_cmd) shell --interface ipython
 
-# Frontend
+# Lint
 lint:
+	uv run ruff check .
 	$(npm_cmd) run lint
 
 lint-fix:
+	uv run ruff check --fix .
 	$(npm_cmd) run lint:fix
 
+# Frontend
 translate:
 	$(npm_cmd) run translate
 
