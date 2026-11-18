@@ -28,12 +28,12 @@ describe("useCombinedQuery", () => {
     const { result } = renderHook(() =>
       useCombinedQuery(
         { type: [ActionType.VALORIZE], status: [ActionStatus.CREATED] },
-        { type: [ActionType.TRANSFER] }
+        { type: [ActionType.INIT] }
       )
     )
 
     expect(result.current).toEqual({
-      type: [ActionType.TRANSFER],
+      type: [ActionType.INIT],
       status: [ActionStatus.CREATED],
     })
   })
@@ -58,12 +58,12 @@ describe("useCombinedQuery", () => {
       useCombinedQuery(
         { type: [ActionType.INIT], status: [ActionStatus.CREATED] },
         { type: [ActionType.VALORIZE], origin_material: ["renewable"] },
-        { type: [ActionType.TRANSFER], status: undefined, site: ["station"] }
+        { type: [ActionType.INIT], status: undefined, site: ["station"] }
       )
     )
 
     expect(result.current).toEqual({
-      type: [ActionType.TRANSFER],
+      type: [ActionType.INIT],
       status: [ActionStatus.CREATED],
       origin_material: ["renewable"],
       site: ["station"],
