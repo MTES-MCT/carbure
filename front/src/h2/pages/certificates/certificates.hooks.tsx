@@ -1,7 +1,5 @@
 import { useTranslation } from "react-i18next"
 
-import { useActionColumns } from "traceability/hooks/action-columns"
-import { useActionFilters } from "traceability/hooks/use-action-filters"
 import { useActionFields } from "traceability/hooks/action-fields"
 import {
   ActionIndustry,
@@ -16,6 +14,8 @@ import { Button } from "common/components/button2"
 import { compact } from "common/utils/collection"
 import { useH2Permissions } from "h2/hooks/use-h2-permissions"
 import { usePortal } from "common/components/portal"
+import { useH2ActionColumns } from "h2/hooks/use-h2-action-columns"
+import { useH2ActionFilters } from "h2/hooks/use-h2-action-filters"
 
 const H2_CERTIFICATE_QUERY: Partial<ActionQuery> = {
   type: [ActionType.VALORIZE],
@@ -41,11 +41,18 @@ export function useH2CertificatesPage(): {
 } {
   const { t } = useTranslation()
 
-  const filters = useActionFilters()
-  const columns = useActionColumns()
+  const filters = useH2ActionFilters()
+  const columns = useH2ActionColumns()
   const fields = useActionFields()
   const { canValidateCertificates } = useH2Permissions()
   const portal = usePortal()
+  const sharedColumns = [
+    { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
+    columns.previous_material,
+    columns.period,
+    columns.total_emissions,
+  ]
+  const sharedFilters = [filters.period, filters.previous_material]
 
   return {
     page: {
@@ -62,33 +69,58 @@ export function useH2CertificatesPage(): {
             status: [ActionStatus.CREATED],
             quantity_available: true,
           },
+          columns: compact([
+            ...sharedColumns,
+            columns.quantity_available,
+            canValidateCertificates && {
+              header: t("Actions"),
+              cell: (action) => (
+                <Button
+                  captive
+                  title={t("Céder")}
+                  priority="secondary"
+                  iconId="ri-send-plane-line"
+                  size="small"
+                  onClick={() =>
+                    portal((close) => (
+                      <TransferCertificateDialog
+                        onClose={close}
+                        action={action}
+                      />
+                    ))
+                  }
+                />
+              ),
+            },
+          ]),
+        },
+        {
+          key: "transferred",
+          label: t("En attente"),
+          query: {
+            type: [ActionType.TRANSFER],
+            status: [ActionStatus.PENDING],
+          },
+          columns: [
+            ...sharedColumns,
+            columns.quantity,
+            {
+              ...columns.holder,
+              header: t("Redevable"),
+            },
+          ],
+          filters: [
+            {
+              ...filters.holder,
+              label: t("Redevable"),
+            },
+            ...sharedFilters,
+          ],
         },
       ],
       emptyState: <EmptyCertificates />,
-      filters: [filters.period, filters.origin_material],
-      columns: compact([
-        { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
-        columns.period,
-        columns.quantity_available,
-        columns.total_emissions,
-        canValidateCertificates && {
-          header: t("Actions"),
-          cell: (action) => (
-            <Button
-              captive
-              title={t("Céder")}
-              priority="secondary"
-              iconId="ri-send-plane-line"
-              size="small"
-              onClick={() =>
-                portal((close) => (
-                  <TransferCertificateDialog onClose={close} action={action} />
-                ))
-              }
-            />
-          ),
-        },
-      ]),
+      filters: sharedFilters,
+      columns: sharedColumns,
       fieldsets: [
         {
           legend: t("Certificat"),

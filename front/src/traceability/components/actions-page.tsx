@@ -95,11 +95,11 @@ export const ActionsPage = ({
   const actionTabs = useActionTabs(tabs)
   const fixedQuery = useStableQuery(_fixedQuery)
 
-  const visibleColumns = columns.filter(
+  const visibleColumns = (actionTabs.activeTab?.columns ?? columns).filter(
     (column) => column.condition?.(entity) ?? true
   )
 
-  const visibleFilters = filters.filter(
+  const visibleFilters = (actionTabs.activeTab?.filters ?? filters).filter(
     (filter) => filter.condition?.(entity) ?? true
   )
 

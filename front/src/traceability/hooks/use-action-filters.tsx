@@ -31,6 +31,11 @@ export function useActionFilters() {
       label: t("Matière d'origine"),
     },
 
+    previous_material: {
+      key: ActionFilter.previous_material,
+      label: t("Matière précédente"),
+    },
+
     order_by: {
       key: ActionFilter.order_by,
       label: t("Tri"),

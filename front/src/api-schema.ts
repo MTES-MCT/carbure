@@ -16344,6 +16344,7 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                previous_material?: string[];
                 quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
@@ -16601,6 +16602,7 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
+                previous_material?: string[];
                 quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
@@ -16758,6 +16760,7 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
+                previous_material?: string[];
                 quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
@@ -17360,6 +17363,7 @@ export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     order_by = "order_by",
     origin_material = "origin_material",
     period = "period",
+    previous_material = "previous_material",
     shipping_method = "shipping_method",
     site = "site",
     status = "status",

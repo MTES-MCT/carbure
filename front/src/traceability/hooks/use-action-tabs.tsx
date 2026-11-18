@@ -1,12 +1,16 @@
 import { Navigate, useLocation, useParams } from "react-router"
 
 import { ActionQuery } from "traceability/types"
+import { ActionColumn } from "traceability/hooks/action-columns"
+import { ActionFilterDisplay } from "traceability/hooks/use-action-filters"
 import { useStableQuery } from "traceability/hooks/use-stable-query"
 
 export type ActionTab = {
   key: string
   label: string
   query?: Partial<ActionQuery>
+  columns?: ActionColumn[]
+  filters?: ActionFilterDisplay[]
 }
 
 const EMPTY_QUERY: Partial<ActionQuery> = {}
