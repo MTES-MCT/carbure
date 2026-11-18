@@ -2,7 +2,9 @@
 
 Comment une filière **étend** le template et l’import, sans recopier le noyau.
 
-Flux : `excel_columns` (template) → parse (`header` → `key`) → serializer du handler → `create`.  
+Flux : `excel_columns` (template) → parse (`header` → `key`) → serializer du handler → `create`.
+
+Les postes GES (`eec`, `el`, `ei`, `ep`, `etd`, `eu`, `eccs`, `esca`, `eccr`, et pour H2 `etd1` / `etd2`) sont des `Decimal(13, 9)` : jusqu'à 9 décimales sont conservées, une 10e est refusée. H2 additionne `etd1` et `etd2` tels quels. `quantity` passe par `TruncatingDecimalField` : les chiffres au-delà de 3 décimales sont coupés, et une valeur qui tombe à `0` est une erreur de cellule.
 Les clés qui ne sont pas des champs du modèle `Action` sont **écartées** au `create` générique.
 
 `pos_id` est obligatoire dans le fichier : une cellule vide est une erreur de ligne. Le champ reste optionnel sur le modèle. `carbure_id` n’est pas une colonne : c’est `C`, l’année de `created_at`, la filière, puis la clé primaire en base 36 sur 8 caractères, calculé à la lecture. Une action 10 créée en 2026 en H2 donne `C2026-H2-0000000A`.

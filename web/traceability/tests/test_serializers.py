@@ -1,10 +1,11 @@
+from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import Mock
 
 from django.test import SimpleTestCase
 from rest_framework import serializers
 
-from traceability.serializers.fields import LookupSlugRelatedField
+from traceability.serializers.fields import LookupSlugRelatedField, TruncatingDecimalField
 from traceability.serializers.lookups import CertificateLookupField, MaterialLookupField, SiteLookupField
 
 
@@ -60,3 +61,16 @@ class LookupSlugRelatedFieldTest(SimpleTestCase):
         self.assertEqual(second.to_internal_value("Hydrogène gazeux"), material)
         first.get_queryset.assert_called_once()
         second.get_queryset.assert_not_called()
+
+
+class TruncatingDecimalFieldTest(SimpleTestCase):
+    def setUp(self):
+        self.field = TruncatingDecimalField(max_digits=7, decimal_places=3, min_value=Decimal("0"))
+
+    def test_drops_digits_past_three_decimals(self):
+        self.assertEqual(self.field.run_validation("1.2349"), Decimal("1.234"))
+        self.assertEqual(self.field.run_validation("1.234"), Decimal("1.234"))
+
+    def test_rejects_a_value_that_still_exceeds_the_digit_limit(self):
+        with self.assertRaises(serializers.ValidationError):
+            self.field.run_validation("10000.1234")
