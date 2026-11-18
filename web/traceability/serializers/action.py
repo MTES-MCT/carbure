@@ -42,18 +42,6 @@ class ActionSerializer(serializers.ModelSerializer):
         exclude = ["file"]
 
 
-class ActionInputSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Action
-        exclude = ["file"]
-        read_only_fields = ["id", "industry", "holder", "parent"]
-
-    def create(self, validated_data):
-        validated_data["industry"] = self.context["handler"].industry
-        validated_data["holder"] = self.context["entity"]
-        return super().create(validated_data)
-
-
 class ActionQuerySerializer(serializers.Serializer):
     industry = serializers.ChoiceField(choices=Action.INDUSTRIES)
 

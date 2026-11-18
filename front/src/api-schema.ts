@@ -3652,6 +3652,11 @@ export interface components {
             /** Mode de transport */
             shipping_method?: components["schemas"]["ActionShippingMethodEnum"] | null;
             /**
+             * Date de création
+             * Format: date-time
+             */
+            readonly created_at: string;
+            /**
              * Date de référence
              * Format: date
              */

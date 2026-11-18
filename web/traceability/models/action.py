@@ -9,7 +9,7 @@ from traceability.services.quantities import quantity_available
 
 from .action_status import ActionStatus, latest_status
 
-CARBURE_ID_PREFIX = "C-"
+CARBURE_ID_PREFIX = "C"
 CARBURE_ID_CODE_LENGTH = 8
 
 
@@ -20,13 +20,15 @@ class Conv(Func):
     output_field = CharField()
 
 
-def carbure_id_expression(action_id):
-    """C-, the id in base 36 padded to 8, then the id. Past 8 characters, LPAD keeps the extra digits."""
+def carbure_id_expression(action_id, year, industry):
+    """C{year}-{industry}-{id in base 36, padded to 8}. Past 8 characters, LPAD keeps the extra digits."""
     return Concat(
         Value(CARBURE_ID_PREFIX),
-        LPad(Conv(action_id, 10, 36), CARBURE_ID_CODE_LENGTH, Value("0")),
+        year,
         Value("-"),
-        action_id,
+        industry,
+        Value("-"),
+        LPad(Conv(action_id, 10, 36), CARBURE_ID_CODE_LENGTH, Value("0")),
         output_field=CharField(),
     )
 
@@ -46,7 +48,7 @@ class ActionManager(models.Manager):
                     output_field=CharField(),
                 )
             )
-            .annotate(carbure_id=carbure_id_expression(F("id")))
+            .annotate(carbure_id=carbure_id_expression(F("id"), ExtractYear("created_at"), F("industry")))
             .annotate(quantity_available=quantity_available())
         )
 
@@ -119,6 +121,7 @@ class Action(models.Model):
         verbose_name="Fichier",
     )
 
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     working_date = models.DateField(verbose_name="Date de référence")
 
     eec = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
