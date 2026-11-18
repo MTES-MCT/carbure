@@ -29,7 +29,7 @@ ACTION_EXCEL_COLUMNS = {
     },
     "quantity": {
         "header": "Quantité",
-        "comment": "Chiffre strictement supérieur à 0",
+        "comment": "Chiffre strictement supérieur à 0. Au-delà de 3 décimales, la valeur est tronquée",
         "color": EXCEL_CONSUMPTION_COLOR,
     },
     "site": {
@@ -56,47 +56,47 @@ ACTION_EXCEL_COLUMNS = {
     },
     "eec": {
         "header": "EEC",
-        "comment": "Émissions résultant de l'extraction ou de la culture des matières premières - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "comment": "Émissions résultant de l'extraction ou de la culture des matières premières - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_PRODUCTION_COLOR,
     },
     "el": {
         "header": "EL",
-        "comment": "Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "comment": "Émissions annualisées résultant de modifications des stocks de carbone dues à des changements dans l'affectation des sols - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_PRODUCTION_COLOR,
     },
     "ei": {
         "header": "EI",
-        "comment": "Emissions liées aux intrants (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",
+        "comment": "Emissions liées aux intrants (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_PRODUCTION_COLOR,
     },
     "ep": {
         "header": "EP",
-        "comment": "Emissions liées à la production (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",
+        "comment": "Emissions liées à la production (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_PRODUCTION_COLOR,
     },
     "etd": {
         "header": "ETD",
-        "comment": "Emissions liées au transport et à la distribution (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "comment": "Emissions liées au transport et à la distribution (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_TRANSPORT_COLOR,
     },
     "eu": {
         "header": "EU",
-        "comment": "Émissions résultant du carburant à l'usage (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",
+        "comment": "Émissions résultant du carburant à l'usage (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_CONSUMPTION_COLOR,
     },
     "eccs": {
         "header": "ECCS",
-        "comment": "Réductions d'émissions dues au captage et au stockage géologique du carbone (gCO₂éq/MJ de carburant) - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "comment": "Réductions d'émissions dues au captage et au stockage géologique du carbone (gCO₂éq/MJ de carburant) - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_CONSUMPTION_COLOR,
     },
     "esca": {
         "header": "ESCA",
-        "comment": "Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole - Chiffre supérieur ou égal à 0",  # noqa: E501
+        "comment": "Réductions d'émissions dues à l'accumulation du carbone dans les sols grâce à une meilleure gestion agricole - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_PRODUCTION_COLOR,
     },
     "eccr": {
         "header": "ECCR",
-        "comment": "Réductions d'émissions dues au piégeage et à la substitution du CO2 - Chiffre supérieur ou égal à 0",
+        "comment": "Réductions d'émissions dues au piégeage et à la substitution du CO2 - Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",  # noqa: E501
         "color": EXCEL_CONSUMPTION_COLOR,
     },
     "working_date": {

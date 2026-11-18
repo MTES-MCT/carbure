@@ -2,7 +2,9 @@
 
 Comment une filière **étend** le template et l’import, sans recopier le noyau.
 
-Flux : `excel_columns` (template) → parse (`header` → `key`) → serializer du handler → `create`.  
+Flux : `excel_columns` (template) → parse (`header` → `key`) → serializer du handler → `create`.
+
+Les postes GES de l'import (`eec`, `el`, `ei`, `ep`, `etd`, `eu`, `eccs`, `esca`, `eccr`, et pour H2 `etd1` / `etd2`) et `quantity` passent par `TruncatingDecimalField` : les chiffres au-delà de 3 décimales sont coupés avant le contrôle (`1,2349` devient `1,234`), puis les limites de chiffres s'appliquent. H2 additionne `etd1` et `etd2` après cette troncature. `quantity` reste strictement positive : une valeur qui tombe à `0` après troncature est une erreur de cellule. La création hors Excel garde le contrôle strict à 3 décimales.
 Les clés qui ne sont pas des champs du modèle `Action` sont **écartées** au `create` générique.
 
 Un import **réussi** enregistre le fichier Excel en `core.StoredFile` (S3 privé, `traceability/actions/{entity_id}/{YYYYMMDD_HHMMSS}_…`) et le lie à toutes les actions créées (`Action.file`). Un import en erreur (fichier vide, invalide, ou `validation_errors`) ne persiste rien. Si la création des actions échoue après l’upload, la transaction SQL est annulée et le fichier est retiré du storage.
