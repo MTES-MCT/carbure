@@ -67,13 +67,13 @@ class H2ActionHandler(ActionIndustryHandler):
         {
             "key": "etd1",
             "header": "Etd1 : émissions liées au transport du lot et à sa compression en vue de l'expédition (gCO2eq/MJ)",
-            "comment": "Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",
+            "comment": "Chiffre supérieur ou égal à 0",
             "color": EXCEL_TRANSPORT_COLOR,
         },
         {
             "key": "etd2",
             "header": "Etd2 : émissions propres à l'activité de distribution, à ajouter à Etd1 (gCO2eq/MJ)",
-            "comment": "Chiffre supérieur ou égal à 0. Au-delà de 3 décimales, la valeur est tronquée",
+            "comment": "Chiffre supérieur ou égal à 0",
             "color": EXCEL_CONSUMPTION_COLOR,
         },
         excel_column("site", header="Station", comment="Liste de choix - Nom de la station dans carbure"),
@@ -81,10 +81,7 @@ class H2ActionHandler(ActionIndustryHandler):
         excel_column(
             "quantity",
             header="Quantité consommée (kg)",
-            comment=(
-                "Peut être différent de la quantité du lot/batch — Chiffre strictement supérieur à 0. "
-                "Au-delà de 3 décimales, la valeur est tronquée"
-            ),
+            comment="Peut être différent de la quantité du lot/batch — Chiffre strictement supérieur à 0",
         ),
         excel_column("eu"),
         excel_column("eccs"),
