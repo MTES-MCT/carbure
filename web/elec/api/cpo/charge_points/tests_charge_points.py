@@ -21,13 +21,10 @@ class ElecCharginPointsTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         # mock call to TransportDataGouv not to depend on the dynamic CSV and have predictable "allowed" charge points
-        cls.mocked_download_csv = patch("elec.services.transport_data_gouv.TransportDataGouv.download_csv").start()
+        download_csv_patch = patch("elec.services.transport_data_gouv.TransportDataGouv.download_csv")
+        cls.addClassCleanup(download_csv_patch.stop)
+        cls.mocked_download_csv = download_csv_patch.start()
         cls.mocked_download_csv.return_value = "%s/web/elec/fixtures/transport_data_gouv.csv" % (os.environ["CARBURE_HOME"])
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls.mocked_download_csv.stop()
 
     def setUp(self):
         self.cpo = Entity.objects.create(
