@@ -124,6 +124,7 @@ INSTALLED_APPS = [
     "ml",
     "saf",
     "transactions",
+    "solid_biomass",
     "elec",
     "simple_history",
     "tiruert",

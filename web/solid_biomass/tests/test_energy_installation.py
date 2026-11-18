@@ -6,8 +6,9 @@ from django.urls import reverse
 from core.models import Entity
 from core.tests_utils import setup_current_user
 from entity.factories.entity import EntityFactory
-from entity.views.energy_installation import EnergyInstallationSerializer
-from transactions.models import EnergyInstallation, Site
+from solid_biomass.models import EnergyInstallation
+from solid_biomass.serializers.energy_installation import EnergyInstallationSerializer
+from transactions.models import Site
 
 
 class EnergyInstallationTests(TestCase):
@@ -22,6 +23,9 @@ class EnergyInstallationTests(TestCase):
             entity_rights=[(self.producer, "RW"), (self.other, "RW")],
         )
         self.url = reverse("energy-installation")
+
+    def test_url_is_in_solid_biomass_api(self):
+        self.assertEqual(self.url, "/api/solid-biomass/energy-installation/")
 
     def put_installation(self, entity, data):
         return self.client.put(

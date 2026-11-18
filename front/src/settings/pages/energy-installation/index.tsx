@@ -25,13 +25,14 @@ type InstallationRequest = components["schemas"]["EnergyInstallationRequest"]
 
 const getInstallation = async (entity_id: number) =>
   (
-    await api.GET("/entities/energy-installation/", {
+    await api.GET("/solid-biomass/energy-installation/", {
       params: { query: { entity_id } },
     })
   ).data
+
 const saveInstallation = async (entity_id: number, data: InstallationRequest) =>
   (
-    await api.PUT("/entities/energy-installation/", {
+    await api.PUT("/solid-biomass/energy-installation/", {
       params: { query: { entity_id } },
       body: data,
       bodySerializer: JSON.stringify,
