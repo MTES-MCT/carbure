@@ -12,13 +12,13 @@ export function EnergyInstallation() {
   const entity = useEntity()
   const { t } = useTranslation()
   const { result, loading, error } = useEnergyInstallation()
-  const mutation = useSaveEnergyInstallation()
+  const saveInstallation = useSaveEnergyInstallation()
 
   if (loading && !result) return <LoaderOverlay />
   if (error && !result)
     return <p>{t("Impossible de charger l'installation.")}</p>
 
-  const installation = result ?? {}
+  const installation = result?.data ?? {}
 
   const generalKey = JSON.stringify([
     installation.production_type,
@@ -40,15 +40,15 @@ export function EnergyInstallation() {
         key={generalKey}
         installation={installation}
         readOnly={!entity.canWrite()}
-        save={mutation.execute}
-        loading={mutation.loading}
+        save={saveInstallation.execute}
+        loading={saveInstallation.loading}
       />
       <IcpeCard
         key={icpeKey}
         installation={installation}
         readOnly={!entity.canWrite()}
-        save={mutation.execute}
-        loading={mutation.loading}
+        save={saveInstallation.execute}
+        loading={saveInstallation.loading}
       />
     </>
   )
