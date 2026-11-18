@@ -40,9 +40,9 @@ class H2ActionExcelImportSerializer(ActionExcelImportSerializer):
         error_messages={"invalid_choice": _("La valeur doit être Oui ou Non.")},
     )
     etd1 = serializers.DecimalField(
-        max_digits=7, decimal_places=3, min_value=Decimal("0"), required=False, allow_null=True, write_only=True
+        max_digits=13, decimal_places=9, min_value=Decimal("0"), required=False, allow_null=True, write_only=True
     )
-    etd2 = serializers.DecimalField(max_digits=7, decimal_places=3, min_value=Decimal("0"), write_only=True)
+    etd2 = serializers.DecimalField(max_digits=13, decimal_places=9, min_value=Decimal("0"), write_only=True)
     shipping_fuel_type = serializers.ChoiceField(
         choices=SHIPPING_FUEL_TYPES,
         required=False,
