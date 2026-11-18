@@ -501,13 +501,13 @@ class ElecCharginPointsTest(TestCase):
         assert data["data"][0]["status"] == "PENDING"
 
         # With pagination
-        response = self.client.get(
-            reverse("elec-cpo-charge-points-get-applications"),
-            {"entity_id": self.cpo.id, "from_idx": 0, "limit": 1},
-        )
-        data = response.json()
-        assert response.status_code == 200
-        assert len(data["data"]) == 1
+        for index, expected_application in enumerate((application, application2, application3)):
+            response = self.client.get(
+                reverse("elec-cpo-charge-points-get-applications"),
+                {"entity_id": self.cpo.id, "from_idx": index, "limit": 1},
+            )
+            assert response.status_code == 200
+            assert [item["id"] for item in response.json()["data"]] == [expected_application.id]
 
     def test_get_charge_points_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)
