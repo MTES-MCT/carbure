@@ -5,15 +5,20 @@ import Tooltip from "common/components/tooltip"
 import { ExternalLink } from "common/components/button"
 import { useQuery } from "common/hooks/async"
 
+const DATASET_ID = "685965d0ab901919e14a4a1b"
+const RESOURCE_ID = "4ca78c71-4ea4-475d-bd3a-d4aef88f7bf8"
+const DATASET_URL =
+  "https://transport.data.gouv.fr/datasets/base-nationale-des-points-de-recharge-pour-vehicules-electriques-en-france-irve"
+
 interface TDGResponse {
   resources: {
+    id: string
     preview_url: string | null
   }[]
 }
 
 async function fetchTDG(): Promise<TDGResponse> {
-  const url =
-    "https://www.data.gouv.fr/api/1/datasets/5448d3e0c751df01f85d0572/"
+  const url = `https://www.data.gouv.fr/api/1/datasets/${DATASET_ID}/`
 
   const res = await fetch(url)
   const json = await res.json()
@@ -25,14 +30,16 @@ export function TDGInfo() {
   const { t } = useTranslation()
 
   const tdg = useQuery(fetchTDG, { key: "tdg", params: [] })
-  const previewURL = tdg.result?.resources[0]?.preview_url ?? ""
+  const previewURL =
+    tdg.result?.resources.find((resource) => resource.id === RESOURCE_ID)
+      ?.preview_url ?? DATASET_URL
 
   return (
     <Alert icon={InfoCircle} variant="info" style={{ minWidth: "50vw" }}>
       <section>
         <p>
           {t("Carbure utilise les")}{" "}
-          <ExternalLink href="https://www.data.gouv.fr/fr/datasets/5448d3e0c751df01f85d0572/">
+          <ExternalLink href={DATASET_URL}>
             <b>{t("données consolidées IRVE")}</b>
           </ExternalLink>{" "}
           <Trans defaults="de <b>transport.data.gouv.fr</b> pour déterminer certaines caractéristiques de vos points de recharge." />
