@@ -16,7 +16,7 @@ import { EntityUserRights } from "./pages/user-rights"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useRoutes } from "common/hooks/routes"
 import { Navigate, Route, Routes } from "react-router-dom"
-import EnergyInstallationPage from "./pages/energy-installation"
+import EnergyInstallation from "solid-biomass/pages/energy-installation"
 import { BiomethaneSettingsRoutes } from "biomethane/routes"
 
 const Settings = () => {
@@ -140,7 +140,7 @@ const Settings = () => {
             />
           )}
           {isSolidBiomassProducer && (
-            <Route path="installation" element={<EnergyInstallationPage />} />
+            <Route path="installation" element={<EnergyInstallation />} />
           )}
           {isProducer && (
             <Route
