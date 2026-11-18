@@ -86,7 +86,9 @@ const Declarations = () => {
               { key: EntityType.Trader, label: t("Trader") },
               {
                 key: EntityType.PowerOrHeatProducer,
-                label: t("Producteur d'électricité ou de chaleur"),
+                label: t(
+                  "Producteur d'électricité ou de chaleur (biomasse liquide)"
+                ),
               },
             ]}
           />

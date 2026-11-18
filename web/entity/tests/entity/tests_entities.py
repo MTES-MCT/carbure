@@ -29,6 +29,19 @@ class AdminEntitiesTest(TestCase):
         assert response.status_code == 201
         assert Entity.objects.filter(name="Test Entity").exists()
 
+    def test_create_biomass_operator(self):
+        data = {
+            "name": "Biomass operator",
+            "entity_type": Entity.SOLID_BIOMASS_ENERGY_PRODUCER,
+            "has_saf": False,
+            "has_elec": False,
+        }
+
+        response = self.client.post(reverse("entity-list") + f"?entity_id={self.admin.id}", data)
+
+        assert response.status_code == 201
+        assert Entity.objects.filter(name=data["name"], entity_type=Entity.SOLID_BIOMASS_ENERGY_PRODUCER).exists()
+
     def test_create_entity_duplicate_name(self):
         Entity.objects.create(name="Duplicate Entity", entity_type="Producteur")
 

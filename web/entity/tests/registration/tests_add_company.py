@@ -98,6 +98,17 @@ class EntityRegistrationAddCompanyTest(TestCase):
         entity.refresh_from_db()
         assert entity.is_enabled is True
 
+    def test_register_biomass_operator(self):
+        data = {**self.entity_data, "entity_type": Entity.SOLID_BIOMASS_ENERGY_PRODUCER}
+
+        response = self.client.post(reverse("api-entity-registration-add-company"), data)
+
+        assert response.status_code == 200
+        entity = Entity.objects.get(name=data["name"])
+        assert entity.entity_type == Entity.SOLID_BIOMASS_ENERGY_PRODUCER
+        assert not entity.is_enabled
+        assert UserRightsRequests.objects.filter(user=self.user, entity=entity, status="PENDING").exists()
+
     # When a company is a trader, it must have a certificate
     def test_create_foreign_entity_without_certificate_throw_error(self):
         data = {**self.entity_data, "entity_type": Entity.TRADER}

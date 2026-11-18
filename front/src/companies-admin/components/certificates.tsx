@@ -14,6 +14,7 @@ import { compact, matchesSearch } from "common/utils/collection"
 import Select from "common/components/select"
 import { useState } from "react"
 import useEntity from "common/hooks/entity"
+import { getEntityTypeLabel } from "common/utils/normalizers"
 
 type CertificatesProps = {
   search?: string
@@ -108,7 +109,11 @@ const Certificates = ({
               cell: (e) => (
                 <Cell
                   text={e.entity.name}
-                  sub={t(e.entity.entity_type ?? "")}
+                  sub={
+                    e.entity.entity_type
+                      ? getEntityTypeLabel(e.entity.entity_type)
+                      : ""
+                  }
                 />
               ),
             },

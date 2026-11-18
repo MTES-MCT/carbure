@@ -3767,10 +3767,10 @@ export interface components {
             pos_id?: string | null;
         };
         /**
-         * @description * `ROAD` - Transport routier
+         * @description * `ROAD` - Road transport
          *     * `PIPELINE` - Pipeline
          *     * `RAILROAD` - Rail
-         *     * `SEA` - Transport maritime
+         *     * `SEA` - Maritime transport
          * @enum {string}
          */
         ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
@@ -5956,7 +5956,8 @@ export interface components {
          *     * `Charge Point Operator` - Charge Point Operator
          *     * `Compagnie aérienne` - Compagnie aérienne
          *     * `Unknown` - Unknown
-         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+         *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
          *     * `SAF Trader` - Trader de SAF
          *     * `Producteur de biométhane` - Producteur de biométhane
          *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -7103,9 +7104,9 @@ export interface components {
         ResetPasswordRequest: {
             uidb64: string;
             token: string;
-            /** Mot de passe */
+            /** Password */
             password1: string;
-            /** Confirmation du mot de passe */
+            /** Password confirmation */
             password2: string;
         };
         Response: {
@@ -7654,9 +7655,9 @@ export interface components {
              */
             email: string;
             name: string;
-            /** Mot de passe */
+            /** Password */
             password1: string;
-            /** Confirmation du mot de passe */
+            /** Password confirmation */
             password2: string;
         };
         UserEntity: {
@@ -7696,10 +7697,7 @@ export interface components {
         };
         /** @description Resend the activation email for the pending account matching this address. */
         UserResendActivationLinkRequest: {
-            /**
-             * Adresse email
-             * Format: email
-             */
+            /** Format: email */
             email: string;
         };
         UserRights: {
@@ -11516,7 +11514,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -11592,7 +11591,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -11670,7 +11670,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -11744,7 +11745,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -14038,7 +14040,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -14301,7 +14304,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -14393,7 +14397,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -16150,10 +16155,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16391,10 +16396,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16538,10 +16543,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16812,6 +16817,7 @@ export enum PathsApiEntitiesAdminUsersGetParametersQueryEntity_type {
     Producteur = "Producteur",
     Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
     SAF_Trader = "SAF Trader",
+    Solid_Biomass_Energy_Producer = "Solid Biomass Energy Producer",
     Trader = "Trader",
     Unknown = "Unknown"
 }
@@ -17280,6 +17286,7 @@ export enum EntityTypeEnum {
     Airline = "Compagnie a\u00E9rienne",
     Unknown = "Unknown",
     PowerOrHeatProducer = "Power or Heat Producer",
+    SolidBiomassEnergyProducer = "Solid Biomass Energy Producer",
     SAF_Trader = "SAF Trader",
     Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
     Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane",
