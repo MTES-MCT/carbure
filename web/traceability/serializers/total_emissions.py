@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-_GES_DECIMAL = {"max_digits": 13, "decimal_places": 3, "read_only": True}
+_GES_DECIMAL = {"max_digits": 19, "decimal_places": 9, "read_only": True}
 
 
 class ActionTotalEmissionsSerializer(serializers.Serializer):

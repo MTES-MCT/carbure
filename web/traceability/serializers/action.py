@@ -136,15 +136,6 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         min_value=Decimal("0.001"),
         error_messages={"min_value": _("La quantité doit être strictement positive.")},
     )
-    eec = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
-    el = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
-    ei = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
-    ep = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
-    etd = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
-    eu = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
-    eccs = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
-    esca = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
-    eccr = TruncatingDecimalField(max_digits=7, decimal_places=3, required=False)
 
     class Meta:
         model = Action
