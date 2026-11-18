@@ -10,7 +10,7 @@ EXCEL_CONSUMPTION_COLOR = "#E2F0D9"
 ACTION_EXCEL_COLUMNS = {
     "pos_id": {
         "header": "N° de POS",
-        "comment": "N° de la preuve de durabilité (max 64 caractères)",
+        "comment": "N° de la preuve de durabilité (max 48 caractères)",
         "color": EXCEL_PRODUCTION_COLOR,
     },
     "certificate": {

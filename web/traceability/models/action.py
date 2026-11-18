@@ -1,13 +1,36 @@
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import CharField, Q, QuerySet, Value
+from django.db.models import CharField, F, Func, Q, QuerySet, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
 from traceability.services.quantities import quantity_available
 
 from .action_status import ActionStatus, latest_status
+
+CARBURE_ID_PREFIX = "C"
+CARBURE_ID_CODE_LENGTH = 8
+
+
+class Conv(Func):
+    """MySQL CONV: number written in another base, uppercase."""
+
+    function = "CONV"
+    output_field = CharField()
+
+
+def carbure_id_expression(action_id, year, industry):
+    """C{year}-{industry}-{id in base 36, padded to 8}. Past 8 characters, LPAD keeps the extra digits."""
+    return Concat(
+        Value(CARBURE_ID_PREFIX),
+        year,
+        Value("-"),
+        industry,
+        Value("-"),
+        LPad(Conv(action_id, 10, 36), CARBURE_ID_CODE_LENGTH, Value("0")),
+        output_field=CharField(),
+    )
 
 
 class ActionManager(models.Manager):
@@ -25,13 +48,19 @@ class ActionManager(models.Manager):
                     output_field=CharField(),
                 )
             )
+            .annotate(carbure_id=carbure_id_expression(F("id"), ExtractYear("created_at"), F("industry")))
             .annotate(quantity_available=quantity_available())
         )
 
 
 class Action(models.Model):
     pos_id = models.CharField(
-        verbose_name="N° de POS", max_length=48, unique=True, error_messages={"unique": _("Ce N° de POS existe déjà.")}
+        verbose_name="N° de POS",
+        max_length=48,
+        unique=True,
+        null=True,
+        blank=True,
+        error_messages={"unique": _("Ce N° de POS existe déjà.")},
     )
 
     holder = models.ForeignKey(
@@ -92,6 +121,7 @@ class Action(models.Model):
         verbose_name="Fichier",
     )
 
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     working_date = models.DateField(verbose_name="Date de référence")
 
     eec = models.DecimalField(default=Decimal(0.0), max_digits=7, decimal_places=3)
@@ -127,13 +157,21 @@ class Action(models.Model):
         attach_inherited_fields(ordered)
         return ordered
 
+    def save(self, *args, **kwargs):
+        self.pos_id = self.pos_id or None
+        super().save(*args, **kwargs)
+
     @staticmethod
     @transaction.atomic
     def bulk_create(actions: list["Action"], default_status=ActionStatus.CREATED) -> QuerySet["Action"]:
-        Action.objects.bulk_create(actions)
-        created_actions = Action.objects.filter(pos_id__in=[a.pos_id for a in actions])
+        # MySQL does not return autoincrement ids from a bulk insert, and pos_id
+        # may be null, so each row is saved to recover its primary key.
+        for action in actions:
+            action.pos_id = action.pos_id or None
+            action.save()
 
-        created_statuses = [ActionStatus(status=default_status, action=a) for a in created_actions]
+        created_actions = Action.objects.filter(pk__in=[action.pk for action in actions])
+        created_statuses = [ActionStatus(status=default_status, action=action) for action in created_actions]
         ActionStatus.objects.bulk_create(created_statuses)
 
         return created_actions

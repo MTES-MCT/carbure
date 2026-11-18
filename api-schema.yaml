@@ -13477,6 +13477,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -13485,6 +13486,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -13496,6 +13498,8 @@ paths:
           description: |-
             Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -13552,7 +13556,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -13895,6 +13898,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -13903,6 +13907,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -13914,6 +13919,8 @@ paths:
           description: |-
             Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -13958,7 +13965,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -14194,6 +14200,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -14202,6 +14209,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -14213,6 +14221,8 @@ paths:
           description: |-
             Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -14257,7 +14267,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -14500,8 +14509,13 @@ components:
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
           default: "0.000"
+        carbure_id:
+          type: string
+          readOnly: true
+          title: Identifiant Carbure
         pos_id:
           type: string
+          nullable: true
           title: N° de POS
           maxLength: 48
         industry:
@@ -14533,6 +14547,11 @@ components:
             - $ref: "#/components/schemas/ActionShippingMethodEnum"
           nullable: true
           title: Mode de transport
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date de création
         working_date:
           type: string
           format: date
@@ -14574,14 +14593,15 @@ components:
           format: decimal
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
       required:
+        - carbure_id
         - certificate
+        - created_at
         - holder
         - id
         - industry
         - inherited_fields
         - material
         - parent
-        - pos_id
         - quantity
         - quantity_available
         - site
@@ -14634,7 +14654,7 @@ components:
           title: Action parente
         pos_id:
           type: string
-          minLength: 1
+          nullable: true
           title: N° de POS
           maxLength: 48
         material:
@@ -14716,7 +14736,6 @@ components:
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
       required:
         - holder
-        - pos_id
         - quantity
         - status
         - type
@@ -14761,11 +14780,11 @@ components:
           readOnly: true
         pos_id:
           type: string
+          nullable: true
           title: N° de POS
           maxLength: 48
       required:
         - id
-        - pos_id
     ActionShippingMethodEnum:
       enum:
         - ROAD

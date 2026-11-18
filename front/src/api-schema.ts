@@ -3629,8 +3629,10 @@ export interface components {
              * @default 0.000
              */
             readonly quantity_available: string;
+            /** Identifiant Carbure */
+            readonly carbure_id: string;
             /** N° de POS */
-            pos_id: string;
+            pos_id?: string | null;
             /** Filière */
             industry: components["schemas"]["IndustryEnum"];
             /** Type d'action */
@@ -3649,6 +3651,11 @@ export interface components {
             shipping_distance?: number | null;
             /** Mode de transport */
             shipping_method?: components["schemas"]["ActionShippingMethodEnum"] | null;
+            /**
+             * Date de création
+             * Format: date-time
+             */
+            readonly created_at: string;
             /**
              * Date de référence
              * Format: date
@@ -3694,7 +3701,7 @@ export interface components {
             /** Action parente */
             parent?: number | null;
             /** N° de POS */
-            pos_id: string;
+            pos_id?: string | null;
             /** Matière */
             material?: number | null;
             status: components["schemas"]["ActionStatusEnum"];
@@ -3757,7 +3764,7 @@ export interface components {
         ActionParent: {
             readonly id: number;
             /** N° de POS */
-            pos_id: string;
+            pos_id?: string | null;
         };
         /**
          * @description * `ROAD` - Transport routier
@@ -16111,6 +16118,8 @@ export interface operations {
                 /**
                  * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -16137,7 +16146,7 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16354,6 +16363,8 @@ export interface operations {
                 /**
                  * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -16376,7 +16387,7 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16499,6 +16510,8 @@ export interface operations {
                 /**
                  * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -16521,7 +16534,7 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -17074,6 +17087,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryIndustry {
     H2 = "H2"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
+    ValueMinuscarbure_id = "-carbure_id",
     ValueMinusholder = "-holder",
     ValueMinusmaterial = "-material",
     ValueMinuspos_id = "-pos_id",
@@ -17082,6 +17096,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinussite = "-site",
     ValueMinusstatus = "-status",
     ValueMinusworking_date = "-working_date",
+    carbure_id = "carbure_id",
     holder = "holder",
     material = "material",
     pos_id = "pos_id",

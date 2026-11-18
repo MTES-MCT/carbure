@@ -75,6 +75,7 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertEqual(response.data["rows_imported"], 1)
 
         action = Action.objects.get(pos_id="ACT-001")
+        self.assertTrue(action.carbure_id.startswith(f"C{action.created_at.year}-{action.industry}-"))
         assert_object_contains_data(
             self,
             action,
@@ -139,6 +140,21 @@ class ActionExcelImportViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Action.objects.get(pos_id="ACT-001").shipping_method, "")
+
+    def test_import_rejects_missing_pos_id(self):
+        response = self._post(
+            filled_generic_template(
+                material_name=self.material.name,
+                site_name=self.site.name,
+                certificate_id=self.certificate.certificate_id,
+                pos_id=None,
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertEqual(StoredFile.objects.count(), 0)
+        self.assertIn("pos_id", response.data["validation_errors"][0]["errors"])
 
     def test_import_rejects_unknown_material(self):
         response = self._post(

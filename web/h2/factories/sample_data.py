@@ -116,6 +116,30 @@ def setup_h2_lots_init() -> tuple[Action, Action]:
     return h2_lot_01, h2_lot_02
 
 
+def valorize_child(parent: Action) -> Action:
+    """Demo certificate. Identified by its parent, because a valorize action has no PoS."""
+    child, _created = Action.unannotated.get_or_create(
+        parent=parent,
+        type=Action.VALORIZE,
+        defaults={
+            "holder": parent.holder,
+            "industry": Action.H2,
+            "quantity": parent.quantity,
+            "working_date": parent.working_date,
+            "material": None,
+            "site": None,
+            "shipping_date": None,
+            "shipping_distance": None,
+            "shipping_method": None,
+        },
+    )
+    if child.pos_id is not None:
+        child.pos_id = None
+        child.save(update_fields=["pos_id"])
+    ActionStatus.objects.get_or_create(action=child, status=ActionStatus.CREATED)
+    return child
+
+
 def setup_h2_certificates() -> tuple[Action, Action]:
     holder = setup_h2_entity()
     paris_station, lyon_station = setup_h2_stations()
@@ -157,39 +181,7 @@ def setup_h2_certificates() -> tuple[Action, Action]:
     ActionStatus.objects.create(action=h2_lot_03, status=ActionStatus.ACCEPTED)
     ActionStatus.objects.create(action=h2_lot_04, status=ActionStatus.ACCEPTED)
 
-    h2_certificate_01 = ActionFactory(
-        parent=h2_lot_03,
-        status=ActionStatus.CREATED,
-        industry=Action.H2,
-        type=Action.VALORIZE,
-        pos_id="H2-DEMO-VALORIZE-001",
-        holder=h2_lot_03.holder,
-        quantity=h2_lot_03.quantity,
-        working_date=h2_lot_03.working_date,
-        material=None,
-        site=None,
-        shipping_date=None,
-        shipping_distance=None,
-        shipping_method=None,
-    )
-
-    h2_certificate_02 = ActionFactory(
-        parent=h2_lot_04,
-        status=ActionStatus.CREATED,
-        industry=Action.H2,
-        type=Action.VALORIZE,
-        pos_id="H2-DEMO-VALORIZE-002",
-        holder=h2_lot_04.holder,
-        quantity=h2_lot_04.quantity,
-        working_date=h2_lot_04.working_date,
-        material=None,
-        site=None,
-        shipping_date=None,
-        shipping_distance=None,
-        shipping_method=None,
-    )
-
-    return h2_certificate_01, h2_certificate_02
+    return valorize_child(h2_lot_03), valorize_child(h2_lot_04)
 
 
 def setup_h2_inherited_material_chain() -> Action:
