@@ -18,6 +18,8 @@ class EnergyInstallationSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
+        if attrs.get("icpe_number") == "":
+            attrs["icpe_number"] = None
         production_type = attrs.get("production_type", getattr(self.instance, "production_type", None))
         if production_type not in (EnergyInstallation.HEAT, EnergyInstallation.COGENERATION):
             attrs["heat_type"] = None

@@ -1,5 +1,6 @@
 import json
 
+from django.http import QueryDict
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
@@ -66,6 +67,28 @@ class EnergyInstallationTests(TestCase):
 
 
 class EnergyInstallationSerializerTests(SimpleTestCase):
+    def test_multipart_empty_values_clear_fields(self):
+        instance = EnergyInstallation(
+            production_type=EnergyInstallation.COGENERATION,
+            useful_temperature=150,
+            electrical_efficiency=40,
+            thermal_efficiency=80,
+            icpe_number="0123456789",
+        )
+        data = QueryDict(mutable=True)
+        for field in (
+            "useful_temperature",
+            "electrical_efficiency",
+            "thermal_efficiency",
+            "icpe_number",
+            "commissioning_date",
+        ):
+            data[field] = ""
+        serializer = EnergyInstallationSerializer(instance, data=data, partial=True)
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        for field in data:
+            self.assertIsNone(serializer.validated_data[field], field)
+
     def test_efficiencies_follow_production_type(self):
         for production_type, electrical, thermal in [
             (EnergyInstallation.ELECTRICITY, 40, None),
