@@ -114,6 +114,46 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Action.objects.get(pos_id="ACT-001").shipping_date, date(2026, 1, 15))
 
+    def test_import_truncates_emissions_to_three_decimals(self):
+        response = self._post(
+            filled_generic_template(
+                material_name=self.material.name,
+                site_name=self.site.name,
+                certificate_id=self.certificate.certificate_id,
+                ei=Decimal("1.2349"),
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="ACT-001").ei, Decimal("1.234"))
+
+    def test_import_truncates_quantity_to_three_decimals(self):
+        response = self._post(
+            filled_generic_template(
+                material_name=self.material.name,
+                site_name=self.site.name,
+                certificate_id=self.certificate.certificate_id,
+                quantity=Decimal("120000.1234"),
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="ACT-001").quantity, Decimal("120000.123"))
+
+    def test_import_rejects_quantity_that_truncates_to_zero(self):
+        response = self._post(
+            filled_generic_template(
+                material_name=self.material.name,
+                site_name=self.site.name,
+                certificate_id=self.certificate.certificate_id,
+                quantity=Decimal("0.0004"),
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Action.objects.count(), 0)
+        self.assertIn("quantity", response.data["validation_errors"][0]["errors"])
+
     def test_import_accepts_working_date_as_month_year(self):
         response = self._post(
             filled_generic_template(
