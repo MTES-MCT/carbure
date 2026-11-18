@@ -17,12 +17,6 @@ export type ActionColumn = Column<Action> & {
 export function useActionColumns() {
   const { t } = useTranslation()
 
-  const pos_id: ActionColumn = {
-    key: "pos_id",
-    header: t("N° de POS"),
-    cell: (action) => <Cell text={action.pos_id} />,
-  }
-
   return {
     status: {
       key: "status",
@@ -91,7 +85,11 @@ export function useActionColumns() {
       cell: (action) => <Cell text={action.site?.name} />,
     },
 
-    pos_id,
+    pos_id: {
+      key: "pos_id",
+      header: t("N° de POS"),
+      cell: (action) => <Cell text={action.pos_id} />,
+    },
 
     carbure_id: {
       key: "carbure_id",

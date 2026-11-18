@@ -75,7 +75,7 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertEqual(response.data["rows_imported"], 1)
 
         action = Action.objects.get(pos_id="ACT-001")
-        self.assertTrue(action.carbure_id)
+        self.assertEqual(action.carbure_id.rsplit("-", 1)[-1], str(action.pk))
         assert_object_contains_data(
             self,
             action,

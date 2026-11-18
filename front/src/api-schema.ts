@@ -3629,10 +3629,7 @@ export interface components {
              * @default 0.000
              */
             readonly quantity_available: string;
-            /**
-             * Identifiant Carbure
-             * Format: uuid
-             */
+            /** Identifiant Carbure */
             readonly carbure_id: string;
             /** N° de POS */
             pos_id?: string | null;
@@ -3678,12 +3675,6 @@ export interface components {
             /** Format: decimal */
             eccr?: string;
         };
-        ActionAuthorizationRequest: {
-            parent?: number | null;
-            type: components["schemas"]["ActionTypeEnum"];
-            status: components["schemas"]["ActionStatusEnum"];
-            holder: number;
-        };
         ActionCertificate: {
             readonly id: number;
             certificate_id: string;
@@ -3705,7 +3696,7 @@ export interface components {
             /** Action parente */
             parent?: number | null;
             /** N° de POS */
-            pos_id: string;
+            pos_id?: string | null;
             /** Matière */
             material?: number | null;
             status: components["schemas"]["ActionStatusEnum"];
@@ -3767,11 +3758,6 @@ export interface components {
         /** @description Small representation used for the parent action relation. */
         ActionParent: {
             readonly id: number;
-            /**
-             * Identifiant Carbure
-             * Format: uuid
-             */
-            readonly carbure_id: string;
             /** N° de POS */
             pos_id?: string | null;
         };
@@ -16155,7 +16141,7 @@ export interface operations {
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16396,7 +16382,7 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16543,7 +16529,7 @@ export interface operations {
                 ordering?: string;
                 origin_material?: string[];
                 period?: string[];
-                quantity_available?: boolean | null;
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**

@@ -13556,7 +13556,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -13966,7 +13965,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -14269,7 +14267,6 @@ paths:
           name: quantity_available
           schema:
             type: boolean
-            nullable: true
         - name: search
           required: false
           in: query
@@ -14514,7 +14511,6 @@ components:
           default: "0.000"
         carbure_id:
           type: string
-          format: uuid
           readOnly: true
           title: Identifiant Carbure
         pos_id:
@@ -14607,22 +14603,6 @@ components:
         - total_emissions
         - type
         - working_date
-    ActionAuthorizationRequest:
-      type: object
-      properties:
-        parent:
-          type: integer
-          nullable: true
-        type:
-          $ref: "#/components/schemas/ActionTypeEnum"
-        status:
-          $ref: "#/components/schemas/ActionStatusEnum"
-        holder:
-          type: integer
-      required:
-        - holder
-        - status
-        - type
     ActionCertificate:
       type: object
       properties:
@@ -14668,7 +14648,7 @@ components:
           title: Action parente
         pos_id:
           type: string
-          minLength: 1
+          nullable: true
           title: N° de POS
           maxLength: 48
         material:
@@ -14750,7 +14730,6 @@ components:
           pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
       required:
         - holder
-        - pos_id
         - quantity
         - status
         - type
@@ -14793,18 +14772,12 @@ components:
         id:
           type: integer
           readOnly: true
-        carbure_id:
-          type: string
-          format: uuid
-          readOnly: true
-          title: Identifiant Carbure
         pos_id:
           type: string
           nullable: true
           title: N° de POS
           maxLength: 48
       required:
-        - carbure_id
         - id
     ActionShippingMethodEnum:
       enum:

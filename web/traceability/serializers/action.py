@@ -21,7 +21,7 @@ class ActionParentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Action
-        fields = ["id", "carbure_id", "pos_id"]
+        fields = ["id", "pos_id"]
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -35,6 +35,7 @@ class ActionSerializer(serializers.ModelSerializer):
     total_emissions = ActionTotalEmissionsSerializer(read_only=True, allow_null=True)
     inherited_fields = ActionInheritedFieldsSerializer(read_only=True)
     quantity_available = serializers.DecimalField(max_digits=13, decimal_places=3, read_only=True, default=0)
+    carbure_id = serializers.CharField(read_only=True, label="Identifiant Carbure")
 
     class Meta:
         model = Action
@@ -45,7 +46,7 @@ class ActionInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         exclude = ["file"]
-        read_only_fields = ["id", "carbure_id", "industry", "holder", "parent"]
+        read_only_fields = ["id", "industry", "holder", "parent"]
 
     def create(self, validated_data):
         validated_data["industry"] = self.context["handler"].industry

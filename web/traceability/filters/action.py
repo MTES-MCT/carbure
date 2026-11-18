@@ -29,7 +29,8 @@ class ActionFilter(RecursiveFilterSet):
 
     order_by = OrderingFilter(
         fields=(
-            ("carbure_id", "carbure_id"),
+            # The label is derived from the pk. Ordering by id uses the primary key.
+            ("id", "carbure_id"),
             ("pos_id", "pos_id"),
             ("holder__name", "holder"),
             ("material__name", "material"),
