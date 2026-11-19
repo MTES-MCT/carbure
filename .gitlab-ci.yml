@@ -1,6 +1,7 @@
 stages:
   - check
   - security
+  - deploy
   - pass
 
 workflow:
@@ -79,6 +80,20 @@ security-audit:
     entrypoint: [""]
   script:
     - trivy fs --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 .
+
+deploy-fallback:
+  stage: deploy
+  image: python:3.12-alpine
+  resource_group: fallback-production
+  script:
+    - python fallback/generate.py
+    - apk add --no-cache lftp ca-certificates
+    - export LFTP_PASSWORD="$FALLBACK_FTPS_PASSWORD"
+    - lftp --norc --user "$FALLBACK_FTPS_USER" --env-password "$FALLBACK_FTPS_URL" -e 'set ftp:ssl-force yes; mirror --reverse --transfer-all --no-perms fallback/dist .; exit'
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
+      changes:
+        - fallback/**/*
 
 # job: always succeed so we can merge MR that do not change front/back code
 pass:

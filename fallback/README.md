@@ -11,13 +11,25 @@ Chaque fichier JSON dans `pages/` décrit une page :
 - `message` : explication du problème.
 - `information` : indication sur la marche à suivre.
 
-Le fichier `template.html` définit la mise en page commune. Après une modification, lancer depuis la racine du projet :
+Le fichier `template.html` définit la mise en page commune. Pour générer les pages localement après une modification, lancer depuis la racine du projet :
 
 ```sh
 make fallback
 ```
 
 Le script génère les pages dans `dist/` avec le même nom que leur fichier JSON : par exemple, `pages/timeout.json` produit `dist/timeout.html`.
+
+## Déploiement automatique
+
+La CI GitLab génère et déploie les pages sur AlwaysData lorsqu'un fichier de `fallback/` change sur `master`.
+
+Notez que les pages supprimées doivent être retirées manuellement du serveur.
+
+Variables GitLab CI/CD :
+
+- `FALLBACK_FTPS_URL` : URL FTPS du répertoire cible.
+- `FALLBACK_FTPS_USER` : identifiant FTP.
+- `FALLBACK_FTPS_PASSWORD` : mot de passe FTP, masqué et protégé.
 
 ## Configurer Scalingo
 
