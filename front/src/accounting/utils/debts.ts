@@ -1,4 +1,19 @@
-import { Balance, Debt } from "accounting/types"
+import { Balance, Debt, DebtType } from "accounting/types"
+
+export const getDebtRepaymentTypes = (debt: Debt): DebtType[] => [
+  ...(debt.remaining_volume > 0 ? [DebtType.VOLUME] : []),
+  ...(debt.remaining_tco2 > 0 ? [DebtType.TCO2] : []),
+]
+
+export const getDebtRepaymentType = (
+  debt: Debt,
+  selectedType?: DebtType
+): DebtType | undefined => {
+  const types = getDebtRepaymentTypes(debt)
+  return types.length === 1
+    ? types[0]
+    : types.find((type) => type === selectedType)
+}
 
 // Debts are tracked per (biofuel, customs category) pair, whatever the sector
 export const findDebt = (
