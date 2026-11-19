@@ -306,7 +306,7 @@ class OperationExcelImportService:
 
             lots = [{"id": lot_id, "volume": volume} for lot_id, volume in group.lot_volumes.items()]
             try:
-                group.debt_splits = DebtService.plan_repayment(
+                group.debt_splits = DebtService.plan_volume_repayment(
                     group.debited_entity, group.biofuel, group.customs_category, lots
                 )
             except serializers.ValidationError as exc:

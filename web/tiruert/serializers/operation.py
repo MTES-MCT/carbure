@@ -6,7 +6,7 @@ from core.models.lot import CarbureLot
 from core.serializer_fields import CachedPrimaryKeyRelatedField
 from core.serializers import CountrySerializer
 from core.utils import check_file_size_and_extension
-from tiruert.models import Operation
+from tiruert.models import Operation, TiruertDebt
 from tiruert.serializers.balance import BalanceBiofuelSerializer
 from tiruert.serializers.fields import TruncatedFloatField
 from tiruert.serializers.operation_detail import OperationDetailSerializer
@@ -248,6 +248,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "lots",
             "status",
             "devaluation_type",
+            "debt_type",
         ]
         extra_kwargs = {
             "biofuel": {"required": True, "allow_null": False},
@@ -259,6 +260,7 @@ class OperationInputSerializer(serializers.ModelSerializer):
         slug_field="code_pays", queryset=Pays.objects.all(), required=False, allow_null=True
     )
     lots = OperationLotSerializer(many=True, required=True, allow_empty=False)
+    debt_type = serializers.ChoiceField(choices=TiruertDebt.DEBT_TYPES, required=False)
 
     def validate_type(self, value):
         if value not in Operation.API_CREATABLE_TYPES:
@@ -266,6 +268,9 @@ class OperationInputSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
+        if data.get("type") != Operation.DEBT_REPAYMENT:
+            if data.get("debt_type", TiruertDebt.VOLUME) != TiruertDebt.VOLUME:
+                raise serializers.ValidationError({"debt_type": _("Réservé aux acquittements de dette.")})
         if data.get("credited_entity") and data.get("type") not in (Operation.CESSION, Operation.TRANSFERT):
             raise serializers.ValidationError(
                 {"credited_entity": _("Ce champ est autorisé uniquement pour les opérations de type CESSION ou TRANSFERT.")}

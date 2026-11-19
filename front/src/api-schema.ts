@@ -3375,6 +3375,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/operations/simulate_debt_repayment/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["simulate_debt_repayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/operations/teneur/declare/": {
         parameters: {
             query?: never;
@@ -5200,12 +5216,47 @@ export interface components {
          * @enum {string}
          */
         CropTypeEnum: CropTypeEnum;
+        DebtRepaymentSimulation: {
+            selected_lots: components["schemas"]["SimulationLotOutput"][];
+            /** Format: double */
+            total_volume: number;
+            /**
+             * Format: double
+             * @description Cumulative tCO2 credited to the debt at 0.001 t precision, used to validate the preview.
+             */
+            repaid_tco2: number;
+            /** Format: double */
+            remaining_tco2: number;
+            /** Format: double */
+            debt_tco2: number;
+        };
+        DebtRepaymentSimulationInputRequest: {
+            customs_category: components["schemas"]["MPCategoriesEnum"];
+            biofuel: number;
+            debited_entity: number;
+            unit?: string;
+            /** Format: double */
+            ges_bound_min?: number;
+            /** Format: double */
+            ges_bound_max?: number;
+            feedstock?: string[];
+            origin_country?: string[];
+            durability_period?: string[];
+        };
         DebtSummary: {
             biofuel: components["schemas"]["BalanceBiofuel"];
             customs_category: components["schemas"]["MPCategoriesEnum"];
             /** Format: double */
             remaining_volume: number;
+            /** Format: double */
+            remaining_tco2: number;
         };
+        /**
+         * @description * `VOLUME` - VOLUME
+         *     * `TCO2` - TCO2
+         * @enum {string}
+         */
+        DebtTypeEnum: DebtTypeEnum;
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -6523,6 +6574,7 @@ export interface components {
             lots: components["schemas"]["OperationLotRequest"][];
             status?: components["schemas"]["OperationStatusEnum"];
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
+            debt_type?: components["schemas"]["DebtTypeEnum"];
         };
         OperationList: {
             readonly id: number;
@@ -16040,6 +16092,34 @@ export interface operations {
             };
         };
     };
+    simulate_debt_repayment: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DebtRepaymentSimulationInputRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DebtRepaymentSimulationInputRequest"];
+                "multipart/form-data": components["schemas"]["DebtRepaymentSimulationInputRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebtRepaymentSimulation"];
+                };
+            };
+        };
+    };
     declare_teneur: {
         parameters: {
             query: {
@@ -17215,6 +17295,10 @@ export enum CorrectionStatusEnum {
 export enum CropTypeEnum {
     PRIMARY = "PRIMARY",
     INTERMEDIATE = "INTERMEDIATE"
+}
+export enum DebtTypeEnum {
+    VOLUME = "VOLUME",
+    TCO2 = "TCO2"
 }
 export enum DeliveryTypeEnum {
     UNKNOWN = "UNKNOWN",
