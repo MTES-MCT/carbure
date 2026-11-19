@@ -1,6 +1,6 @@
 {
-  "titre_page": "Service indisponible",
-  "titre": "Service indisponible",
-  "message": "Le service CarbuRe est momentanément inaccessible. Nous sommes désolés pour la gêne occasionnée.",
-  "information": "Nous vous invitons à réessayer un peu plus tard. Merci de votre patience et de votre compréhension."
+  "titre_page": "Service temporairement suspendu",
+  "titre": "Service temporairement suspendu",
+  "message": "L'accès à CarbuRe est temporairement suspendu. Nos équipes travaillent à rétablir le service dans les meilleures conditions.",
+  "information": "Nous vous remercions de votre patience et de votre compréhension."
 }
