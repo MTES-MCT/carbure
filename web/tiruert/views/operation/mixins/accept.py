@@ -60,7 +60,7 @@ class AcceptActionMixin:
 
         operation.status = operation_status
         operation.validation_date = datetime.now()
-        operation.save()
+        operation.save(update_fields=["status", "validation_date"])
         return Response({"status": "accepted"}, status=status.HTTP_200_OK)
 
     @extend_schema(

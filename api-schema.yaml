@@ -13482,6 +13482,40 @@ paths:
               schema:
                 $ref: "#/components/schemas/SimulationMinMaxOutput"
           description: ""
+  /api/tiruert/operations/simulate_debt_repayment/:
+    post:
+      operationId: simulate_debt_repayment
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DebtRepaymentSimulationInputRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/DebtRepaymentSimulationInputRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/DebtRepaymentSimulationInputRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtRepaymentSimulation"
+          description: ""
   /api/tiruert/operations/teneur/declare/:
     post:
       operationId: declare_teneur
@@ -17858,6 +17892,72 @@ components:
       description: |-
         * `PRIMARY` - PRIMARY
         * `INTERMEDIATE` - INTERMEDIATE
+    DebtRepaymentSimulation:
+      type: object
+      properties:
+        selected_lots:
+          type: array
+          items:
+            $ref: "#/components/schemas/SimulationLotOutput"
+        total_volume:
+          type: number
+          format: double
+        repaid_tco2:
+          type: number
+          format: double
+          description: Cumulative tCO2 credited to the debt at 0.001 t precision, used to
+            validate the preview.
+        remaining_tco2:
+          type: number
+          format: double
+          minimum: 0
+        debt_tco2:
+          type: number
+          format: double
+          minimum: 0
+      required:
+        - debt_tco2
+        - remaining_tco2
+        - repaid_tco2
+        - selected_lots
+        - total_volume
+    DebtRepaymentSimulationInputRequest:
+      type: object
+      properties:
+        customs_category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        biofuel:
+          type: integer
+        debited_entity:
+          type: integer
+        unit:
+          type: string
+          minLength: 1
+        ges_bound_min:
+          type: number
+          format: double
+        ges_bound_max:
+          type: number
+          format: double
+        feedstock:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        origin_country:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        durability_period:
+          type: array
+          items:
+            type: string
+            minLength: 1
+      required:
+        - biofuel
+        - customs_category
+        - debited_entity
     DebtSummary:
       type: object
       properties:
@@ -17868,10 +17968,23 @@ components:
         remaining_volume:
           type: number
           format: double
+        remaining_tco2:
+          type: number
+          format: double
+          minimum: 0
       required:
         - biofuel
         - customs_category
+        - remaining_tco2
         - remaining_volume
+    DebtTypeEnum:
+      enum:
+        - VOLUME
+        - TCO2
+      type: string
+      description: |-
+        * `VOLUME` - VOLUME
+        * `TCO2` - TCO2
     DeleteCertificateRequest:
       type: object
       properties:
@@ -21123,6 +21236,8 @@ components:
           allOf:
             - $ref: "#/components/schemas/DevaluationTypeEnum"
           nullable: true
+        debt_type:
+          $ref: "#/components/schemas/DebtTypeEnum"
       required:
         - biofuel
         - customs_category

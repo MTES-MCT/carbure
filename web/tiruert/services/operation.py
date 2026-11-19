@@ -13,7 +13,7 @@ from core.models.feedstock import Biocarburant
 from core.utils import truncate
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilterForBalance
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation, OperationDetail, TiruertDebt
 from tiruert.services.balance import BalanceService
 from tiruert.services.debt import DebtService
 from tiruert.services.energy import energy_mj
@@ -36,14 +36,19 @@ class OperationService:
         One operation, or one per repaid debt for a DEBT_REPAYMENT (the lots are spread over the debts).
         """
         entity_id = request.entity.id
+        debt_type = validated_data.pop("debt_type", TiruertDebt.VOLUME)
         validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
         OperationService.lock_lots_for_update([lot["id"] for lot in selected_lots])
 
         if validated_data["type"] == Operation.DEBT_REPAYMENT:
             # Planned before the checks: it locks the debts, so everything read afterwards is up to date
-            repayments = DebtService.plan_repayment(
-                request.entity, validated_data["biofuel"], validated_data["customs_category"], selected_lots
-            )
+            if debt_type == TiruertDebt.TCO2:
+                OperationService.check_debited_entity(entity_id, validated_data)
+                repayments = DebtService.plan_tco2_repayment(validated_data, selected_lots)
+            else:
+                repayments = DebtService.plan_volume_repayment(
+                    request.entity, validated_data["biofuel"], validated_data["customs_category"], selected_lots
+                )
         else:
             repayments = [(None, selected_lots)]
 
@@ -54,13 +59,16 @@ class OperationService:
 
         OperationService.define_operation_status(validated_data)
 
-        return [
-            OperationService.create_operation_with_details(
-                {**validated_data, **({"debt": debt} if debt else {})},
-                OperationService.build_details_data(lots, emissions_by_lot),
+        operations = []
+        for debt, lots in repayments:
+            details = OperationService.build_details_data(lots, emissions_by_lot)
+            operations.append(
+                OperationService.create_operation_with_details(
+                    {**validated_data, **({"debt": debt} if debt else {})},
+                    details,
+                )
             )
-            for debt, lots in repayments
-        ]
+        return operations
 
     @staticmethod
     def lock_lots_for_update(lot_ids: list[int]) -> list[int]:
@@ -116,6 +124,7 @@ class OperationService:
             biofuel_id=data["biofuel"].id,
             customs_category=data["customs_category"],
             repayment_statuses=[Operation.VALIDATED],
+            debt_type=None,
         )
         if open_debts.exists():
             raise serializers.ValidationError(

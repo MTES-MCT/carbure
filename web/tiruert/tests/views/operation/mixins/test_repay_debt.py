@@ -1,10 +1,13 @@
+from unittest.mock import patch
+
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
 from core.models import MatierePremiere, UserRights
 from core.tests_utils import setup_current_user
-from tiruert.models import Operation
+from tiruert.models import Operation, TiruertDebt
 from tiruert.tests.debt_utils import DebtTestMixin
 
 
@@ -200,6 +203,94 @@ class DebtsViewTest(DebtViewTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), [])
+
+
+class TCO2DebtViewTest(DebtViewTestCase):
+    def setUp(self):
+        super().setUp()
+        self.lot = self.create_lot(100)
+        self.debt = self.create_debt(self.lot, 0.1)
+        self.debt.type = TiruertDebt.TCO2
+        self.debt.save(update_fields=["type"])
+
+    def simulate(self, **extra):
+        return self.client.post(
+            f"{reverse('operations-simulate-debt-repayment')}?entity_id={self.entity.id}",
+            {
+                "biofuel": self.biofuel.id,
+                "customs_category": MatierePremiere.CONV,
+                "debited_entity": self.entity.id,
+                **extra,
+            },
+            content_type="application/json",
+        )
+
+    def test_simulate_then_submit_tco2_and_summary(self):
+        """The dedicated simulation is accepted unchanged and the TCO2 debt closes."""
+        response = self.simulate()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        preview = response.json()
+        self.assertEqual(set(preview), {"selected_lots", "total_volume", "repaid_tco2", "remaining_tco2", "debt_tco2"})
+        response = self.post_repay(
+            [{"id": lot["lot_id"], "volume": float(lot["volume"])} for lot in preview["selected_lots"]],
+            debt_type="TCO2",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.json())
+        self.assertEqual(self.get_debts().json(), [])
+        retry = self.post_repay(
+            [{"id": lot["lot_id"], "volume": float(lot["volume"])} for lot in preview["selected_lots"]],
+            debt_type="TCO2",
+        )
+        self.assertEqual(retry.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).count(), 1)
+
+    def test_tco2_cannot_be_used_for_non_repayment_type(self):
+        """TCO2 debt type cannot be used for other debits."""
+        response = self.post_repay(
+            [{"id": self.lot.id, "volume": 10}],
+            debt_type="TCO2",
+            type=Operation.TRANSFERT,
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_simulation_validates_entity_and_filters(self):
+        """The simulation never reads another entity's stock and applies selection filters."""
+        response = self.simulate(debited_entity=self.other_entity.id)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("debited_entity", response.json())
+        response = self.simulate(debited_entity=None)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.simulate(biofuel=None)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.simulate(ges_bound_min=90)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("NO_AVAILABLE_STOCK", str(response.json()))
+
+    def test_simulation_does_not_use_a_depot_selection(self):
+        """A repayment uses entity stock without validating an unsupported depot filter."""
+        expected = self.simulate()
+        response = self.simulate(from_depot=999999)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.json())
+        self.assertEqual(response.json(), expected.json())
+
+    def test_simulation_requires_write_rights_and_verified_login(self):
+        """The new action requires entity write rights and an OTP-verified user."""
+        UserRights.objects.filter(user=self.user, entity=self.entity).update(role=UserRights.RO)
+        self.assertEqual(self.simulate().status_code, status.HTTP_403_FORBIDDEN)
+        UserRights.objects.filter(user=self.user, entity=self.entity).update(role=UserRights.ADMIN)
+        with patch.object(get_user_model(), "is_verified", return_value=False):
+            self.assertEqual(self.simulate().status_code, status.HTTP_403_FORBIDDEN)
+        self.client.logout()
+        self.assertIn(self.simulate().status_code, (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
+
+    def test_summary_keeps_a_two_decimal_tco2_remainder(self):
+        """TCO2 balances use a two-decimal threshold, matching volume precision."""
+        self.debt.value = 0.01
+        self.debt.save(update_fields=["value"])
+        summary = self.get_debts().json()
+        self.assertEqual(len(summary), 1)
+        self.assertEqual(summary[0]["remaining_volume"], 0)
+        self.assertEqual(summary[0]["remaining_tco2"], 0.01)
 
 
 class DebtRepaymentOperationDisplayTest(DebtViewTestCase):

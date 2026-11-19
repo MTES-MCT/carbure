@@ -21,6 +21,7 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
                         "accept",
                         "simulate",
                         "simulate_min_max",
+                        "simulate_debt_repayment",
                         "create",
                         "update",
                         "partial_update",

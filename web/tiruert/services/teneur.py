@@ -10,7 +10,7 @@ from adapters.logger import log_warning
 from core.utils import truncate
 from tiruert.models import Operation
 from tiruert.services.balance import BalanceService
-from tiruert.services.energy import avoided_emissions_tco2, energy_mj
+from tiruert.services.energy import GHG_REFERENCE_RED_II, avoided_emissions_tco2, energy_mj
 
 
 class TeneurServiceError(Exception):
@@ -22,9 +22,6 @@ class TeneurServiceError(Exception):
     def __init__(self, code):
         self.code = code
         super().__init__(code)
-
-
-GHG_REFERENCE_RED_II = 94  # gCO2/MJ
 
 
 class TeneurService:
