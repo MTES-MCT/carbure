@@ -1,8 +1,13 @@
 from django.db import models
-from django.db.models import F, FloatField, OuterRef, Subquery, Sum
-from django.db.models.functions import Coalesce
+from django.db.models import Case, F, FloatField, OuterRef, Subquery, Sum, Value, When
+from django.db.models.functions import Coalesce, Greatest
 
 from core.models import MatierePremiere
+from tiruert.services.energy import (
+    GHG_REFERENCE_RED_II,
+    avoided_emissions_tco2_expression,
+    energy_mj_expression,
+)
 
 from .operation import Operation
 from .operation_detail import OperationDetail
@@ -14,6 +19,15 @@ class TiruertDebtQuerySet(models.QuerySet):
         if repayment_statuses is None:
             repayment_statuses = Operation.ACTIVE_STATUSES
 
+        avoided_emissions = avoided_emissions_tco2_expression(
+            energy_mj_expression(
+                F("volume"),
+                F("operation__renewable_energy_share"),
+                F("lot__biofuel__pci_litre"),
+            ),
+            F("emission_rate_per_mj"),
+            GHG_REFERENCE_RED_II,
+        )
         repaid = (
             OperationDetail.objects.filter(
                 operation__debt=OuterRef("pk"),
@@ -21,11 +35,23 @@ class TiruertDebtQuerySet(models.QuerySet):
             )
             .order_by()
             .values("operation__debt")
-            .annotate(total=Sum("volume"))
+            .annotate(
+                total=Sum(
+                    Case(
+                        When(operation__debt__type="TCO2", then=avoided_emissions),
+                        default=F("volume"),
+                        output_field=FloatField(),
+                    )
+                )
+            )
             .values("total")
         )
         return self.annotate(repaid=Coalesce(Subquery(repaid, output_field=FloatField()), 0.0)).annotate(
-            remaining=F("value") - F("repaid")
+            remaining=Case(
+                When(type="TCO2", then=Greatest(F("value") - F("repaid"), Value(0.0))),
+                default=F("value") - F("repaid"),
+                output_field=FloatField(),
+            )
         )
 
 

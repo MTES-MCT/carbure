@@ -1,6 +1,6 @@
 from collections import defaultdict
 from copy import copy
-from decimal import Decimal
+from decimal import ROUND_DOWN, Decimal
 
 from django.db import transaction
 from django.db.models import Q, QuerySet, Sum
@@ -10,6 +10,8 @@ from core.models import CarbureLot
 from core.utils import truncate
 from tiruert.models import Operation, OperationDetail, TiruertDebt
 from tiruert.services.balance import BalanceService
+from tiruert.services.debt import DebtService
+from tiruert.services.energy import energy_mj
 from tiruert.services.operation import OperationService
 
 
@@ -46,6 +48,7 @@ class CorrectionService:
     @staticmethod
     @transaction.atomic
     def create_correction_operations_for_lot_update(lot_ids: list[int]):
+        """Apply GHG and volume corrections for the given lots in one transaction."""
         CorrectionService.create_correction_operations_for_lot_ghg_update(lot_ids)
         CorrectionService.create_correction_operations_for_lot_volume_update(lot_ids)
 
@@ -89,6 +92,7 @@ class CorrectionService:
                 "emission_rate_per_mj_delta",
                 "lot__ghg_total",
                 "operation__type",
+                "operation__status",
                 "operation__credited_entity_id",
                 "operation__customs_category",
                 "operation__biofuel_id",
@@ -102,6 +106,18 @@ class CorrectionService:
         for detail in details:
             key = (detail.lot_id, detail.operation.customs_category, detail.operation.biofuel_id)
             details_by_lot_category_biofuel[key].append(detail)
+
+        debtor_ids = (
+            Operation.objects.filter(
+                type=Operation.TRANSFERT,
+                status__in=[Operation.ACCEPTED, Operation.CORRECTED],
+                details__lot_id__in=lot_ids,
+                debited_entity__isnull=False,
+            )
+            .values_list("debited_entity_id", flat=True)
+            .distinct()
+        )
+        DebtService.lock_entities(debtor_ids)
 
         updated_details = []
         corrected_operation_ids = set()
@@ -119,6 +135,13 @@ class CorrectionService:
 
     @staticmethod
     def _apply_ghg_correction(grouped_details: list[OperationDetail]) -> list[OperationDetail]:
+        """
+        Apply the lot's emission-rate change to details sharing a lot, category and biofuel.
+
+        Create the corresponding correction and, depending on the direction of the change,
+        a transfer debt or corrections for transfer recipients. Return the modified details
+        for bulk update; confirmed transfers are excluded when the emission rate increases.
+        """
         initial = next((detail for detail in grouped_details if detail.operation.type in Operation.CREDIT_TYPES), None)
         if initial is None:
             return []
@@ -130,21 +153,73 @@ class CorrectionService:
             return []
 
         source = initial.operation
+        if delta > 0:
+            CorrectionService._create_transfer_tco2_debt(initial, delta)
         CorrectionService._create_ghg_correction(initial, previous_rate, delta, source.credited_entity_id)
         if delta < 0:
             CorrectionService._copy_ghg_correction_to_transfer_recipients(initial, previous_rate, delta)
 
         corrected_details = [
-            detail for detail in grouped_details if delta < 0 or detail.operation.type != Operation.TRANSFERT
+            detail
+            for detail in grouped_details
+            if delta < 0
+            or detail.operation.type != Operation.TRANSFERT
+            or detail.operation.status in [Operation.DRAFT, Operation.PENDING]
         ]
         for detail in corrected_details:
             detail.emission_rate_per_mj_delta = float(current_rate - Decimal(str(detail.emission_rate_per_mj)))
         return corrected_details
 
     @staticmethod
+    def _create_transfer_tco2_debt(initial: OperationDetail, delta: Decimal) -> None:
+        """Create a TCO2 debt for the initiator of confirmed transfers if the emissions loss is significant."""
+        source = initial.operation
+        transfers = CorrectionService._confirmed_transfer_details(
+            [initial.lot_id], source.customs_category, source.biofuel_id
+        )
+        initiator_id = transfers.values_list("operation__debited_entity_id", flat=True).first()
+        if initiator_id is None:
+            return
+        transfers = transfers.filter(operation__debited_entity_id=initiator_id)
+        loss = sum(
+            (
+                energy_mj(
+                    Decimal(str(detail.volume)),
+                    Decimal(str(detail.lot.biofuel.pci_litre)),
+                    Decimal(str(detail.operation.renewable_energy_share)),
+                )
+                * delta
+                / Decimal(1_000_000)
+                for detail in transfers
+            ),
+            Decimal(0),
+        )
+        if loss >= Decimal("0.01"):
+            TiruertDebt.objects.create(
+                type=TiruertDebt.TCO2,
+                value=float(loss.quantize(Decimal("0.01"), rounding=ROUND_DOWN)),
+                entity_id=initiator_id,
+                biofuel_id=source.biofuel_id,
+                customs_category=source.customs_category,
+                lot_id=initial.lot_id,
+            )
+
+    @staticmethod
+    def _confirmed_transfer_details(lot_ids, customs_category, biofuel_id):
+        """Return accepted or corrected transfer details in chronological order."""
+        return OperationDetail.objects.filter(
+            lot_id__in=lot_ids,
+            operation__type=Operation.TRANSFERT,
+            operation__customs_category=customs_category,
+            operation__biofuel_id=biofuel_id,
+            operation__status__in=[Operation.ACCEPTED, Operation.CORRECTED],
+        ).order_by("operation__created_at", "id")
+
+    @staticmethod
     def _copy_ghg_correction_to_transfer_recipients(
         initial: OperationDetail, previous_rate: Decimal, delta: Decimal
     ) -> None:
+        """Create a GHG correction for each distinct transfer recipient other than the initial creditor."""
         source = initial.operation
         recipients = (
             Operation.objects.filter(
@@ -326,6 +401,7 @@ class CorrectionService:
 
     @staticmethod
     def _create_volume_correction(converted_lot, credit_data: dict, volume_delta: float):
+        """Create a validated credit or debit correction for the converted lot's volume change."""
         is_credit = volume_delta > 0
         entity_id = credit_data["entity_id"]
 
