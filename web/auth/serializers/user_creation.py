@@ -1,8 +1,8 @@
-from django.contrib.auth import get_user_model, password_validation
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from auth.validators import validate_name
+from auth.serializers.credentials import validate_password_confirmation, validated_name
 
 User = get_user_model()
 
@@ -31,21 +31,12 @@ class UserCreationSerializer(serializers.ModelSerializer):
         return User.objects.normalize_email(value)
 
     def validate_name(self, value):
-        validate_name(value)
-        return value
+        return validated_name(value)
 
     def validate(self, data):
-        if data["password1"] != data["password2"]:
-            raise serializers.ValidationError({"password2": _("The two password fields didn't match.")})
-
-        try:
-            # Create a temporary user instance for password validation
-            # UserAttributeSimilarityValidator requires a user instance to check against
-            temp_user = User(**{k: v for k, v in data.items() if k not in ("password1", "password2")})
-            password_validation.validate_password(data["password2"], temp_user)
-        except serializers.ValidationError as e:
-            raise serializers.ValidationError({"password2": e.messages})
-
+        # The account does not exist yet. Similarity is checked against the submitted name and email.
+        user = User(**{k: v for k, v in data.items() if k not in ("password1", "password2")})
+        validate_password_confirmation(data["password1"], data["password2"], user)
         return data
 
     def create(self, validated_data):

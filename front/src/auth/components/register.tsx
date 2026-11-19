@@ -122,7 +122,12 @@ export const Register = () => {
         </Button>
       </Content>
       <HashRoute path="pending" element={<RegisterPending />} />
-      <HashRoute path="activate-request" element={<ActivateRequest />} />
+      <HashRoute
+        path="activate-request"
+        element={
+          <ActivateRequest onClose={() => navigate(ROUTE_URLS.AUTH.REGISTER)} />
+        }
+      />
     </Container>
   )
 }

@@ -60,7 +60,9 @@ class RequestPasswordResetAction:
         try:
             email = retrieve_email(request.data)
             user = get_user_model().objects.get(email=email)
-            send_notification_mail(user, request)
+            # An invited account has no password yet. The activation form collects the name.
+            if user.is_active or user.has_usable_password():
+                send_notification_mail(user, request)
             return Response({"status": "success"})
 
         except Exception:

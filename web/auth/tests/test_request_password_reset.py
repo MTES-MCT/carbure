@@ -67,3 +67,11 @@ class RequestPasswordResetTests(TestCase):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data == {"status": "success"}
+
+    def test_pending_invite_does_not_receive_a_reset_mail(self):
+        User.objects.create_user(email="invite@example.com", password=None, is_active=False)
+
+        response = self.client.post(self.request_password_reset_url, {"username": "invite@example.com"})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(mail.outbox) == 0

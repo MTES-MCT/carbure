@@ -1,9 +1,8 @@
-import datetime
-
 from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema_field
 from rest_framework.serializers import ChoiceField
 
@@ -35,11 +34,25 @@ class DoubleCountingRegistration(models.Model):
     EXPIRES_SOON = "EXPIRES_SOON"
     INCOMING = "INCOMING"
 
+    # calculated status based on validity dates (see `computed_status` property)
     AGREEMENT_STATUS = (
         (ACTIVE, ACTIVE),
         (EXPIRED, EXPIRED),
         (EXPIRES_SOON, EXPIRES_SOON),
         (INCOMING, INCOMING),
+    )
+
+    # administrative status manually defined (see `status`)
+    VALID = "VALID"
+    SUSPENDED = "SUSPENDED"
+    WITHDRAWN = "WITHDRAWN"
+    TERMINATED = "TERMINATED"
+
+    STATUS_CHOICES = (
+        (VALID, "Valide"),
+        (SUSPENDED, "Suspendu"),
+        (WITHDRAWN, "Retiré"),
+        (TERMINATED, "Interrompu"),
     )
 
     certificate_id = models.CharField(max_length=64)
@@ -49,6 +62,7 @@ class DoubleCountingRegistration(models.Model):
     valid_from = models.DateField()
     valid_until = models.DateField()
     application = models.ForeignKey(DoubleCountingApplication, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=VALID)
 
     def natural_key(self):
         return {
@@ -57,14 +71,13 @@ class DoubleCountingRegistration(models.Model):
             "registered_address": self.registered_address,
             "valid_from": self.valid_from,
             "valid_until": self.valid_until,
-            # "status": self.get_status,
         }
 
     @property
     @extend_schema_field(ChoiceField(choices=AGREEMENT_STATUS))
-    def status(self):
+    def computed_status(self):
         ENDING_MONTH_DELAY = 6
-        current_date = datetime.datetime.now().date()
+        current_date = timezone.localdate()
         if current_date > self.valid_until:
             return DoubleCountingRegistration.EXPIRED
         else:

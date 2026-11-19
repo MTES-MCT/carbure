@@ -40,10 +40,10 @@ class RejectActionMixinTest(TestCase):
     def test_reject_operation_updates_status_to_rejected(self):
         """Test POST /operations/:id/reject/ changes operation status to REJECTED."""
         operation = OperationFactory(
-            type=Operation.CESSION,
+            type=Operation.TRANSFERT,
             status=Operation.PENDING,
-            debited_entity=self.entity,
-            credited_entity=self.other_entity,
+            debited_entity=self.other_entity,
+            credited_entity=self.entity,
         )
         url = reverse("operations-reject", kwargs={"pk": operation.id})
 
@@ -54,3 +54,35 @@ class RejectActionMixinTest(TestCase):
 
         operation.refresh_from_db()
         self.assertEqual(operation.status, Operation.REJECTED)
+
+    def test_reject_teneur_is_forbidden(self):
+        """Operations other than transfers cannot be rejected through the API."""
+        operation = OperationFactory(
+            type=Operation.TENEUR,
+            status=Operation.PENDING,
+            debited_entity=self.entity,
+            credited_entity=self.other_entity,
+        )
+        url = reverse("operations-reject", kwargs={"pk": operation.id})
+
+        response = self.client.post(url, query_params=self.base_params)
+
+        self.assertEqual(response.status_code, 403)
+        operation.refresh_from_db()
+        self.assertEqual(operation.status, Operation.PENDING)
+
+    def test_reject_non_pending_transfer_is_forbidden(self):
+        """Transfers that are no longer pending cannot be rejected through the API."""
+        operation = OperationFactory(
+            type=Operation.TRANSFERT,
+            status=Operation.ACCEPTED,
+            debited_entity=self.other_entity,
+            credited_entity=self.entity,
+        )
+        url = reverse("operations-reject", kwargs={"pk": operation.id})
+
+        response = self.client.post(url, query_params=self.base_params)
+
+        self.assertEqual(response.status_code, 403)
+        operation.refresh_from_db()
+        self.assertEqual(operation.status, Operation.ACCEPTED)

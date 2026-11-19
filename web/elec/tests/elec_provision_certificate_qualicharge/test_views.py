@@ -118,6 +118,17 @@ class ElecProvisionCertificateQualichargeViewSetListTest(TestCase):
         self.assertIn("total_quantity_renewable", data)
         self.assertEqual(data["total_quantity_renewable"], 3750.0)  # 15000 * 0.25
 
+    def test_list_metadata_empty_queryset(self):
+        """Test pagination metadata defaults to 0 when queryset is empty"""
+        self.list_params["query_params"]["year"] = 2099
+        response = self.client.get(**self.list_params)
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["count"], 0)
+        self.assertEqual(data["total_quantity"], 0.0)
+        self.assertEqual(data["total_quantity_renewable"], 0.0)
+
     def test_retrieve_certificate(self):
         """Test certificate retrieval"""
         certificate = ElecProvisionCertificateQualichargeFactory(

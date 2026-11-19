@@ -1,9 +1,14 @@
-import { DoubleCountingStatus, DoubleCountingAgreementStatus } from "api-schema"
+import {
+  DoubleCountingStatus,
+  DoubleCountingAgreementStatus,
+  DoubleCountingRegistrationStatusEnum,
+} from "api-schema"
 import { Biofuel, Feedstock } from "common/types"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export { DoubleCountingStatus }
 export { DoubleCountingAgreementStatus as AgreementStatus }
+export { DoubleCountingRegistrationStatusEnum as AgreementRegistrationStatus }
 
 export enum Admin {
   DGEC = "MTE - DGEC",
@@ -80,6 +85,7 @@ export interface DoubleCountingAgreementsSnapshot {
   agreements_active: number
   agreements_expired: number
   agreements_incoming: number
+  agreements_inactive: number
 }
 
 export type DoubleCountingSnapshot = apiTypes["ApplicationSnapshot"]
@@ -93,6 +99,7 @@ export interface DoubleCountingAgreementsOverview {
   active: DoubleCountingAgreementOverview[]
   incoming: DoubleCountingAgreementOverview[]
   expired: DoubleCountingAgreementOverview[]
+  inactive: DoubleCountingAgreementOverview[]
 }
 
 export type DoubleCountingAgreementOverview =

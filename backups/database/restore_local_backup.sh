@@ -27,6 +27,11 @@ if [[ -z "$DATABASE_URL" ]]; then
   exit 1
 fi
 
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
+# shellcheck source=mysql_url.sh
+source "$script_dir/mysql_url.sh"
+
 if [[ -d "$backup_path" ]]; then
   shopt -s nullglob
   backup_files=("$backup_path"/*.tar.gz)
@@ -37,26 +42,7 @@ else
   backup_file=$backup_path
 fi
 
-URL=${DATABASE_URL#*://}
-AUTH=${URL%%/*}
-USER_INFO=${AUTH%@*}
-HOST_PORT=${AUTH##*@}
-
-MYSQL_DATABASE=${URL#*/}
-MYSQL_DATABASE=${MYSQL_DATABASE%%\?*}
-MYSQL_USER=${USER_INFO%%:*}
-MYSQL_HOST=${HOST_PORT%%:*}
-MYSQL_PORT=${HOST_PORT#*:}
-
-# Extract password from DATABASE_URL if present, otherwise prompt the user
-if [[ "$USER_INFO" == *:* ]]; then
-  MYSQL_PASSWORD=${USER_INFO#*:}
-else
-  read -r -s -p "MySQL password: " MYSQL_PASSWORD
-  echo
-fi
-
-MYSQL=(mysql --user="$MYSQL_USER" --password="$MYSQL_PASSWORD" --host="$MYSQL_HOST" --port="$MYSQL_PORT" --protocol=tcp)
+parse_mysql_url
 
 echo "> Recreating database '$MYSQL_DATABASE'..."
 "${MYSQL[@]}" -e "DROP DATABASE IF EXISTS \`$MYSQL_DATABASE\`;"

@@ -4,7 +4,8 @@ from datetime import date
 from django.test import TestCase
 from django.urls import reverse
 
-from core.models import CarbureLot, Entity, Pays, UserRights
+from certificates.models import DoubleCountingRegistration
+from core.models import CarbureLot, Entity, MatierePremiere, Pays, UserRights
 from core.tests_utils import setup_current_user
 from doublecount.factories.agreement import DoubleCountingRegistrationFactory
 from doublecount.factories.application import DoubleCountingApplicationFactory
@@ -130,6 +131,108 @@ class AdminDoubleCountAgreementsTest(TestCase):
         total_progression = (prod3_progression + prod1_progression) / 2
         assert active_agreement1["quotas_progression"] == round(total_progression, 2)
 
+    def test_get_agreements_inactive(self):
+        """Test retrieving inactive agreements."""
+        valid_agreement, *_ = self.create_agreement()
+        suspended_agreement, *_ = self.create_agreement()
+        suspended_agreement.status = DoubleCountingRegistration.SUSPENDED
+        suspended_agreement.save()
+
+        response = self.client.get(
+            reverse("double-counting-agreements-agreement-admin"),
+            {"entity_id": self.admin.id, "year": 2023, "order_by": "production_site"},
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        assert [a["id"] for a in data["active"]] == [valid_agreement.id]
+        assert [a["id"] for a in data["inactive"]] == [suspended_agreement.id]
+        assert data["inactive"][0]["status"] == DoubleCountingRegistration.SUSPENDED
+
+    def test_get_agreements_incoming_and_expired_exclude_inactive(self):
+        valid_agreement, *_ = self.create_agreement()
+        suspended_agreement, *_ = self.create_agreement()
+        suspended_agreement.status = DoubleCountingRegistration.SUSPENDED
+        suspended_agreement.save()
+
+        def get_lists(year):
+            response = self.client.get(
+                reverse("double-counting-agreements-agreement-admin"),
+                {"entity_id": self.admin.id, "year": year},
+            )
+            assert response.status_code == 200
+            return response.json()
+
+        # agreements start in 2023 and end after the current year
+        incoming = get_lists(self.requested_start_year - 1)["incoming"]
+        assert [a["id"] for a in incoming] == [valid_agreement.id]
+
+        expired = get_lists(valid_agreement.valid_until.year + 1)["expired"]
+        assert [a["id"] for a in expired] == [valid_agreement.id]
+
+    def test_update_agreement_status(self):
+        agreement, *_ = self.create_agreement()
+        response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.SUSPENDED},
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.admin.id}",
+        )
+
+        assert response.status_code == 200
+        assert response.json()["status"] == DoubleCountingRegistration.SUSPENDED
+        agreement.refresh_from_db()
+        assert agreement.status == DoubleCountingRegistration.SUSPENDED
+
+    def test_update_inactive_agreement_status(self):
+        agreement, *_ = self.create_agreement()
+        agreement.status = DoubleCountingRegistration.WITHDRAWN
+        agreement.save()
+
+        response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.TERMINATED},
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.admin.id}",
+        )
+
+        assert response.status_code == 200
+        assert response.json()["status"] == DoubleCountingRegistration.TERMINATED
+        agreement.refresh_from_db()
+        assert agreement.status == DoubleCountingRegistration.TERMINATED
+
+    def test_update_agreement_status_to_valid(self):
+        agreement, *_ = self.create_agreement()
+        agreement.status = DoubleCountingRegistration.SUSPENDED
+        agreement.save()
+
+        response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.VALID},
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.admin.id}",
+        )
+
+        assert response.status_code == 200
+        assert response.json()["status"] == DoubleCountingRegistration.VALID
+        agreement.refresh_from_db()
+        assert agreement.status == DoubleCountingRegistration.VALID
+
+    def test_read_only_admin_cannot_update_agreement_status(self):
+        agreement, *_ = self.create_agreement()
+        setup_current_user(self, "readonly@carbure.local", "Read Only", "gogogo", [(self.admin, UserRights.RO)], True)
+
+        response = self.client.patch(
+            reverse("double-counting-agreements-update-status", kwargs={"id": agreement.id}),
+            {"status": DoubleCountingRegistration.SUSPENDED},
+            content_type="application/json",
+            QUERY_STRING=f"entity_id={self.admin.id}",
+        )
+
+        assert response.status_code == 403
+        agreement.refresh_from_db()
+        assert agreement.status == DoubleCountingRegistration.VALID
+
     def test_get_agreements_excel(self):
         self.create_agreement()
 
@@ -143,6 +246,13 @@ class AdminDoubleCountAgreementsTest(TestCase):
     def test_get_agreement_details(self):
         agreement, app, production1, production2, production3 = self.create_agreement()
         agreement_id = agreement.id
+        non_industrial_feedstocks = list(
+            MatierePremiere.biofuel.filter(is_double_compte=True, is_industrial_waste=False).order_by("id")[:3]
+        )
+        self.assertEqual(len(non_industrial_feedstocks), 3)
+        for production, feedstock in zip((production1, production2, production3), non_industrial_feedstocks, strict=True):
+            production.feedstock = feedstock
+            production.save(update_fields=["feedstock"])
 
         start_year = agreement.valid_from.year
 
@@ -158,7 +268,7 @@ class AdminDoubleCountAgreementsTest(TestCase):
         data = response.json()
         application = data["application"]
         quotas = data["quotas"]
-        assert not data["has_dechets_industriels"]
+        assert data["has_dechets_industriels"] is False
 
         assert application["id"] == app.id
         assert len(quotas) == 2  # production 1 +production 3

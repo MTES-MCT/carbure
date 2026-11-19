@@ -88,7 +88,11 @@ const Teneur = () => {
                 />
               </p>
             </Col>
-            <Button priority="primary" onClick={onValidatePendingTeneurClick}>
+            <Button
+              priority="primary"
+              onClick={onValidatePendingTeneurClick}
+              disabled={!entity.canWrite()}
+            >
               {t("Valider ma teneur")}
             </Button>
           </Row>

@@ -14,7 +14,7 @@ from transactions.repositories.admin_lots_repository import TransactionsAdminLot
 
 
 @check_admin_rights(allow_external=[ExternalAdminRights.BIOFUEL])
-@csp_exempt
+@csp_exempt()
 @xframe_options_sameorigin
 def map(request, entity, entity_id):
     status = request.GET.get("status", False)

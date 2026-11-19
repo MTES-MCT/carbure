@@ -13,7 +13,7 @@
       "size": "M"
     },
     {
-      "command": "45 1 * * * bash database/restore.sh scalingo carbure-prod \"$READ_REPLICA_DATABASE_URL\"",
+      "command": "45 1 * * * bash database/restore_and_anonymize.sh scalingo carbure-prod \"$READ_REPLICA_DATABASE_URL\"",
       "size": "M"
     },
     {

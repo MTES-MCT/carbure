@@ -194,6 +194,11 @@ class AdminDoubleCountApplicationsTest(TestCase):
 
     def test_export_application(self):
         application, sourcing1, production1, sourcing2, production2 = self.create_application()
+        non_industrial_feedstock = MatierePremiere.biofuel.filter(is_double_compte=True, is_industrial_waste=False).first()
+        self.assertIsNotNone(non_industrial_feedstock)
+        for production in (production1, production2):
+            production.feedstock = non_industrial_feedstock
+            production.save(update_fields=["feedstock"])
 
         assert application.status != DoubleCountingApplication.ACCEPTED
 

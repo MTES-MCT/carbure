@@ -127,7 +127,7 @@ const DoubleCounting = () => {
           />
           <Route
             path="*"
-            element={<Navigate to={DoubleCountingTab.ACTIVE} />}
+            element={<Navigate to={`../${DoubleCountingTab.ACTIVE}`} />}
           />
         </Routes>
       </Content>

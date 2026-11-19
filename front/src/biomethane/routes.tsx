@@ -188,7 +188,10 @@ export const BiomethaneProviderRoutes = () => (
       path="provider/declarations"
       element={<Navigate replace to={`${lastSelectableDeclarationYear}`} />}
     />
-    <Route path="*" element={<Navigate replace to="provider/declarations" />} />
+    <Route
+      path="*"
+      element={<Navigate replace to="../provider/declarations" />}
+    />
   </Routes>
 )
 
@@ -243,7 +246,7 @@ export const BiomethaneAdminRoutes = () => {
           </>
         )}
       </Route>
-      <Route path="*" element={<Navigate replace to="admin/dashboard" />} />
+      <Route path="*" element={<Navigate replace to="../admin/dashboard" />} />
     </Routes>
   )
 }

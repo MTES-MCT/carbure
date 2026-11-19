@@ -9,6 +9,7 @@ from .biofuel_feedstock import check_deprecated_mp, check_mp_bc_incoherent, chec
 from .certificates import check_certificate_validity
 from .double_counting import (
     check_expired_double_counting_certificate,
+    check_inactive_double_counting_certificate,
     check_invalid_double_counting_certificate,
     check_missing_ref_dbl_counting,
     check_unknown_double_counting_certificate,
@@ -16,11 +17,9 @@ from .double_counting import (
 from .general import (
     check_declaration_already_validated,
     check_delivery_in_the_future,
-    check_depot_not_configured,
     check_mac_bc_wrong,
     check_mac_not_efpe,
     check_missing_delivery_type,
-    check_volume_faible,
     check_year_locked,
 )
 from .ghg import (
@@ -88,6 +87,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         check_unknown_double_counting_certificate(lot, prefetched_data),
         check_expired_double_counting_certificate(lot, prefetched_data),
         check_invalid_double_counting_certificate(lot, prefetched_data),
+        check_inactive_double_counting_certificate(lot, prefetched_data),
         # biofuel/feedstock errors
         *check_mp_bc_incoherent(lot),  # this one generates a list of errors so we flatten it with *
         *check_provenance_mp(lot),  # same here
@@ -109,14 +109,12 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         check_ghg_reduc_for_production_site(lot),
         # general errors
         check_declaration_already_validated(lot, prefetched_data),
-        check_volume_faible(lot),
         check_year_locked(lot, prefetched_data),
         check_mac_bc_wrong(lot),
         check_mac_not_efpe(lot),
         check_delivery_in_the_future(lot),
         # check_mp_not_configured(lot, prefetched_data),
         # check_bc_not_configured(lot, prefetched_data),
-        check_depot_not_configured(lot, prefetched_data),
         # check_delivery_date_validity(lot),
         check_certificate_validity(lot, prefetched_data),
         check_missing_delivery_type(lot),

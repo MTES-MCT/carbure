@@ -1,8 +1,9 @@
 import { resolvePath, useLocation, useResolvedPath } from "react-router-dom"
 
-export function useMatcher() {
+export function useMatcher(basePath?: string) {
   const location = useLocation()
-  const parentPath = useResolvedPath(".").pathname.trim()
+  const resolvedPath = useResolvedPath(".")
+  const parentPath = (basePath ?? resolvedPath.pathname).trim()
   const currentPath = location.pathname.trim()
 
   return (path: string | undefined) => {
@@ -11,7 +12,10 @@ export function useMatcher() {
     } else if (path.startsWith("#")) {
       return path === location.hash
     } else {
-      const tabPath = resolvePath(path, parentPath).pathname.trim()
+      const fromPath = /^\.\.(\/|$)/.test(path)
+        ? resolvedPath.pathname
+        : parentPath
+      const tabPath = resolvePath(path, fromPath).pathname.trim()
       const startsWithPath =
         currentPath.startsWith(tabPath) &&
         currentPath.charAt(tabPath.length) === "/"

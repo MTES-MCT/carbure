@@ -25,6 +25,9 @@ class RejectActionMixin:
     @action(detail=True, methods=["post"])
     def reject(self, request, pk=None):
         operation = self.get_object()
+        if operation.type not in Operation.API_REJECTABLE_TYPES or operation.status != Operation.PENDING:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         operation.status = Operation.REJECTED
         operation.save()
 

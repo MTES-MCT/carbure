@@ -11,9 +11,17 @@ CERTIFICATE_PROCESSING_ERROR = "CERTIFICATE_PROCESSING_ERROR"
 CERTIFICATE_PROCESSING_ERROR_MESSAGE = "Unable to process this certificate."
 
 
+def _is_list_item_errors(errors):
+    return isinstance(errors, dict) and all(isinstance(index, int) for index in errors)
+
+
 def handle_bulk_create_validation_errors(request, serializer):
+    if any(not isinstance(index, int) for index in serializer.errors):
+        raise serializers.ValidationError(serializer.errors)
+
     errors = []
-    for idx, (item_errors, item_data) in enumerate(zip(serializer.errors, request.data)):
+    for idx, item_errors in serializer.errors.items():
+        item_data = request.data[idx]
         if not item_errors:
             continue
 
@@ -22,28 +30,30 @@ def handle_bulk_create_validation_errors(request, serializer):
 
         # Errors at entity level
         for field, messages in item_errors.items():
-            if field != "operational_units":
+            if field != "operational_units" or not _is_list_item_errors(messages):
                 errors.append({"index": idx, "entity": entity, "siren": siren, "field": field, "errors": messages})
 
         # Errors at operational unit level
-        if "operational_units" in item_errors:
+        if _is_list_item_errors(item_errors.get("operational_units")):
             operational_units = item_data.get("operational_units", [])
-            for unit_error, unit_data in zip(item_errors["operational_units"], operational_units):
+            for unit_idx, unit_error in item_errors["operational_units"].items():
+                unit_data = operational_units[unit_idx]
                 if not unit_error:
                     continue
 
                 code = unit_data.get("code", "")
 
                 for field, messages in unit_error.items():
-                    if field != "stations":
+                    if field != "stations" or not _is_list_item_errors(messages):
                         errors.append(
                             {"index": idx, "entity": entity, "unit_code": code, "field": field, "errors": messages}
                         )
 
                 # Errors at station level
-                if "stations" in unit_error:
+                if _is_list_item_errors(unit_error.get("stations")):
                     stations = unit_data.get("stations", [])
-                    for station_error, station_data in zip(unit_error["stations"], stations):
+                    for station_idx, station_error in unit_error["stations"].items():
+                        station_data = stations[station_idx]
                         if not station_error:
                             continue
 
