@@ -89,4 +89,4 @@ flush:
 	$(django_cmd) flush
 
 fallback:
-	python3 fallback/generate.py
+	uv run python fallback/generate.py
