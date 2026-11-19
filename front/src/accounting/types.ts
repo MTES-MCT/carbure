@@ -19,6 +19,7 @@ import {
   PathsApiTiruertElecOperationsGetParametersQueryOrder_by as ElecOperationOrder,
   PathsApiTiruertElecOperationsFiltersGetParametersQueryFilter as ElecOperationsFilter,
   ElecOperationTypeEnum as CreateElecOperationType,
+  DebtTypeEnum as DebtType,
 } from "api-schema"
 import { QueryBuilder } from "common/hooks/query-builder-2"
 
@@ -61,6 +62,7 @@ export {
   OperationsFilter,
   OperationDebitOrCredit,
   OperationBiofuelCategory,
+  DebtType,
   BalancesGroupBy,
   OperationOrder,
   ElecOperationOrder,
