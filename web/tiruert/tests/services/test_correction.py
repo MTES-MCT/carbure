@@ -870,7 +870,7 @@ class CorrectionServiceVolumeTest(TestCase):
         )
 
     def test_ghg_increase_does_not_correct_transfers(self):
-        """Leave transfer details and statuses unchanged when GHG emissions increase."""
+        """Leave confirmed transfer details and statuses unchanged when GHG emissions increase."""
         lot = self.create_lot(ghg_total=20)
         transfer = self.create_transfer(
             lot,
@@ -886,6 +886,27 @@ class CorrectionServiceVolumeTest(TestCase):
         self.assertEqual(transfer.status, Operation.ACCEPTED)
         self.assertFalse(transfer.corrected)
         self.assertIsNone(detail.emission_rate_per_mj_delta)
+
+    def test_ghg_increase_updates_draft_and_pending_transfers(self):
+        """Update unaccepted transfer emissions so beneficiaries see the corrected rate before acceptance."""
+        lot = self.create_lot(ghg_total=20)
+        recipient = Entity.objects.create(name="Transfer recipient", entity_type=Entity.OPERATOR)
+        transfers = [
+            (self.create_transfer(lot, recipient, status=transfer_status), transfer_status)
+            for transfer_status in (Operation.DRAFT, Operation.PENDING)
+        ]
+
+        lot.ghg_total = 25
+        lot.save(update_fields=["ghg_total"])
+        CorrectionService.create_correction_operations_for_lot_ghg_update([lot.id])
+
+        for transfer, original_status in transfers:
+            with self.subTest(status=original_status):
+                transfer.refresh_from_db()
+                detail = transfer.details.get()
+                self.assertEqual(transfer.status, original_status)
+                self.assertTrue(transfer.corrected)
+                self.assertEqual(detail.emission_rate_per_mj_delta, 5)
 
     def test_ghg_correction_rejects_accepted_transfer_without_recipient(self):
         """Roll back the event rather than silently losing a recipient's correction."""

@@ -3,6 +3,8 @@ from decimal import Decimal
 from django.db.models import ExpressionWrapper, FloatField, Value
 from django.db.models.functions import Coalesce
 
+GHG_REFERENCE_RED_II = 94  # gCO2/MJ
+
 
 def effective_emission_rate_per_mj(emission_rate, delta=None):
     return float(Decimal(str(emission_rate)) + Decimal(str(delta if delta is not None else 0)))
