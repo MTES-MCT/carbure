@@ -39,7 +39,7 @@ def get_applications(request, entity):
     limit = applications_sort_form.cleaned_data["limit"] or 25
 
     applications = ChargePointRepository.get_annotated_applications_by_cpo(entity)
-    applications = filter_charge_point_applications(applications, **applications_filter_form.cleaned_data)
+    applications = filter_charge_point_applications(applications, **applications_filter_form.cleaned_data).order_by("id")
 
     if applications_sort_form.cleaned_data["from_idx"] is not None:
         paginator = Paginator(applications, limit)

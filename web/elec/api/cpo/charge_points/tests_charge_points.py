@@ -21,13 +21,10 @@ class ElecCharginPointsTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         # mock call to TransportDataGouv not to depend on the dynamic CSV and have predictable "allowed" charge points
-        cls.mocked_download_csv = patch("elec.services.transport_data_gouv.TransportDataGouv.download_csv").start()
+        download_csv_patch = patch("elec.services.transport_data_gouv.TransportDataGouv.download_csv")
+        cls.addClassCleanup(download_csv_patch.stop)
+        cls.mocked_download_csv = download_csv_patch.start()
         cls.mocked_download_csv.return_value = "%s/web/elec/fixtures/transport_data_gouv.csv" % (os.environ["CARBURE_HOME"])
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls.mocked_download_csv.stop()
 
     def setUp(self):
         self.cpo = Entity.objects.create(
@@ -504,13 +501,13 @@ class ElecCharginPointsTest(TestCase):
         assert data["data"][0]["status"] == "PENDING"
 
         # With pagination
-        response = self.client.get(
-            reverse("elec-cpo-charge-points-get-applications"),
-            {"entity_id": self.cpo.id, "from_idx": 0, "limit": 1},
-        )
-        data = response.json()
-        assert response.status_code == 200
-        assert len(data["data"]) == 1
+        for index, expected_application in enumerate((application, application2, application3)):
+            response = self.client.get(
+                reverse("elec-cpo-charge-points-get-applications"),
+                {"entity_id": self.cpo.id, "from_idx": index, "limit": 1},
+            )
+            assert response.status_code == 200
+            assert [item["id"] for item in response.json()["data"]] == [expected_application.id]
 
     def test_get_charge_points_ok(self):
         application = ElecChargePointApplication.objects.create(cpo=self.cpo)

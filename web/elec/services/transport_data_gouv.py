@@ -9,7 +9,8 @@ from core.utils import is_true
 
 
 class TransportDataGouv:
-    URL = "https://www.data.gouv.fr/api/1/datasets/5448d3e0c751df01f85d0572/"
+    URL = "https://www.data.gouv.fr/api/1/datasets/685965d0ab901919e14a4a1b/"
+    RESOURCE_ID = "4ca78c71-4ea4-475d-bd3a-d4aef88f7bf8"
 
     CSV_COLUMNS = [
         "id_station_itinerance",
@@ -20,7 +21,6 @@ class TransportDataGouv:
         "prise_type_combo_ccs",
         "prise_type_chademo",
         "date_maj",
-        "last_modified",
         "nom_amenageur",
         "siren_amenageur",
     ]
@@ -43,7 +43,6 @@ class TransportDataGouv:
         "prise_type_combo_ccs": "max",
         "prise_type_chademo": "max",
         "date_maj": "max",
-        "last_modified": "max",
         "nom_amenageur": "first",
         "siren_amenageur": "first",
     }
@@ -121,8 +120,9 @@ class TransportDataGouv:
 
         data = api_response.json()
 
-        dataset_url: str = data["resources"][0]["latest"]
-        last_modified = isoparse(data["resources"][0]["last_modified"])
+        resource = next(resource for resource in data["resources"] if resource["id"] == TransportDataGouv.RESOURCE_ID)
+        dataset_url: str = resource["latest"]
+        last_modified = isoparse(resource["last_modified"])
         file_path = f"/tmp/transport_data_gouv_charge_points_{last_modified:%Y-%m-%d_%H-%M-%S}.csv"
 
         # cache the csv to the filesystem to avoid refetching it every time
@@ -141,7 +141,7 @@ class TransportDataGouv:
             sep=",",
             header=0,
             usecols=TransportDataGouv.CSV_COLUMNS,
-            parse_dates=["last_modified", "date_maj"],
+            parse_dates=["date_maj"],
             dayfirst=False,
             encoding="utf-8",
             engine="python",
