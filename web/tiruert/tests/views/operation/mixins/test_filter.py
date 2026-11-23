@@ -224,7 +224,7 @@ class FilterBalanceSectorAnnotationTest(TestCase):
         self.view = DummyFilterView()
 
     def test_balance_sector_filter_returns_gpl_for_gpl_compatible_biofuel(self):
-        """The balance sector annotation should include GPL_C."""
+        """The balance sector annotation should include GPL."""
         entity = Entity.objects.filter(entity_type=Entity.OPERATOR).first()
         feedstock = MatierePremiere.biofuel.filter(category=MatierePremiere.CONV).first()
         biofuel = Biocarburant.objects.create(
@@ -264,4 +264,4 @@ class FilterBalanceSectorAnnotationTest(TestCase):
 
         response = self.view.filters_balance(request)
 
-        self.assertEqual(response.data, [Operation.GPL_C])
+        self.assertEqual(response.data, [Operation.GPL])

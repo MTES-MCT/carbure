@@ -34,7 +34,7 @@ class FeedStockSerializer(serializers.ModelSerializer):
 class BiofuelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Biocarburant
-        fields = ["name", "name_en", "code"]
+        fields = ["name", "name_en", "code", "compatible_gpl"]
 
 
 class BiofuelDetailSerializer(serializers.ModelSerializer):

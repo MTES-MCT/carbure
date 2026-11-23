@@ -14,6 +14,7 @@ import { LotFormValue } from "./lot-form"
 import { Biofuel, Country, Feedstock, Unit } from "common/types"
 import { Option } from "common/utils/normalize"
 import { useFeedstockParams } from "common/hooks/api/use-feedstocks"
+import useEntity from "common/hooks/entity"
 
 interface LotFieldsProps {
   readOnly?: boolean
@@ -97,6 +98,7 @@ export const UnitSelect = (props: SelectProps<Option<Unit>, Unit>) => {
 
 export const BiofuelField = (props: AutocompleteProps<Biofuel>) => {
   const { t } = useTranslation()
+  const entity = useEntity()
   const bind = useBind<LotFormValue>()
   const bound = bind("biofuel")
   return (
@@ -104,7 +106,7 @@ export const BiofuelField = (props: AutocompleteProps<Biofuel>) => {
       required
       label={t("Biocarburant")}
       defaultOptions={bound.value ? [bound.value] : undefined}
-      getOptions={api.findBiofuels}
+      getOptions={(query) => api.findBiofuels(query, entity.id)}
       normalize={norm.normalizeBiofuel}
       {...bound}
       {...props}

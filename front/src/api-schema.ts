@@ -3767,10 +3767,10 @@ export interface components {
             pos_id?: string | null;
         };
         /**
-         * @description * `ROAD` - Road transport
+         * @description * `ROAD` - Transport routier
          *     * `PIPELINE` - Pipeline
          *     * `RAILROAD` - Rail
-         *     * `SEA` - Maritime transport
+         *     * `SEA` - Transport maritime
          * @enum {string}
          */
         ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
@@ -4000,11 +4000,13 @@ export interface components {
             name: string;
             name_en: string;
             code: string;
+            compatible_gpl?: boolean;
         };
         BiofuelRequest: {
             name: string;
             name_en: string;
             code: string;
+            compatible_gpl?: boolean;
         };
         /** @description Serializer pour la liste admin des déclarations annuelles biométhane (DREAL). */
         BiomethaneAdminAnnualDeclaration: {
@@ -6408,7 +6410,7 @@ export interface components {
          * @description * `ESSENCE` - ESSENCE
          *     * `GAZOLE` - GAZOLE
          *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-         *     * `GPL_C` - GPL_C
+         *     * `GPL` - GPL
          *     * `MARITIME` - MARITIME
          * @enum {string}
          */
@@ -7104,9 +7106,9 @@ export interface components {
         ResetPasswordRequest: {
             uidb64: string;
             token: string;
-            /** Password */
+            /** Mot de passe */
             password1: string;
-            /** Password confirmation */
+            /** Confirmation du mot de passe */
             password2: string;
         };
         Response: {
@@ -7655,9 +7657,9 @@ export interface components {
              */
             email: string;
             name: string;
-            /** Password */
+            /** Mot de passe */
             password1: string;
-            /** Password confirmation */
+            /** Confirmation du mot de passe */
             password2: string;
         };
         UserEntity: {
@@ -7697,7 +7699,10 @@ export interface components {
         };
         /** @description Resend the activation email for the pending account matching this address. */
         UserResendActivationLinkRequest: {
-            /** Format: email */
+            /**
+             * Adresse email
+             * Format: email
+             */
             email: string;
         };
         UserRights: {
@@ -13416,6 +13421,7 @@ export interface operations {
     resources_biofuels_list: {
         parameters: {
             query?: {
+                entity_id?: number;
                 /** @description Search within the fields `name`, `name_en`, and `code` */
                 query?: string;
             };
@@ -15249,7 +15255,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15626,7 +15632,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15743,7 +15749,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15883,7 +15889,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -16155,10 +16161,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Road transport
+                 * @description * `ROAD` - Transport routier
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Maritime transport
+                 *     * `SEA` - Transport maritime
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16396,10 +16402,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Road transport
+                 * @description * `ROAD` - Transport routier
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Maritime transport
+                 *     * `SEA` - Transport maritime
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16543,10 +16549,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Road transport
+                 * @description * `ROAD` - Transport routier
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Maritime transport
+                 *     * `SEA` - Transport maritime
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -17051,7 +17057,7 @@ export enum PathsApiTiruertOperationsGetParametersQuerySector {
     CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
     ESSENCE = "ESSENCE",
     GAZOLE = "GAZOLE",
-    GPL_C = "GPL_C",
+    GPL = "GPL",
     MARITIME = "MARITIME"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {

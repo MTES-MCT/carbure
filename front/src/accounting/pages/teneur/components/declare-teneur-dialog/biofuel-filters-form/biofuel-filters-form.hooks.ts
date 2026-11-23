@@ -10,7 +10,7 @@ export const useCompatibleSectors = (balance?: Balance) => {
     return [
       biofuel.compatible_essence && OperationSector.ESSENCE,
       biofuel.compatible_diesel && OperationSector.GAZOLE,
-      biofuel.compatible_gpl && OperationSector.GPL_C,
+      biofuel.compatible_gpl && OperationSector.GPL,
       biofuel.compatible_maritime && OperationSector.MARITIME,
       balance.sector,
     ].filter(

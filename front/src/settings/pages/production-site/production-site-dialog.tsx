@@ -318,7 +318,7 @@ export const ProductionSiteForm = ({
           label={t("Biocarburants")}
           placeholder={t("Ajouter biocarburants...")}
           defaultOptions={value.biocarburants}
-          getOptions={common.findBiofuels}
+          getOptions={(query) => common.findBiofuels(query, entity.id)}
           normalize={normalizeBiofuel}
           {...bind("biocarburants")}
           required
