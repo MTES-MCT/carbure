@@ -115,20 +115,7 @@ class ActionExcelImportViewTest(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Action.objects.get(pos_id="ACT-001").shipping_date, date(2026, 1, 15))
 
-    def test_import_keeps_nine_emission_decimals(self):
-        response = self._post(
-            filled_generic_template(
-                material_name=self.material.name,
-                site_name=self.site.name,
-                certificate_id=self.certificate.certificate_id,
-                ei=Decimal("1.234567891"),
-            )
-        )
-
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(Action.objects.get(pos_id="ACT-001").ei, Decimal("1.234567891"))
-
-    def test_import_rejects_an_emission_past_nine_decimals(self):
+    def test_import_keeps_ten_emission_decimals(self):
         response = self._post(
             filled_generic_template(
                 material_name=self.material.name,
@@ -138,9 +125,21 @@ class ActionExcelImportViewTest(APITestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(Action.objects.count(), 0)
-        self.assertIn("ei", response.data["validation_errors"][0]["errors"])
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="ACT-001").ei, Decimal("1.2345678912"))
+
+    def test_import_truncates_an_emission_past_ten_decimals(self):
+        response = self._post(
+            filled_generic_template(
+                material_name=self.material.name,
+                site_name=self.site.name,
+                certificate_id=self.certificate.certificate_id,
+                ei=Decimal("1.23456789121"),
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="ACT-001").ei, Decimal("1.2345678912"))
 
     def test_import_truncates_quantity_to_three_decimals(self):
         response = self._post(

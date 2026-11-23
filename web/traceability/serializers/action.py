@@ -9,7 +9,12 @@ from core.serializers import EntityPreviewSerializer
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
 from traceability.serializers.certificate import ActionCertificateSerializer
-from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField, TruncatingDecimalField
+from traceability.serializers.fields import (
+    EMISSION_DECIMAL,
+    ExcelDateField,
+    ExcelMonthYearField,
+    TruncatingDecimalField,
+)
 from traceability.serializers.inherited_fields import ActionInheritedFieldsSerializer
 from traceability.serializers.lookups import CertificateLookupField, MaterialLookupField, SiteLookupField
 from traceability.serializers.material import MaterialSerializer
@@ -107,6 +112,15 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         min_value=Decimal("0.001"),
         error_messages={"min_value": _("La quantité doit être strictement positive.")},
     )
+    eec = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    el = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    ei = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    ep = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    etd = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    eu = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    eccs = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    esca = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    eccr = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
 
     class Meta:
         model = Action

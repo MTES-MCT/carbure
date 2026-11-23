@@ -6,6 +6,7 @@ from rest_framework import serializers
 from core.serializers import check_fields_required_when
 from traceability.models import Action
 from traceability.serializers.action import ActionExcelImportSerializer
+from traceability.serializers.fields import EMISSION_DECIMAL, TruncatingDecimalField
 
 TRANSPORT_FIELDS = ("shipping_method", "shipping_distance", "shipping_date", "etd1")
 SHIPPING_FUEL_TYPES = (
@@ -39,10 +40,10 @@ class H2ActionExcelImportSerializer(ActionExcelImportSerializer):
         write_only=True,
         error_messages={"invalid_choice": _("La valeur doit être Oui ou Non.")},
     )
-    etd1 = serializers.DecimalField(
-        max_digits=13, decimal_places=9, min_value=Decimal("0"), required=False, allow_null=True, write_only=True
+    etd1 = TruncatingDecimalField(
+        **EMISSION_DECIMAL, min_value=Decimal("0"), required=False, allow_null=True, write_only=True
     )
-    etd2 = serializers.DecimalField(max_digits=13, decimal_places=9, min_value=Decimal("0"), write_only=True)
+    etd2 = TruncatingDecimalField(**EMISSION_DECIMAL, min_value=Decimal("0"), write_only=True)
     shipping_fuel_type = serializers.ChoiceField(
         choices=SHIPPING_FUEL_TYPES,
         required=False,
