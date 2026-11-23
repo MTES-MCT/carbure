@@ -67,6 +67,36 @@ class H2ActionExcelImportViewTest(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Action.objects.get(pos_id="H2-001").etd, Decimal("2.000"))
 
+    def test_import_sums_etd1_and_etd2_with_their_decimals(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.station.name,
+                certificate_id=self.certificate.certificate_id,
+                etd1=Decimal("1.2345678912"),
+                etd2=Decimal("0.0000000001"),
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="H2-001").etd, Decimal("1.2345678913"))
+
+    def test_import_truncates_excel_float_noise_on_etd1(self):
+        response = self._post(
+            filled_h2_template(
+                pos_id="H2-001",
+                material_name=self.material.name,
+                site_name=self.station.name,
+                certificate_id=self.certificate.certificate_id,
+                etd1=15.339000000000002,
+                etd2=Decimal("1.331"),
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Action.objects.get(pos_id="H2-001").etd, Decimal("16.670"))
+
     def test_import_rejects_missing_h2_extra_fields(self):
         for field in ("lot_id", "lot_quantity", "producer", "consumed_on_production_site", "etd2"):
             with self.subTest(field=field):

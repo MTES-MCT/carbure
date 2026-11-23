@@ -66,12 +66,12 @@ ACTION_EXCEL_COLUMNS = {
     },
     "ei": {
         "header": "EI",
-        "comment": "Emissions liées aux intrants (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",
+        "comment": "Emissions liées aux intrants (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",  # noqa: E501
         "color": EXCEL_PRODUCTION_COLOR,
     },
     "ep": {
         "header": "EP",
-        "comment": "Emissions liées à la production (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",
+        "comment": "Emissions liées à la production (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",  # noqa: E501
         "color": EXCEL_PRODUCTION_COLOR,
     },
     "etd": {
@@ -81,7 +81,7 @@ ACTION_EXCEL_COLUMNS = {
     },
     "eu": {
         "header": "EU",
-        "comment": "Émissions résultant du carburant à l'usage (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",
+        "comment": "Émissions résultant du carburant à l'usage (gCO2eq/MJ de carburant) - Chiffre supérieur ou égal à 0",  # noqa: E501
         "color": EXCEL_CONSUMPTION_COLOR,
     },
     "eccs": {
@@ -96,7 +96,7 @@ ACTION_EXCEL_COLUMNS = {
     },
     "eccr": {
         "header": "ECCR",
-        "comment": "Réductions d'émissions dues au piégeage et à la substitution du CO2 - Chiffre supérieur ou égal à 0",
+        "comment": "Réductions d'émissions dues au piégeage et à la substitution du CO2 - Chiffre supérieur ou égal à 0",  # noqa: E501
         "color": EXCEL_CONSUMPTION_COLOR,
     },
     "working_date": {

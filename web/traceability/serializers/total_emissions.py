@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-_GES_DECIMAL = {"max_digits": 13, "decimal_places": 3, "read_only": True}
+# A single post stays within 999 (see EMISSION_DECIMAL). These fields sum a
+# parent chain, so they keep extra integer digits for a total that should not occur.
+_GES_DECIMAL = {"max_digits": 16, "decimal_places": 10, "read_only": True}
 
 
 class ActionTotalEmissionsSerializer(serializers.Serializer):

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -7,7 +9,12 @@ from core.serializers import EntityPreviewSerializer
 from traceability.models import Action
 from traceability.models.action_status import ActionStatus
 from traceability.serializers.certificate import ActionCertificateSerializer
-from traceability.serializers.fields import ExcelDateField, ExcelMonthYearField
+from traceability.serializers.fields import (
+    EMISSION_DECIMAL,
+    ExcelDateField,
+    ExcelMonthYearField,
+    TruncatingDecimalField,
+)
 from traceability.serializers.inherited_fields import ActionInheritedFieldsSerializer
 from traceability.serializers.lookups import CertificateLookupField, MaterialLookupField, SiteLookupField
 from traceability.serializers.material import MaterialSerializer
@@ -99,6 +106,21 @@ class ActionExcelImportSerializer(serializers.ModelSerializer):
         error_messages={"invalid": _("La période doit être au format mois/année.")},
     )
     shipping_method = LabelChoiceField(choices=Action.SHIPPING_METHODS, required=False, allow_blank=True)
+    quantity = TruncatingDecimalField(
+        max_digits=13,
+        decimal_places=3,
+        min_value=Decimal("0.001"),
+        error_messages={"min_value": _("La quantité doit être strictement positive.")},
+    )
+    eec = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    el = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    ei = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    ep = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    etd = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    eu = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    eccs = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    esca = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
+    eccr = TruncatingDecimalField(**EMISSION_DECIMAL, required=False)
 
     class Meta:
         model = Action

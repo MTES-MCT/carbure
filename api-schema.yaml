@@ -14678,39 +14678,39 @@ components:
         eec:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         el:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         ei:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         ep:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         etd:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         eu:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         eccs:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         esca:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         eccr:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
       required:
         - carbure_id
         - certificate
@@ -14820,39 +14820,39 @@ components:
         eec:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         el:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         ei:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         ep:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         etd:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         eu:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         eccs:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         esca:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
         eccr:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,4}(?:\.\d{0,9})?$
       required:
         - holder
         - quantity
@@ -14967,52 +14967,52 @@ components:
         eec:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         el:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         ei:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         ep:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         etd:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         eu:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         eccs:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         esca:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         eccr:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
         total:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,10}(?:\.\d{0,9})?$
           readOnly: true
       required:
         - eccr
