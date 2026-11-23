@@ -79,6 +79,10 @@ export const formatOperationType = (type: string) => {
       return i18next.t("Expiration")
     case OperationType.REPORT:
       return i18next.t("Report Tiruert 2026")
+    case OperationType.CORRECTION:
+      return i18next.t("Correction")
+    case OperationType.DEBT_REPAYMENT:
+      return i18next.t("Remboursement de dette")
     default:
       return i18next.t("Inconnu")
   }

@@ -19,7 +19,7 @@ export const useDeleteOperation = ({
   const { t } = useTranslation()
 
   return useMutation(api.deleteOperation, {
-    invalidates: ["operations"],
+    invalidates: ["operations", "balances", "debts"],
     onSuccess: () => {
       notify(t(`L'opération n°{{id}} a été annulée.`, { id: operation?.id }), {
         variant: "success",
@@ -130,7 +130,7 @@ export const useValidateDraftOperation = ({
   }
 
   const mutation = useMutation(api.patchOperation, {
-    invalidates: ["operations"],
+    invalidates: ["operations", "balances", "debts"],
     onSuccess: () => {
       notify(getSuccessMessage(), {
         variant: "success",

@@ -9,6 +9,7 @@ from core.models import Biocarburant, Entity, MatierePremiere
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.declaration_period import DeclarationPeriodService
 from tiruert.services.operation_excel_import import OperationExcelImportService, OperationGroup, _default_status
+from tiruert.tests.debt_utils import DebtTestMixin
 from transactions.factories import CarbureLotFactory
 
 
@@ -350,6 +351,7 @@ class OperationExcelImportServiceHelpersTest(TestCase):
         """Should return PENDING for TENEUR and DRAFT for TRANSFERT or unknown operation types."""
         self.assertEqual(_default_status(Operation.TENEUR), Operation.PENDING)
         self.assertEqual(_default_status(Operation.TRANSFERT), Operation.DRAFT)
+        self.assertEqual(_default_status(Operation.DEBT_REPAYMENT), Operation.DRAFT)
         self.assertEqual(_default_status("UNKNOWN"), Operation.DRAFT)
 
 
@@ -408,8 +410,10 @@ class OperationExcelImportServiceExecuteTest(TestCase):
     @patch("tiruert.services.operation_excel_import.OperationExcelImportService._build_lookup_caches")
     @patch("tiruert.services.operation_excel_import.OperationExcelRowSerializer")
     @patch("tiruert.services.operation_excel_import.OperationExcelImportService._parse_rows")
+    @patch("tiruert.services.operation_excel_import.OperationService.lock_lots_for_update")
     def test_execute_create_mode_creates_operations(
         self,
+        mock_lock_lots,
         mock_parse_rows,
         mock_row_serializer_cls,
         mock_build_lookup_caches,
@@ -422,6 +426,9 @@ class OperationExcelImportServiceExecuteTest(TestCase):
         mock_response_serializer,
     ):
         """Should create operations and include created operation data in create mode response."""
+        calls = []
+        mock_lock_lots.side_effect = lambda lot_ids: calls.append(("lock_lots", lot_ids))
+        mock_validate_groups.side_effect = lambda *args: calls.append("validate")
         debited = SimpleNamespace(id=1, name="Debited")
         parsed_rows = [{"lot_id": 1, "volume": 100, "operation_type": Operation.TENEUR}]
         mock_parse_rows.return_value = parsed_rows
@@ -431,7 +438,7 @@ class OperationExcelImportServiceExecuteTest(TestCase):
         mock_row_serializer_cls.return_value = mock_row_serializer
         mock_build_lookup_caches.return_value = {"lot_cache": {}, "credited_entity_cache": {}}
         mock_validate_retrieved_data.return_value = mock_row_serializer
-        groups = [Mock()]
+        groups = [SimpleNamespace(lot_volumes={1: 100})]
         mock_build_groups.return_value = groups
         mock_get_current_declaration_year.return_value = 2026
         operations = [Mock()]
@@ -441,6 +448,7 @@ class OperationExcelImportServiceExecuteTest(TestCase):
 
         result = OperationExcelImportService.execute(Mock(), "create", debited)
 
+        self.assertEqual(calls, [("lock_lots", [1]), "validate"])
         mock_create_operations.assert_called_once_with(groups, 2026)
         mock_build_groups_data.assert_called_once_with(groups, operations)
         self.assertEqual(result, {"mode": "create", "operations": [{"created": True}]})
@@ -541,6 +549,126 @@ class OperationExcelImportServiceCreateOperationsTest(TestCase):
         mock_get_emission_rates_by_lot.assert_called_once_with([10, 11, 12])
         self.assertEqual(mock_create_operation_for_group.call_count, 2)
         self.assertEqual(len(operations), 2)
+
+
+class OperationExcelImportServiceDebtRepaymentTest(DebtTestMixin, TestCase):
+    def _row(self, lot, volume, **extra):
+        return {
+            "lot_id": lot.id,
+            "volume": volume,
+            "operation_type": Operation.DEBT_REPAYMENT,
+            "biofuel": "EMAG",
+            "customs_category": MatierePremiere.CONV,
+            **extra,
+        }
+
+    def _execute(self, rows, mode="create"):
+        with patch("tiruert.services.operation_excel_import.ExcelImporter.parse", return_value=rows):
+            return OperationExcelImportService.execute(Mock(), mode, self.entity)
+
+    def _validation_messages(self, rows):
+        with self.assertRaises(ExcelValidationError) as context:
+            self._execute(rows)
+        return [message for error in context.exception.validation_errors for message in error["errors"]["validation"]]
+
+    def test_creates_a_draft_repayment_linked_to_the_debt(self):
+        """Should create a DRAFT DEBT_REPAYMENT carrying the debt, which reserves its volume."""
+        lot = self.create_lot(1000)
+        debt = self.create_debt(lot, 300)
+
+        result = self._execute([self._row(lot, 200)])
+
+        (entry,) = result["operations"]
+        operation = Operation.objects.get(id=entry["operation_id"])
+        self.assertEqual(operation.type, Operation.DEBT_REPAYMENT)
+        self.assertEqual(operation.status, Operation.DRAFT)
+        self.assertEqual(operation.debt_id, debt.id)
+        self.assertEqual(operation.debited_entity, self.entity)
+        self.assertEqual(entry["debt"], {"id": debt.id, "lot": {"id": lot.id, "carbure_id": lot.carbure_id}})
+        self.assertEqual(self.remaining(debt), 100)
+
+    def test_validate_mode_previews_the_repayment_without_writing(self):
+        """Should report the targeted debt in validate mode and leave the debt untouched."""
+        lot = self.create_lot(1000)
+        debt = self.create_debt(lot, 300)
+
+        result = self._execute([self._row(lot, 200)], mode="validate")
+
+        (entry,) = result["operations"]
+        self.assertIsNone(entry["operation_id"])
+        self.assertEqual(entry["debt"]["id"], debt.id)
+        self.assertEqual(entry["total_volume"], 200)
+        self.assertFalse(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).exists())
+        self.assertEqual(self.remaining(debt), 300)
+
+    def test_spreads_the_volume_over_several_debts_oldest_first(self):
+        """Should create one operation per repaid debt and split a lot between two debts."""
+        lot_a = self.create_lot(1000)
+        lot_b = self.create_lot(500)
+        debt_1 = self.create_debt(lot_a, 300)
+        debt_2 = self.create_debt(lot_a, 200)
+
+        result = self._execute([self._row(lot_a, 250), self._row(lot_b, 250)])
+
+        first, second = result["operations"]
+        self.assertEqual([first["debt"]["id"], second["debt"]["id"]], [debt_1.id, debt_2.id])
+        self.assertEqual([first["lot_count"], second["lot_count"]], [2, 1])
+        self.assertEqual([first["total_volume"], second["total_volume"]], [300, 200])
+        self.assertEqual(Operation.objects.get(id=first["operation_id"]).debt_id, debt_1.id)
+        self.assertEqual(Operation.objects.get(id=second["operation_id"]).debt_id, debt_2.id)
+        self.assertEqual(self.remaining(debt_1), 0)
+        self.assertEqual(self.remaining(debt_2), 0)
+
+    def test_rejects_a_biofuel_and_category_without_open_debt(self):
+        """Should report a missing debt for the biofuel and category of the rows."""
+        lot = self.create_lot(1000)
+
+        messages = self._validation_messages([self._row(lot, 100)])
+
+        self.assertIn("Aucune dette à acquitter pour ce biocarburant et cette catégorie.", messages)
+        self.assertFalse(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).exists())
+
+    def test_rejects_a_volume_above_the_remaining_debt(self):
+        """Should compare the total of the rows with the remaining volume of all the open debts."""
+        lot = self.create_lot(1000)
+        self.create_debt(lot, 100)
+        self.create_debt(lot, 50)
+
+        messages = self._validation_messages([self._row(lot, 100), self._row(lot, 60)])
+
+        self.assertEqual(messages, ["Le volume à acquitter (160.0 L) dépasse la dette restante (150.0 L)."])
+
+    def test_rejects_a_volume_above_the_lot_balance(self):
+        """Should still check that the lots hold the requested volume."""
+        small_lot = self.create_lot(100)
+        self.create_debt(small_lot, 500)
+
+        messages = self._validation_messages([self._row(small_lot, 200)])
+
+        self.assertEqual(len(messages), 1)
+        self.assertIn("Volume insuffisant", messages[0])
+
+    def test_rejects_a_recipient(self):
+        """Should reject a credited entity on a repayment row, with its Excel row number."""
+        lot = self.create_lot(1000)
+        self.create_debt(lot, 300)
+
+        with self.assertRaises(ExcelValidationError) as context:
+            self._execute([self._row(lot, 100, credited_entity=self.other_entity.id)])
+
+        (error,) = context.exception.validation_errors
+        self.assertEqual(error["row"], 3)
+        self.assertIn("credited_entity", error["errors"])
+
+    def test_rejects_a_debit_operation_while_the_debt_is_open(self):
+        """Should refuse a TENEUR of the same biofuel and category in the same file as the repayment."""
+        lot = self.create_lot(1000)
+        self.create_debt(lot, 300)
+
+        messages = self._validation_messages([self._row(lot, 100), self._row(lot, 50, operation_type=Operation.TENEUR)])
+
+        self.assertTrue(any("Une dette est ouverte" in message for message in messages))
+        self.assertFalse(Operation.objects.filter(type=Operation.DEBT_REPAYMENT).exists())
 
 
 class OperationExcelImportServiceLedgerBiofuelTest(TestCase):

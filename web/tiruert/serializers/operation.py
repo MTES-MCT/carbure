@@ -27,6 +27,16 @@ class OperationEntitySerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
+class OperationDebtLotSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    carbure_id = serializers.CharField()
+
+
+class OperationDebtSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    lot = OperationDebtLotSerializer()
+
+
 class BaseOperationSerializer(serializers.ModelSerializer):
     from_depot = OperationDepotSerializer()
     to_depot = OperationDepotSerializer()
@@ -42,6 +52,7 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     _depot = serializers.CharField(read_only=True)
     avoided_emissions = serializers.SerializerMethodField()
     year = serializers.IntegerField(source="declaration_year", read_only=True)
+    transaction = serializers.CharField(read_only=True, source="_transaction")
 
     def get_volume(self, instance) -> float:
         return instance.volume
@@ -52,17 +63,17 @@ class BaseOperationSerializer(serializers.ModelSerializer):
     def get_avoided_emissions(self, instance) -> float:
         return instance.avoided_emissions
 
-    def get_fields(self):
-        fields = super().get_fields()
-        if not self.context.get("details"):
-            fields.pop("details", None)
-        return fields
-
 
 class OperationListSerializer(BaseOperationSerializer):
     volume = TruncatedFloatField(source="_volume", read_only=True)
     energy = TruncatedFloatField(source="_energy", read_only=True, decimal_places=0)
     avoided_emissions = TruncatedFloatField(source="_avoided_emissions", read_only=True)
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if not self.context.get("details"):
+            fields.pop("details", None)
+        return fields
 
     class Meta:
         model = Operation
@@ -88,6 +99,7 @@ class OperationListSerializer(BaseOperationSerializer):
             "details",
             "avoided_emissions",
             "year",
+            "transaction",
         ]
 
 
@@ -120,9 +132,12 @@ class OperationSerializer(BaseOperationSerializer):
             "details",
             "year",
             "devaluation_type",
+            "debt",
+            "transaction",
         ]
 
     export_country = CountrySerializer(read_only=True)
+    debt = OperationDebtSerializer(read_only=True, allow_null=True)
 
 
 class OperationLotSerializer(serializers.Serializer):
@@ -150,6 +165,7 @@ class OperationImportGroupSerializer(serializers.Serializer):
     lot_count = serializers.IntegerField()
     total_volume = serializers.FloatField()
     rows = serializers.ListField(child=serializers.IntegerField())
+    debt = OperationDebtSerializer(allow_null=True)
 
 
 class OperationImportResponseSerializer(serializers.Serializer):
@@ -192,14 +208,19 @@ class OperationExcelRowSerializer(serializers.Serializer):
 
     def validate_operation_type(self, value):
         normalized = str(value or "").strip().upper()
-        if normalized not in [Operation.TRANSFERT, Operation.TENEUR]:
-            raise serializers.ValidationError(_("Le type d'opération doit être 'TRANSFERT' ou 'TENEUR'."))
+        if normalized not in [Operation.TRANSFERT, Operation.TENEUR, Operation.DEBT_REPAYMENT]:
+            raise serializers.ValidationError(_("Le type d'opération doit être 'TRANSFERT', 'TENEUR' ou 'DEBT_REPAYMENT'."))
         return normalized
 
     def validate(self, attrs):
         if attrs.get("operation_type") == Operation.TRANSFERT and not attrs.get("credited_entity"):
             raise serializers.ValidationError(
                 {"credited_entity": _("Destinataire requis pour les opérations de type TRANSFERT.")}
+            )
+        # A recipient would split the repayment rows into several groups, each checked against the same debts
+        if attrs.get("operation_type") == Operation.DEBT_REPAYMENT and attrs.get("credited_entity"):
+            raise serializers.ValidationError(
+                {"credited_entity": _("Le destinataire doit rester vide pour les opérations de type DEBT_REPAYMENT.")}
             )
         return attrs
 
@@ -223,15 +244,15 @@ class OperationInputSerializer(serializers.ModelSerializer):
             "devaluation_type",
         ]
         extra_kwargs = {
-            "biofuel": {"required": True},
-            "customs_category": {"required": True},
-            "debited_entity": {"required": True},
+            "biofuel": {"required": True, "allow_null": False},
+            "customs_category": {"required": True, "allow_null": False},
+            "debited_entity": {"required": True, "allow_null": False},
         }
 
     export_country = serializers.SlugRelatedField(
         slug_field="code_pays", queryset=Pays.objects.all(), required=False, allow_null=True
     )
-    lots = OperationLotSerializer(many=True, required=True)
+    lots = OperationLotSerializer(many=True, required=True, allow_empty=False)
 
     def validate_type(self, value):
         if value not in Operation.API_CREATABLE_TYPES:
@@ -239,6 +260,10 @@ class OperationInputSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
+        if data.get("credited_entity") and data.get("type") not in (Operation.CESSION, Operation.TRANSFERT):
+            raise serializers.ValidationError(
+                {"credited_entity": _("Ce champ est autorisé uniquement pour les opérations de type CESSION ou TRANSFERT.")}
+            )
         if data.get("objective_sector") and data.get("type") != Operation.TENEUR:
             raise serializers.ValidationError(
                 {"declared_sector": "objective_sector ne peut être défini que pour les opérations de type TENEUR"}
@@ -246,34 +271,32 @@ class OperationInputSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        with transaction.atomic():
-            request = self.context.get("request")
-            entity_id = request.entity.id
-            selected_lots = validated_data.pop("lots")
-            declaration_year = self.context.get("declaration_year")
-            validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
-
-            OperationService.perform_checks_before_create(
-                request, entity_id, selected_lots, validated_data, declaration_year
-            )
-
-            # Fetch emission rates from the oldest OperationDetail for each lot
-            lot_ids = [lot["id"] for lot in selected_lots]
-            emissions_by_lot = OperationService.get_emission_rates_by_lot(lot_ids)
-
-            OperationService.define_operation_status(validated_data)
-
-            detail_operations_data = OperationService.build_details_data(selected_lots, emissions_by_lot)
-
-            operation = OperationService.create_operation_with_details(validated_data, detail_operations_data)
-
-            return operation
+        request = self.context.get("request")
+        selected_lots = validated_data.pop("lots")
+        operations = OperationService.create_operations(
+            request, validated_data, selected_lots, self.context.get("declaration_year")
+        )
+        return operations if validated_data["type"] == Operation.DEBT_REPAYMENT else operations[0]
 
 
 class OperationUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operation
         fields = ["to_depot", "status"]
+
+    def validate_status(self, value):
+        request = self.context.get("request")
+        entity_id = getattr(getattr(request, "entity", None), "id", None)
+        if self.instance is None or entity_id != self.instance.debited_entity_id:
+            raise serializers.ValidationError(_("Seule l'entité débitée peut modifier le statut de l'opération."))
+
+        allowed_transition = {
+            Operation.TRANSFERT: (Operation.DRAFT, Operation.PENDING),
+            Operation.DEBT_REPAYMENT: (Operation.DRAFT, Operation.VALIDATED),
+        }.get(self.instance.type)
+        if allowed_transition != (self.instance.status, value):
+            raise serializers.ValidationError(_("Le statut de cette opération ne peut pas être modifié via cette action."))
+        return value
 
 
 class OperationCorrectionSerializer(serializers.Serializer):

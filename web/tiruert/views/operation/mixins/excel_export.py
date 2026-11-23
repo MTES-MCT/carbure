@@ -38,10 +38,17 @@ class ExcelExportActionMixin:
                         {
                             "label": "Expéditeur",
                             "value": lambda o: o.debited_entity.name
-                            if o.debited_entity and o._type != Operation.TENEUR
+                            if o.debited_entity
+                            and o._type not in [Operation.TENEUR, Operation.CORRECTION, Operation.DEBT_REPAYMENT]
                             else "",
                         },
-                        {"label": "Destinataire", "value": "credited_entity.name"},
+                        {
+                            "label": "Destinataire",
+                            "value": lambda o: o.credited_entity.name
+                            if o.credited_entity
+                            and o._type not in [Operation.TENEUR, Operation.CORRECTION, Operation.DEBT_REPAYMENT]
+                            else "",
+                        },
                         {"label": "Volume (L)", "value": lambda o: truncate(o._volume)},
                         {"label": "Énergie (MJ)", "value": lambda o: truncate(o._energy, 0)},
                         {"label": "Tonnes CO2 eq. évitées", "value": lambda o: truncate(o.avoided_emissions)},

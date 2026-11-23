@@ -43,6 +43,7 @@ class OperationViewSetPermissionsTest(TestCase, PermissionTestMixin):
                         "list",
                         "retrieve",
                         "balance",
+                        "debts",
                         "filters",
                         "filters_balance",
                         "export_operation_details_to_excel",

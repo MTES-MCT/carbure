@@ -3274,6 +3274,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/operations/debts/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Remaining debt volume of the entity per biofuel and customs category */
+        get: operations["list_debts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/operations/export/": {
         parameters: {
             query?: never;
@@ -5202,6 +5219,12 @@ export interface components {
          * @enum {string}
          */
         CropTypeEnum: CropTypeEnum;
+        DebtSummary: {
+            biofuel: components["schemas"]["BalanceBiofuel"];
+            customs_category: components["schemas"]["MPCategoriesEnum"];
+            /** Format: double */
+            remaining_volume: number;
+        };
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -6446,16 +6469,34 @@ export interface components {
             readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
+            details?: components["schemas"]["OperationDetail"][];
             readonly year: number;
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
+            readonly debt: components["schemas"]["OperationDebt"] | null;
+            readonly transaction: string;
         };
         OperationCorrectionRequest: {
             /** Format: double */
             correction_volume: number;
         };
+        OperationDebt: {
+            id: number;
+            lot: components["schemas"]["OperationDebtLot"];
+        };
+        OperationDebtLot: {
+            id: number;
+            carbure_id: string;
+        };
         OperationDepot: {
             id: number;
             name: string;
+        };
+        OperationDetail: {
+            lot: number;
+            /** Format: double */
+            volume?: number;
+            /** Format: double */
+            emission_rate_per_mj?: number;
         };
         OperationEntity: {
             id: number;
@@ -6480,32 +6521,18 @@ export interface components {
             /** Format: double */
             total_volume: number;
             rows: number[];
+            debt: components["schemas"]["OperationDebt"] | null;
         };
         OperationImportResponse: {
             mode: components["schemas"]["ModeEnum"];
             operations: components["schemas"]["OperationImportGroup"][];
         };
-        OperationInput: {
-            type: components["schemas"]["OperationTypeEnum"];
-            customs_category: components["schemas"]["MPCategoriesEnum"];
-            biofuel: number | null;
-            credited_entity?: number | null;
-            debited_entity: number | null;
-            from_depot?: number | null;
-            to_depot?: number | null;
-            export_country?: string | null;
-            export_recipient?: string;
-            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
-            lots: components["schemas"]["OperationLot"][];
-            status?: components["schemas"]["OperationStatusEnum"];
-            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
-        };
         OperationInputRequest: {
             type: components["schemas"]["OperationTypeEnum"];
             customs_category: components["schemas"]["MPCategoriesEnum"];
-            biofuel: number | null;
+            biofuel: number;
             credited_entity?: number | null;
-            debited_entity: number | null;
+            debited_entity: number;
             from_depot?: number | null;
             to_depot?: number | null;
             export_country?: string | null;
@@ -6543,11 +6570,7 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
-        };
-        OperationLot: {
-            id: number;
-            /** Format: double */
-            volume: number;
+            readonly transaction: string;
         };
         OperationLotRequest: {
             id: number;
@@ -6579,6 +6602,8 @@ export interface components {
          *     * `TRANSFERT` - TRANSFERT
          *     * `EXPIRATION` - EXPIRATION
          *     * `REPORT` - REPORT
+         *     * `CORRECTION` - CORRECTION
+         *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -15207,6 +15232,8 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15317,7 +15344,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OperationInput"];
+                    "application/json": components["schemas"]["Operation"] | components["schemas"]["OperationList"][];
                 };
             };
         };
@@ -15584,6 +15611,8 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15705,6 +15734,8 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -15788,6 +15819,28 @@ export interface operations {
             };
         };
     };
+    list_debts: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebtSummary"][];
+                };
+            };
+        };
+    };
     tiruert_operations_export_retrieve: {
         parameters: {
             query: {
@@ -15845,6 +15898,8 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
@@ -17013,7 +17068,9 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     ACQUISITION = "ACQUISITION",
     CESSION = "CESSION",
+    CORRECTION = "CORRECTION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+    DEBT_REPAYMENT = "DEBT_REPAYMENT",
     DEVALUATION = "DEVALUATION",
     EXPEDITION = "EXPEDITION",
     EXPIRATION = "EXPIRATION",
@@ -17391,7 +17448,9 @@ export enum OperationTypeEnum {
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     TRANSFERT = "TRANSFERT",
     EXPIRATION = "EXPIRATION",
-    REPORT = "REPORT"
+    REPORT = "REPORT",
+    CORRECTION = "CORRECTION",
+    DEBT_REPAYMENT = "DEBT_REPAYMENT"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",

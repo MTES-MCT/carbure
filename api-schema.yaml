@@ -11928,7 +11928,9 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -11952,6 +11954,8 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12171,7 +12175,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationInput"
+                oneOf:
+                  - $ref: "#/components/schemas/Operation"
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/OperationList"
           description: ""
   /api/tiruert/operations/{id}/:
     get:
@@ -12511,7 +12519,9 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -12535,6 +12545,8 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12809,7 +12821,9 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -12833,6 +12847,8 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -13020,6 +13036,31 @@ paths:
                     - TERF SAF
                   summary: Example of filters response.
           description: ""
+  /api/tiruert/operations/debts/:
+    get:
+      operationId: list_debts
+      description: Remaining debt volume of the entity per biofuel and customs category
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DebtSummary"
+          description: ""
   /api/tiruert/operations/export/:
     get:
       operationId: tiruert_operations_export_retrieve
@@ -13139,7 +13180,9 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -13163,6 +13206,8 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -17854,6 +17899,20 @@ components:
       description: |-
         * `PRIMARY` - PRIMARY
         * `INTERMEDIATE` - INTERMEDIATE
+    DebtSummary:
+      type: object
+      properties:
+        biofuel:
+          $ref: "#/components/schemas/BalanceBiofuel"
+        customs_category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        remaining_volume:
+          type: number
+          format: double
+      required:
+        - biofuel
+        - customs_category
+        - remaining_volume
     DeleteCertificateRequest:
       type: object
       properties:
@@ -20883,6 +20942,10 @@ components:
           type: number
           format: double
           readOnly: true
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationDetail"
         year:
           type: integer
           readOnly: true
@@ -20890,6 +20953,14 @@ components:
           allOf:
             - $ref: "#/components/schemas/DevaluationTypeEnum"
           nullable: true
+        debt:
+          allOf:
+            - $ref: "#/components/schemas/OperationDebt"
+          readOnly: true
+          nullable: true
+        transaction:
+          type: string
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -20898,12 +20969,14 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - debt
         - energy
         - export_country
         - from_depot
         - id
         - sector
         - to_depot
+        - transaction
         - type
         - volume
         - year
@@ -20915,6 +20988,26 @@ components:
           format: double
       required:
         - correction_volume
+    OperationDebt:
+      type: object
+      properties:
+        id:
+          type: integer
+        lot:
+          $ref: "#/components/schemas/OperationDebtLot"
+      required:
+        - id
+        - lot
+    OperationDebtLot:
+      type: object
+      properties:
+        id:
+          type: integer
+        carbure_id:
+          type: string
+      required:
+        - carbure_id
+        - id
     OperationDepot:
       type: object
       properties:
@@ -20925,6 +21018,19 @@ components:
       required:
         - id
         - name
+    OperationDetail:
+      type: object
+      properties:
+        lot:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - lot
     OperationEntity:
       type: object
       properties:
@@ -20978,11 +21084,16 @@ components:
           type: array
           items:
             type: integer
+        debt:
+          allOf:
+            - $ref: "#/components/schemas/OperationDebt"
+          nullable: true
       required:
         - biofuel
         - credited_entity
         - customs_category
         - debited_entity
+        - debt
         - lot_count
         - operation_id
         - rows
@@ -21002,54 +21113,6 @@ components:
       required:
         - mode
         - operations
-    OperationInput:
-      type: object
-      properties:
-        type:
-          $ref: "#/components/schemas/OperationTypeEnum"
-        customs_category:
-          $ref: "#/components/schemas/MPCategoriesEnum"
-        biofuel:
-          type: integer
-          nullable: true
-        credited_entity:
-          type: integer
-          nullable: true
-        debited_entity:
-          type: integer
-          nullable: true
-        from_depot:
-          type: integer
-          nullable: true
-        to_depot:
-          type: integer
-          nullable: true
-        export_country:
-          type: string
-          nullable: true
-        export_recipient:
-          type: string
-          maxLength: 255
-        objective_sector:
-          allOf:
-            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
-          nullable: true
-        lots:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationLot"
-        status:
-          $ref: "#/components/schemas/OperationStatusEnum"
-        devaluation_type:
-          allOf:
-            - $ref: "#/components/schemas/DevaluationTypeEnum"
-          nullable: true
-      required:
-        - biofuel
-        - customs_category
-        - debited_entity
-        - lots
-        - type
     OperationInputRequest:
       type: object
       properties:
@@ -21059,13 +21122,11 @@ components:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: integer
-          nullable: true
         credited_entity:
           type: integer
           nullable: true
         debited_entity:
           type: integer
-          nullable: true
         from_depot:
           type: integer
           nullable: true
@@ -21164,6 +21225,9 @@ components:
         year:
           type: integer
           readOnly: true
+        transaction:
+          type: string
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -21177,20 +21241,10 @@ components:
         - id
         - sector
         - to_depot
+        - transaction
         - type
         - volume
         - year
-    OperationLot:
-      type: object
-      properties:
-        id:
-          type: integer
-        volume:
-          type: number
-          format: double
-      required:
-        - id
-        - volume
     OperationLotRequest:
       type: object
       properties:
@@ -21236,6 +21290,8 @@ components:
         - TRANSFERT
         - EXPIRATION
         - REPORT
+        - CORRECTION
+        - DEBT_REPAYMENT
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -21250,6 +21306,8 @@ components:
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT
+        * `CORRECTION` - CORRECTION
+        * `DEBT_REPAYMENT` - DEBT_REPAYMENT
     OperationUpdate:
       type: object
       properties:

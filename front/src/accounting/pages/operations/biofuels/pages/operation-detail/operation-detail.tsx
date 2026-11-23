@@ -14,6 +14,7 @@ import { formatOperationType } from "accounting/utils/formatters"
 import { useOperationDetailFields } from "./operation-detail-fields"
 import { OperationDetailActions } from "./operation-detail-actions"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
+import { Button } from "common/components/button2"
 
 export const OperationDetail = () => {
   const navigate = useNavigate()
@@ -61,10 +62,26 @@ export const OperationDetail = () => {
           ) : (
             <>
               <Grid className={css["operation-detail-fields"]}>
-                {fields.map(({ label, value }) => (
-                  <div key={label}>
-                    <Text className={css["field-label"]}>{label}</Text>
-                    <Text className={css["field-value"]}>{value}</Text>
+                {fields.map(({ label, value, href }) => (
+                  <div key={`${label}-${value}`}>
+                    {label && (
+                      <Text className={css["field-label"]}>{label}</Text>
+                    )}
+                    <Text className={css["field-value"]}>
+                      {href ? (
+                        <Button
+                          customPriority="link"
+                          linkProps={{
+                            to: href,
+                            target: "_blank",
+                          }}
+                        >
+                          {value}
+                        </Button>
+                      ) : (
+                        value
+                      )}
+                    </Text>
                   </div>
                 ))}
               </Grid>

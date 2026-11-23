@@ -10,6 +10,7 @@ from core.tests_utils import setup_current_user
 from entity.factories import EntityFactory
 from tiruert.services.operation_excel_template import (
     BIOFUELS_SHEET_NAME,
+    DEBTS_SHEET_NAME,
     ENTITIES_SHEET_NAME,
     MAIN_SHEET_NAME,
     TABLE_HEADERS,
@@ -47,7 +48,7 @@ class OperationExcelTemplateViewSetIntegrationTest(TestCase):
         entities_sheet = workbook[ENTITIES_SHEET_NAME]
         biofuels_sheet = workbook[BIOFUELS_SHEET_NAME]
 
-        self.assertEqual(workbook.sheetnames, [MAIN_SHEET_NAME, ENTITIES_SHEET_NAME, BIOFUELS_SHEET_NAME])
+        self.assertEqual(workbook.sheetnames, [MAIN_SHEET_NAME, ENTITIES_SHEET_NAME, BIOFUELS_SHEET_NAME, DEBTS_SHEET_NAME])
         self.assertEqual([cell.value for cell in main_sheet[1]], [label for label, _ in TABLE_HEADERS])
         self.assertEqual([cell.value for cell in main_sheet[2]], [key for _, key in TABLE_HEADERS])
         self.assertTrue(main_sheet.row_dimensions[2].hidden)
