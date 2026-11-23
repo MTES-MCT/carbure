@@ -492,6 +492,17 @@ class OperationServiceCheckDebitedEntityTest(TestCase):
 
 
 class OperationServiceOpenDebtTest(OperationServiceTestCase):
+    def create_repayment(self, debt, lot, status):
+        operation = Operation.objects.create(
+            type=Operation.DEBT_REPAYMENT,
+            status=status,
+            customs_category=debt.customs_category,
+            biofuel=debt.biofuel,
+            debited_entity=debt.entity,
+            debt=debt,
+        )
+        OperationDetail.objects.create(operation=operation, lot=lot, volume=debt.value, emission_rate_per_mj=0)
+
     def test_create_operations_rejects_debit_when_matching_open_debt_exists(self):
         TiruertDebt.objects.create(
             type=TiruertDebt.VOLUME,
@@ -519,6 +530,45 @@ class OperationServiceOpenDebtTest(OperationServiceTestCase):
 
         self.assertIn("debt", context.exception.detail)
         self.assertEqual(Operation.objects.count(), 0)
+
+    def test_draft_repayment_does_not_acquit_debt_for_a_new_operation(self):
+        debt = TiruertDebt.objects.create(
+            type=TiruertDebt.VOLUME,
+            value=100,
+            entity=self.entity,
+            biofuel=self.biofuel_eth,
+            customs_category=self.feedstock_conv.category,
+            lot=self.lot_blending_accepted,
+        )
+        self.create_repayment(debt, self.lot_blending_accepted, Operation.DRAFT)
+        data = {
+            "type": Operation.TENEUR,
+            "biofuel": debt.biofuel,
+            "customs_category": debt.customs_category,
+        }
+
+        with self.assertRaises(ValidationError) as context:
+            OperationService.check_open_debt(self.entity.id, data)
+
+        self.assertIn("debt", context.exception.detail)
+
+    def test_validated_repayment_acquits_debt_for_a_new_operation(self):
+        debt = TiruertDebt.objects.create(
+            type=TiruertDebt.VOLUME,
+            value=100,
+            entity=self.entity,
+            biofuel=self.biofuel_eth,
+            customs_category=self.feedstock_conv.category,
+            lot=self.lot_blending_accepted,
+        )
+        self.create_repayment(debt, self.lot_blending_accepted, Operation.VALIDATED)
+        data = {
+            "type": Operation.TENEUR,
+            "biofuel": debt.biofuel,
+            "customs_category": debt.customs_category,
+        }
+
+        OperationService.check_open_debt(self.entity.id, data)
 
 
 class OperationServiceCheckVolumesTest(TestCase):

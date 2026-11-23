@@ -125,6 +125,7 @@ class OperationService:
             entity_id,
             biofuel_id=data["biofuel"].id,
             customs_category=data["customs_category"],
+            repayment_statuses=[Operation.VALIDATED],
         )
         if open_debts.exists():
             raise serializers.ValidationError(

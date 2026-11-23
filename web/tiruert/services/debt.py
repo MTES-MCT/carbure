@@ -14,11 +14,11 @@ MIN_OPEN_VOLUME = 0.005
 
 class DebtService:
     @staticmethod
-    def get_open_debts(entity_id, biofuel_id=None, customs_category=None):
+    def get_open_debts(entity_id, biofuel_id=None, customs_category=None, repayment_statuses=None):
         """
         Open VOLUME debts of an entity (remaining volume > 0), oldest first.
         """
-        debts = TiruertDebt.objects.with_remaining().filter(
+        debts = TiruertDebt.objects.with_remaining(repayment_statuses=repayment_statuses).filter(
             entity_id=entity_id,
             type=TiruertDebt.VOLUME,
             remaining__gte=MIN_OPEN_VOLUME,

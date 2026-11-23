@@ -9,12 +9,15 @@ from .operation_detail import OperationDetail
 
 
 class TiruertDebtQuerySet(models.QuerySet):
-    def with_remaining(self):
-        """Annotate `repaid` (volume of the active DEBT_REPAYMENT operations) and `remaining` (value - repaid)."""
+    def with_remaining(self, repayment_statuses=None):
+        """Annotate remaining debt after repayments in the selected statuses (active statuses by default)."""
+        if repayment_statuses is None:
+            repayment_statuses = Operation.ACTIVE_STATUSES
+
         repaid = (
             OperationDetail.objects.filter(
                 operation__debt=OuterRef("pk"),
-                operation__status__in=Operation.ACTIVE_STATUSES,
+                operation__status__in=repayment_statuses,
             )
             .order_by()
             .values("operation__debt")
