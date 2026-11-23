@@ -5750,22 +5750,39 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -5904,22 +5921,39 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -6058,22 +6092,39 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -6221,22 +6272,39 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -9604,22 +9672,39 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -10044,22 +10129,39 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -10282,22 +10384,39 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
-            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+
+            * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -13576,10 +13695,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -13985,10 +14104,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -14287,10 +14406,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -14793,10 +14912,10 @@ components:
         - SEA
       type: string
       description: |-
-        * `ROAD` - Transport routier
+        * `ROAD` - Road transport
         * `PIPELINE` - Pipeline
         * `RAILROAD` - Rail
-        * `SEA` - Transport maritime
+        * `SEA` - Maritime transport
     ActionSite:
       type: object
       properties:
@@ -19615,25 +19734,42 @@ components:
         - Compagnie aérienne
         - Unknown
         - Power or Heat Producer
+        - Solid Biomass Energy Producer
         - SAF Trader
         - Producteur de biométhane
         - Fournisseur de biométhane
         - HRS
       type: string
-      description: |-
+      description: >-
         * `Producteur` - Producteur
+
         * `Opérateur` - Opérateur
+
         * `Administration` - Administration
+
         * `Trader` - Trader
+
         * `Auditor` - Auditeur
+
         * `Administration Externe` - Administration Externe
+
         * `Charge Point Operator` - Charge Point Operator
+
         * `Compagnie aérienne` - Compagnie aérienne
+
         * `Unknown` - Unknown
-        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+
+        * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+
+        * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+        chaleur (biomasse solide)
+
         * `SAF Trader` - Trader de SAF
+
         * `Producteur de biométhane` - Producteur de biométhane
+
         * `Fournisseur de biométhane` - Fournisseur de biométhane
+
         * `HRS` - Distributeur d'hydrogène pour la mobilité
       x-enum-varnames:
         - Producer
@@ -19646,9 +19782,11 @@ components:
         - Airline
         - Unknown
         - PowerOrHeatProducer
+        - SolidBiomassEnergyProducer
         - SAF_Trader
         - Producteur_de_biom_thane
         - Fournisseur_de_biom_thane
+        - HRS
     ErrorResponse:
       type: object
       properties:
@@ -22079,12 +22217,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Mot de passe
+          title: Password
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Confirmation du mot de passe
+          title: Password confirmation
       required:
         - password1
         - password2
@@ -23435,12 +23573,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Mot de passe
+          title: Password
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Confirmation du mot de passe
+          title: Password confirmation
       required:
         - email
         - name
@@ -23589,7 +23727,6 @@ components:
           type: string
           format: email
           minLength: 1
-          title: Adresse email
       required:
         - email
     UserRights:
