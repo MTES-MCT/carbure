@@ -1,4 +1,8 @@
+from decimal import Decimal
+
 from django.db import transaction
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 from django.utils.decorators import decorator_from_middleware, method_decorator
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import OpenApiParameter, extend_schema
@@ -10,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from core.filters import FiltersActionFactory
-from core.utils import CustomPageNumberPagination
+from core.pagination import MetadataPageNumberPagination
 from traceability.exceptions import ActionNotDeletableError
 from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
@@ -22,6 +26,17 @@ from traceability.serializers.creation import ActionCreateRequestSerializer
 from traceability.serializers.creation.authorization import ActionAuthorizationSerializer
 from traceability.services.delete import delete_action
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
+
+
+class ActionPagination(MetadataPageNumberPagination):
+    """Sum of stored quantities over the filtered queryset, before the page slice.
+
+    Units are ignored: ``quantity`` values are added as stored.
+    """
+
+    aggregate_fields = {
+        "total_quantity": Coalesce(Sum("quantity"), Decimal("0")),
+    }
 
 
 @extend_schema(
@@ -56,7 +71,7 @@ class ActionViewset(
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     filterset_class = ActionFilter
-    pagination_class = CustomPageNumberPagination
+    pagination_class = ActionPagination
     search_fields = ["holder__name", "carbure_id", "pos_id"]
 
     def get_permissions(self):

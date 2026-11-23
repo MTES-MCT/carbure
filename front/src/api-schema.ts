@@ -6643,6 +6643,7 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Action"][];
+            total_quantity?: number;
         };
         PaginatedAdminUserRowList: {
             /** @example 123 */

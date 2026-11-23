@@ -13,6 +13,7 @@ import useYears from "common/hooks/years-2"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Tabs } from "common/components/tabs2"
 import { FilterMultiSelect2 } from "common/molecules/filter-multiselect2"
+import { RecapQuantity } from "common/molecules/recap-quantity"
 
 import { getActionFilters, getActions, getActionYears } from "traceability/api"
 import {
@@ -67,6 +68,7 @@ export type ActionsPageProps = {
   fieldsets?: ActionFieldset[]
   industry: ActionIndustry
   emptyState?: ReactNode
+  renderQuantityTotal?: (count: number, total?: number) => ReactNode
 }
 
 export const ActionsPage = ({
@@ -83,6 +85,7 @@ export const ActionsPage = ({
   fieldsets,
   industry,
   emptyState,
+  renderQuantityTotal,
 }: ActionsPageProps) => {
   usePrivateNavigation(listTitle)
 
@@ -212,6 +215,15 @@ export const ActionsPage = ({
           getFilterOptions={getFilterOptions}
           normalizers={filterNormalizers}
         />
+
+        {renderQuantityTotal && result?.data?.count ? (
+          <RecapQuantity
+            text={renderQuantityTotal(
+              result.data.count,
+              result.data.total_quantity
+            )}
+          />
+        ) : null}
 
         <Table
           loading={loading}

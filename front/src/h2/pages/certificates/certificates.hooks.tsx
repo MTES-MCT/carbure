@@ -28,6 +28,7 @@ type H2CertificatesPageConfig = Pick<
   | "filters"
   | "columns"
   | "fieldsets"
+  | "renderQuantityTotal"
 >
 
 export function useH2CertificatesPage(): {
