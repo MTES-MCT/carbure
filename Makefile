@@ -4,7 +4,7 @@
 	makemigrations migrate seed ipython \
 	lint-fix translate translate-missing \
 	check-diff check-types generate-and-check-types \
-	flush
+	flush fallback
 
 -include .env
 export
@@ -87,3 +87,6 @@ check-types:
 
 flush:
 	$(django_cmd) flush
+
+fallback:
+	uv run python fallback/generate.py
