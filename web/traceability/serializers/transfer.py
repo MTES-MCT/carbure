@@ -1,4 +1,4 @@
-import uuid
+from datetime import date
 
 from traceability.serializers.creation import ActionCreationSerializer
 
@@ -15,7 +15,5 @@ class TransferSerializer(ActionCreationSerializer):
         fields = ["quantity"]
 
     def create(self, validated_data):
-        parent = validated_data["parent"]
-        validated_data["pos_id"] = str(uuid.uuid4())
-        validated_data["working_date"] = parent.working_date
+        validated_data["working_date"] = date.today()
         return super().create(validated_data)

@@ -63,13 +63,12 @@ export function useTransferCertificateDialog(
   const transfer = (value: TransferCertificateForm | undefined) => {
     if (!value?.holder || !value.quantity) return
 
-    emission.execute(entity.id, action.industry, {
+    return emission.execute(entity.id, action.industry, {
       type: ActionType.TRANSFER,
       status: ActionStatus.PENDING,
       holder: value.holder.id,
       parent: action.id,
       quantity: value.quantity,
-      pos_id: "demoo",
     })
   }
 
