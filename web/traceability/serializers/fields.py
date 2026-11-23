@@ -51,6 +51,13 @@ class ExcelMonthYearField(ExcelDateField):
         return value
 
 
+# 3 digits before the decimal point, 10 after. Excel stores an IEEE float:
+# a displayed 15.339 can be saved as 15.339000000000002. Digits past 10
+# decimals are truncated before the precision check, which would otherwise
+# reject the cell.
+EMISSION_DECIMAL = {"max_digits": 13, "decimal_places": 10}
+
+
 class TruncatingDecimalField(serializers.DecimalField):
     """Cut digits past ``decimal_places`` before the precision check.
 

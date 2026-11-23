@@ -10,7 +10,8 @@ from core.models import Entity
 from traceability.factories import ActionFactory
 from traceability.models import Action
 from traceability.serializers import ActionInputSerializer
-from traceability.serializers.fields import LookupSlugRelatedField, TruncatingDecimalField
+from traceability.serializers.fields import EMISSION_DECIMAL, LookupSlugRelatedField, TruncatingDecimalField
+from traceability.serializers.total_emissions import ActionTotalEmissionsSerializer
 
 
 class ActionInputSerializerTest(TestCase):
@@ -81,6 +82,14 @@ class LookupSlugRelatedFieldTest(SimpleTestCase):
         second.get_queryset.assert_not_called()
 
 
+class ActionTotalEmissionsSerializerTest(SimpleTestCase):
+    def test_represents_a_chain_sum_above_one_post_ceiling(self):
+        payload = {name: Decimal("0") for name in ("eec", "el", "ei", "ep", "etd", "eu", "eccs", "esca", "eccr", "total")}
+        payload["total"] = Decimal("1000.1234567890")
+
+        self.assertEqual(ActionTotalEmissionsSerializer(payload).data["total"], "1000.1234567890")
+
+
 class TruncatingDecimalFieldTest(SimpleTestCase):
     def setUp(self):
         self.field = TruncatingDecimalField(max_digits=7, decimal_places=3, min_value=Decimal("0"))
@@ -92,3 +101,15 @@ class TruncatingDecimalFieldTest(SimpleTestCase):
     def test_rejects_a_value_that_still_exceeds_the_digit_limit(self):
         with self.assertRaises(serializers.ValidationError):
             self.field.run_validation("10000.1234")
+
+    def test_drops_excel_float_noise_past_ten_decimals(self):
+        field = TruncatingDecimalField(**EMISSION_DECIMAL)
+
+        self.assertEqual(field.run_validation(15.339000000000002), Decimal("15.3390000000"))
+
+    def test_rejects_a_fourth_integer_digit_on_emissions(self):
+        field = TruncatingDecimalField(**EMISSION_DECIMAL)
+
+        self.assertEqual(field.run_validation("999.1234567890"), Decimal("999.1234567890"))
+        with self.assertRaises(serializers.ValidationError):
+            field.run_validation("1000")
