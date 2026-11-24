@@ -8,7 +8,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 | [`docs/inherited_fields.md`](docs/inherited_fields.md) | Règles des champs hérités                       |
 | [`docs/total_emissions.md`](docs/total_emissions.md)   | Formule du cumul GES                            |
 | [`docs/excel.md`](docs/excel.md)                       | Colonnes et import Excel                        |
-| [`docs/action_flows.md`](docs/action_flows.md)         | Flows de création et autorisations des statuts   |
+| [`docs/action_flows.md`](docs/action_flows.md)         | Flows de création et autorisations des statuts  |
 
 ## Choix de conception
 
@@ -21,11 +21,12 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 
 ## Modèle
 
-| Concept        | Rôle                                                                                                                                                            |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Concept        | Rôle                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Action`       | `carbure_id` (annotation `C{année}-{filière}-{base36 sur 8}`, non stockée ; l’année vient de `created_at`, la filière du champ `industry` ; `10` créé en 2026 en H2 donne `C2026-H2-0000000A`), `created_at` (posé à l’enregistrement), `pos_id` (PoS optionnel, unique s’il est renseigné), détenteur, matière, quantité, site, logistique, GES. Fichier source optionnel (`file` → `core.StoredFile`, renseigné à l’import Excel, non exposé à l’API) |
-| `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset                                                                  |
-| `Material`     | Catalogue (`code`, `name`, `description`, `unit`, `lhv`, `density`). L’unité native de `quantity` vit ici. Facteurs optionnels, ou strictement > 0              |
+| `ActionStatus` | Historique de workflow (`CREATED`, `PENDING`, …). Le statut courant est annoté sur le queryset                                                                                                                                                                                                                                                                                                                                                          |
+| `Material`     | Catalogue (`code`, `name`, `description`, `classification`, `unit`, `lhv`, `density`). La classification est optionnelle ; l’unité native de `quantity` vit ici. Facteurs optionnels, ou strictement > 0                                                                                                                                                                                                                                                |
+| `MaterialTag`  | Étiquette associée à une matière, définie par un type et une valeur. Le triplet matière, type, valeur est unique ; les valeurs autorisées dépendent du type                                                                                                                                                                                                                                                                                             |
 
 Import des matières :
 
@@ -51,7 +52,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 | `excel_columns`                                           | Colonnes du template et mapping à l’import — voir [`docs/excel.md`](docs/excel.md)                                       |
 | `excel_import_serializer_class`                           | Validation d’import (surcharge filière)                                                                                  |
 | `action_creation_serializers`                             | Serializers de création associés aux types d'action ; ceux de la filière complètent ou remplacent les valeurs par défaut |
-| `action_status_authorizations`                           | Prédicats d'attribution par couple `(type d'action, statut)` ; la filière définit l'ensemble de ses règles                 |
+| `action_status_authorizations`                            | Prédicats d'attribution par couple `(type d'action, statut)` ; la filière définit l'ensemble de ses règles               |
 | `read_permission`, `write_permission`, `admin_permission` | Droits pour chaque endpoint                                                                                              |
 | `scope_queryset`                                          | Filtre sur `industry`, puis détenteur ou parent. Si on est admin, on affiche toutes les données de la filière            |
 | `action_creation_flow`                                    | Liens de création déclarés par la filière                                                                                |
