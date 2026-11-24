@@ -126,7 +126,7 @@ pass:
         - .gitlab-ci.yml
 
 .frontend:
-  image: node:latest
+  image: node:24.22.3-alpine3.24
   cache:
     - key:
         files:
@@ -136,6 +136,7 @@ pass:
   before_script:
     - cd front
     - npm ci --cache .npm --prefer-offline
+    - apk add --update git
   rules:
     - changes:
         - front/**/*
