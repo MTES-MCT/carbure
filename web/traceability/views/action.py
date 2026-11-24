@@ -38,6 +38,16 @@ class ActionPagination(MetadataPageNumberPagination):
         "total_quantity": Coalesce(Sum("quantity"), Decimal("0")),
     }
 
+    def get_paginated_response_schema(self, schema):
+        response_schema = super().get_paginated_response_schema(schema)
+        # The parent types every aggregate as a number. This sum is a Decimal,
+        # and DRF serializes decimals as strings.
+        response_schema["properties"]["total_quantity"] = {
+            "type": "string",
+            "format": "decimal",
+        }
+        return response_schema
+
 
 @extend_schema(
     parameters=[

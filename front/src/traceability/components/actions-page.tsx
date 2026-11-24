@@ -68,7 +68,7 @@ export type ActionsPageProps = {
   fieldsets?: ActionFieldset[]
   industry: ActionIndustry
   emptyState?: ReactNode
-  renderQuantityTotal?: (count: number, total?: number) => ReactNode
+  renderQuantityTotal?: (count: number, total?: string) => ReactNode
 }
 
 export const ActionsPage = ({
