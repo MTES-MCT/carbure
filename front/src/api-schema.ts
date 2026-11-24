@@ -1,4 +1,20 @@
 export interface paths {
+    "/api/auth/activate/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["auth_activate_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/activate-profile/": {
         parameters: {
             query?: never;
@@ -24,23 +40,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["auth_check_activate_profile_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/auth/activate/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["auth_activate_create"];
+        post: operations["auth_activate_profile_check_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2879,6 +2879,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/solid-biomass/energy-installation/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["solid_biomass_energy_installation_retrieve"];
+        put: operations["solid_biomass_energy_installation_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/declaration-period/": {
         parameters: {
             query?: never;
@@ -3274,6 +3290,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tiruert/operations/debts/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Remaining debt volume of the entity per biofuel and customs category */
+        get: operations["list_debts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/operations/export/": {
         parameters: {
             query?: never;
@@ -3442,7 +3475,8 @@ export interface paths {
         /** @description Add a years action based on an action's working date. */
         get: operations["traceability_actions_list"];
         put?: never;
-        post?: never;
+        /** @description Create an action. */
+        post: operations["traceability_actions_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3462,6 +3496,23 @@ export interface paths {
         post?: never;
         /** @description Add a years action based on an action's working date. */
         delete: operations["traceability_actions_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/traceability/actions/{id}/status/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Change an action's status. */
+        post: operations["traceability_actions_status_create"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3601,18 +3652,20 @@ export interface components {
             readonly status: components["schemas"]["ActionStatusEnum"] | null;
             readonly holder: components["schemas"]["EntityPreview"];
             readonly parent: components["schemas"]["ActionParent"] | null;
-            readonly material: components["schemas"]["Material"];
+            readonly material: components["schemas"]["Material"] | null;
             readonly site: components["schemas"]["ActionSite"];
             readonly certificate: components["schemas"]["ActionCertificate"] | null;
             readonly total_emissions: components["schemas"]["ActionTotalEmissions"] | null;
-            /** Format: decimal */
-            readonly mass: string | null;
-            /** Format: decimal */
-            readonly volume: string | null;
-            /** Format: decimal */
-            readonly energy: string | null;
+            readonly inherited_fields: components["schemas"]["ActionInheritedFields"];
+            /**
+             * Format: decimal
+             * @default 0.000
+             */
+            readonly quantity_available: string;
+            /** Identifiant Carbure */
+            readonly carbure_id: string;
             /** N° de POS */
-            pos_id: string;
+            pos_id?: string | null;
             /** Filière */
             industry: components["schemas"]["IndustryEnum"];
             /** Type d'action */
@@ -3631,6 +3684,11 @@ export interface components {
             shipping_distance?: number | null;
             /** Mode de transport */
             shipping_method?: components["schemas"]["ActionShippingMethodEnum"] | null;
+            /**
+             * Date de création
+             * Format: date-time
+             */
+            readonly created_at: string;
             /**
              * Date de référence
              * Format: date
@@ -3661,15 +3719,85 @@ export interface components {
             certificate_type: components["schemas"]["CertificateTypeEnum"];
             certificate_holder: string;
         };
+        /**
+         * @description Schema of the create body. The view validates with the type serializer.
+         *
+         *     ``working_date`` is optional: the client sends it when it knows the date,
+         *     otherwise the server fills it. ``industry`` comes from the query param.
+         *     ``pos_id`` follows the model until it becomes optional.
+         */
+        ActionCreateRequestRequest: {
+            /** Type d'action */
+            type: components["schemas"]["ActionTypeEnum"];
+            /** Entité détentrice de la quantité de l'action */
+            holder: number;
+            /** Action parente */
+            parent?: number | null;
+            /** N° de POS */
+            pos_id?: string | null;
+            /** Matière */
+            material?: number | null;
+            status: components["schemas"]["ActionStatusEnum"];
+            /** Certificat */
+            certificate?: number | null;
+            /**
+             * Quantité de matière
+             * Format: decimal
+             */
+            quantity: string;
+            site?: number | null;
+            /**
+             * Date d'expédition
+             * Format: date
+             */
+            shipping_date?: string | null;
+            /** Distance de livraison */
+            shipping_distance?: number | null;
+            /** Mode de transport */
+            shipping_method?: components["schemas"]["ActionShippingMethodEnum"] | null;
+            /** Format: date */
+            working_date?: string;
+            /** Fichier */
+            file?: number | null;
+            /** Format: decimal */
+            eec?: string;
+            /** Format: decimal */
+            el?: string;
+            /** Format: decimal */
+            ei?: string;
+            /** Format: decimal */
+            ep?: string;
+            /** Format: decimal */
+            etd?: string;
+            /** Format: decimal */
+            eu?: string;
+            /** Format: decimal */
+            eccs?: string;
+            /** Format: decimal */
+            esca?: string;
+            /** Format: decimal */
+            eccr?: string;
+        };
         ActionExcelUploadRequest: {
             /** Format: binary */
             file: File;
+        };
+        /**
+         * @description Every value the front receives from the parent-chain walk.
+         *
+         *     previous_material is the nearest declared material above the action.
+         *     origin_material is the first declared material from the root. It is the action's
+         *     own material when nothing above declares one.
+         */
+        ActionInheritedFields: {
+            previous_material: components["schemas"]["Material"] | null;
+            origin_material: components["schemas"]["Material"] | null;
         };
         /** @description Small representation used for the parent action relation. */
         ActionParent: {
             readonly id: number;
             /** N° de POS */
-            pos_id: string;
+            pos_id?: string | null;
         };
         /**
          * @description * `ROAD` - Transport routier
@@ -3683,6 +3811,12 @@ export interface components {
             readonly id: number;
             name: string;
             site_type?: components["schemas"]["SiteTypeEnum"];
+        };
+        ActionStatusAuthorization: {
+            status: components["schemas"]["ActionStatusEnum"];
+        };
+        ActionStatusAuthorizationRequest: {
+            status: components["schemas"]["ActionStatusEnum"];
         };
         /**
          * @description * `CREATED` - CREATED
@@ -3734,7 +3868,6 @@ export interface components {
             password1: string;
             password2: string;
         };
-        ActivateResponse: Record<string, never>;
         AddCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -3900,11 +4033,13 @@ export interface components {
             name: string;
             name_en: string;
             code: string;
+            compatible_gpl?: boolean;
         };
         BiofuelRequest: {
             name: string;
             name_en: string;
             code: string;
+            compatible_gpl?: boolean;
         };
         /** @description Serializer pour la liste admin des déclarations annuelles biométhane (DREAL). */
         BiomethaneAdminAnnualDeclaration: {
@@ -4966,8 +5101,11 @@ export interface components {
             checked_at: string;
         };
         Classification: {
+            /** @default  */
             group: string;
+            /** @default  */
             category: string;
+            /** @default  */
             subcategory: string;
             readonly crop_type: components["schemas"]["CropTypeEnum"] | null;
         };
@@ -5097,6 +5235,12 @@ export interface components {
          * @enum {string}
          */
         CropTypeEnum: CropTypeEnum;
+        DebtSummary: {
+            biofuel: components["schemas"]["BalanceBiofuel"];
+            customs_category: components["schemas"]["MPCategoriesEnum"];
+            /** Format: double */
+            remaining_volume: number;
+        };
         DeleteCertificateRequest: {
             certificate_id: string;
             certificate_type: string;
@@ -5230,7 +5374,7 @@ export interface components {
             readonly created_at: string;
             readonly producer: components["schemas"]["Entity"];
             /**
-             * Adresse électronique
+             * Email address
              * Format: email
              */
             readonly producer_user: string;
@@ -5262,7 +5406,7 @@ export interface components {
             /** Format: double */
             readonly quotas_progression: number;
             /**
-             * Adresse électronique
+             * Email address
              * Format: email
              */
             readonly producer_user: string;
@@ -5625,6 +5769,40 @@ export interface components {
         EmptyResponseRequest: {
             empty?: string;
         };
+        EnergyInstallation: {
+            production_type?: components["schemas"]["ProductionTypeEnum"] | null;
+            heat_type?: components["schemas"]["HeatTypeEnum"] | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Format: double */
+            useful_temperature?: number | null;
+            /** Format: double */
+            electrical_efficiency?: number | null;
+            /** Format: double */
+            thermal_efficiency?: number | null;
+            icpe_number?: (string) | null;
+            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+        };
+        EnergyInstallationRequest: {
+            production_type?: components["schemas"]["ProductionTypeEnum"] | null;
+            heat_type?: components["schemas"]["HeatTypeEnum"] | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Format: double */
+            useful_temperature?: number | null;
+            /** Format: double */
+            electrical_efficiency?: number | null;
+            /** Format: double */
+            thermal_efficiency?: number | null;
+            icpe_number?: (string) | null;
+            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+        };
         /**
          * @description * `PRODUCED_BIOGAS` - Biogaz produit par l'installation
          *     * `PRODUCED_BIOMETHANE` - Biométhane produit par l'installation
@@ -5853,7 +6031,8 @@ export interface components {
          *     * `Charge Point Operator` - Charge Point Operator
          *     * `Compagnie aérienne` - Compagnie aérienne
          *     * `Unknown` - Unknown
-         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
+         *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
          *     * `SAF Trader` - Trader de SAF
          *     * `Producteur de biométhane` - Producteur de biométhane
          *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -6082,6 +6261,14 @@ export interface components {
             country?: number | null;
         };
         /**
+         * @description * `HOT_WATER` - Eau chaude
+         *     * `STEAM` - Vapeur
+         *     * `HOT_WATER_STEAM` - Eau chaude et vapeur
+         *     * `INDUSTRIAL_PROCESS` - Process industriel
+         * @enum {string}
+         */
+        HeatTypeEnum: HeatTypeEnum;
+        /**
          * @description * `TOTAL` - Totale
          *     * `PARTIAL` - Partielle
          * @enum {string}
@@ -6304,7 +6491,7 @@ export interface components {
          * @description * `ESSENCE` - ESSENCE
          *     * `GAZOLE` - GAZOLE
          *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-         *     * `GPL_C` - GPL_C
+         *     * `GPL` - GPL
          *     * `MARITIME` - MARITIME
          * @enum {string}
          */
@@ -6340,16 +6527,34 @@ export interface components {
             readonly energy: number;
             /** Format: double */
             readonly avoided_emissions: number;
+            details?: components["schemas"]["OperationDetail"][];
             readonly year: number;
             devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
+            readonly debt: components["schemas"]["OperationDebt"] | null;
+            readonly transaction: string;
         };
         OperationCorrectionRequest: {
             /** Format: double */
             correction_volume: number;
         };
+        OperationDebt: {
+            id: number;
+            lot: components["schemas"]["OperationDebtLot"];
+        };
+        OperationDebtLot: {
+            id: number;
+            carbure_id: string;
+        };
         OperationDepot: {
             id: number;
             name: string;
+        };
+        OperationDetail: {
+            lot: number;
+            /** Format: double */
+            volume?: number;
+            /** Format: double */
+            emission_rate_per_mj?: number;
         };
         OperationEntity: {
             id: number;
@@ -6374,32 +6579,18 @@ export interface components {
             /** Format: double */
             total_volume: number;
             rows: number[];
+            debt: components["schemas"]["OperationDebt"] | null;
         };
         OperationImportResponse: {
             mode: components["schemas"]["ModeEnum"];
             operations: components["schemas"]["OperationImportGroup"][];
         };
-        OperationInput: {
-            type: components["schemas"]["OperationTypeEnum"];
-            customs_category: components["schemas"]["MPCategoriesEnum"];
-            biofuel: number | null;
-            credited_entity?: number | null;
-            debited_entity: number | null;
-            from_depot?: number | null;
-            to_depot?: number | null;
-            export_country?: string | null;
-            export_recipient?: string;
-            objective_sector?: components["schemas"]["ObjectiveSectorCodeEnum"] | null;
-            lots: components["schemas"]["OperationLot"][];
-            status?: components["schemas"]["OperationStatusEnum"];
-            devaluation_type?: components["schemas"]["DevaluationTypeEnum"] | null;
-        };
         OperationInputRequest: {
             type: components["schemas"]["OperationTypeEnum"];
             customs_category: components["schemas"]["MPCategoriesEnum"];
-            biofuel: number | null;
+            biofuel: number;
             credited_entity?: number | null;
-            debited_entity: number | null;
+            debited_entity: number;
             from_depot?: number | null;
             to_depot?: number | null;
             export_country?: string | null;
@@ -6437,11 +6628,7 @@ export interface components {
             /** Format: double */
             readonly avoided_emissions: number;
             readonly year: number;
-        };
-        OperationLot: {
-            id: number;
-            /** Format: double */
-            volume: number;
+            readonly transaction: string;
         };
         OperationLotRequest: {
             id: number;
@@ -6473,6 +6660,8 @@ export interface components {
          *     * `TRANSFERT` - TRANSFERT
          *     * `EXPIRATION` - EXPIRATION
          *     * `REPORT` - REPORT
+         *     * `CORRECTION` - CORRECTION
+         *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
          * @enum {string}
          */
         OperationTypeEnum: OperationTypeEnum;
@@ -6512,7 +6701,6 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Action"][];
-            total_count?: number;
         };
         PaginatedAdminUserRowList: {
             /** @example 123 */
@@ -6937,6 +7125,13 @@ export interface components {
             readonly type: string;
             readonly certificate_id: string;
         };
+        /**
+         * @description * `ELECTRICITY` - Électricité seule
+         *     * `HEAT` - Chaleur/Froid seul
+         *     * `COGENERATION` - Cogénération
+         * @enum {string}
+         */
+        ProductionTypeEnum: ProductionTypeEnum;
         ProvisionCertificateBulkRequest: {
             entity: string;
             siren: string;
@@ -7338,7 +7533,8 @@ export interface components {
             name: string;
         };
         /**
-         * @description * `OTHER` - Autre
+         * @description * `ENERGY INSTALLATION` - Installation de chaleur et d’électricité
+         *     * `OTHER` - Autre
          *     * `EFS` - EFS
          *     * `EFPE` - EFPE
          *     * `OIL DEPOT` - OIL DEPOT
@@ -7535,11 +7731,10 @@ export interface components {
          */
         UserCreation: {
             /**
-             * Adresse électronique
+             * Email address
              * Format: email
              */
             email: string;
-            /** Nom */
             name: string;
         };
         /**
@@ -7548,11 +7743,10 @@ export interface components {
          */
         UserCreationRequest: {
             /**
-             * Adresse électronique
+             * Email address
              * Format: email
              */
             email: string;
-            /** Nom */
             name: string;
             /** Mot de passe */
             password1: string;
@@ -7597,7 +7791,7 @@ export interface components {
         /** @description Resend the activation email for the pending account matching this address. */
         UserResendActivationLinkRequest: {
             /**
-             * Courriel
+             * Adresse email
              * Format: email
              */
             email: string;
@@ -7674,7 +7868,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    auth_check_activate_profile_create: {
+    auth_activate_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -7689,14 +7883,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The invitation link is still valid. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description The link is expired, already used, or does not belong to an invited account. */
+            /** @description Bad request - missing fields. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7722,6 +7909,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The account was activated and the password was set. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -7739,7 +7927,7 @@ export interface operations {
             };
         };
     };
-    auth_activate_create: {
+    auth_activate_profile_check_create: {
         parameters: {
             query?: never;
             header?: never;
@@ -7754,15 +7942,14 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The invitation link is still valid. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["ActivateResponse"];
-                };
+                content?: never;
             };
-            /** @description Bad request - missing fields. */
+            /** @description The link is expired, already used, or does not belong to an invited account. */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -7903,6 +8090,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description The request was accepted. A mail is sent only when a pending account matches the address. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -9648,7 +9836,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -9748,7 +9936,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -9790,7 +9978,7 @@ export interface operations {
             query?: {
                 certificate_id?: string;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -9832,7 +10020,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -9876,7 +10064,7 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter?: string;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -10240,7 +10428,7 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiDoubleCountingApplicationsFiltersGetParametersQueryFilter;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -10312,7 +10500,7 @@ export interface operations {
                 /** @description Entity ID */
                 entity_id: number;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `production_site` - Production site
                  *     * `-production_site` - Production site (décroissant)
@@ -10484,7 +10672,7 @@ export interface operations {
                 entity_id: number;
                 operating_unit?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
@@ -10866,7 +11054,7 @@ export interface operations {
                 filter: PathsApiElecProvisionCertificatesFiltersGetParametersQueryFilter;
                 operating_unit?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `quarter` - Quarter
                  *     * `-quarter` - Quarter (décroissant)
@@ -11000,7 +11188,7 @@ export interface operations {
                 month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -11206,7 +11394,7 @@ export interface operations {
                 month?: PathsApiElecTransferCertificatesGetParametersQueryMonth[];
                 operator?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -11422,7 +11610,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -11430,20 +11619,20 @@ export interface operations {
                  */
                 entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
-                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
                  *
                  *     * `true` - True
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `entity_name` - Entity name
                  *     * `-entity_name` - Entity name (décroissant)
                  *     * `entity_id` - Entity id
                  *     * `-entity_id` - Entity id (décroissant)
-                 *     * `user` - Utilisateur
+                 *     * `user` - User
                  *     * `-user` - Utilisateur (décroissant)
                  *     * `role` - Role
                  *     * `-role` - Role (décroissant)
@@ -11498,7 +11687,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -11506,20 +11696,20 @@ export interface operations {
                  */
                 entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
-                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
                  *
                  *     * `true` - True
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `entity_name` - Entity name
                  *     * `-entity_name` - Entity name (décroissant)
                  *     * `entity_id` - Entity id
                  *     * `-entity_id` - Entity id (décroissant)
-                 *     * `user` - Utilisateur
+                 *     * `user` - User
                  *     * `-user` - Utilisateur (décroissant)
                  *     * `role` - Role
                  *     * `-role` - Role (décroissant)
@@ -11576,7 +11766,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -11586,20 +11777,20 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiEntitiesAdminUsersFiltersGetParametersQueryFilter;
                 /**
-                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
                  *
                  *     * `true` - True
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `entity_name` - Entity name
                  *     * `-entity_name` - Entity name (décroissant)
                  *     * `entity_id` - Entity id
                  *     * `-entity_id` - Entity id (décroissant)
-                 *     * `user` - Utilisateur
+                 *     * `user` - User
                  *     * `-user` - Utilisateur (décroissant)
                  *     * `role` - Role
                  *     * `-role` - Role (décroissant)
@@ -11650,7 +11841,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -11658,20 +11850,20 @@ export interface operations {
                  */
                 entity_type?: PathsApiEntitiesAdminUsersGetParametersQueryEntity_type[];
                 /**
-                 * @description Précise si l’utilisateur doit être considéré comme actif. Décochez ceci plutôt que de supprimer le compte.
+                 * @description Designates whether this user should be treated as active. Unselect this instead of deleting accounts.
                  *
                  *     * `true` - True
                  *     * `false` - False
                  */
                 is_active?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `entity_name` - Entity name
                  *     * `-entity_name` - Entity name (décroissant)
                  *     * `entity_id` - Entity id
                  *     * `-entity_id` - Entity id (décroissant)
-                 *     * `user` - Utilisateur
+                 *     * `user` - User
                  *     * `-user` - Utilisateur (décroissant)
                  *     * `role` - Role
                  *     * `-role` - Role (décroissant)
@@ -13010,7 +13202,7 @@ export interface operations {
                  */
                 has_personal_vehicle_connector?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `name` - Name
                  *     * `-name` - Name (décroissant)
@@ -13206,7 +13398,7 @@ export interface operations {
                  */
                 has_personal_vehicle_connector?: PathsApiElecTransferCertificatesGetParametersQueryUsed_in_tiruert[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `name` - Name
                  *     * `-name` - Name (décroissant)
@@ -13320,6 +13512,7 @@ export interface operations {
     resources_biofuels_list: {
         parameters: {
             query?: {
+                entity_id?: number;
                 /** @description Search within the fields `name`, `name_en`, and `code` */
                 query?: string;
             };
@@ -13677,7 +13870,7 @@ export interface operations {
                 entity_id: number;
                 feedstock?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -13792,7 +13985,7 @@ export interface operations {
                 entity_id: number;
                 feedstock?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -13849,7 +14042,7 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiSafTicketSourcesFiltersGetParametersQueryFilter;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `volume` - Volume
                  *     * `-volume` - Volume (décroissant)
@@ -13944,7 +14137,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -13967,7 +14161,7 @@ export interface operations {
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -14207,7 +14401,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -14230,7 +14425,7 @@ export interface operations {
                 ets_status?: PathsApiSafTicketsGetParametersQueryEts_status[];
                 feedstock?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -14299,7 +14494,8 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
+                 *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
                  *     * `Fournisseur de biométhane` - Fournisseur de biométhane
@@ -14324,7 +14520,7 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiSafTicketsFiltersGetParametersQueryFilter;
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `client` - Client
                  *     * `-client` - Client (décroissant)
@@ -14409,6 +14605,54 @@ export interface operations {
             };
         };
     };
+    solid_biomass_energy_installation_retrieve: {
+        parameters: {
+            query: {
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyInstallation"];
+                };
+            };
+        };
+    };
+    solid_biomass_energy_installation_update: {
+        parameters: {
+            query: {
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EnergyInstallationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EnergyInstallationRequest"];
+                "multipart/form-data": components["schemas"]["EnergyInstallationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyInstallation"];
+                };
+            };
+        };
+    };
     tiruert_declaration_period_retrieve: {
         parameters: {
             query: {
@@ -14480,7 +14724,7 @@ export interface operations {
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -14745,7 +14989,7 @@ export interface operations {
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -14796,7 +15040,7 @@ export interface operations {
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -14848,7 +15092,7 @@ export interface operations {
                 from_to?: string;
                 operation?: PathsApiTiruertElecOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `created_at` - Created at
                  *     * `-created_at` - Created at (décroissant)
@@ -15102,11 +15346,13 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -15150,7 +15396,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15212,7 +15458,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OperationInput"];
+                    "application/json": components["schemas"]["Operation"] | components["schemas"]["OperationList"][];
                 };
             };
         };
@@ -15479,11 +15725,13 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -15527,7 +15775,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15600,11 +15848,13 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -15644,7 +15894,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -15679,6 +15929,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": string[];
+                };
+            };
+        };
+    };
+    list_debts: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebtSummary"][];
                 };
             };
         };
@@ -15740,11 +16012,13 @@ export interface operations {
                  *     * `TRANSFERT` - TRANSFERT
                  *     * `EXPIRATION` - EXPIRATION
                  *     * `REPORT` - REPORT
+                 *     * `CORRECTION` - CORRECTION
+                 *     * `DEBT_REPAYMENT` - DEBT_REPAYMENT
                  *     * `ACQUISITION` - ACQUISITION
                  */
                 operation?: PathsApiTiruertOperationsGetParametersQueryOperation[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
                  *     * `status` - Status
                  *     * `-status` - Status (décroissant)
@@ -15784,7 +16058,7 @@ export interface operations {
                  * @description * `ESSENCE` - ESSENCE
                  *     * `GAZOLE` - GAZOLE
                  *     * `CARBURÉACTEUR` - CARBURÉACTEUR
-                 *     * `GPL_C` - GPL_C
+                 *     * `GPL` - GPL
                  *     * `MARITIME` - MARITIME
                  */
                 sector?: PathsApiTiruertOperationsGetParametersQuerySector[];
@@ -16022,8 +16296,10 @@ export interface operations {
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -16044,11 +16320,13 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_material?: string[];
                 /** @description A page number within the paginated result set. */
                 page?: number;
                 /** @description Number of results to return per page. */
                 page_size?: number;
                 period?: string[];
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16089,6 +16367,52 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PaginatedActionList"];
                 };
+            };
+        };
+    };
+    traceability_actions_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionCreateRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionCreateRequestRequest"];
+                "multipart/form-data": components["schemas"]["ActionCreateRequestRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Action"];
+                };
+            };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -16149,6 +16473,62 @@ export interface operations {
             };
         };
     };
+    traceability_actions_status_create: {
+        parameters: {
+            query: {
+                /** @description Authorised entity ID. */
+                entity_id: number;
+                /** @description * `H2` - Hydrogène */
+                industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
+                /** @description Filter actions by working date year. */
+                year?: number;
+            };
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this Action. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionStatusAuthorizationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ActionStatusAuthorizationRequest"];
+                "multipart/form-data": components["schemas"]["ActionStatusAuthorizationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionStatusAuthorization"];
+                };
+            };
+            /** @description No response body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No response body */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     traceability_actions_filters_retrieve: {
         parameters: {
             query: {
@@ -16161,8 +16541,10 @@ export interface operations {
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -16183,7 +16565,9 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_material?: string[];
                 period?: string[];
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16304,8 +16688,10 @@ export interface operations {
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
-                 * @description Ordre
+                 * @description Ordering
                  *
+                 *     * `carbure_id` - Carbure id
+                 *     * `-carbure_id` - Carbure id (décroissant)
                  *     * `pos_id` - Pos id
                  *     * `-pos_id` - Pos id (décroissant)
                  *     * `holder` - Holder
@@ -16326,7 +16712,9 @@ export interface operations {
                 order_by?: PathsApiTraceabilityActionsGetParametersQueryOrder_by[];
                 /** @description Which field to use when ordering the results. */
                 ordering?: string;
+                origin_material?: string[];
                 period?: string[];
+                quantity_available?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16604,6 +16992,7 @@ export enum PathsApiEntitiesAdminUsersGetParametersQueryEntity_type {
     Producteur = "Producteur",
     Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
     SAF_Trader = "SAF Trader",
+    Solid_Biomass_Energy_Producer = "Solid Biomass Energy Producer",
     Trader = "Trader",
     Unknown = "Unknown"
 }
@@ -16793,7 +17182,9 @@ export enum PathsApiTiruertOperationsGetParametersQueryCustoms_category {
 export enum PathsApiTiruertOperationsGetParametersQueryOperation {
     ACQUISITION = "ACQUISITION",
     CESSION = "CESSION",
+    CORRECTION = "CORRECTION",
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
+    DEBT_REPAYMENT = "DEBT_REPAYMENT",
     DEVALUATION = "DEVALUATION",
     EXPEDITION = "EXPEDITION",
     EXPIRATION = "EXPIRATION",
@@ -16837,7 +17228,7 @@ export enum PathsApiTiruertOperationsGetParametersQuerySector {
     CARBUR_ACTEUR = "CARBUR\u00C9ACTEUR",
     ESSENCE = "ESSENCE",
     GAZOLE = "GAZOLE",
-    GPL_C = "GPL_C",
+    GPL = "GPL",
     MARITIME = "MARITIME"
 }
 export enum PathsApiTiruertOperationsGetParametersQueryStatus {
@@ -16879,6 +17270,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryIndustry {
     H2 = "H2"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
+    ValueMinuscarbure_id = "-carbure_id",
     ValueMinusholder = "-holder",
     ValueMinusmaterial = "-material",
     ValueMinuspos_id = "-pos_id",
@@ -16887,6 +17279,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinussite = "-site",
     ValueMinusstatus = "-status",
     ValueMinusworking_date = "-working_date",
+    carbure_id = "carbure_id",
     holder = "holder",
     material = "material",
     pos_id = "pos_id",
@@ -16918,6 +17311,7 @@ export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {
     holder = "holder",
     material = "material",
     order_by = "order_by",
+    origin_material = "origin_material",
     period = "period",
     shipping_method = "shipping_method",
     site = "site",
@@ -17069,6 +17463,7 @@ export enum EntityTypeEnum {
     Airline = "Compagnie a\u00E9rienne",
     Unknown = "Unknown",
     PowerOrHeatProducer = "Power or Heat Producer",
+    SolidBiomassEnergyProducer = "Solid Biomass Energy Producer",
     SAF_Trader = "SAF Trader",
     Producteur_de_biom_thane = "Producteur de biom\u00E9thane",
     Fournisseur_de_biom_thane = "Fournisseur de biom\u00E9thane",
@@ -17097,6 +17492,12 @@ export enum GesOptionEnum {
     Default = "Default",
     Actual = "Actual",
     NUTS2 = "NUTS2"
+}
+export enum HeatTypeEnum {
+    HOT_WATER = "HOT_WATER",
+    STEAM = "STEAM",
+    HOT_WATER_STEAM = "HOT_WATER_STEAM",
+    INDUSTRIAL_PROCESS = "INDUSTRIAL_PROCESS"
 }
 export enum HygienizationExemptionTypeEnum {
     TOTAL = "TOTAL",
@@ -17167,7 +17568,9 @@ export enum OperationTypeEnum {
     CUSTOMS_CORRECTION = "CUSTOMS_CORRECTION",
     TRANSFERT = "TRANSFERT",
     EXPIRATION = "EXPIRATION",
-    REPORT = "REPORT"
+    REPORT = "REPORT",
+    CORRECTION = "CORRECTION",
+    DEBT_REPAYMENT = "DEBT_REPAYMENT"
 }
 export enum OwnershipTypeEnum {
     OWN = "OWN",
@@ -17183,6 +17586,11 @@ export enum ProcessTypeEnum {
     LIQUID_PROCESS = "LIQUID_PROCESS",
     DRY_PROCESS = "DRY_PROCESS"
 }
+export enum ProductionTypeEnum {
+    ELECTRICITY = "ELECTRICITY",
+    HEAT = "HEAT",
+    COGENERATION = "COGENERATION"
+}
 export enum RoleEnum {
     ReadOnly = "RO",
     ReadWrite = "RW",
@@ -17190,6 +17598,7 @@ export enum RoleEnum {
     Auditor = "AUDITOR"
 }
 export enum SiteTypeEnum {
+    ENERGY_INSTALLATION = "ENERGY INSTALLATION",
     OTHER = "OTHER",
     EFS = "EFS",
     EFPE = "EFPE",

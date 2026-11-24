@@ -1,6 +1,19 @@
-from django.db.models import Case, CharField, ExpressionWrapper, F, FloatField, OuterRef, Q, Subquery, Sum, Value, When
+from django.db.models import (
+    Case,
+    CharField,
+    ExpressionWrapper,
+    F,
+    FloatField,
+    OuterRef,
+    Prefetch,
+    Q,
+    Subquery,
+    Sum,
+    Value,
+    When,
+)
 from django.db.models.functions import Coalesce, Round
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -9,7 +22,7 @@ from core.pagination import MetadataPageNumberPagination
 from entity.permissions import HasDgddiWriteRights
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilter
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation, OperationDetail, TiruertDebt
 from tiruert.permissions import HasTiruertRightsBalanceAndOperations, HasTiruertWriteRights, TiruertAdminRights
 from tiruert.serializers import (
     OperationInputSerializer,
@@ -156,7 +169,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
                 When(biofuel__compatible_essence=True, then=Value("ESSENCE")),
                 When(biofuel__compatible_diesel=True, then=Value("GAZOLE")),
                 When(biofuel__code__in=SAF_BIOFUEL_TYPES, then=Value("CARBURÉACTEUR")),
-                When(biofuel__compatible_gpl=True, then=Value("GPL_C")),
+                When(biofuel__compatible_gpl=True, then=Value("GPL")),
                 When(biofuel__compatible_maritime=True, then=Value("MARITIME")),
                 default=Value(None),
                 output_field=CharField(),
@@ -208,18 +221,44 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         elif self.action in ["retrieve", "correct", "export_operations_to_excel"] or details_requested:
             queryset = queryset.prefetch_related("details")
 
+        if self.action == "retrieve":
+            queryset = queryset.prefetch_related(
+                Prefetch("debt", queryset=TiruertDebt.objects.select_related("lot").only("id", "lot_id", "lot__carbure_id"))
+            )
+
         # exclude operations that are drafts and credits
         queryset = queryset.exclude(Q(_transaction="CREDIT", status=Operation.DRAFT))
 
         return queryset
 
+    @extend_schema(
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(
+                response={
+                    "oneOf": [
+                        {"$ref": "#/components/schemas/Operation"},
+                        {
+                            "type": "array",
+                            "items": {"$ref": "#/components/schemas/OperationList"},
+                        },
+                    ]
+                }
+            )
+        }
+    )
     def create(self, request):
         entity_id = request.entity.id
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             operation = serializer.save()
+            if isinstance(operation, list):
+                operations = self.get_queryset().filter(id__in=[item.id for item in operation]).order_by("id")
+                return Response(
+                    OperationListSerializer(operations, many=True, context={"details": 1, "entity_id": entity_id}).data,
+                    status=status.HTTP_201_CREATED,
+                )
             return Response(
-                OperationSerializer(operation, context={"details": 1, "entity_id": entity_id}).data,
+                OperationSerializer(operation, context={"entity_id": entity_id}).data,
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -231,7 +270,7 @@ class OperationViewSet(ModelViewSet, ActionMixin):
         if serializer.is_valid():
             operation = serializer.save()
             return Response(
-                OperationSerializer(operation, context={"details": 1, "entity_id": entity_id}).data,
+                OperationSerializer(operation, context={"entity_id": entity_id}).data,
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

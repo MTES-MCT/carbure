@@ -33,7 +33,7 @@ class UserCreationSerializerTest(TestCase):
         serializer = UserCreationSerializer(data=data)
         assert not serializer.is_valid()
         assert "password2" in serializer.errors
-        assert serializer.errors["password2"][0] == "The two password fields didn't match."
+        assert serializer.errors["password2"][0] == "Les deux mots de passe ne correspondent pas."
 
     def test_invalidates_a_too_common_password(self):
         data = {

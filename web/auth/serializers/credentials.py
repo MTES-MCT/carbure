@@ -15,7 +15,7 @@ def validated_name(value):
 
 def validate_password_confirmation(password1, password2, user):
     if password1 != password2:
-        raise serializers.ValidationError({"password2": _("The two password fields didn't match.")})
+        raise serializers.ValidationError({"password2": _("Les deux mots de passe ne correspondent pas.")})
 
     try:
         password_validation.validate_password(password2, user)

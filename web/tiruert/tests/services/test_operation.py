@@ -2,12 +2,13 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 from django.http import QueryDict
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from rest_framework.exceptions import ValidationError
 
+from certificates.models import DoubleCountingRegistration
 from core.models import Biocarburant, CarbureLot, Entity, MatierePremiere, Pays
 from saf.models.constants import SAF_BIOFUEL_TYPES
-from tiruert.models import Operation, OperationDetail
+from tiruert.models import Operation, OperationDetail, TiruertDebt
 from tiruert.services.energy import energy_mj
 from tiruert.services.operation import OperationService, OperationServiceErrors
 from transactions.factories import CarbureLotFactory
@@ -180,10 +181,12 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
     @patch("tiruert.services.operation.OperationService.remove_existing_lots")
     @patch("tiruert.services.operation.OperationService.exclude_saf_biofuel")
     @patch("tiruert.services.operation.OperationService.filter_fr_delivery_site")
+    @patch("tiruert.services.operation.OperationService.exclude_tiruert_ineligible_lots")
     @patch("tiruert.services.operation.OperationService.filter_valid_lots")
     def test_create_operations_from_lots_calls_filter_and_transform_steps(
         self,
         mock_filter_valid_lots,
+        mock_exclude_tiruert_ineligible_lots,
         mock_filter_fr_delivery_site,
         mock_exclude_saf_biofuel,
         mock_remove_existing_lots,
@@ -194,12 +197,14 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         """Should call the 4 lot filters and 3 transformation methods in order."""
         input_lots = Mock(name="input_lots")
         lots_after_valid_filter = Mock(name="lots_after_valid_filter")
+        lots_after_tiruert_ineligible_filter = Mock(name="lots_after_tiruert_ineligible_filter")
         lots_after_fr_filter = Mock(name="lots_after_fr_filter")
         lots_after_saf_filter = Mock(name="lots_after_saf_filter")
         lots_after_existing_filter = [Mock(name="lot")]
         lots_after_ep2 = []
 
         mock_filter_valid_lots.return_value = lots_after_valid_filter
+        mock_exclude_tiruert_ineligible_lots.return_value = lots_after_tiruert_ineligible_filter
         mock_filter_fr_delivery_site.return_value = lots_after_fr_filter
         mock_exclude_saf_biofuel.return_value = lots_after_saf_filter
         mock_remove_existing_lots.return_value = lots_after_existing_filter
@@ -210,7 +215,8 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
         OperationService.create_operations_from_lots(input_lots)
 
         mock_filter_valid_lots.assert_called_once_with(input_lots)
-        mock_filter_fr_delivery_site.assert_called_once_with(lots_after_valid_filter)
+        mock_exclude_tiruert_ineligible_lots.assert_called_once_with(lots_after_valid_filter)
+        mock_filter_fr_delivery_site.assert_called_once_with(lots_after_tiruert_ineligible_filter)
         mock_exclude_saf_biofuel.assert_called_once_with(lots_after_fr_filter)
         mock_remove_existing_lots.assert_called_once_with(lots_after_saf_filter)
         mock_process_ep2_lots.assert_called_once_with(lots_after_existing_filter)
@@ -281,6 +287,22 @@ class OperationServiceCreateOperationsTest(OperationServiceTestCase):
 
 class OperationServiceFilterLotsTest(OperationServiceTestCase):
     """Test OperationService.filter_valid_lots() method."""
+
+    def test_exclude_tiruert_ineligible_lots(self):
+        lot = CarbureLotFactory.create(
+            carbure_client=self.entity,
+            feedstock=self.feedstock_conv,
+            biofuel=self.biofuel_eth,
+            lot_status="ACCEPTED",
+            delivery_type="BLENDING",
+            production_site_double_counting_certificate=DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT,
+            volume=700,
+            carbure_delivery_site=self.depot,
+        )
+
+        valid_lots = OperationService.exclude_tiruert_ineligible_lots(self.entity_lots)
+
+        self.assertNotIn(lot.id, valid_lots.values_list("id", flat=True))
 
     def test_filter_valid_lots_returns_only_valid_lots(self):
         """Should apply RFC usage whitelist while still allowing empty RFC usage."""
@@ -467,6 +489,86 @@ class OperationServiceCheckDebitedEntityTest(TestCase):
             OperationServiceErrors.ENTITY_ID_DO_NOT_MATCH_DEBITED_ID,
             str(context.exception.detail["debited_entity"]),
         )
+
+
+class OperationServiceOpenDebtTest(OperationServiceTestCase):
+    def create_repayment(self, debt, lot, status):
+        operation = Operation.objects.create(
+            type=Operation.DEBT_REPAYMENT,
+            status=status,
+            customs_category=debt.customs_category,
+            biofuel=debt.biofuel,
+            debited_entity=debt.entity,
+            debt=debt,
+        )
+        OperationDetail.objects.create(operation=operation, lot=lot, volume=debt.value, emission_rate_per_mj=0)
+
+    def test_create_operations_rejects_debit_when_matching_open_debt_exists(self):
+        TiruertDebt.objects.create(
+            type=TiruertDebt.VOLUME,
+            value=100,
+            entity=self.entity,
+            biofuel=self.biofuel_eth,
+            customs_category=self.feedstock_conv.category,
+            lot=self.lot_blending_accepted,
+        )
+        request = Mock(entity=self.entity, GET=QueryDict(""))
+        data = {
+            "type": Operation.TRANSFERT,
+            "biofuel": self.biofuel_eth,
+            "customs_category": self.feedstock_conv.category,
+            "debited_entity": self.entity,
+        }
+
+        with self.assertRaises(ValidationError) as context:
+            OperationService.create_operations(
+                request,
+                data,
+                [{"id": self.lot_blending_accepted.id, "volume": 10}],
+                declaration_year=2026,
+            )
+
+        self.assertIn("debt", context.exception.detail)
+        self.assertEqual(Operation.objects.count(), 0)
+
+    def test_draft_repayment_does_not_acquit_debt_for_a_new_operation(self):
+        debt = TiruertDebt.objects.create(
+            type=TiruertDebt.VOLUME,
+            value=100,
+            entity=self.entity,
+            biofuel=self.biofuel_eth,
+            customs_category=self.feedstock_conv.category,
+            lot=self.lot_blending_accepted,
+        )
+        self.create_repayment(debt, self.lot_blending_accepted, Operation.DRAFT)
+        data = {
+            "type": Operation.TENEUR,
+            "biofuel": debt.biofuel,
+            "customs_category": debt.customs_category,
+        }
+
+        with self.assertRaises(ValidationError) as context:
+            OperationService.check_open_debt(self.entity.id, data)
+
+        self.assertIn("debt", context.exception.detail)
+
+    def test_validated_repayment_acquits_debt_for_a_new_operation(self):
+        debt = TiruertDebt.objects.create(
+            type=TiruertDebt.VOLUME,
+            value=100,
+            entity=self.entity,
+            biofuel=self.biofuel_eth,
+            customs_category=self.feedstock_conv.category,
+            lot=self.lot_blending_accepted,
+        )
+        self.create_repayment(debt, self.lot_blending_accepted, Operation.VALIDATED)
+        data = {
+            "type": Operation.TENEUR,
+            "biofuel": debt.biofuel,
+            "customs_category": debt.customs_category,
+        }
+
+        OperationService.check_open_debt(self.entity.id, data)
 
 
 class OperationServiceCheckVolumesTest(TestCase):
@@ -1169,12 +1271,12 @@ class OperationServiceDefineSectorTest(TestCase):
         self.assertEqual(result, Operation.GAZOLE)
 
     def test_define_sector_returns_gpl_for_compatible_gpl_biofuel(self):
-        """Should return GPL_C when the biofuel is GPL-compatible."""
+        """Should return GPL when the biofuel is GPL-compatible."""
         biofuel = Mock(code="HCGPL", compatible_essence=False, compatible_diesel=False, compatible_gpl=True)
 
         result = OperationService.define_sector(biofuel)
 
-        self.assertEqual(result, Operation.GPL_C)
+        self.assertEqual(result, Operation.GPL)
 
     def test_define_sector_returns_carbureacteur_for_saf_biofuel(self):
         """Should return CARBUREACTEUR for SAF biofuel codes."""
@@ -1244,3 +1346,52 @@ class OperationServiceBuildDetailsDataTest(TestCase):
                 {"lot_id": 4, "volume": 20.00, "emission_rate_per_mj": 8.8},
             ],
         )
+
+
+class OperationServiceDefineOperationStatusTest(SimpleTestCase):
+    def define(self, operation_type, status=None):
+        data = {"type": operation_type, **({"status": status} if status else {})}
+        OperationService.define_operation_status(data)
+        return data["status"]
+
+    def test_auto_accepted_types_are_accepted_even_as_a_draft(self):
+        """Types that need no validation are ACCEPTED whatever the requested status."""
+        self.assertEqual(self.define(Operation.DEVALUATION), Operation.ACCEPTED)
+        self.assertEqual(self.define(Operation.DEVALUATION, Operation.DRAFT), Operation.ACCEPTED)
+
+    def test_other_types_are_pending_unless_saved_as_a_draft(self):
+        """A draft is kept, any other requested status is replaced by PENDING."""
+        self.assertEqual(self.define(Operation.TRANSFERT), Operation.PENDING)
+        self.assertEqual(self.define(Operation.TRANSFERT, Operation.CANCELED), Operation.PENDING)
+        self.assertEqual(self.define(Operation.TRANSFERT, Operation.DRAFT), Operation.DRAFT)
+
+    def test_debt_repayment_is_validated_unless_saved_as_a_draft(self):
+        """A repayment skips the validation step: VALIDATED, or DRAFT to only reserve the volume."""
+        self.assertEqual(self.define(Operation.DEBT_REPAYMENT), Operation.VALIDATED)
+        self.assertEqual(self.define(Operation.DEBT_REPAYMENT, Operation.DRAFT), Operation.DRAFT)
+        for requested in (Operation.PENDING, Operation.CANCELED, Operation.ACCEPTED):
+            with self.subTest(status=requested):
+                self.assertEqual(self.define(Operation.DEBT_REPAYMENT, requested), Operation.VALIDATED)
+
+
+class OperationServiceCreationPipelineTest(TestCase):
+    @patch.object(OperationService, "create_operation_with_details")
+    @patch.object(OperationService, "get_emission_rates_by_lot")
+    @patch.object(OperationService, "perform_checks_before_create")
+    @patch.object(OperationService, "lock_lots_for_update")
+    def test_lots_are_locked_before_checks_and_creation(self, lock_lots, checks, emission_rates, create):
+        """The checks, the emission rates and the status come first, then one operation is created."""
+        calls = []
+        lock_lots.side_effect = lambda lot_ids: calls.append(("lock_lots", lot_ids))
+        checks.side_effect = lambda *args: calls.append("checks")
+        emission_rates.side_effect = lambda lot_ids: calls.append("emission_rates") or {1: 9.8}
+        create.side_effect = lambda data, details: calls.append("create") or "operation"
+        data = {"type": Operation.TRANSFERT, "biofuel": Biocarburant(renewable_energy_share=0.5)}
+
+        operations = OperationService.create_operations(Mock(), data, [{"id": 1, "volume": 10}], 2026)
+
+        self.assertEqual(operations, ["operation"])
+        self.assertEqual(calls, [("lock_lots", [1]), "checks", "emission_rates", "create"])
+        self.assertEqual(data["renewable_energy_share"], 0.5)
+        self.assertEqual(data["status"], Operation.PENDING)
+        self.assertNotIn("debt", create.call_args[0][0])

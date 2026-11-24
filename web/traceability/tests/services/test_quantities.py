@@ -1,81 +1,79 @@
 from decimal import Decimal
 
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 
-from traceability.factories import ActionFactory, MaterialFactory
-from traceability.models import Action, Material
+from traceability.factories import ActionFactory
+from traceability.models import Action, ActionStatus
+from traceability.services.quantities import quantity_available
 
 
-class AnnotateQuantitiesTest(TestCase):
+def available(*actions):
+    rows = (
+        Action.unannotated.filter(pk__in=[action.pk for action in actions])
+        .annotate(quantity_available=quantity_available())
+        .values_list("pk", "quantity_available")
+    )
+    return dict(rows)
+
+
+class QuantityAvailableTest(TestCase):
     fixtures = ["json/countries.json"]
 
-    def test_manager_annotates_mass_volume_energy_from_material(self):
-        material = MaterialFactory.create(lhv=Decimal("120"), density=Decimal("0.8"))
-        action = ActionFactory.create(
-            type=Action.INIT,
-            quantity=Decimal("100.000"),
-            material=material,
-        )
+    def test_without_children_the_available_quantity_is_the_action_quantity(self):
+        action = ActionFactory.create(quantity=Decimal("100.000"))
 
-        annotated = Action.objects.get(pk=action.pk)
-        self.assertEqual(annotated.mass, Decimal("100.000"))
-        self.assertEqual(annotated.volume, Decimal("125.000"))
-        self.assertEqual(annotated.energy, Decimal("12000.000"))
+        self.assertEqual(available(action)[action.pk], Decimal("100.000"))
 
-    def test_missing_factors_leave_derived_values_null(self):
-        kg = ActionFactory.create(
-            type=Action.INIT,
-            quantity=Decimal("100.000"),
-            material=MaterialFactory.create(unit=Material.KG, lhv=None, density=None),
-        )
-        litre = ActionFactory.create(
-            type=Action.INIT,
-            quantity=Decimal("50.000"),
-            material=MaterialFactory.create(unit=Material.L, lhv=None, density=None),
-        )
-        mj = ActionFactory.create(
-            type=Action.VALORIZE,
-            quantity=Decimal("12000.000"),
-            material=MaterialFactory.create(unit=Material.MJ, lhv=None, density=None),
-        )
+    def test_subtracts_direct_children_and_ignores_grandchildren(self):
+        parent = ActionFactory.create(quantity=Decimal("100.000"), parent=None)
+        child = ActionFactory.create(quantity=Decimal("30.000"), parent=parent)
+        ActionFactory.create(quantity=Decimal("50.000"), parent=child)
 
-        annotated_kg = Action.objects.get(pk=kg.pk)
-        self.assertEqual(annotated_kg.mass, Decimal("100.000"))
-        self.assertIsNone(annotated_kg.volume)
-        self.assertIsNone(annotated_kg.energy)
+        values = available(parent, child)
 
-        annotated_litre = Action.objects.get(pk=litre.pk)
-        self.assertIsNone(annotated_litre.mass)
-        self.assertEqual(annotated_litre.volume, Decimal("50.000"))
-        self.assertIsNone(annotated_litre.energy)
+        self.assertEqual(values[parent.pk], Decimal("70.000"))
 
-        annotated_mj = Action.objects.get(pk=mj.pk)
-        self.assertIsNone(annotated_mj.mass)
-        self.assertIsNone(annotated_mj.volume)
-        self.assertEqual(annotated_mj.energy, Decimal("12000.000"))
+    def test_a_deleted_child_does_not_consume_the_parent(self):
+        parent = ActionFactory.create(quantity=Decimal("100.000"), parent=None)
+        ActionFactory.create(quantity=Decimal("40.000"), parent=parent, status=ActionStatus.PENDING)
+        ActionFactory.create(quantity=Decimal("25.000"), parent=parent, status=ActionStatus.DELETED)
+        ActionFactory.create(quantity=Decimal("15.000"), parent=parent, status=ActionStatus.REJECTED)
 
-    def test_annotates_from_litre_with_factors(self):
-        material = MaterialFactory.create(unit=Material.L, lhv=Decimal("120"), density=Decimal("0.8"))
-        action = ActionFactory.create(
-            type=Action.INIT,
-            quantity=Decimal("50.000"),
-            material=material,
-        )
+        self.assertEqual(available(parent)[parent.pk], Decimal("45.000"))
 
-        annotated = Action.objects.get(pk=action.pk)
-        self.assertEqual(annotated.mass, Decimal("40.000"))
-        self.assertEqual(annotated.volume, Decimal("50.000"))
-        self.assertEqual(annotated.energy, Decimal("4800.000"))
+    def test_only_the_latest_status_decides(self):
+        parent = ActionFactory.create(quantity=Decimal("100.000"), parent=None)
+        released = ActionFactory.create(quantity=Decimal("10.000"), parent=parent, status=ActionStatus.DELETED)
+        removed = ActionFactory.create(quantity=Decimal("30.000"), parent=parent, status=ActionStatus.CREATED)
+        ActionStatus.objects.create(action=released, status=ActionStatus.ACCEPTED)
+        ActionStatus.objects.create(action=removed, status=ActionStatus.DELETED)
 
-    def test_annotates_from_mj_with_factors(self):
-        material = MaterialFactory.create(unit=Material.MJ, lhv=Decimal("120"), density=Decimal("0.8"))
-        action = ActionFactory.create(
-            type=Action.VALORIZE,
-            quantity=Decimal("12000.000"),
-            material=material,
-        )
+        self.assertEqual(available(parent)[parent.pk], Decimal("90.000"))
 
-        annotated = Action.objects.get(pk=action.pk)
-        self.assertEqual(annotated.mass, Decimal("100.000"))
-        self.assertEqual(annotated.volume, Decimal("125.000"))
-        self.assertEqual(annotated.energy, Decimal("12000.000"))
+    def test_queries_only_the_given_actions(self):
+        parent = ActionFactory.create(quantity=Decimal("10.000"), parent=None)
+        ActionFactory.create(quantity=Decimal("1.000"), parent=parent)
+        other = ActionFactory.create(quantity=Decimal("10.000"), parent=None)
+        ActionFactory.create(quantity=Decimal("9.000"), parent=other)
+
+        with CaptureQueriesContext(connection) as captured:
+            values = available(parent)
+
+        self.assertEqual(len(captured), 1)
+        self.assertEqual(values[parent.pk], Decimal("9.000"))
+        self.assertNotIn(other.pk, values)
+
+    def test_the_manager_keeps_a_fully_consumed_action(self):
+        kept = ActionFactory.create(quantity=Decimal("100.000"), parent=None)
+        exhausted = ActionFactory.create(quantity=Decimal("30.000"), parent=None)
+        ActionFactory.create(quantity=Decimal("30.000"), parent=exhausted)
+        untouched = ActionFactory.create(quantity=Decimal("10.000"), parent=None)
+
+        ids = set(Action.objects.values_list("id", flat=True))
+
+        self.assertIn(kept.id, ids)
+        self.assertIn(untouched.id, ids)
+        self.assertIn(exhausted.id, ids)
+        self.assertEqual(Action.objects.get(pk=exhausted.id).quantity_available, Decimal("0.000"))

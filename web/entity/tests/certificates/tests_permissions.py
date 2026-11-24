@@ -1,9 +1,27 @@
-from django.test import TestCase
+from types import SimpleNamespace
+from unittest.mock import patch
+
+from django.test import SimpleTestCase, TestCase
 
 from core.models import Entity, ExternalAdminRights, UserRights
 from core.permissions import AdminRightsFactory, HasAdminRights, HasUserRights, UserRightsFactory
 from core.tests_utils import PermissionTestMixin
+from entity.permissions import HasCertificateRights, HasCertificateWriteRights
 from entity.views.certificates.certificates import EntityCertificateViewSet
+
+
+class SolidBiomassCertificatePermissionTest(SimpleTestCase):
+    @patch("core.permissions.UserRights.objects.filter")
+    def test_read_and_write_roles(self, filter_rights):
+        entity = SimpleNamespace(id=42, entity_type=Entity.SOLID_BIOMASS_ENERGY_PRODUCER)
+        user = SimpleNamespace(is_anonymous=False, is_verified=lambda: True)
+        request = SimpleNamespace(user=user, entity=entity, session={})
+
+        for role, can_write in [(UserRights.RO, False), (UserRights.RW, True), (UserRights.ADMIN, True)]:
+            with self.subTest(role=role):
+                filter_rights.return_value = [SimpleNamespace(entity_id=entity.id, role=role)]
+                self.assertTrue(HasCertificateRights().has_permission(request, None))
+                self.assertEqual(HasCertificateWriteRights().has_permission(request, None), can_write)
 
 
 class CertificatePermissionTest(TestCase, PermissionTestMixin):
@@ -21,6 +39,7 @@ class CertificatePermissionTest(TestCase, PermissionTestMixin):
                                     Entity.TRADER,
                                     Entity.OPERATOR,
                                     Entity.POWER_OR_HEAT_PRODUCER,
+                                    Entity.SOLID_BIOMASS_ENERGY_PRODUCER,
                                     Entity.BIOMETHANE_PRODUCER,
                                 ]
                             )
@@ -39,6 +58,7 @@ class CertificatePermissionTest(TestCase, PermissionTestMixin):
                                 Entity.TRADER,
                                 Entity.OPERATOR,
                                 Entity.POWER_OR_HEAT_PRODUCER,
+                                Entity.SOLID_BIOMASS_ENERGY_PRODUCER,
                                 Entity.BIOMETHANE_PRODUCER,
                             ],
                             role=[UserRights.RW, UserRights.ADMIN],

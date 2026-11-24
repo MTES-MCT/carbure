@@ -13,6 +13,7 @@ python3 ./web/fixtures/load_fossil_fuel_categories.py
 python3 ./web/fixtures/load_fossil_fuels.py
 python3 ./web/fixtures/load_regions.py
 python3 ./web/fixtures/load_departments.py
+python3 ./web/fixtures/load_doublecounted_units.py
 python3 ./web/fixtures/biomethane/load_biomethane_DREAL.py
 python3 ./web/fixtures/biomethane/load_biomethane_ADEME.py
 python3 ./web/fixtures/biomethane/load_biomethane_providers.py

@@ -7,6 +7,7 @@ from core.decorators import check_user_rights
 from core.models import CarbureLot, CarbureLotEvent, GenericError, UserRights
 from core.notifications import notify_correction_done
 from core.traceability import Node, bulk_update_traceability_nodes, diff_to_metadata, get_traceability_nodes
+from tiruert.services.correction import CorrectionService
 
 
 class SubmitFixError:
@@ -56,9 +57,23 @@ def submit_fix(request, context):
     # prepare a list of update events so we know how lots were updated after propagation
     updated_lots = []
     update_events = []
+    # the fixed lots were edited before this call, so their volume change is not in the propagation diff
+    volume_correction_lot_ids = set(fix_lots.values_list("id", flat=True))
+    deferred_volume_correction_lot_ids = set(
+        fix_lots.exclude(carbure_client_id=entity_id).exclude(carbure_client_id__isnull=True).values_list("id", flat=True)
+    )
+    deferred_descendant_lot_ids = set()
+
     for node in updated_nodes:
         if node.type == Node.LOT:
             updated_lots.append(node)
+
+            volume_diff = node.diff.get("volume")
+            if volume_diff is not None and volume_diff[0] != volume_diff[1]:
+                volume_correction_lot_ids.add(node.data.id)
+                if node.data.carbure_client_id not in (None, entity_id):
+                    deferred_volume_correction_lot_ids.add(node.data.id)
+                    deferred_descendant_lot_ids.add(node.data.id)
 
             if len(node.diff) > 0:
                 update_events.append(
@@ -75,12 +90,18 @@ def submit_fix(request, context):
         rejected_lots.update(lot_status=CarbureLot.PENDING, correction_status=CarbureLot.NO_PROBLEMO)
         fix_lots.update(correction_status=CarbureLot.FIXED)
         own_lots.update(correction_status=CarbureLot.NO_PROBLEMO)
+        CarbureLot.objects.filter(id__in=deferred_descendant_lot_ids).update(correction_status=CarbureLot.FIXED)
 
         bulk_update_traceability_nodes(updated_nodes)
 
+        volume_correction_lot_ids -= deferred_volume_correction_lot_ids
+        if volume_correction_lot_ids:
+            CorrectionService.create_correction_operations_for_lot_volume_update(sorted(volume_correction_lot_ids))
+
         CarbureLotEvent.objects.bulk_create(submit_fix_events)
         CarbureLotEvent.objects.bulk_create(update_events)
-        notify_correction_done(lots.exclude(carbure_client_id=entity_id))
+        notified_lot_ids = set(lots.values_list("id", flat=True)) | deferred_descendant_lot_ids
+        notify_correction_done(CarbureLot.objects.filter(id__in=notified_lot_ids).exclude(carbure_client_id=entity_id))
 
     return SuccessResponse()
 

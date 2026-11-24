@@ -13,12 +13,16 @@ import pandas as pd
 def value_closest_match(targets: pd.Series, sources: pd.Series, cutoff: float = 0.8):
     """Return closest string matches of an array.
 
-    For each element in `sources`, return the closest element found in `targets`,
+    For each element in `targets`, return the closest element found in `sources`,
     provided that there is one that is close enough wrt difflib's cutoff.
 
     """
-    candidates = [difflib.get_close_matches(target, sources, n=1, cutoff=cutoff) for target in targets.values]
-    return pd.Series([c.pop() if c else None for c in candidates], index=targets.index)
+    matches = {}
+    for target in targets.unique():
+        candidates = difflib.get_close_matches(target, sources, n=1, cutoff=cutoff)
+        matches[target] = candidates[0] if candidates else None
+
+    return pd.Series([matches[target] for target in targets.values], index=targets.index)
 
 
 def reachable(mixed_df: pd.DataFrame, field: str):
@@ -48,7 +52,14 @@ def load_db(
 
     all_tables: dict[str, pd.DataFrame] = {}
     for table in tables_names:
-        query = f"SELECT * FROM {table}"
+        columns = (
+            "id, eec, ep, etd, eccr, biofuel_id, feedstock_id, "
+            "carbure_producer_id, carbure_production_site_id, country_of_origin_id, "
+            "unknown_production_site, unknown_producer, production_site_double_counting_certificate"
+            if table == "carbure_lots"
+            else "*"
+        )
+        query = f"SELECT {columns} FROM {table}"
         if table == "carbure_lots":
             query = " ".join([query] + lots_query_filters)
         query += ";"

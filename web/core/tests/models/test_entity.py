@@ -1,6 +1,7 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+from core.models.certificate import GenericCertificate
 from core.models.entity import Entity
 from core.models.geography import Pays
 
@@ -36,3 +37,14 @@ class EntityTest(TestCase):
             entity.ntr_id()
 
         self.assertEqual("Entity 'The Entity' has no registered country", context.exception.args[0])
+
+    def test_fetches_all_entities_currently_certified_under_national_scheme(self):
+        query_result = MagicMock()
+        patched_filter = Entity.objects.filter = MagicMock(return_value=query_result)
+
+        entities = Entity.all_currently_certified_under_national_scheme()
+        patched_filter.assert_called_with(
+            entitycertificate__certificate__certificate_type=GenericCertificate.SYSTEME_NATIONAL,
+            entitycertificate__certificate__status=GenericCertificate.VALID,
+        )
+        self.assertEqual(query_result, entities)

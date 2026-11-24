@@ -91,3 +91,25 @@ export const WithDebounce: Story = {
     expect(args.getOptions).toHaveBeenNthCalledWith(2, "test")
   },
 }
+
+export const NullValue: Story = {
+  args: {
+    ...Default.args,
+    value: null,
+    getOptions: fn(async () => [
+      {
+        id: "1",
+        label: "Société 1",
+      },
+    ]),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement)
+    const input = await waitFor(() =>
+      canvas.getByPlaceholderText(args.placeholder ?? "")
+    )
+
+    expect(input).toHaveValue("")
+    expect(args.getOptions).not.toHaveBeenCalled()
+  },
+}

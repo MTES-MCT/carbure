@@ -9,8 +9,8 @@ def detect_outliers(
     emission_group_cols: dict[str, list[str]],
     chosen_quantile: float,
     computed_quantiles: list[float],
-    clf_lof: IsolationForest,
-    clf_if: LocalOutlierFactor,
+    clf_if: IsolationForest,
+    clf_lof: LocalOutlierFactor,
 ) -> pd.DataFrame:
     outliers = pd.DataFrame(columns=df.columns.tolist() + ["is_lof_outlier", "is_if_outlier"])
 

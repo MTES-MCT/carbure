@@ -1,26 +1,34 @@
 import h2.handlers.lookups as lookups
+from h2.handlers.authorization import is_h2_admin, is_hrs_holder
 from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 from h2.serializers.action import SHIPPING_FUEL_TYPES, H2ActionExcelImportSerializer
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.excel import EXCEL_CONSUMPTION_COLOR, EXCEL_PRODUCTION_COLOR, EXCEL_TRANSPORT_COLOR, excel_column
-from traceability.lifecycle.rules import Creation, Transition
 from traceability.models import Action, ActionStatus
 
 
 class H2ActionHandler(ActionIndustryHandler):
     industry = Action.H2
-    transitions = (
-        Transition(Action.INIT, ActionStatus.PENDING, ActionStatus.ACCEPTED),
-        Transition(Action.INIT, ActionStatus.PENDING, ActionStatus.REJECTED),
-    )
-    creations = (
-        Creation(Action.INIT, ActionStatus.PENDING, root=True),
-        Creation(Action.VALORIZE, ActionStatus.CREATED, parent=Action.INIT, parent_status=ActionStatus.PENDING),
-    )
-    lookups = lookups
+
     read_permission = HasHRSRights
     write_permission = HasHRSWriteRights
     admin_permission = HasH2AdminRights
+
+    action_creation_flow = [
+        (None, (Action.INIT, ActionStatus.PENDING)),
+        ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
+    ]
+
+    action_status_authorizations = {
+        (Action.INIT, ActionStatus.PENDING): is_hrs_holder,
+        (Action.INIT, ActionStatus.ACCEPTED): is_h2_admin,
+        (Action.INIT, ActionStatus.REJECTED): is_h2_admin,
+        (Action.INIT, ActionStatus.BLOCKED): is_h2_admin,
+        (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
+    }
+
+    lookups = lookups
+
     excel_import_serializer_class = H2ActionExcelImportSerializer
     excel_columns = [
         {

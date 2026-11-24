@@ -20,7 +20,7 @@ import { LoaderLine } from "../icon"
 
 export type AutocompleteProps<T, V = T> = Trigger &
   InputProps & {
-    value?: V
+    value?: V | null
     options?: T[]
     defaultOptions?: T[]
     getOptions?: (query: string) => Promise<T[]>
@@ -55,8 +55,9 @@ export function Autocomplete<T, V>({
 }: AutocompleteProps<T, V>) {
   const triggerRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const selectedValue = value ?? undefined
   const autocomplete = useAutocomplete({
-    value,
+    value: selectedValue,
     options,
     defaultOptions,
     getOptions,
@@ -114,7 +115,7 @@ export function Autocomplete<T, V>({
             <List
               controlRef={triggerRef}
               items={autocomplete.suggestions}
-              selectedValue={value}
+              selectedValue={selectedValue}
               normalize={normalize}
               onFocus={onChange}
               onSelectValue={(key: V | undefined) => {

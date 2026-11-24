@@ -12,6 +12,7 @@ from .double_counting import (
     check_inactive_double_counting_certificate,
     check_invalid_double_counting_certificate,
     check_missing_ref_dbl_counting,
+    check_tiruert_ineligibility,
     check_unknown_double_counting_certificate,
 )
 from .general import (
@@ -88,6 +89,7 @@ def sanity_checks(lot: CarbureLot, prefetched_data) -> list[GenericError]:
         check_expired_double_counting_certificate(lot, prefetched_data),
         check_invalid_double_counting_certificate(lot, prefetched_data),
         check_inactive_double_counting_certificate(lot, prefetched_data),
+        check_tiruert_ineligibility(lot),
         # biofuel/feedstock errors
         *check_mp_bc_incoherent(lot),  # this one generates a list of errors so we flatten it with *
         *check_provenance_mp(lot),  # same here

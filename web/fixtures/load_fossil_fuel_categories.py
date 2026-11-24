@@ -19,11 +19,9 @@ with open(filename) as csvfile:
             # header
             continue
         name = row[1]
-        pci_litre = row[2]
         obj, created = FossilFuelCategory.objects.update_or_create(
             id=id,
             defaults={
                 "name": name,
-                "pci_litre": pci_litre,
             },
         )

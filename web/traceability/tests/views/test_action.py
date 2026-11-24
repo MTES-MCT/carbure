@@ -1,14 +1,17 @@
+from decimal import Decimal
 from unittest.mock import patch
 
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from rest_framework import status
 
 from core.models import Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
-from traceability.factories import ActionFactory
+from traceability.factories import ActionFactory, MaterialFactory
 from traceability.models import Action
-from traceability.services.total_emissions import annotate_total_emissions
+from traceability.services.parent_chain import annotate_parent_chain
 
 
 class ActionViewsetQuerysetTest(TestCase):
@@ -22,12 +25,13 @@ class ActionViewsetQuerysetTest(TestCase):
         self.list_url = reverse("traceability-action-list")
         self.base_params = {"entity_id": self.entity.id, "industry": Action.H2}
 
-        self.own_action = ActionFactory.create(holder=self.entity, industry=Action.H2)
+        self.own_action = ActionFactory.create(holder=self.entity, industry=Action.H2, quantity=Decimal("1000000.000"))
         self.other_holder_action = ActionFactory.create(holder=self.other_entity, industry=Action.H2)
         self.child_of_own_action = ActionFactory.create(
             holder=self.other_entity,
             industry=Action.H2,
             parent=self.own_action,
+            quantity=Decimal("1.000"),
         )
         self.other_industry_action = ActionFactory.create(holder=self.entity, industry="BIOMASS")
 
@@ -69,9 +73,86 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertIn("total_emissions", by_id[self.own_action.id])
         self.assertIn("total", by_id[self.own_action.id]["total_emissions"])
         self.assertEqual(by_id[self.own_action.id]["status"], "PENDING")
-        self.assertIn("mass", by_id[self.own_action.id])
-        self.assertIn("volume", by_id[self.own_action.id])
-        self.assertIn("energy", by_id[self.own_action.id])
+
+    def test_list_and_retrieve_expose_quantity_available(self):
+        self.own_action.quantity = Decimal("100.000")
+        self.own_action.save(update_fields=["quantity"])
+        self.child_of_own_action.quantity = Decimal("40.000")
+        self.child_of_own_action.save(update_fields=["quantity"])
+
+        listing = self.client.get(self.list_url, self.base_params)
+        detail = self.client.get(
+            reverse("traceability-action-detail", args=[self.own_action.id]),
+            self.base_params,
+        )
+
+        self.assertEqual(listing.status_code, status.HTTP_200_OK)
+        by_id = {item["id"]: item for item in listing.data["results"]}
+        self.assertEqual(by_id[self.own_action.id]["quantity_available"], "60.000")
+        self.assertEqual(by_id[self.child_of_own_action.id]["quantity_available"], "40.000")
+        self.assertEqual(detail.status_code, status.HTTP_200_OK)
+        self.assertEqual(detail.data["quantity_available"], "60.000")
+
+    def test_list_keeps_exhausted_actions_unless_the_caller_filters_them(self):
+        exhausted = ActionFactory.create(holder=self.entity, industry=Action.H2, quantity=Decimal("30.000"))
+        ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=exhausted,
+            quantity=Decimal("30.000"),
+        )
+
+        shown = self.client.get(self.list_url, self.base_params)
+        available = self.client.get(self.list_url, {**self.base_params, "quantity_available": True})
+        exhausted_only = self.client.get(self.list_url, {**self.base_params, "quantity_available": False})
+
+        self.assertEqual(shown.status_code, status.HTTP_200_OK)
+        self.assertIn(exhausted.id, [item["id"] for item in shown.data["results"]])
+        self.assertIn(self.own_action.id, [item["id"] for item in shown.data["results"]])
+        self.assertEqual(available.status_code, status.HTTP_200_OK)
+        self.assertNotIn(exhausted.id, [item["id"] for item in available.data["results"]])
+        self.assertIn(self.own_action.id, [item["id"] for item in available.data["results"]])
+        self.assertEqual(exhausted_only.status_code, status.HTTP_200_OK)
+        self.assertEqual([item["id"] for item in exhausted_only.data["results"]], [exhausted.id])
+
+    def test_list_includes_inherited_material(self):
+        child = ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=None,
+        )
+
+        response = self.client.get(self.list_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        by_id = {item["id"]: item for item in response.data["results"]}
+        self.assertIsNone(by_id[child.id]["material"])
+        self.assertEqual(by_id[child.id]["inherited_fields"]["previous_material"]["id"], self.own_action.material_id)
+        self.assertEqual(by_id[child.id]["inherited_fields"]["origin_material"]["id"], self.own_action.material_id)
+        self.assertIsNone(by_id[self.own_action.id]["inherited_fields"]["previous_material"])
+        self.assertEqual(
+            by_id[self.own_action.id]["inherited_fields"]["origin_material"]["id"],
+            self.own_action.material_id,
+        )
+
+    def test_retrieve_includes_inherited_material(self):
+        child = ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=None,
+        )
+
+        response = self.client.get(
+            reverse("traceability-action-detail", args=[child.id]),
+            self.base_params,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(response.data["material"])
+        self.assertEqual(response.data["inherited_fields"]["previous_material"]["code"], self.own_action.material.code)
+        self.assertEqual(response.data["inherited_fields"]["origin_material"]["name"], self.own_action.material.name)
 
     def test_retrieve_includes_total_emissions(self):
         response = self.client.get(
@@ -86,11 +167,11 @@ class ActionViewsetQuerysetTest(TestCase):
     def test_retrieve_annotates_only_the_requested_action(self):
         seen_pks = []
 
-        def capture(queryset):
+        def capture(queryset, **kwargs):
             seen_pks.extend(queryset.values_list("pk", flat=True))
-            return annotate_total_emissions(queryset)
+            return annotate_parent_chain(queryset, **kwargs)
 
-        with patch("traceability.views.action.annotate_total_emissions", side_effect=capture):
+        with patch("traceability.services.parent_chain.annotate_parent_chain", side_effect=capture):
             response = self.client.get(
                 reverse("traceability-action-detail", args=[self.own_action.id]),
                 self.base_params,
@@ -98,6 +179,80 @@ class ActionViewsetQuerysetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(seen_pks, [self.own_action.id])
+
+    def test_list_annotates_the_page_once(self):
+        seen = []
+
+        def capture(queryset, **kwargs):
+            seen.append(list(queryset.values_list("pk", flat=True)))
+            return annotate_parent_chain(queryset, **kwargs)
+
+        with patch("traceability.services.parent_chain.annotate_parent_chain", side_effect=capture):
+            response = self.client.get(self.list_url, self.base_params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(seen, [[self.own_action.id, self.child_of_own_action.id]])
+
+    def test_empty_year_with_origin_material_stays_empty(self):
+        response = self.client.get(
+            self.list_url,
+            {**self.base_params, "year": 1999, "origin_material": self.own_action.material.code},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["results"], [])
+
+    def test_list_filters_by_origin_material(self):
+        other = MaterialFactory(code="CH4", name="Méthane")
+        child = ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=other,
+        )
+
+        response = self.client.get(
+            self.list_url,
+            {**self.base_params, "origin_material": self.own_action.material.code},
+        )
+        excluded = self.client.get(self.list_url, {**self.base_params, "origin_material": other.code})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ids = [item["id"] for item in response.data["results"]]
+        self.assertCountEqual(ids, [self.own_action.id, self.child_of_own_action.id, child.id])
+        self.assertEqual(excluded.status_code, status.HTTP_200_OK)
+        self.assertEqual(excluded.data["results"], [])
+
+    def test_origin_material_filter_walks_once_then_annotates_the_page(self):
+        with CaptureQueriesContext(connection) as captured:
+            response = self.client.get(
+                self.list_url,
+                {**self.base_params, "origin_material": self.own_action.material.code},
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        recursive = [query["sql"] for query in captured.captured_queries if "with recursive" in query["sql"].lower()]
+        self.assertEqual(len(recursive), 2)
+        self.assertNotIn("ei_sum", recursive[0].lower())
+        self.assertNotIn("action_status", recursive[0].lower())
+        self.assertIn("ei_sum", recursive[1].lower())
+
+    def test_filters_lists_origin_material_codes(self):
+        other = MaterialFactory(code="CH4", name="Méthane")
+        ActionFactory.create(
+            holder=self.other_entity,
+            industry=Action.H2,
+            parent=self.own_action,
+            material=other,
+        )
+
+        response = self.client.get(
+            reverse("traceability-action-filters"),
+            {**self.base_params, "filter": "origin_material"},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [self.own_action.material.code])
 
 
 class ActionViewsetAdminQuerysetTest(TestCase):

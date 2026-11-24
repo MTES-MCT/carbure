@@ -21,8 +21,6 @@ with open(filename) as csvfile:
         cert_id = row[2]
         vfrom = dateutil.parser.parse(row[3], dayfirst=True)
         vuntil = dateutil.parser.parse(row[4], dayfirst=True)
-        scope = row[5]
-        print(vuntil, vfrom)
 
         d = {}
         d["certificate_holder"] = name

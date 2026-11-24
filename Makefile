@@ -2,9 +2,9 @@
 	up down restart logs-django_cmd open restart-backend restart-frontend \
 	test-backend test-frontend \
 	makemigrations migrate seed ipython \
-	lint-fix translate translate-missing \
+	lint lint-fix translate translate-missing \
 	check-diff check-types generate-and-check-types \
-	flush
+	flush reset-db fallback
 
 -include .env
 export
@@ -54,18 +54,24 @@ migrate:
 	$(django_cmd) migrate
 
 seed:
-	$(django_cmd) create_sample_data $(app)
+	$(django_cmd) create_sample_data $(app) $(if $(reset),--reset)
+
+reset-db:
+	$(django_cmd) create_sample_data --reset
 
 ipython:
 	$(django_cmd) shell --interface ipython
 
-# Frontend
+# Lint
 lint:
+	uv run ruff check .
 	$(npm_cmd) run lint
 
 lint-fix:
+	uv run ruff check --fix .
 	$(npm_cmd) run lint:fix
 
+# Frontend
 translate:
 	$(npm_cmd) run translate
 
@@ -74,7 +80,7 @@ translate-missing:
 
 # Type checking
 generate-and-check-types:
-	$(django_cmd) spectacular --file api-schema.yaml
+	$(django_cmd) spectacular --lang en --file api-schema.yaml
 	$(npm_cmd) run generate-api
 	$(npm_cmd) run check-diff
 	$(npm_cmd) run check-types
@@ -87,3 +93,6 @@ check-types:
 
 flush:
 	$(django_cmd) flush
+
+fallback:
+	uv run python fallback/generate.py

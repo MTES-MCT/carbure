@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 
-import { findEnabledEntities, findMaterials, findSites } from "common/api"
+import { findEnabledEntities, findSites } from "common/api"
 import { Autocomplete } from "common/components/autocomplete2"
 import { FormManager } from "common/components/form2"
 import {
@@ -19,16 +19,13 @@ import { SiteTypeEnum } from "api-schema"
 import {
   Action,
   ActionHolder,
-  ActionMaterial,
   ActionShippingMethod,
   ActionSite,
+  InheritedFieldKey,
 } from "traceability/types"
-import {
-  normalizeActionMaterial,
-  normalizeActionSite,
-} from "traceability/normalizers"
+import { normalizeActionSite } from "traceability/normalizers"
 import { useGhgEmissionTitles } from "traceability/hooks/use-ghg-emission-titles"
-import { quantityField } from "./quantity-field"
+import { materialField } from "./material-field"
 import {
   ACTION_EMISSIONS_UNIT,
   formatUnitActionDecimal,
@@ -47,7 +44,7 @@ export type ActionFieldConfig = {
 }
 
 export type ActionField = {
-  key: keyof Partial<Action>
+  key: keyof Partial<Action> | InheritedFieldKey
   label: string
   field: (config: ActionFieldConfig) => React.ReactNode
   condition?: (entity: EntityManager) => boolean
@@ -94,28 +91,29 @@ export function useActionFields() {
       },
     },
 
-    material: {
-      key: "material",
-      label: t("Matière"),
+    material: materialField(),
+    origin_material: materialField("origin_material"),
+    previous_material: materialField("previous_material"),
+
+    quantity: {
+      key: "quantity",
+      label: t("Quantité"),
       field: ({ form, props }) => {
-        const bound = form.bind("material")
+        const unit =
+          form.value.material?.unit ??
+          form.value.inherited_fields?.previous_material?.unit
 
         return (
-          <Autocomplete<ActionMaterial, ActionMaterial>
+          <ActionDecimalInput
+            readOnlyValue={
+              unit ? formatUnitActionDecimal(form.value.quantity, unit) : "-"
+            }
             {...props}
-            {...bound}
-            defaultOptions={bound.value ? [bound.value] : undefined}
-            getOptions={findMaterials}
-            normalize={normalizeActionMaterial}
+            {...form.bind("quantity")}
           />
         )
       },
     },
-
-    quantity: quantityField(),
-    mass: quantityField("mass"),
-    volume: quantityField("volume"),
-    energy: quantityField("energy"),
 
     site: {
       key: "site",
@@ -139,8 +137,11 @@ export function useActionFields() {
     pos_id,
 
     carbure_id: {
-      ...pos_id,
+      key: "carbure_id",
       label: t("N° d'identifiant Carbure"),
+      field: ({ form, props }: ActionFieldConfig) => (
+        <TextInput {...props} readOnly {...form.bind("carbure_id")} />
+      ),
     },
 
     certificate: {

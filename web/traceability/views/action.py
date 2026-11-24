@@ -1,19 +1,26 @@
+from django.db import transaction
 from django.utils.decorators import decorator_from_middleware, method_decorator
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import DestroyModelMixin, ListModelMixin, RetrieveModelMixin
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from core.filters import FiltersActionFactory
-from core.pagination import TotalCountPagination
+from core.utils import CustomPageNumberPagination
 from traceability.exceptions import ActionNotDeletableError
 from traceability.filters import ActionFilter
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.middlewares import ActionHandlerMiddleware
-from traceability.models import Action
+from traceability.models import Action, ActionStatus
 from traceability.serializers.action import ActionQuerySerializer, ActionSerializer
+from traceability.serializers.action_status import ActionStatusAuthorizationSerializer
+from traceability.serializers.creation import ActionCreateRequestSerializer
+from traceability.serializers.creation.authorization import ActionAuthorizationSerializer
 from traceability.services.delete import delete_action
-from traceability.services.total_emissions import annotate_total_emissions
 from traceability.views.mixins import ExcelImportActionMixin, ExcelTemplateActionMixin, YearsActionMixin
 
 
@@ -49,8 +56,8 @@ class ActionViewset(
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
     filterset_class = ActionFilter
-    pagination_class = TotalCountPagination
-    search_fields = ["holder__name", "pos_id"]
+    pagination_class = CustomPageNumberPagination
+    search_fields = ["holder__name", "carbure_id", "pos_id"]
 
     def get_permissions(self):
         # prevent DRF from raising an exception when generating the schema
@@ -59,25 +66,76 @@ class ActionViewset(
 
     def get_queryset(self):
         queryset = self.request.handler.scope_queryset(self.request, self.queryset)
-        if self.action == "retrieve":
-            queryset = annotate_total_emissions(queryset.filter(pk=self.kwargs["pk"]))
+        if self.action == "status":
+            return queryset.select_for_update()
         return queryset
+
+    def get_object(self):
+        action = super().get_object()
+        if self.action == "retrieve":
+            return Action.annotate_actions([action])[0]
+        return action
 
     def paginate_queryset(self, queryset):
         page = super().paginate_queryset(queryset)
-        if page is None:
-            return None
-        # Annotate the current page only: the CTE cannot run on a sliced queryset
-        # (MySQL rejects LIMIT in the pk__in subquery). Re-index to keep page order.
-        ids = [action.pk for action in page]
-        by_id = {action.pk: action for action in annotate_total_emissions(queryset.filter(pk__in=ids))}
-        return [by_id[action_id] for action_id in ids]
+        if not page:
+            return page
+
+        # origin_material has already reduced this queryset to the matching ids.
+        return Action.annotate_actions(page)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context["entity"] = getattr(self.request, "entity", None)
         context["handler"] = getattr(self.request, "handler", None)
         return context
+
+    @extend_schema(
+        request=ActionCreateRequestSerializer,
+        responses={201: ActionSerializer, 400: None, 403: None},
+        description="Create an action.",
+    )
+    def create(self, request, *args, **kwargs):
+        context = self.get_serializer_context()
+
+        # Validate the request data against the authorization rules
+        authorization_serializer = ActionAuthorizationSerializer(data=request.data, context=context)
+        authorization_serializer.is_valid(raise_exception=True)
+
+        # Get the serializer class for the action type, throw an error if the action type is not supported
+        action_type = authorization_serializer.validated_data["type"]
+        serializer_class = request.handler.get_action_creation_serializers().get(action_type)
+
+        if serializer_class is None:
+            raise ValidationError({"type": _("Ce type d'action ne peut pas être créé.")})
+
+        # Validate the request data against the serializer class
+        serializer = serializer_class(data=request.data, context=context)
+        serializer.is_valid(raise_exception=True)
+
+        # Create the action and assign the status
+        with transaction.atomic():
+            action = serializer.save()
+            ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
+            action = Action.annotate_actions([action])[0]
+            return Response(ActionSerializer(action, context=context).data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        request=ActionStatusAuthorizationSerializer,
+        responses={200: ActionStatusAuthorizationSerializer, 400: None, 403: None, 404: None},
+        description="Change an action's status.",
+    )
+    @action(detail=True, methods=["post"])
+    def status(self, request, *args, **kwargs):
+        with transaction.atomic():
+            action = self.get_object()
+            serializer = ActionStatusAuthorizationSerializer(
+                action, data=request.data, context=self.get_serializer_context()
+            )
+            serializer.is_valid(raise_exception=True)
+            ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
+
+        return Response(serializer.validated_data)
 
     def perform_destroy(self, instance):
         try:

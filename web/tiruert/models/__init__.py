@@ -1,5 +1,6 @@
 from .operation import Operation
 from .operation_detail import OperationDetail
+from .debt import TiruertDebt
 from .fossil_fuel import FossilFuel
 from .fossil_fuel_category import FossilFuelCategory
 from .fossil_fuel_category_consideration_rate import FossilFuelCategoryConsiderationRate

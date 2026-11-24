@@ -10,18 +10,19 @@ class OperationConstantsTest(TestCase):
     """Tests for Operation constants."""
 
     def test_api_creatable_types_contains_expected_values(self):
-        """Should contain only TRANSFERT, EXPORTATION, EXPEDITION, TENEUR, DEVALUATION."""
+        """Should contain all operation types available through the API."""
         expected = [
             Operation.TRANSFERT,
             Operation.EXPORTATION,
             Operation.EXPEDITION,
             Operation.TENEUR,
             Operation.DEVALUATION,
+            Operation.DEBT_REPAYMENT,
         ]
         self.assertCountEqual(Operation.API_CREATABLE_TYPES, expected)
 
     def test_api_deletable_types_contains_expected_values(self):
-        """Should contain only CESSION, TENEUR, TRANSFERT, EXPORTATION, EXPEDITION, DEVALUATION."""
+        """Should contain only CESSION, TENEUR, TRANSFERT, EXPORTATION, EXPEDITION, DEVALUATION, DEBT_REPAYMENT."""
         expected = [
             Operation.CESSION,
             Operation.TENEUR,
@@ -29,6 +30,7 @@ class OperationConstantsTest(TestCase):
             Operation.EXPORTATION,
             Operation.EXPEDITION,
             Operation.DEVALUATION,
+            Operation.DEBT_REPAYMENT,
         ]
         self.assertCountEqual(Operation.API_DELETABLE_TYPES, expected)
 
@@ -181,7 +183,7 @@ class OperationSectorPropertyTest(TestCase):
         self.assertEqual(result, Operation.GAZOLE)
 
     def test_sector_returns_gpl_when_compatible_gpl(self):
-        """Should return GPL_C when biofuel is compatible with GPL."""
+        """Should return GPL when biofuel is compatible with GPL."""
         biofuel = Biocarburant.objects.create(
             code="HCGPL",
             name="HCGPL",
@@ -192,7 +194,7 @@ class OperationSectorPropertyTest(TestCase):
         operation = Operation(biofuel=biofuel)
 
         result = operation.sector
-        self.assertEqual(result, Operation.GPL_C)
+        self.assertEqual(result, Operation.GPL)
 
     def test_sector_returns_carbureacteur_when_saf_biofuel(self):
         """Should return CARBUREACTEUR when biofuel code is in SAF_BIOFUEL_TYPES."""

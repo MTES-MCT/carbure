@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 
 from core.models import StoredFile
-from traceability.exceptions import ConversionError, NoEligibleActionError
+from traceability.exceptions import NoEligibleActionError
 from traceability.models import Action, ActionStatus, Material
 from traceability.services.refuse import refuse
 from traceability.services.valorize import valorize
@@ -21,7 +21,6 @@ class StoredFileActionInline(admin.TabularInline):
     show_change_link = True
     fields = ("pos_id", "industry", "site", "holder", "quantity", "working_date")
     readonly_fields = fields
-    ordering = ("pos_id",)
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -59,10 +58,6 @@ def valorize_actions_into_certificates(modeladmin, request, queryset):
     except NoEligibleActionError:
         modeladmin.message_user(request, "Aucune action éligible à valoriser", messages.WARNING)
         return
-    except ConversionError as exc:
-        pos_ids = ", ".join(action.pos_id for action in exc.actions)
-        modeladmin.message_user(request, f"Conversion impossible vers MJ pour : {pos_ids}", messages.ERROR)
-        return
     modeladmin.message_user(request, f"{len(created)} certificat(s) créé(s).")
 
 
@@ -79,6 +74,7 @@ def refuse_selected_actions(modeladmin, request, queryset):
 @admin.register(Action)
 class ActionAdmin(admin.ModelAdmin):
     list_display = (
+        "carbure_id",
         "pos_id",
         "industry",
         "type",
@@ -101,7 +97,14 @@ class ActionAdmin(admin.ModelAdmin):
         "material__name",
         "shipping_method",
     )
+    readonly_fields = ("carbure_id",)
+
+    @admin.display(description="Identifiant Carbure", ordering="id")
+    def carbure_id(self, obj):
+        return obj.carbure_id
+
     search_fields = (
+        "carbure_id",
         "pos_id",
         "holder__name",
         "material__code",
@@ -125,7 +128,7 @@ class StoredFileAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "entity", "user", "created_at")
     list_filter = ("entity",)
     fields = ("entity", "user", "name", "url", "created_at")
-    search_fields = ("name", "entity__name", "user__email", "actions__pos_id")
+    search_fields = ("name", "entity__name", "user__email")
     raw_id_fields = ("user", "entity")
     readonly_fields = ("created_at",)
     list_select_related = ("entity", "user")

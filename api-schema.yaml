@@ -25,17 +25,6 @@ paths:
         - cookieAuth: []
         - basicAuth: []
       responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ActivateResponse"
-              examples:
-                SuccessExample:
-                  value: {}
-                  summary: A successful activation
-                  description: The account was successfully activated.
-          description: ""
         "400":
           content:
             application/json:
@@ -78,7 +67,7 @@ paths:
           description: The link is no longer valid, or the account already has a password.
   /api/auth/activate-profile/check/:
     post:
-      operationId: auth_check_activate_profile_create
+      operationId: auth_activate_profile_check_create
       tags:
         - auth
       requestBody:
@@ -104,7 +93,8 @@ paths:
             application/json:
               schema:
                 message: Could not activate user account
-          description: The link is expired, already used, or does not belong to an invited account.
+          description: The link is expired, already used, or does not belong to an invited
+            account.
   /api/auth/confirm-email-change/:
     post:
       operationId: auth_confirm_email_change_create
@@ -2955,7 +2945,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3034,6 +3024,45 @@ paths:
               schema:
                 $ref: "#/components/schemas/DoubleCountingRegistrationDetails"
           description: ""
+  /api/double-counting/agreements/{id}/update-status/:
+    patch:
+      operationId: double_counting_agreements_update_status_partial_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Entity ID
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Certificat Double Compte.
+          required: true
+      tags:
+        - double-counting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/PatchedAgreementStatusUpdateRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgreementStatusUpdateResponse"
+          description: ""
   /api/double-counting/agreements/agreement-admin/:
     get:
       operationId: double_counting_agreements_agreement_admin_retrieve
@@ -3064,7 +3093,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3137,7 +3166,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3183,46 +3212,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/DoubleCountingRegistrationPublic"
           description: ""
-  /api/double-counting/agreements/bulk-update-status/:
-    post:
-      operationId: double_counting_agreements_bulk_update_status_create
-      parameters:
-        - in: query
-          name: entity_id
-          schema:
-            type: integer
-          description: Entity ID
-          required: true
-      tags:
-        - double-counting
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/AgreementStatusBulkUpdateRequest"
-        required: true
-      security:
-        - cookieAuth: []
-        - basicAuth: []
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AgreementStatusBulkUpdateResponse"
-          description: ""
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AgreementStatusBulkUpdateErrorResponse"
-          description: ""
   /api/double-counting/agreements/export/:
     get:
       operationId: double_counting_agreements_export_retrieve
@@ -3253,7 +3242,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3335,7 +3324,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3841,7 +3830,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -3975,7 +3964,7 @@ paths:
                 - production_site
                 - valid_until
           description: |-
-            Ordre
+            Ordering
 
             * `production_site` - Production site
             * `-production_site` - Production site (décroissant)
@@ -4244,7 +4233,7 @@ paths:
                 - quarter
                 - source
           description: |-
-            Ordre
+            Ordering
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
@@ -4354,7 +4343,6 @@ paths:
             type: array
             items:
               type: string
-              format: date
           explode: true
           style: form
         - in: query
@@ -4631,7 +4619,6 @@ paths:
             type: array
             items:
               type: string
-              format: date
           explode: true
           style: form
         - in: query
@@ -4904,7 +4891,7 @@ paths:
                 - quarter
                 - source
           description: |-
-            Ordre
+            Ordering
 
             * `quarter` - Quarter
             * `-quarter` - Quarter (décroissant)
@@ -5146,7 +5133,7 @@ paths:
                 - status
                 - transfer_date
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -5466,7 +5453,7 @@ paths:
                 - status
                 - transfer_date
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -5763,22 +5750,40 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
+
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (bioliquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -5788,13 +5793,13 @@ paths:
             type: array
             items:
               type: boolean
-              title: Actif
+              title: Active
               enum:
                 - "false"
                 - "true"
           description: >-
-            Précise si l’utilisateur doit être considéré comme actif. Décochez
-            ceci plutôt que de supprimer le compte.
+            Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
 
 
             * `true` - True
@@ -5820,13 +5825,13 @@ paths:
                 - role
                 - user
           description: |-
-            Ordre
+            Ordering
 
             * `entity_name` - Entity name
             * `-entity_name` - Entity name (décroissant)
             * `entity_id` - Entity id
             * `-entity_id` - Entity id (décroissant)
-            * `user` - Utilisateur
+            * `user` - User
             * `-user` - Utilisateur (décroissant)
             * `role` - Role
             * `-role` - Role (décroissant)
@@ -5917,22 +5922,40 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
+
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (bioliquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -5942,13 +5965,13 @@ paths:
             type: array
             items:
               type: boolean
-              title: Actif
+              title: Active
               enum:
                 - "false"
                 - "true"
           description: >-
-            Précise si l’utilisateur doit être considéré comme actif. Décochez
-            ceci plutôt que de supprimer le compte.
+            Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
 
 
             * `true` - True
@@ -5974,13 +5997,13 @@ paths:
                 - role
                 - user
           description: |-
-            Ordre
+            Ordering
 
             * `entity_name` - Entity name
             * `-entity_name` - Entity name (décroissant)
             * `entity_id` - Entity id
             * `-entity_id` - Entity id (décroissant)
-            * `user` - Utilisateur
+            * `user` - User
             * `-user` - Utilisateur (décroissant)
             * `role` - Role
             * `-role` - Role (décroissant)
@@ -6071,22 +6094,40 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
+
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (bioliquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -6107,13 +6148,13 @@ paths:
             type: array
             items:
               type: boolean
-              title: Actif
+              title: Active
               enum:
                 - "false"
                 - "true"
           description: >-
-            Précise si l’utilisateur doit être considéré comme actif. Décochez
-            ceci plutôt que de supprimer le compte.
+            Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
 
 
             * `true` - True
@@ -6139,13 +6180,13 @@ paths:
                 - role
                 - user
           description: |-
-            Ordre
+            Ordering
 
             * `entity_name` - Entity name
             * `-entity_name` - Entity name (décroissant)
             * `entity_id` - Entity id
             * `-entity_id` - Entity id (décroissant)
-            * `user` - Utilisateur
+            * `user` - User
             * `-user` - Utilisateur (décroissant)
             * `role` - Role
             * `-role` - Role (décroissant)
@@ -6234,22 +6275,40 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
+
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (bioliquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -6259,13 +6318,13 @@ paths:
             type: array
             items:
               type: boolean
-              title: Actif
+              title: Active
               enum:
                 - "false"
                 - "true"
           description: >-
-            Précise si l’utilisateur doit être considéré comme actif. Décochez
-            ceci plutôt que de supprimer le compte.
+            Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
 
 
             * `true` - True
@@ -6291,13 +6350,13 @@ paths:
                 - role
                 - user
           description: |-
-            Ordre
+            Ordering
 
             * `entity_name` - Entity name
             * `-entity_name` - Entity name (décroissant)
             * `entity_id` - Entity id
             * `-entity_id` - Entity id (décroissant)
-            * `user` - Utilisateur
+            * `user` - User
             * `-user` - Utilisateur (décroissant)
             * `role` - Role
             * `-role` - Role (décroissant)
@@ -8119,7 +8178,7 @@ paths:
                 - name
                 - site_siret
           description: |-
-            Ordre
+            Ordering
 
             * `name` - Name
             * `-name` - Name (décroissant)
@@ -8412,7 +8471,7 @@ paths:
                 - name
                 - site_siret
           description: |-
-            Ordre
+            Ordering
 
             * `name` - Name
             * `-name` - Name (décroissant)
@@ -8564,6 +8623,10 @@ paths:
     get:
       operationId: resources_biofuels_list
       parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
         - in: query
           name: query
           schema:
@@ -9052,7 +9115,7 @@ paths:
                 - ghg_reduction
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -9282,7 +9345,7 @@ paths:
                 - ghg_reduction
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -9449,7 +9512,7 @@ paths:
                 - ghg_reduction
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `volume` - Volume
             * `-volume` - Volume (décroissant)
@@ -9617,22 +9680,40 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
+
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (bioliquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -9716,7 +9797,7 @@ paths:
                 - supplier
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -10057,22 +10138,40 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
+
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (bioliquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -10156,7 +10255,7 @@ paths:
                 - supplier
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -10295,22 +10394,40 @@ paths:
                 - Producteur
                 - Producteur de biométhane
                 - SAF Trader
+                - Solid Biomass Energy Producer
                 - Trader
                 - Unknown
-          description: |-
+          description: >-
             * `Producteur` - Producteur
+
             * `Opérateur` - Opérateur
+
             * `Administration` - Administration
+
             * `Trader` - Trader
+
             * `Auditor` - Auditeur
+
             * `Administration Externe` - Administration Externe
+
             * `Charge Point Operator` - Charge Point Operator
+
             * `Compagnie aérienne` - Compagnie aérienne
+
             * `Unknown` - Unknown
+
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+            (bioliquide)
+
+            * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+            chaleur (biomasse solide)
+
             * `SAF Trader` - Trader de SAF
+
             * `Producteur de biométhane` - Producteur de biométhane
+
             * `Fournisseur de biométhane` - Fournisseur de biométhane
+
             * `HRS` - Distributeur d'hydrogène pour la mobilité
           explode: true
           style: form
@@ -10415,7 +10532,7 @@ paths:
                 - supplier
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `client` - Client
             * `-client` - Client (décroissant)
@@ -10569,6 +10686,58 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
           description: ""
+  /api/solid-biomass/energy-installation/:
+    get:
+      operationId: solid_biomass_energy_installation_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - solid-biomass
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyInstallation"
+          description: ""
+    put:
+      operationId: solid_biomass_energy_installation_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - solid-biomass
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyInstallation"
+          description: ""
   /api/tiruert/declaration-period/:
     get:
       operationId: tiruert_declaration_period_retrieve
@@ -10702,7 +10871,7 @@ paths:
                 - quantity
                 - status
           description: |-
-            Ordre
+            Ordering
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
@@ -11085,7 +11254,7 @@ paths:
                 - quantity
                 - status
           description: |-
-            Ordre
+            Ordering
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
@@ -11226,7 +11395,7 @@ paths:
                 - quantity
                 - status
           description: |-
-            Ordre
+            Ordering
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
@@ -11379,7 +11548,7 @@ paths:
                 - quantity
                 - status
           description: |-
-            Ordre
+            Ordering
 
             * `created_at` - Created at
             * `-created_at` - Created at (décroissant)
@@ -11811,7 +11980,9 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -11835,6 +12006,8 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -11872,7 +12045,7 @@ paths:
                 - type
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -11951,13 +12124,13 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - GPL_C
+                - GPL
                 - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
-            * `GPL_C` - GPL_C
+            * `GPL` - GPL
             * `MARITIME` - MARITIME
           explode: true
           style: form
@@ -12054,7 +12227,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OperationInput"
+                oneOf:
+                  - $ref: "#/components/schemas/Operation"
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/OperationList"
           description: ""
   /api/tiruert/operations/{id}/:
     get:
@@ -12394,7 +12571,9 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -12418,6 +12597,8 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12455,7 +12636,7 @@ paths:
                 - type
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -12534,13 +12715,13 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - GPL_C
+                - GPL
                 - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
-            * `GPL_C` - GPL_C
+            * `GPL` - GPL
             * `MARITIME` - MARITIME
           explode: true
           style: form
@@ -12692,7 +12873,9 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -12716,6 +12899,8 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -12753,7 +12938,7 @@ paths:
                 - type
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -12820,13 +13005,13 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - GPL_C
+                - GPL
                 - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
-            * `GPL_C` - GPL_C
+            * `GPL` - GPL
             * `MARITIME` - MARITIME
           explode: true
           style: form
@@ -12902,6 +13087,31 @@ paths:
                     - TMF
                     - TERF SAF
                   summary: Example of filters response.
+          description: ""
+  /api/tiruert/operations/debts/:
+    get:
+      operationId: list_debts
+      description: Remaining debt volume of the entity per biofuel and customs category
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+      tags:
+        - tiruert
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DebtSummary"
           description: ""
   /api/tiruert/operations/export/:
     get:
@@ -13022,7 +13232,9 @@ paths:
               enum:
                 - ACQUISITION
                 - CESSION
+                - CORRECTION
                 - CUSTOMS_CORRECTION
+                - DEBT_REPAYMENT
                 - DEVALUATION
                 - EXPEDITION
                 - EXPIRATION
@@ -13046,6 +13258,8 @@ paths:
             * `TRANSFERT` - TRANSFERT
             * `EXPIRATION` - EXPIRATION
             * `REPORT` - REPORT
+            * `CORRECTION` - CORRECTION
+            * `DEBT_REPAYMENT` - DEBT_REPAYMENT
             * `ACQUISITION` - ACQUISITION
           explode: true
           style: form
@@ -13083,7 +13297,7 @@ paths:
                 - type
                 - volume
           description: |-
-            Ordre
+            Ordering
 
             * `status` - Status
             * `-status` - Status (décroissant)
@@ -13150,13 +13364,13 @@ paths:
                 - CARBURÉACTEUR
                 - ESSENCE
                 - GAZOLE
-                - GPL_C
+                - GPL
                 - MARITIME
           description: |-
             * `ESSENCE` - ESSENCE
             * `GAZOLE` - GAZOLE
             * `CARBURÉACTEUR` - CARBURÉACTEUR
-            * `GPL_C` - GPL_C
+            * `GPL` - GPL
             * `MARITIME` - MARITIME
           explode: true
           style: form
@@ -13490,6 +13704,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -13498,6 +13713,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -13507,8 +13723,10 @@ paths:
                 - status
                 - working_date
           description: |-
-            Ordre
+            Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -13533,6 +13751,14 @@ paths:
           description: Which field to use when ordering the results.
           schema:
             type: string
+        - in: query
+          name: origin_material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
         - name: page
           required: false
           in: query
@@ -13553,6 +13779,10 @@ paths:
               type: string
           explode: true
           style: form
+        - in: query
+          name: quantity_available
+          schema:
+            type: boolean
         - name: search
           required: false
           in: query
@@ -13641,6 +13871,58 @@ paths:
               schema:
                 $ref: "#/components/schemas/PaginatedActionList"
           description: ""
+    post:
+      operationId: traceability_actions_create
+      description: Create an action.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequestRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequestRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionCreateRequestRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Action"
+          description: ""
+        "400":
+          description: No response body
+        "403":
+          description: No response body
   /api/traceability/actions/{id}/:
     get:
       operationId: traceability_actions_retrieve
@@ -13722,6 +14004,67 @@ paths:
       responses:
         "204":
           description: No response body
+  /api/traceability/actions/{id}/status/:
+    post:
+      operationId: traceability_actions_status_create
+      description: Change an action's status.
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          description: Authorised entity ID.
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this Action.
+          required: true
+        - in: query
+          name: industry
+          schema:
+            enum:
+              - H2
+            type: string
+            minLength: 1
+          description: "* `H2` - Hydrogène"
+          required: true
+        - in: query
+          name: year
+          schema:
+            type: integer
+          description: Filter actions by working date year.
+      tags:
+        - traceability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActionStatusAuthorizationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/ActionStatusAuthorizationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ActionStatusAuthorizationRequest"
+        required: true
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActionStatusAuthorization"
+          description: ""
+        "400":
+          description: No response body
+        "403":
+          description: No response body
+        "404":
+          description: No response body
   /api/traceability/actions/filters/:
     get:
       operationId: traceability_actions_filters_retrieve
@@ -13741,6 +14084,7 @@ paths:
               - holder
               - material
               - order_by
+              - origin_material
               - period
               - shipping_method
               - site
@@ -13781,6 +14125,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -13789,6 +14134,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -13798,8 +14144,10 @@ paths:
                 - status
                 - working_date
           description: |-
-            Ordre
+            Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -13825,6 +14173,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: origin_material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: period
           schema:
             type: array
@@ -13832,6 +14188,10 @@ paths:
               type: string
           explode: true
           style: form
+        - in: query
+          name: quantity_available
+          schema:
+            type: boolean
         - name: search
           required: false
           in: query
@@ -13927,8 +14287,8 @@ paths:
                     - holder
                     - material
                     - order_by
+                    - origin_material
                     - period
-                    - shipping_method
                   summary: Example of filters response.
           description: ""
   /api/traceability/actions/import/:
@@ -14067,6 +14427,7 @@ paths:
             items:
               type: string
               enum:
+                - -carbure_id
                 - -holder
                 - -material
                 - -pos_id
@@ -14075,6 +14436,7 @@ paths:
                 - -site
                 - -status
                 - -working_date
+                - carbure_id
                 - holder
                 - material
                 - pos_id
@@ -14084,8 +14446,10 @@ paths:
                 - status
                 - working_date
           description: |-
-            Ordre
+            Ordering
 
+            * `carbure_id` - Carbure id
+            * `-carbure_id` - Carbure id (décroissant)
             * `pos_id` - Pos id
             * `-pos_id` - Pos id (décroissant)
             * `holder` - Holder
@@ -14111,6 +14475,14 @@ paths:
           schema:
             type: string
         - in: query
+          name: origin_material
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
           name: period
           schema:
             type: array
@@ -14118,6 +14490,10 @@ paths:
               type: string
           explode: true
           style: form
+        - in: query
+          name: quantity_available
+          schema:
+            type: boolean
         - name: search
           required: false
           in: query
@@ -14335,6 +14711,7 @@ components:
           allOf:
             - $ref: "#/components/schemas/Material"
           readOnly: true
+          nullable: true
         site:
           allOf:
             - $ref: "#/components/schemas/ActionSite"
@@ -14349,26 +14726,23 @@ components:
             - $ref: "#/components/schemas/ActionTotalEmissions"
           readOnly: true
           nullable: true
-        mass:
+        inherited_fields:
+          allOf:
+            - $ref: "#/components/schemas/ActionInheritedFields"
+          readOnly: true
+        quantity_available:
           type: string
           format: decimal
           pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
-          nullable: true
-        volume:
+          default: "0.000"
+        carbure_id:
           type: string
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
           readOnly: true
-          nullable: true
-        energy:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
-          readOnly: true
-          nullable: true
+          title: Identifiant Carbure
         pos_id:
           type: string
+          nullable: true
           title: N° de POS
           maxLength: 48
         industry:
@@ -14400,6 +14774,11 @@ components:
             - $ref: "#/components/schemas/ActionShippingMethodEnum"
           nullable: true
           title: Mode de transport
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          title: Date de création
         working_date:
           type: string
           format: date
@@ -14407,55 +14786,55 @@ components:
         eec:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         el:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         ei:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         ep:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         etd:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eu:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eccs:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         esca:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
         eccr:
           type: string
           format: decimal
-          pattern: ^-?\d{0,4}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
       required:
+        - carbure_id
         - certificate
-        - energy
+        - created_at
         - holder
         - id
         - industry
-        - mass
+        - inherited_fields
         - material
         - parent
-        - pos_id
         - quantity
+        - quantity_available
         - site
         - status
         - total_emissions
         - type
-        - volume
         - working_date
     ActionCertificate:
       type: object
@@ -14476,6 +14855,117 @@ components:
         - certificate_id
         - certificate_type
         - id
+    ActionCreateRequestRequest:
+      type: object
+      description: >-
+        Schema of the create body. The view validates with the type serializer.
+
+
+        ``working_date`` is optional: the client sends it when it knows the
+        date,
+
+        otherwise the server fills it. ``industry`` comes from the query param.
+
+        ``pos_id`` follows the model until it becomes optional.
+      properties:
+        type:
+          allOf:
+            - $ref: "#/components/schemas/ActionTypeEnum"
+          title: Type d'action
+        holder:
+          type: integer
+          title: Entité détentrice de la quantité de l'action
+        parent:
+          type: integer
+          nullable: true
+          title: Action parente
+        pos_id:
+          type: string
+          nullable: true
+          title: N° de POS
+          maxLength: 48
+        material:
+          type: integer
+          nullable: true
+          title: Matière
+        status:
+          $ref: "#/components/schemas/ActionStatusEnum"
+        certificate:
+          type: integer
+          nullable: true
+          title: Certificat
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          title: Quantité de matière
+        site:
+          type: integer
+          nullable: true
+        shipping_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date d'expédition
+        shipping_distance:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+          title: Distance de livraison
+        shipping_method:
+          allOf:
+            - $ref: "#/components/schemas/ActionShippingMethodEnum"
+          nullable: true
+          title: Mode de transport
+        working_date:
+          type: string
+          format: date
+        file:
+          type: integer
+          nullable: true
+          title: Fichier
+        eec:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+        el:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+        ei:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+        ep:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+        etd:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+        eu:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+        eccs:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+        esca:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+        eccr:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,10})?$
+      required:
+        - holder
+        - quantity
+        - status
+        - type
     ActionExcelUploadRequest:
       type: object
       properties:
@@ -14484,6 +14974,30 @@ components:
           format: binary
       required:
         - file
+    ActionInheritedFields:
+      type: object
+      description: >-
+        Every value the front receives from the parent-chain walk.
+
+
+        previous_material is the nearest declared material above the action.
+
+        origin_material is the first declared material from the root. It is the
+        action's
+
+        own material when nothing above declares one.
+      properties:
+        previous_material:
+          allOf:
+            - $ref: "#/components/schemas/Material"
+          nullable: true
+        origin_material:
+          allOf:
+            - $ref: "#/components/schemas/Material"
+          nullable: true
+      required:
+        - origin_material
+        - previous_material
     ActionParent:
       type: object
       description: Small representation used for the parent action relation.
@@ -14493,11 +15007,11 @@ components:
           readOnly: true
         pos_id:
           type: string
+          nullable: true
           title: N° de POS
           maxLength: 48
       required:
         - id
-        - pos_id
     ActionShippingMethodEnum:
       enum:
         - ROAD
@@ -14524,6 +15038,20 @@ components:
       required:
         - id
         - name
+    ActionStatusAuthorization:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ActionStatusEnum"
+      required:
+        - status
+    ActionStatusAuthorizationRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ActionStatusEnum"
+      required:
+        - status
     ActionStatusEnum:
       enum:
         - CREATED
@@ -14547,52 +15075,52 @@ components:
         eec:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         el:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         ei:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         ep:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         etd:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         eu:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         eccs:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         esca:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         eccr:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
         total:
           type: string
           format: decimal
-          pattern: ^-?\d{0,10}(?:\.\d{0,3})?$
+          pattern: ^-?\d{0,6}(?:\.\d{0,10})?$
           readOnly: true
       required:
         - eccr
@@ -14652,9 +15180,6 @@ components:
         - password2
         - token
         - uidb64
-    ActivateResponse:
-      type: object
-      additionalProperties: false
     AddCertificateRequest:
       type: object
       properties:
@@ -14740,33 +15265,13 @@ components:
         - expired
         - inactive
         - incoming
-    AgreementStatusBulkUpdateErrorResponse:
+    AgreementStatusUpdateResponse:
       type: object
       properties:
-        message:
-          type: string
-      required:
-        - message
-    AgreementStatusBulkUpdateRequest:
-      type: object
-      properties:
-        agreement_ids:
-          type: array
-          items:
-            type: integer
-          maxItems: 100
         status:
           $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
       required:
-        - agreement_ids
         - status
-    AgreementStatusBulkUpdateResponse:
-      type: object
-      properties:
-        updated_count:
-          type: integer
-      required:
-        - updated_count
     Airport:
       type: object
       properties:
@@ -15050,6 +15555,8 @@ components:
         code:
           type: string
           maxLength: 16
+        compatible_gpl:
+          type: boolean
       required:
         - code
         - name
@@ -15069,6 +15576,8 @@ components:
           type: string
           minLength: 1
           maxLength: 16
+        compatible_gpl:
+          type: boolean
       required:
         - code
         - name
@@ -17160,12 +17669,15 @@ components:
       properties:
         group:
           type: string
+          default: ""
           maxLength: 128
         category:
           type: string
+          default: ""
           maxLength: 128
         subcategory:
           type: string
+          default: ""
           maxLength: 128
         crop_type:
           allOf:
@@ -17173,10 +17685,7 @@ components:
           nullable: true
           readOnly: true
       required:
-        - category
         - crop_type
-        - group
-        - subcategory
     CollectionTypeEnum:
       enum:
         - PRIVATE
@@ -17442,6 +17951,20 @@ components:
       description: |-
         * `PRIMARY` - PRIMARY
         * `INTERMEDIATE` - INTERMEDIATE
+    DebtSummary:
+      type: object
+      properties:
+        biofuel:
+          $ref: "#/components/schemas/BalanceBiofuel"
+        customs_category:
+          $ref: "#/components/schemas/MPCategoriesEnum"
+        remaining_volume:
+          type: number
+          format: double
+      required:
+        - biofuel
+        - customs_category
+        - remaining_volume
     DeleteCertificateRequest:
       type: object
       properties:
@@ -17710,7 +18233,7 @@ components:
         producer_user:
           type: string
           format: email
-          title: Adresse électronique
+          title: Email address
           readOnly: true
         production_site:
           allOf:
@@ -17799,7 +18322,7 @@ components:
         producer_user:
           type: string
           format: email
-          title: Adresse électronique
+          title: Email address
           readOnly: true
       required:
         - agreement_id
@@ -18725,6 +19248,94 @@ components:
         empty:
           type: string
           minLength: 1
+    EnergyInstallation:
+      type: object
+      properties:
+        production_type:
+          allOf:
+            - $ref: "#/components/schemas/ProductionTypeEnum"
+          nullable: true
+        heat_type:
+          allOf:
+            - $ref: "#/components/schemas/HeatTypeEnum"
+          nullable: true
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        icpe_number:
+          nullable: true
+          oneOf:
+            - type: string
+              pattern: ^\d{10}$
+              maxLength: 10
+            - type: string
+              maxLength: 0
+        icpe_regime:
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
+    EnergyInstallationRequest:
+      type: object
+      properties:
+        production_type:
+          allOf:
+            - $ref: "#/components/schemas/ProductionTypeEnum"
+          nullable: true
+        heat_type:
+          allOf:
+            - $ref: "#/components/schemas/HeatTypeEnum"
+          nullable: true
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        icpe_number:
+          nullable: true
+          oneOf:
+            - type: string
+              pattern: ^\d{10}$
+              maxLength: 10
+            - type: string
+              maxLength: 0
+        icpe_regime:
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
     EnergyTypesEnum:
       enum:
         - PRODUCED_BIOGAS
@@ -19337,25 +19948,43 @@ components:
         - Compagnie aérienne
         - Unknown
         - Power or Heat Producer
+        - Solid Biomass Energy Producer
         - SAF Trader
         - Producteur de biométhane
         - Fournisseur de biométhane
         - HRS
       type: string
-      description: |-
+      description: >-
         * `Producteur` - Producteur
+
         * `Opérateur` - Opérateur
+
         * `Administration` - Administration
+
         * `Trader` - Trader
+
         * `Auditor` - Auditeur
+
         * `Administration Externe` - Administration Externe
+
         * `Charge Point Operator` - Charge Point Operator
+
         * `Compagnie aérienne` - Compagnie aérienne
+
         * `Unknown` - Unknown
+
         * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
+        (bioliquide)
+
+        * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
+        chaleur (biomasse solide)
+
         * `SAF Trader` - Trader de SAF
+
         * `Producteur de biométhane` - Producteur de biométhane
+
         * `Fournisseur de biométhane` - Fournisseur de biométhane
+
         * `HRS` - Distributeur d'hydrogène pour la mobilité
       x-enum-varnames:
         - Producer
@@ -19368,9 +19997,11 @@ components:
         - Airline
         - Unknown
         - PowerOrHeatProducer
+        - SolidBiomassEnergyProducer
         - SAF_Trader
         - Producteur_de_biom_thane
         - Fournisseur_de_biom_thane
+        - HRS
     ErrorResponse:
       type: object
       properties:
@@ -19900,6 +20531,18 @@ components:
         - distribution_capacity
         - name
         - storage_capacity
+    HeatTypeEnum:
+      enum:
+        - HOT_WATER
+        - STEAM
+        - HOT_WATER_STEAM
+        - INDUSTRIAL_PROCESS
+      type: string
+      description: |-
+        * `HOT_WATER` - Eau chaude
+        * `STEAM` - Vapeur
+        * `HOT_WATER_STEAM` - Eau chaude et vapeur
+        * `INDUSTRIAL_PROCESS` - Process industriel
     HygienizationExemptionTypeEnum:
       enum:
         - TOTAL
@@ -20368,14 +21011,14 @@ components:
         - ESSENCE
         - GAZOLE
         - CARBURÉACTEUR
-        - GPL_C
+        - GPL
         - MARITIME
       type: string
       description: |-
         * `ESSENCE` - ESSENCE
         * `GAZOLE` - GAZOLE
         * `CARBURÉACTEUR` - CARBURÉACTEUR
-        * `GPL_C` - GPL_C
+        * `GPL` - GPL
         * `MARITIME` - MARITIME
     Operation:
       type: object
@@ -20451,6 +21094,10 @@ components:
           type: number
           format: double
           readOnly: true
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/OperationDetail"
         year:
           type: integer
           readOnly: true
@@ -20458,6 +21105,14 @@ components:
           allOf:
             - $ref: "#/components/schemas/DevaluationTypeEnum"
           nullable: true
+        debt:
+          allOf:
+            - $ref: "#/components/schemas/OperationDebt"
+          readOnly: true
+          nullable: true
+        transaction:
+          type: string
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -20466,12 +21121,14 @@ components:
         - created_at
         - credited_entity
         - debited_entity
+        - debt
         - energy
         - export_country
         - from_depot
         - id
         - sector
         - to_depot
+        - transaction
         - type
         - volume
         - year
@@ -20483,6 +21140,26 @@ components:
           format: double
       required:
         - correction_volume
+    OperationDebt:
+      type: object
+      properties:
+        id:
+          type: integer
+        lot:
+          $ref: "#/components/schemas/OperationDebtLot"
+      required:
+        - id
+        - lot
+    OperationDebtLot:
+      type: object
+      properties:
+        id:
+          type: integer
+        carbure_id:
+          type: string
+      required:
+        - carbure_id
+        - id
     OperationDepot:
       type: object
       properties:
@@ -20493,6 +21170,19 @@ components:
       required:
         - id
         - name
+    OperationDetail:
+      type: object
+      properties:
+        lot:
+          type: integer
+        volume:
+          type: number
+          format: double
+        emission_rate_per_mj:
+          type: number
+          format: double
+      required:
+        - lot
     OperationEntity:
       type: object
       properties:
@@ -20546,11 +21236,16 @@ components:
           type: array
           items:
             type: integer
+        debt:
+          allOf:
+            - $ref: "#/components/schemas/OperationDebt"
+          nullable: true
       required:
         - biofuel
         - credited_entity
         - customs_category
         - debited_entity
+        - debt
         - lot_count
         - operation_id
         - rows
@@ -20570,54 +21265,6 @@ components:
       required:
         - mode
         - operations
-    OperationInput:
-      type: object
-      properties:
-        type:
-          $ref: "#/components/schemas/OperationTypeEnum"
-        customs_category:
-          $ref: "#/components/schemas/MPCategoriesEnum"
-        biofuel:
-          type: integer
-          nullable: true
-        credited_entity:
-          type: integer
-          nullable: true
-        debited_entity:
-          type: integer
-          nullable: true
-        from_depot:
-          type: integer
-          nullable: true
-        to_depot:
-          type: integer
-          nullable: true
-        export_country:
-          type: string
-          nullable: true
-        export_recipient:
-          type: string
-          maxLength: 255
-        objective_sector:
-          allOf:
-            - $ref: "#/components/schemas/ObjectiveSectorCodeEnum"
-          nullable: true
-        lots:
-          type: array
-          items:
-            $ref: "#/components/schemas/OperationLot"
-        status:
-          $ref: "#/components/schemas/OperationStatusEnum"
-        devaluation_type:
-          allOf:
-            - $ref: "#/components/schemas/DevaluationTypeEnum"
-          nullable: true
-      required:
-        - biofuel
-        - customs_category
-        - debited_entity
-        - lots
-        - type
     OperationInputRequest:
       type: object
       properties:
@@ -20627,13 +21274,11 @@ components:
           $ref: "#/components/schemas/MPCategoriesEnum"
         biofuel:
           type: integer
-          nullable: true
         credited_entity:
           type: integer
           nullable: true
         debited_entity:
           type: integer
-          nullable: true
         from_depot:
           type: integer
           nullable: true
@@ -20732,6 +21377,9 @@ components:
         year:
           type: integer
           readOnly: true
+        transaction:
+          type: string
+          readOnly: true
       required:
         - _depot
         - _entity
@@ -20745,20 +21393,10 @@ components:
         - id
         - sector
         - to_depot
+        - transaction
         - type
         - volume
         - year
-    OperationLot:
-      type: object
-      properties:
-        id:
-          type: integer
-        volume:
-          type: number
-          format: double
-      required:
-        - id
-        - volume
     OperationLotRequest:
       type: object
       properties:
@@ -20804,6 +21442,8 @@ components:
         - TRANSFERT
         - EXPIRATION
         - REPORT
+        - CORRECTION
+        - DEBT_REPAYMENT
       type: string
       description: |-
         * `INCORPORATION` - INCORPORATION
@@ -20818,6 +21458,8 @@ components:
         * `TRANSFERT` - TRANSFERT
         * `EXPIRATION` - EXPIRATION
         * `REPORT` - REPORT
+        * `CORRECTION` - CORRECTION
+        * `DEBT_REPAYMENT` - DEBT_REPAYMENT
     OperationUpdate:
       type: object
       properties:
@@ -20887,8 +21529,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Action"
-        total_count:
-          type: integer
     PaginatedAdminUserRowList:
       type: object
       required:
@@ -21327,6 +21967,11 @@ components:
             $ref: "#/components/schemas/SafTicketSourcePreview"
         total_available_volume:
           type: number
+    PatchedAgreementStatusUpdateRequest:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/DoubleCountingRegistrationStatusEnum"
     PatchedBiomethaneAnnualDeclarationRequest:
       type: object
       properties:
@@ -21630,6 +22275,16 @@ components:
       required:
         - certificate_id
         - type
+    ProductionTypeEnum:
+      enum:
+        - ELECTRICITY
+        - HEAT
+        - COGENERATION
+      type: string
+      description: |-
+        * `ELECTRICITY` - Électricité seule
+        * `HEAT` - Chaleur/Froid seul
+        * `COGENERATION` - Cogénération
     ProvisionCertificateBulkRequest:
       type: object
       properties:
@@ -22709,6 +23364,7 @@ components:
         - name
     SiteTypeEnum:
       enum:
+        - ENERGY INSTALLATION
         - OTHER
         - EFS
         - EFPE
@@ -22724,6 +23380,7 @@ components:
         - H2 REFUELING STATION
       type: string
       description: |-
+        * `ENERGY INSTALLATION` - Installation de chaleur et d’électricité
         * `OTHER` - Autre
         * `EFS` - EFS
         * `EFPE` - EFPE
@@ -23126,11 +23783,10 @@ components:
         email:
           type: string
           format: email
-          title: Adresse électronique
+          title: Email address
           maxLength: 255
         name:
           type: string
-          title: Nom
           maxLength: 255
       required:
         - email
@@ -23145,12 +23801,11 @@ components:
           type: string
           format: email
           minLength: 1
-          title: Adresse électronique
+          title: Email address
           maxLength: 255
         name:
           type: string
           minLength: 1
-          title: Nom
           maxLength: 255
         password1:
           type: string
@@ -23303,14 +23958,14 @@ components:
         - username
     UserResendActivationLinkRequest:
       type: object
-      description: Resend the activation email for the pending account matching
-        this address.
+      description: Resend the activation email for the pending account matching this
+        address.
       properties:
         email:
           type: string
           format: email
           minLength: 1
-          title: Courriel
+          title: Adresse email
       required:
         - email
     UserRights:

@@ -6,7 +6,6 @@ from django.test import TestCase
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import Biocarburant, MatierePremiere
-from core.models.feedstock import GPL_BIOFUEL_TYPES
 from saf.models.constants import SAF_BIOFUEL_TYPES
 from transactions.factories import CarbureLotFactory
 from transactions.models import ProductionSite
@@ -104,6 +103,18 @@ class DoubleCountingSanityChecksTest(TestCase):
 
         error_list = self.run_checks(lot)
         assert not has_error(error, error_list)
+
+    def test_missing_ref_dbl_counting_gpl(self):
+        """GPL-compatible biofuels do not require a double-counting reference."""
+        gpl_biofuel = Biocarburant.objects.create(name="GPL test", code="TEST_GPL", compatible_gpl=True)
+        lot = self.create_lot(
+            feedstock=self.dc_feedstock,
+            biofuel=gpl_biofuel,
+            production_site_double_counting_certificate="",
+        )
+
+        errors = self.run_checks(lot)
+        assert not has_error(CarbureSanityCheckErrors.MISSING_REF_DBL_COUNTING, errors)
 
     def test_unknown_double_counting_certificate_unknown_production_site(self):
         error = CarbureCertificatesErrors.UNKNOWN_DOUBLE_COUNTING_CERTIFICATE
@@ -227,6 +238,30 @@ class DoubleCountingSanityChecksTest(TestCase):
             assert has_error(error, error_list), status
             assert next(e for e in error_list if e.error == error).is_blocking
 
+    def test_tiruert_ineligibility_is_non_blocking(self):
+        """Test that the TIRUERT-ineligible certificate produces a non-blocking warning."""
+        error = CarbureCertificatesErrors.LOT_NOT_ELIGIBLE_TIRUERT
+        certificate_id = DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT
+        DoubleCountingRegistration.objects.create(
+            certificate_id=certificate_id,
+            production_site=self.production_site,
+            valid_from=datetime.date(2026, 1, 1),
+            valid_until=datetime.date(2027, 12, 31),
+        )
+        lot = self.create_lot(
+            feedstock=self.dc_feedstock,
+            biofuel=self.dc_biofuel,
+            carbure_producer=self.producer,
+            carbure_production_site=self.production_site,
+            delivery_date=datetime.date(2026, 6, 1),
+            production_site_double_counting_certificate=certificate_id,
+        )
+
+        error_list = self.run_checks(lot, get_prefetched_data())
+        warning = next(e for e in error_list if e.error == error)
+
+        assert not warning.is_blocking
+
     @patch("certificates.models.timezone.localdate", new=lambda: datetime.date(2026, 10, 6))
     def test_computed_status(self):
         self.assertEqual(self.old_dc_cert.computed_status, DoubleCountingRegistration.EXPIRED)
@@ -268,16 +303,3 @@ class DoubleCountingSanityChecksTest(TestCase):
         error_list = self.run_checks(lot)
 
         assert not has_error(CarbureCertificatesErrors.MISSING_REF_DBL_COUNTING, error_list)
-
-    def test_no_double_counting_requirement_on_gpl(self):
-        for code in GPL_BIOFUEL_TYPES:
-            gpl_biofuel = Biocarburant.objects.create(name=code, name_en=code, description="", code=code)
-            lot = self.create_lot(
-                feedstock=self.dc_feedstock,
-                biofuel=gpl_biofuel,
-                production_site_double_counting_certificate="",
-            )
-
-            error_list = self.run_checks(lot)
-
-            assert not has_error(CarbureCertificatesErrors.MISSING_REF_DBL_COUNTING, error_list)

@@ -25,6 +25,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { OperationsExcelImportDialog } from "./pages/operations-excel-import-dialog"
 import { OperationTable } from "./components/operations-table"
 import useEntity from "common/hooks/entity"
+import { DebtNotice } from "./components/debt-notice"
 
 const OperationsBiofuels = () => {
   const { t } = useTranslation()
@@ -79,6 +80,7 @@ const OperationsBiofuels = () => {
         onSelect={actions.setFilters}
         getFilterOptions={getFilterOptions}
       />
+      <DebtNotice />
       {!loading &&
       result?.data?.results &&
       result?.data?.results?.length === 0 ? (

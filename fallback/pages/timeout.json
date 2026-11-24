@@ -1,0 +1,6 @@
+{
+  "titre_page": "Délai de réponse dépassé",
+  "titre": "Le service met trop de temps à répondre",
+  "message": "Le délai de réponse de CarbuRe a été dépassé et votre demande n'a pas pu être affichée.",
+  "information": "Merci de réessayer dans quelques instants. Si vous avez envoyé des données, vérifiez si elles ont été enregistrées avant de les envoyer à nouveau."
+}

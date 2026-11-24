@@ -1,56 +1,33 @@
-from django.db.models import Case, DecimalField, Expression, ExpressionWrapper, F, Value, When
-from django.db.models.functions import Round
+from decimal import Decimal
 
-QUANTITY_FIELD = DecimalField(max_digits=13, decimal_places=3)
+from django.db.models import DecimalField, ExpressionWrapper, F, OuterRef, Subquery, Sum, Value
+from django.db.models.functions import Coalesce
+
+from traceability.models.action_status import ActionStatus, latest_status
+
+# A deleted child does not consume its parent.
+_EXCLUDED_CHILD_STATUSES = (ActionStatus.DELETED,)
+_QUANTITY = DecimalField(max_digits=16, decimal_places=3)
 
 
-def _expression_wrapper(expression: Expression) -> ExpressionWrapper:
-    return ExpressionWrapper(expression, output_field=QUANTITY_FIELD)
+def quantity_available():
+    """quantity minus the sum of direct children.
 
-
-def quantities_db_annotation() -> dict:
-    """Annotate mass (kg), volume (l) and energy (MJ) from the material's factors.
-
-    mass   = volume × density
-    energy = mass × lhv
-
-    Reads `material.lhv` / `material.density`. Missing factors yield NULL.
+    Children whose latest status is DELETED are left out.
+    Grandchildren do not. No consuming child leaves the stored quantity.
     """
-    from traceability.models.material import Material
+    from traceability.models.action import Action
 
-    quantity = F("quantity")
-    lhv = F("material__lhv")
-    density = F("material__density")
-    empty = Value(None, output_field=QUANTITY_FIELD)
-
-    mass = Round(
-        Case(
-            When(material__unit=Material.KG, then=quantity),
-            When(material__unit=Material.L, then=_expression_wrapper(quantity * density)),
-            When(material__unit=Material.MJ, then=_expression_wrapper(quantity / lhv)),
-            default=empty,
-            output_field=QUANTITY_FIELD,
-        ),
-        precision=3,
+    consumed = (
+        Action.unannotated.filter(parent_id=OuterRef("pk"))
+        .annotate(status=latest_status())
+        .exclude(status__in=_EXCLUDED_CHILD_STATUSES)
+        .order_by()
+        .values("parent_id")
+        .annotate(total=Sum("quantity"))
+        .values("total")
     )
-    volume = Round(
-        Case(
-            When(material__unit=Material.L, then=quantity),
-            When(material__unit=Material.KG, then=_expression_wrapper(quantity / density)),
-            When(material__unit=Material.MJ, then=_expression_wrapper(quantity / lhv / density)),
-            default=empty,
-            output_field=QUANTITY_FIELD,
-        ),
-        precision=3,
+    return ExpressionWrapper(
+        F("quantity") - Coalesce(Subquery(consumed, output_field=_QUANTITY), Value(Decimal("0")), output_field=_QUANTITY),
+        output_field=_QUANTITY,
     )
-    energy = Round(
-        Case(
-            When(material__unit=Material.MJ, then=quantity),
-            When(material__unit=Material.KG, then=_expression_wrapper(quantity * lhv)),
-            When(material__unit=Material.L, then=_expression_wrapper(quantity * density * lhv)),
-            default=empty,
-            output_field=QUANTITY_FIELD,
-        ),
-        precision=3,
-    )
-    return {"mass": mass, "volume": volume, "energy": energy}

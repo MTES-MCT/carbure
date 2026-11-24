@@ -7,6 +7,7 @@ from django.db.models import Q
 from edelivery.ebms.ntr import NationalTradeRegister
 from transactions.models.site import Site
 
+from .certificate import GenericCertificate
 from .geography import Department, Pays
 from .user import UserRights
 
@@ -27,6 +28,7 @@ class Entity(models.Model):
     UNKNOWN = "Unknown"
     CPO = "Charge Point Operator"
     POWER_OR_HEAT_PRODUCER = "Power or Heat Producer"
+    SOLID_BIOMASS_ENERGY_PRODUCER = "Solid Biomass Energy Producer"
     SAF_TRADER = "SAF Trader"
     BIOMETHANE_PRODUCER = "Producteur de biométhane"
     BIOMETHANE_PROVIDER = "Fournisseur de biométhane"
@@ -41,7 +43,8 @@ class Entity(models.Model):
         (CPO, CPO),
         (AIRLINE, AIRLINE),
         (UNKNOWN, "Unknown"),
-        (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur"),
+        (POWER_OR_HEAT_PRODUCER, "Producteur d'électricité ou de chaleur (bioliquide)"),
+        (SOLID_BIOMASS_ENERGY_PRODUCER, "Producteur d'électricité ou de chaleur (biomasse solide)"),
         (SAF_TRADER, "Trader de SAF"),
         (BIOMETHANE_PRODUCER, "Producteur de biométhane"),
         (BIOMETHANE_PROVIDER, "Fournisseur de biométhane"),
@@ -59,6 +62,7 @@ class Entity(models.Model):
     has_stocks = models.BooleanField(default=False)
     has_direct_deliveries = models.BooleanField(default=False)
     has_elec = models.BooleanField(default=False)
+    has_biogpl = models.BooleanField(default=False, verbose_name="L'entité produit du bio-GPL")
 
     legal_name = models.CharField(max_length=128, blank=True, default="")
     registration_id = models.CharField(max_length=64, blank=True, default="")
@@ -98,6 +102,13 @@ class Entity(models.Model):
         registration_id = ntr.registration_id
         country_code = ntr.country_code
         return Entity.objects.filter(registered_country__code_pays=country_code, registration_id=registration_id).last()
+
+    @staticmethod
+    def all_currently_certified_under_national_scheme():
+        return Entity.objects.filter(
+            entitycertificate__certificate__certificate_type=GenericCertificate.SYSTEME_NATIONAL,
+            entitycertificate__certificate__status=GenericCertificate.VALID,
+        )
 
     def __str__(self):
         return self.name

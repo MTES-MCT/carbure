@@ -2,14 +2,13 @@ import { useTranslation } from "react-i18next"
 
 import { Cell, Column } from "common/components/table2"
 import { EntityManager } from "common/hooks/entity"
-import { formatDate } from "common/utils/formatters"
+import { formatDate, formatUnitOnly } from "common/utils/formatters"
 import { ActionStatusBadge } from "traceability/components/action-status-badge"
 import { Action } from "traceability/types"
 import {
   ACTION_EMISSIONS_UNIT,
   formatActionDecimal,
 } from "traceability/utils/formatters"
-import { quantityColumn } from "./quantity-column"
 
 export type ActionColumn = Column<Action> & {
   condition?: (entity: EntityManager) => boolean
@@ -17,12 +16,6 @@ export type ActionColumn = Column<Action> & {
 
 export function useActionColumns() {
   const { t } = useTranslation()
-
-  const pos_id: ActionColumn = {
-    key: "pos_id",
-    header: t("N° de POS"),
-    cell: (action) => <Cell text={action.pos_id} />,
-  }
 
   return {
     status: {
@@ -44,6 +37,22 @@ export function useActionColumns() {
       cell: (action) => <Cell text={action.material?.name} />,
     },
 
+    origin_material: {
+      key: "origin_material",
+      header: t("Matière"),
+      cell: (action) => (
+        <Cell text={action.inherited_fields?.origin_material?.name} />
+      ),
+    },
+
+    previous_material: {
+      key: "previous_material",
+      header: t("Dernière matière déclarée"),
+      cell: (action) => (
+        <Cell text={action.inherited_fields?.previous_material?.name} />
+      ),
+    },
+
     certificate: {
       key: "certificate",
       header: t("N° de certificat"),
@@ -52,10 +61,23 @@ export function useActionColumns() {
       ),
     },
 
-    quantity: quantityColumn(),
-    mass: quantityColumn("mass"),
-    volume: quantityColumn("volume"),
-    energy: quantityColumn("energy"),
+    quantity: {
+      key: "quantity",
+      header: t("Quantité"),
+      cell: (action) => {
+        const text = formatActionDecimal(action.quantity)
+        const unit =
+          action.material?.unit ??
+          action.inherited_fields?.previous_material?.unit
+
+        return (
+          <Cell
+            text={text || "-"}
+            sub={text && unit ? formatUnitOnly(unit) : undefined}
+          />
+        )
+      },
+    },
 
     site: {
       key: "site",
@@ -63,11 +85,16 @@ export function useActionColumns() {
       cell: (action) => <Cell text={action.site?.name} />,
     },
 
-    pos_id,
+    pos_id: {
+      key: "pos_id",
+      header: t("N° de POS"),
+      cell: (action) => <Cell text={action.pos_id} />,
+    },
 
     carbure_id: {
-      ...pos_id,
+      key: "carbure_id",
       header: t("Identifiant Carbure"),
+      cell: (action) => <Cell text={action.carbure_id} />,
     },
 
     period: {

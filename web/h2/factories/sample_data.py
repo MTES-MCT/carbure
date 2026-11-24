@@ -116,6 +116,30 @@ def setup_h2_lots_init() -> tuple[Action, Action]:
     return h2_lot_01, h2_lot_02
 
 
+def valorize_child(parent: Action) -> Action:
+    """Demo certificate. Identified by its parent, because a valorize action has no PoS."""
+    child, _created = Action.unannotated.get_or_create(
+        parent=parent,
+        type=Action.VALORIZE,
+        defaults={
+            "holder": parent.holder,
+            "industry": Action.H2,
+            "quantity": parent.quantity,
+            "working_date": parent.working_date,
+            "material": None,
+            "site": None,
+            "shipping_date": None,
+            "shipping_distance": None,
+            "shipping_method": None,
+        },
+    )
+    if child.pos_id is not None:
+        child.pos_id = None
+        child.save(update_fields=["pos_id"])
+    ActionStatus.objects.get_or_create(action=child, status=ActionStatus.CREATED)
+    return child
+
+
 def setup_h2_certificates() -> tuple[Action, Action]:
     holder = setup_h2_entity()
     paris_station, lyon_station = setup_h2_stations()
@@ -157,41 +181,62 @@ def setup_h2_certificates() -> tuple[Action, Action]:
     ActionStatus.objects.create(action=h2_lot_03, status=ActionStatus.ACCEPTED)
     ActionStatus.objects.create(action=h2_lot_04, status=ActionStatus.ACCEPTED)
 
-    valorized_energy = Material.valorized_energy()
+    return valorize_child(h2_lot_03), valorize_child(h2_lot_04)
 
-    h2_certificate_01 = ActionFactory(
-        parent=h2_lot_03,
-        status=ActionStatus.CREATED,
+
+def setup_h2_inherited_material_chain() -> Action:
+    """INIT lot with no stored material, so the lots page shows the parent's.
+
+    The leaf is an INIT (what the H2 lots page lists). Its parent has no material
+    either. The material is resolved one step further, on the root INIT.
+    """
+    holder = setup_h2_entity()
+    paris_station, _lyon_station = setup_h2_stations()
+    h2_rfnbo, _h2_bio = setup_h2_materials()
+
+    parent = ActionFactory(
+        pos_id="H2-DEMO-INHERIT-PARENT",
+        holder=holder,
         industry=Action.H2,
-        type=Action.VALORIZE,
-        pos_id="H2-DEMO-VALORIZE-001",
-        holder=h2_lot_03.holder,
-        quantity=h2_lot_03.quantity * h2_lot_03.material.lhv,
-        working_date=h2_lot_03.working_date,
-        material=valorized_energy,
-        site=None,
-        shipping_date=None,
-        shipping_distance=None,
-        shipping_method=None,
+        type=Action.INIT,
+        material=h2_rfnbo,
+        quantity=Decimal("80000.000"),
+        site=paris_station,
+        shipping_date=date(2026, 5, 10),
+        shipping_distance=30,
+        shipping_method=Action.ROAD,
+        working_date=date(2026, 5, 10),
     )
 
-    h2_certificate_02 = ActionFactory(
-        parent=h2_lot_04,
-        status=ActionStatus.CREATED,
+    middle = ActionFactory(
+        pos_id="H2-DEMO-INHERIT-MIDDLE",
+        parent=parent,
+        holder=holder,
         industry=Action.H2,
-        type=Action.VALORIZE,
-        pos_id="H2-DEMO-VALORIZE-002",
-        holder=h2_lot_04.holder,
-        quantity=h2_lot_04.quantity * h2_lot_04.material.lhv,
-        working_date=h2_lot_04.working_date,
-        material=valorized_energy,
-        site=None,
-        shipping_date=None,
-        shipping_distance=None,
-        shipping_method=None,
+        type=Action.INIT,
+        material=None,
+        quantity=Decimal("40000.000"),
+        site=paris_station,
+        shipping_date=date(2026, 6, 12),
+        shipping_distance=45,
+        shipping_method=Action.ROAD,
+        working_date=date(2026, 6, 12),
     )
 
-    return h2_certificate_01, h2_certificate_02
+    return ActionFactory(
+        pos_id="H2-DEMO-INHERIT-INIT",
+        parent=middle,
+        holder=holder,
+        industry=Action.H2,
+        type=Action.INIT,
+        material=None,
+        quantity=Decimal("20000.000"),
+        site=paris_station,
+        shipping_date=date(2026, 7, 18),
+        shipping_distance=60,
+        shipping_method=Action.ROAD,
+        working_date=date(2026, 7, 18),
+    )
 
 
 def setup_h2_producer_certificates() -> None:
@@ -209,3 +254,4 @@ def create_sample_data():
     setup_h2_materials()
     setup_h2_lots_init()
     setup_h2_certificates()
+    setup_h2_inherited_material_chain()

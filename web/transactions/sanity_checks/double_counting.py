@@ -1,7 +1,6 @@
 from certificates.models import DoubleCountingRegistration
 from core.carburetypes import CarbureCertificatesErrors, CarbureSanityCheckErrors
 from core.models import CarbureLot
-from core.models.feedstock import GPL_BIOFUEL_TYPES
 from saf.models.constants import SAF_BIOFUEL_TYPES
 
 from .helpers import generic_error
@@ -10,9 +9,8 @@ from .helpers import generic_error
 def check_missing_ref_dbl_counting(lot: CarbureLot):
     is_dc = lot.feedstock and lot.feedstock.is_double_compte
     is_saf = lot.biofuel and lot.biofuel.code in SAF_BIOFUEL_TYPES
-    is_gpl = lot.biofuel and lot.biofuel.code in GPL_BIOFUEL_TYPES
 
-    if is_dc and not is_saf and not is_gpl:
+    if is_dc and not is_saf and not (lot.biofuel and lot.biofuel.compatible_gpl):
         if not lot.production_site_double_counting_certificate:
             return generic_error(
                 error=CarbureSanityCheckErrors.MISSING_REF_DBL_COUNTING,
@@ -92,6 +90,14 @@ def check_inactive_double_counting_certificate(lot: CarbureLot, prefetched_data)
             is_blocking=True,
             lot=lot,
             field="production_site_double_counting_certificate",
+        )
+
+
+def check_tiruert_ineligibility(lot: CarbureLot):
+    if lot.production_site_double_counting_certificate == DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT:
+        return generic_error(
+            error=CarbureCertificatesErrors.LOT_NOT_ELIGIBLE_TIRUERT,
+            lot=lot,
         )
 
 

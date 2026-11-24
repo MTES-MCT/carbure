@@ -260,7 +260,11 @@ export function getEntityTypeLabel(type: EntityType) {
     case EntityType.CPO:
       return i18next.t("Aménageur de bornes électriques")
     case EntityType.PowerOrHeatProducer:
-      return i18next.t("Producteur d'électricité ou de chaleur")
+      return i18next.t("Producteur d'électricité ou de chaleur (bioliquide)")
+    case EntityType.SolidBiomassEnergyProducer:
+      return i18next.t(
+        "Producteur d'électricité ou de chaleur (biomasse solide)"
+      )
     case EntityType.Producteur_de_biom_thane:
       return i18next.t("Producteur de biométhane")
     case EntityType.Fournisseur_de_biom_thane:
@@ -293,6 +297,10 @@ export function getEntityTypeShortLabel(type: EntityType) {
       return i18next.t("Aménageur")
     case EntityType.PowerOrHeatProducer:
       return i18next.t("Producteur")
+    case EntityType.SolidBiomassEnergyProducer:
+      return i18next.t(
+        "Producteur d'électricité ou de chaleur (biomasse solide)"
+      )
     case EntityType.SAF_Trader:
       return i18next.t("Trader de SAF")
     case EntityType.Producteur_de_biom_thane:

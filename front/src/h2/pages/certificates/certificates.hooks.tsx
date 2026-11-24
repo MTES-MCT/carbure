@@ -3,7 +3,12 @@ import { useTranslation } from "react-i18next"
 import { useActionColumns } from "traceability/hooks/action-columns"
 import { useActionFilters } from "traceability/hooks/use-action-filters"
 import { useActionFields } from "traceability/hooks/action-fields"
-import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
+import {
+  ActionIndustry,
+  ActionQuery,
+  ActionStatus,
+  ActionType,
+} from "traceability/types"
 import { ActionsPageProps } from "traceability/components/actions-page"
 import { EmptyCertificates } from "./components/empty-certificates"
 
@@ -18,6 +23,7 @@ type H2CertificatesPageConfig = Pick<
   | "detailTitle"
   | "subpath"
   | "fixedQuery"
+  | "tabs"
   | "emptyState"
   | "filters"
   | "columns"
@@ -40,10 +46,18 @@ export function useH2CertificatesPage(): {
       detailTitle: t("Certificat d'hydrogène n˚"),
       subpath: "certificates",
       fixedQuery: H2_CERTIFICATE_QUERY,
-      emptyState: <EmptyCertificates />,
-      filters: [
-        filters.period, //
+      tabs: [
+        {
+          key: "available",
+          label: t("Disponibles"),
+          query: {
+            status: [ActionStatus.CREATED],
+            quantity_available: true,
+          },
+        },
       ],
+      emptyState: <EmptyCertificates />,
+      filters: [filters.period, filters.origin_material],
       columns: [
         { ...columns.carbure_id, header: t("N˚ d'identifiant Carbure") },
         columns.period,
@@ -55,7 +69,7 @@ export function useH2CertificatesPage(): {
           legend: t("Certificat"),
           fields: [
             fields.carbure_id,
-            { ...fields.energy, label: t("Quantité certifiée") },
+            { ...fields.quantity, label: t("Quantité certifiée") },
             { ...fields.working_date, label: t("Date de création") },
           ],
         },

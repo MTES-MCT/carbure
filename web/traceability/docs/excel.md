@@ -7,6 +7,8 @@ Flux : `excel_columns` (template) → parse (`header` → `key`) → serializer 
 Les postes GES (`eec`, `el`, `ei`, `ep`, `etd`, `eu`, `eccs`, `esca`, `eccr`, et pour H2 `etd1` / `etd2`) passent par `TruncatingDecimalField` en `Decimal(13, 10)` : 3 chiffres avant la virgule, et les chiffres au-delà de 10 décimales sont coupés. Un flottant Excel affiché `15,339` peut être stocké `15.339000000000002` ; sans cette coupe, la cellule est refusée pour dépassement des 13 chiffres. H2 additionne `etd1` et `etd2` après troncature. `quantity` est aussi un `TruncatingDecimalField`, coupé à 3 décimales : une valeur qui tombe à `0` est une erreur de cellule.
 Les clés qui ne sont pas des champs du modèle `Action` sont **écartées** au `create` générique.
 
+`pos_id` est obligatoire dans le fichier : une cellule vide est une erreur de ligne. Le champ reste optionnel sur le modèle. `carbure_id` n’est pas une colonne : c’est `C`, l’année de `created_at`, la filière, puis la clé primaire en base 36 sur 8 caractères, calculé à la lecture. Une action 10 créée en 2026 en H2 donne `C2026-H2-0000000A`.
+
 Un import **réussi** enregistre le fichier Excel en `core.StoredFile` (S3 privé, `traceability/actions/{entity_id}/{YYYYMMDD_HHMMSS}_…`) et le lie à toutes les actions créées (`Action.file`). Un import en erreur (fichier vide, invalide, ou `validation_errors`) ne persiste rien. Si la création des actions échoue après l’upload, la transaction SQL est annulée et le fichier est retiré du storage.
 
 ---

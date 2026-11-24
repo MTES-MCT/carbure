@@ -17,6 +17,14 @@ class ActionFactory(factory.django.DjangoModelFactory):
         model = Action
         django_get_or_create = ("pos_id",)
 
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        # Several actions may omit pos_id. get_or_create(pos_id=None) would return the first one.
+        if not kwargs.get("pos_id"):
+            kwargs["pos_id"] = None
+            return cls._get_manager(model_class).create(*args, **kwargs)
+        return super()._create(model_class, *args, **kwargs)
+
     pos_id = factory.Faker("lexify", text="POS-????????????")
     holder = factory.SubFactory(EntityFactory, entity_type=Entity.HRS)
     industry = fuzzy.FuzzyChoice(Action.INDUSTRIES, getter=lambda x: x[0])

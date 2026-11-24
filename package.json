@@ -7,7 +7,7 @@
     "build": "(cd front; npm install; npm run build)",
     "test": "python web/manage.py test web --noinput",
     "test-f": "python web/manage.py test $f --keepdb",
-    "generate-schema": "python web/manage.py spectacular --file api-schema.yaml",
+    "generate-schema": "python web/manage.py spectacular --lang en --file api-schema.yaml",
     "generate-schema-ts": "npm run generate-schema && cd front && npm run generate-api",
     "generate-and-check-types": "npm run generate-schema && cd front && npm run generate-and-check-types",
     "migrate": "python web/manage.py makemigrations && python web/manage.py migrate",

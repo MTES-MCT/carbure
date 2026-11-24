@@ -29,6 +29,8 @@ class ProductionSiteCertificate(models.Model):
 
 
 class DoubleCountingRegistration(models.Model):
+    NON_ELIGIBLE_TIRUERT = "non_éligible_TIRUERT"
+
     ACTIVE = "ACTIVE"
     EXPIRED = "EXPIRED"
     EXPIRES_SOON = "EXPIRES_SOON"

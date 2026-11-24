@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from certificates.models import DoubleCountingRegistration
 from core.models import CarbureLot, MatierePremiere
 from core.models.feedstock import Biocarburant
 from core.utils import truncate
@@ -14,6 +15,7 @@ from saf.models.constants import SAF_BIOFUEL_TYPES
 from tiruert.filters import OperationFilterForBalance
 from tiruert.models import Operation, OperationDetail
 from tiruert.services.balance import BalanceService
+from tiruert.services.debt import DebtService
 from tiruert.services.energy import energy_mj
 from tiruert.services.objective import ObjectiveService
 from tiruert.services.teneur import TeneurService
@@ -25,6 +27,51 @@ class OperationServiceErrors:
 
 
 class OperationService:
+    @staticmethod
+    @transaction.atomic
+    def create_operations(request, validated_data, selected_lots, declaration_year) -> list[Operation]:
+        """
+        Check then create the operation requested through the API.
+
+        One operation, or one per repaid debt for a DEBT_REPAYMENT (the lots are spread over the debts).
+        """
+        entity_id = request.entity.id
+        validated_data["renewable_energy_share"] = validated_data["biofuel"].renewable_energy_share
+        OperationService.lock_lots_for_update([lot["id"] for lot in selected_lots])
+
+        if validated_data["type"] == Operation.DEBT_REPAYMENT:
+            # Planned before the checks: it locks the debts, so everything read afterwards is up to date
+            repayments = DebtService.plan_repayment(
+                request.entity, validated_data["biofuel"], validated_data["customs_category"], selected_lots
+            )
+        else:
+            repayments = [(None, selected_lots)]
+
+        OperationService.perform_checks_before_create(request, entity_id, selected_lots, validated_data, declaration_year)
+
+        # Fetch emission rates from the oldest OperationDetail for each lot
+        emissions_by_lot = OperationService.get_emission_rates_by_lot([lot["id"] for lot in selected_lots])
+
+        OperationService.define_operation_status(validated_data)
+
+        return [
+            OperationService.create_operation_with_details(
+                {**validated_data, **({"debt": debt} if debt else {})},
+                OperationService.build_details_data(lots, emissions_by_lot),
+            )
+            for debt, lots in repayments
+        ]
+
+    @staticmethod
+    def lock_lots_for_update(lot_ids: list[int]) -> list[int]:
+        """Lock lots in a stable order before checking or correcting their TIRUERT balances."""
+        if not lot_ids:
+            return []
+
+        return list(
+            CarbureLot.objects.select_for_update().filter(id__in=set(lot_ids)).order_by("id").values_list("id", flat=True)
+        )
+
     @staticmethod
     def get_emission_rates_by_lot(lot_ids):
         """
@@ -57,6 +104,7 @@ class OperationService:
     def perform_checks_before_create(request, entity_id, selected_lots, data, declaration_year):
         OperationService.check_declaration_year(declaration_year, data)
         OperationService.check_debited_entity(entity_id, data)
+        OperationService.check_open_debt(entity_id, data)
         OperationService.check_volumes(selected_lots, data)
         OperationService.check_objectives_compliance(request, selected_lots, data, entity_id, declaration_year)
 
@@ -67,6 +115,29 @@ class OperationService:
         """
         if data["debited_entity"].id != entity_id:
             raise serializers.ValidationError({"debited_entity": OperationServiceErrors.ENTITY_ID_DO_NOT_MATCH_DEBITED_ID})
+
+    @staticmethod
+    def check_open_debt(entity_id, data):
+        if data["type"] == Operation.DEBT_REPAYMENT:
+            return
+
+        open_debts = DebtService.get_open_debts(
+            entity_id,
+            biofuel_id=data["biofuel"].id,
+            customs_category=data["customs_category"],
+            repayment_statuses=[Operation.VALIDATED],
+        )
+        if open_debts.exists():
+            raise serializers.ValidationError(
+                {
+                    "debt": [
+                        _(
+                            "Une dette est ouverte pour ce biocarburant et cette catégorie. "
+                            "Acquittez-la avant de créer une opération de débit."
+                        )
+                    ]
+                }
+            )
 
     @staticmethod
     def check_volumes(selected_lots, data):
@@ -244,7 +315,9 @@ class OperationService:
         if validated_data["type"] in auto_accepted_types:
             validated_data["status"] = Operation.ACCEPTED
         elif validated_data.get("status") != Operation.DRAFT:
-            validated_data["status"] = Operation.PENDING
+            # A repayment is not submitted to any validation
+            is_repayment = validated_data["type"] == Operation.DEBT_REPAYMENT
+            validated_data["status"] = Operation.VALIDATED if is_repayment else Operation.PENDING
 
     @staticmethod
     def create_operation_with_details(operation_data, details_data):
@@ -298,6 +371,7 @@ class OperationService:
 
         # Filter lots to keep only those that are valid for TIRUERT operations
         valid_lots = OperationService.filter_valid_lots(lots)
+        valid_lots = OperationService.exclude_tiruert_ineligible_lots(valid_lots)
         valid_lots = OperationService.filter_fr_delivery_site(valid_lots)
         valid_lots = OperationService.exclude_saf_biofuel(valid_lots)
         valid_lots = OperationService.remove_existing_lots(valid_lots)
@@ -307,10 +381,7 @@ class OperationService:
 
         valid_lots = list(valid_lots)
 
-        # Process EP2 lots, calculate ethanol 15° volumes for valid lots and convert EMAG lots
-        valid_lots = OperationService.process_ep2_lots(valid_lots)
-        OperationService.calculate_volume_ethanol_15(valid_lots)
-        OperationService.convert_emag_lots(valid_lots)
+        valid_lots = OperationService.convert_lots_for_operations(valid_lots)
 
         # Group validated_lots by delivery_type, feedstock, biofuel and depot
         lots_by_delivery_type = defaultdict(list)
@@ -376,6 +447,11 @@ class OperationService:
         )
 
     @staticmethod
+    def exclude_tiruert_ineligible_lots(lots: list[CarbureLot]):
+        """Exclude lots carrying the double counting certificate reserved for TIRUERT-ineligible lots."""
+        return lots.exclude(production_site_double_counting_certificate=DoubleCountingRegistration.NON_ELIGIBLE_TIRUERT)
+
+    @staticmethod
     def exclude_saf_biofuel(lots: list[CarbureLot]):
         """
         Exclude only lots with SAF biofuel.
@@ -396,6 +472,16 @@ class OperationService:
         """
         existing_lots = OperationDetail.objects.filter(lot__in=lots).values_list("lot_id").distinct()
         return lots.exclude(id__in=existing_lots)
+
+    @staticmethod
+    def convert_lots_for_operations(lots: list[CarbureLot]) -> list[CarbureLot]:
+        """
+        Apply EP2 split, ethanol 15° volume and EMAG conversions. Mutates the given lots in place.
+        """
+        converted_lots = OperationService.process_ep2_lots(lots)
+        OperationService.calculate_volume_ethanol_15(converted_lots)
+        OperationService.convert_emag_lots(converted_lots)
+        return converted_lots
 
     @staticmethod
     def process_ep2_lots(lots: list[CarbureLot]) -> list[CarbureLot]:
@@ -461,7 +547,7 @@ class OperationService:
         elif biofuel.code in SAF_BIOFUEL_TYPES:
             return Operation.CARBUREACTEUR
         elif biofuel.compatible_gpl:
-            return Operation.GPL_C
+            return Operation.GPL
         elif biofuel.compatible_maritime:
             return Operation.MARITIME
         return None

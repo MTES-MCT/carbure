@@ -145,3 +145,6 @@ sanity_checks.json
 **/locales/**/*_old.json
 
 .cursor/
+
+# Local working notes
+thinking-summary.md

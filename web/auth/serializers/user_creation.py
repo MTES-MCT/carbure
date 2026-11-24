@@ -13,8 +13,8 @@ class UserCreationSerializer(serializers.ModelSerializer):
     and repeated password validation.
     """
 
-    password1 = serializers.CharField(label=_("Password"), write_only=True)
-    password2 = serializers.CharField(label=_("Password confirmation"), write_only=True)
+    password1 = serializers.CharField(label=_("Mot de passe"), write_only=True)
+    password2 = serializers.CharField(label=_("Confirmation du mot de passe"), write_only=True)
 
     class Meta:
         model = User

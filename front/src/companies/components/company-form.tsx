@@ -34,6 +34,7 @@ const ALLOWED_ENTITY_TYPES = [
   EntityType.Auditor,
   EntityType.PowerOrHeatProducer,
   EntityType.HRS,
+  // EntityType.SolidBiomassEnergyProducer,
 ]
 
 export const CompanyForm = ({

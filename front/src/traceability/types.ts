@@ -10,6 +10,7 @@ import { QueryBuilder } from "common/hooks/query-builder-2"
 import { apiTypes } from "common/services/api-fetch.types"
 
 export type Action = apiTypes["Action"]
+export type InheritedFieldKey = keyof Action["inherited_fields"]
 export type ActionTotalEmissions = NonNullable<Action["total_emissions"]>
 export type ActionHolder = NonNullable<Action["holder"]>
 export type ActionMaterial = NonNullable<Action["material"]>
@@ -19,9 +20,11 @@ export type ActionCertificate = NonNullable<Action["certificate"]>
 export type ActionQueryBuilder = QueryBuilder<ActionStatus[], ActionOrderBy[]>
 
 export type ActionQuery = ActionQueryBuilder["query"] & {
+  quantity_available?: boolean
   [ActionFilter.holder]?: string[]
   [ActionFilter.type]?: ActionType[]
   [ActionFilter.material]?: string[]
+  [ActionFilter.origin_material]?: string[]
   [ActionFilter.shipping_method]?: ActionShippingMethod[]
   [ActionFilter.site]?: string[]
 }

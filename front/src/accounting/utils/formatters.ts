@@ -35,8 +35,8 @@ export const formatSector = (sector: string) => {
       return i18next.t("Gazole")
     case OperationSector.CARBUR_ACTEUR:
       return i18next.t("Carburéacteur")
-    case OperationSector.GPL_C:
-      return i18next.t("GPL-c")
+    case OperationSector.GPL:
+      return i18next.t("GPL")
     case OperationSector.MARITIME:
       return i18next.t("Maritime")
     case ElecOperationSector.ELEC:
@@ -79,6 +79,10 @@ export const formatOperationType = (type: string) => {
       return i18next.t("Expiration")
     case OperationType.REPORT:
       return i18next.t("Report Tiruert 2026")
+    case OperationType.CORRECTION:
+      return i18next.t("Correction")
+    case OperationType.DEBT_REPAYMENT:
+      return i18next.t("Remboursement de dette")
     default:
       return i18next.t("Inconnu")
   }
