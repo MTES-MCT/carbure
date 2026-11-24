@@ -16,6 +16,10 @@ VALUES_PER_TYPE = {
 }
 
 
+def T(type: str, value: str):
+    return Q(tags__type=type, tags__value=value)
+
+
 def values_per_type_constraint(values_per_type):
     # par exemple, génére une condition du genre:
     # Q(type="industry", value__in=industries) | Q("nature", value__in=natures) | ...
@@ -32,4 +36,5 @@ class MaterialTag(models.Model):
     value = models.CharField(max_length=64, choices=VALUES_PER_TYPE)
 
     class Meta:
+        db_table = "material_tag"
         constraints = [values_per_type_constraint(VALUES_PER_TYPE)]
