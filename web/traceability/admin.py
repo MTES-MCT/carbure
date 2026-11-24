@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 
 from core.models import StoredFile
 from traceability.exceptions import NoEligibleActionError
-from traceability.models import Action, ActionStatus, Material
+from traceability.models import Action, ActionStatus, Material, MaterialTag
 from traceability.services.refuse import refuse
 from traceability.services.valorize import valorize
 
@@ -45,10 +45,17 @@ class LatestStatusFilter(admin.SimpleListFilter):
         return queryset
 
 
+class MaterialTagInline(admin.StackedInline):
+    model = MaterialTag
+    extra = 0
+    fields = (("type", "value"),)
+
+
 @admin.register(Material)
 class MaterialAdmin(admin.ModelAdmin):
     list_display = ("id", "code", "name", "unit", "lhv", "density")
     search_fields = ("code", "name")
+    inlines = (MaterialTagInline,)
 
 
 @admin.action(description="Valider les actions sélectionnées et créer les certificats")
