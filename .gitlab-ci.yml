@@ -35,8 +35,8 @@ check-backend:
   stage: check
   extends: .backend
   services:
-    - mysql:8.0
-    - redis:latest
+    - mysql:8.4.13
+    - redis:8.10.3
   script:
     - export CARBURE_HOME=$(pwd)
     - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mysql:3306/$MYSQL_DATABASE
@@ -109,7 +109,7 @@ pass:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 .backend:
-  image: python:3.12
+  image: python:3.12.16
   cache:
     - key:
         files:
@@ -126,7 +126,7 @@ pass:
         - .gitlab-ci.yml
 
 .frontend:
-  image: node:latest
+  image: node:24.22.3-alpine3.24
   cache:
     - key:
         files:
@@ -136,6 +136,7 @@ pass:
   before_script:
     - cd front
     - npm ci --cache .npm --prefer-offline
+    - apk add --update git
   rules:
     - changes:
         - front/**/*

@@ -1,5 +1,4 @@
-# Use the official Ubuntu image as the base image
-FROM ubuntu:noble
+FROM python:3.12.16
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -8,22 +7,13 @@ ENV UV_PROJECT_ENVIRONMENT=/venv
 ENV PATH="/venv/bin:$PATH"
 
 # Run updates and install necessary system packages
-RUN apt-get update -y && apt-get install -y \
-  python3 \
-  python3-pip \
-  python3-venv \
-  python3-dev \
-  git \
+RUN apt-get update -y && apt-get upgrade -y && apt-get install -y \
   build-essential \
   pkg-config \
-  default-libmysqlclient-dev \
-  mysql-client
+  default-libmysqlclient-dev
 
 # Set up working directory
 WORKDIR /app
-
-# Create a virtual environment and activate it
-RUN python3 -m venv /venv
 
 # Install uv
 RUN pip install uv
