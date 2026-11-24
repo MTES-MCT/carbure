@@ -8,6 +8,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
 django.setup()
 
 from core.utils import bulk_update_or_create  # noqa: E402
+from feedstocks.models import Classification  # noqa: E402
 from traceability.models import Material, MaterialTag  # noqa: E402
 from traceability.models.material_tag import Tag  # noqa: E402
 
@@ -15,8 +16,50 @@ filename = "%s/web/traceability/fixtures/materials.csv" % (os.environ["CARBURE_H
 
 
 def cell(row, column):
-    """Empty or missing cells become None. lhv and density are nullable; unit is not."""
+    """Return None for empty or missing cells."""
     return (row.get(column) or "").strip() or None
+
+
+def read_materials(filename):
+    materials = {}
+    material_tags = {}
+
+    with open(filename, newline="", encoding="utf-8-sig") as csvfile:
+        reader = csv.DictReader(csvfile)
+        columns = set(reader.fieldnames or ())
+        tag_columns = columns & set(Tag.values)
+
+        for row in reader:
+            code = cell(row, "code")
+            name = cell(row, "name")
+            unit = cell(row, "unit")
+            if not code or not name or not unit:
+                raise ValueError(f"Material row is missing code, name or unit: {row}")
+
+            materials[code] = {
+                "code": code,
+                "name": name,
+                "unit": unit,
+                "description": cell(row, "description") or "",
+                "lhv": cell(row, "lhv"),
+                "density": cell(row, "density"),
+            }
+            if "category" in columns:
+                materials[code]["category"] = cell(row, "category")
+            material_tags[code] = {tag_type: (cell(row, tag_type) or "").split() for tag_type in tag_columns}
+
+    return materials, material_tags, tag_columns
+
+
+def resolve_classifications(materials):
+    categories = {material["category"] for material in materials.values() if material.get("category")}
+    classifications = {
+        category: Classification.objects.get_or_create(group="", category=category, subcategory="")[0]
+        for category in categories
+    }
+    for material in materials.values():
+        if "category" in material:
+            material["classification"] = classifications.get(material.pop("category"))
 
 
 def sync_tags(material_tags, tag_columns):
@@ -43,34 +86,9 @@ def sync_tags(material_tags, tag_columns):
     )
 
 
-materials = {}
-material_tags = {}
-
-with open(filename, newline="", encoding="utf-8-sig") as csvfile:
-    reader = csv.DictReader(csvfile)
-
-    # Find CSV columns matching a known tag type
-    tag_columns = set(reader.fieldnames or ()) & set(Tag.values)
-
-    for row in reader:
-        code = cell(row, "code")
-        name = cell(row, "name")
-        unit = cell(row, "unit")
-
-        if not code or not name or not unit:
-            raise ValueError(f"Material row is missing code, name or unit: {row}")
-
-        materials[code] = {
-            "code": code,
-            "name": name,
-            "unit": unit,
-            "description": cell(row, "description") or "",
-            "lhv": cell(row, "lhv"),
-            "density": cell(row, "density"),
-        }
-
-        material_tags[code] = {tag_type: (cell(row, tag_type) or "").split() for tag_type in tag_columns}
+materials, material_tags, tag_columns = read_materials(filename)
 
 with transaction.atomic():
+    resolve_classifications(materials)
     bulk_update_or_create(Material, "code", list(materials.values()))
     sync_tags(material_tags, tag_columns)

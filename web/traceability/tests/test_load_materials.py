@@ -7,6 +7,7 @@ from unittest.mock import patch
 from django.db import IntegrityError
 from django.test import TestCase
 
+from feedstocks.models import Classification
 from traceability.models import Material, MaterialTag
 from traceability.models.material_tag import Tag
 
@@ -57,6 +58,30 @@ class LoadMaterialsTest(TestCase):
         self.load("code,name,description,unit\nA,Alpha,,kg\n")
         self.material.refresh_from_db()
         self.assertEqual(self.material.description, "")
+
+    def test_imports_reuses_and_clears_category(self):
+        existing = Classification.objects.create(group="", category="Bois", subcategory="")
+        Classification.objects.create(group="Autre", category="Bois", subcategory="")
+        csv_text = "code,name,unit,category\nA,Alpha,kg, Bois \nB,Beta,kg,Bois\n"
+        self.load(csv_text)
+        self.load(csv_text)
+        self.material.refresh_from_db()
+        self.other.refresh_from_db()
+        self.assertEqual(self.material.classification, existing)
+        self.assertEqual(self.other.classification, existing)
+        self.assertEqual(Classification.objects.count(), 2)
+
+        self.load("code,name,unit,category\nA,Alpha,kg,Nouvelle catégorie\n")
+        self.material.refresh_from_db()
+        self.assertEqual(self.material.classification.category, "Nouvelle catégorie")
+
+        self.load("code,name,unit\nA,Alpha,kg\n")
+        self.material.refresh_from_db()
+        self.assertEqual(self.material.classification.category, "Nouvelle catégorie")
+
+        self.load("code,name,unit,category\nA,Alpha,kg,\n")
+        self.material.refresh_from_db()
+        self.assertIsNone(self.material.classification)
 
     def test_failed_import_restores_materials_and_tags(self):
         with self.assertRaises(IntegrityError):
