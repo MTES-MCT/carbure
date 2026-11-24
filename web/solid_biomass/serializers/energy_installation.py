@@ -3,7 +3,7 @@ from rest_framework import serializers
 from solid_biomass.models import EnergyInstallation
 
 
-class EnergyInstallationSerializer(serializers.ModelSerializer):
+class EnergyInstallationSerializer(serializers.ModelSerializer[EnergyInstallation]):
     class Meta:
         model = EnergyInstallation
         fields = [
@@ -18,6 +18,7 @@ class EnergyInstallationSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
+        attrs["private"] = True
         if attrs.get("icpe_number") == "":
             attrs["icpe_number"] = None
         production_type = attrs.get("production_type", getattr(self.instance, "production_type", None))

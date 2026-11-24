@@ -3,7 +3,7 @@ from django.db import models
 from entity.services.geolocation import ADDRESS_FIELDS, site_address_changed
 
 
-class SiteManager(models.Manager):
+class SiteManager(models.Manager["Site"]):
     def get_queryset(self):
         return super().get_queryset().select_related("created_by", "country").prefetch_related("entitysite_set__entity")
 
