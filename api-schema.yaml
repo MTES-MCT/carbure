@@ -12361,8 +12361,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
@@ -12440,6 +12440,12 @@ paths:
                 type: string
                 format: binary
           description: ""
+        "404":
+          content:
+            application/json:
+              schema:
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/reject/:
     post:
       operationId: reject_operation
@@ -12473,8 +12479,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
@@ -13685,9 +13691,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: material
@@ -13803,10 +13812,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -13886,9 +13895,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -13945,9 +13957,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -13987,9 +14002,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -14026,9 +14044,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -14106,9 +14127,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: material
@@ -14212,10 +14236,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -14307,9 +14331,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -14362,9 +14389,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -14408,9 +14438,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: material
@@ -14514,10 +14547,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -15020,10 +15053,10 @@ components:
         - SEA
       type: string
       description: |-
-        * `ROAD` - Transport routier
+        * `ROAD` - Road transport
         * `PIPELINE` - Pipeline
         * `RAILROAD` - Rail
-        * `SEA` - Transport maritime
+        * `SEA` - Maritime transport
     ActionSite:
       type: object
       properties:
@@ -20567,8 +20600,11 @@ components:
     IndustryEnum:
       enum:
         - H2
+        - SB
       type: string
-      description: "* `H2` - Hydrogène"
+      description: |-
+        * `H2` - Hydrogène
+        * `SB` - Biomasse solide
     InstallationCategoryEnum:
       enum:
         - INSTALLATION_CATEGORY_1
@@ -22453,12 +22489,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Mot de passe
+          title: Password
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Confirmation du mot de passe
+          title: Password confirmation
       required:
         - password1
         - password2
@@ -23811,12 +23847,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Mot de passe
+          title: Password
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Confirmation du mot de passe
+          title: Password confirmation
       required:
         - email
         - name
@@ -23965,7 +24001,6 @@ components:
           type: string
           format: email
           minLength: 1
-          title: Adresse email
       required:
         - email
     UserRights:
