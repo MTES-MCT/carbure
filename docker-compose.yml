@@ -17,14 +17,14 @@ services:
       - 127.0.0.1:33060:33060
 
   carbure-redis:
-    image: redis:latest
+    image: redis:8.10.3
     container_name: carbure_redis
     <<: *common-settings
     volumes:
       - carbureredis:/data
 
   carbure-s3mock:
-    image: adobe/s3mock:latest
+    image: adobe/s3mock:5.2.3
     container_name: carbure_s3mock
     environment:
       COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /containers3root
@@ -80,7 +80,7 @@ services:
       - uploadedfiles:/app/files
 
   carbure-web-proxy:
-    image: nginx:latest
+    image: nginx:1.31.9
     container_name: carbure_web
     depends_on:
       - carbure-frontend
