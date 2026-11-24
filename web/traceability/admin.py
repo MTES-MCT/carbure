@@ -55,6 +55,7 @@ class MaterialTagInline(admin.StackedInline):
 class MaterialAdmin(admin.ModelAdmin):
     list_display = ("id", "code", "name", "classification", "unit", "lhv", "density")
     search_fields = ("code", "name")
+    list_select_related = ("classification",)
     inlines = (MaterialTagInline,)
 
 
