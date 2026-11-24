@@ -1,10 +1,10 @@
 from core.models import GenericCertificate
-from traceability.models import Material
+from traceability.models import Industry, Material, T, Tag
 from transactions.models import Site
 
 
 def material(_entity):
-    return Material.objects.filter(code__startswith="H2-")
+    return Material.objects.filter(T(Tag.INDUSTRY, Industry.H2))
 
 
 def site(entity):
