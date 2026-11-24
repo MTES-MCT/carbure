@@ -49,6 +49,15 @@ class LoadMaterialsTest(TestCase):
         self.assertEqual(self.tags(self.material), [(Tag.INDUSTRY, "H2"), (Tag.INDUSTRY, "H2")])
         self.assertEqual(self.tags(self.other), [(Tag.INDUSTRY, "H2")])
 
+    def test_imports_and_clears_description(self):
+        self.load("code,name,description,unit\nA,Alpha,Une description,kg\n")
+        self.material.refresh_from_db()
+        self.assertEqual(self.material.description, "Une description")
+
+        self.load("code,name,description,unit\nA,Alpha,,kg\n")
+        self.material.refresh_from_db()
+        self.assertEqual(self.material.description, "")
+
     def test_failed_import_restores_materials_and_tags(self):
         with self.assertRaises(IntegrityError):
             self.load("code,name,unit,industry\nA,Nom modifié,kg,INVALID\n")

@@ -55,8 +55,6 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
     for row in reader:
         code = cell(row, "code")
         name = cell(row, "name")
-        lhv = cell(row, "lhv")
-        density = cell(row, "density")
         unit = cell(row, "unit")
 
         if not code or not name or not unit:
@@ -65,10 +63,12 @@ with open(filename, newline="", encoding="utf-8-sig") as csvfile:
         materials[code] = {
             "code": code,
             "name": name,
-            "lhv": lhv,
-            "density": density,
             "unit": unit,
+            "description": cell(row, "description") or "",
+            "lhv": cell(row, "lhv"),
+            "density": cell(row, "density"),
         }
+
         material_tags[code] = {tag_type: (cell(row, tag_type) or "").split() for tag_type in tag_columns}
 
 with transaction.atomic():

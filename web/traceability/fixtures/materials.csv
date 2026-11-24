@@ -1,7 +1,7 @@
-code,name,lhv,density,unit,industry
-H2-RFNBO,Hydrogène RFNBO,120,,kg,H2
-H2-BIO,Bio-H2,120,,kg,H2
-BOIS_ROND,Bois rond,,,kg,SB
+code,name,description,lhv,density,unit,industry
+H2-RFNBO,Hydrogène RFNBO,Hydrogène renouvelable d'origine non biologique.,120,,kg,H2
+H2-BIO,Bio-H2,Hydrogène produit à partir de biomasse.,120,,kg,H2
+BOIS_ROND,Bois rond,Bois brut sous forme de troncs ou de sections de troncs.,,,kg,SB
 
 
 
