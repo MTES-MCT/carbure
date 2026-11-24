@@ -17,7 +17,6 @@ class LoadMaterialsTest(TestCase):
         self.material = Material.objects.create(code="A", name="Alpha", unit=Material.KG)
         self.other = Material.objects.create(code="B", name="Beta", unit=Material.KG)
         MaterialTag.objects.create(material=self.material, type=Tag.INDUSTRY, value="H2")
-        MaterialTag.objects.create(material=self.material, type=Tag.INDUSTRY, value="H2")
         MaterialTag.objects.create(material=self.other, type=Tag.INDUSTRY, value="H2")
 
     def load(self, csv_text):
@@ -47,7 +46,7 @@ class LoadMaterialsTest(TestCase):
 
     def test_missing_tag_column_preserves_tags(self):
         self.load("code,name,unit\nA,Alpha,kg\n")
-        self.assertEqual(self.tags(self.material), [(Tag.INDUSTRY, "H2"), (Tag.INDUSTRY, "H2")])
+        self.assertEqual(self.tags(self.material), [(Tag.INDUSTRY, "H2")])
         self.assertEqual(self.tags(self.other), [(Tag.INDUSTRY, "H2")])
 
     def test_imports_and_clears_description(self):
@@ -89,5 +88,5 @@ class LoadMaterialsTest(TestCase):
 
         self.material.refresh_from_db()
         self.assertEqual(self.material.name, "Alpha")
-        self.assertEqual(self.tags(self.material), [(Tag.INDUSTRY, "H2"), (Tag.INDUSTRY, "H2")])
+        self.assertEqual(self.tags(self.material), [(Tag.INDUSTRY, "H2")])
         self.assertEqual(self.tags(self.other), [(Tag.INDUSTRY, "H2")])

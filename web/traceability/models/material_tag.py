@@ -37,4 +37,7 @@ class MaterialTag(models.Model):
 
     class Meta:
         db_table = "material_tag"
-        constraints = [values_per_type_constraint(VALUES_PER_TYPE)]
+        constraints = [
+            values_per_type_constraint(VALUES_PER_TYPE),
+            models.UniqueConstraint(fields=["material", "type", "value"], name="material_tag_unique"),
+        ]
