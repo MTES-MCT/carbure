@@ -1,9 +1,9 @@
-import { IcpeRegimeEnum } from "api-schema"
 import { useTranslation } from "react-i18next"
-import { RadioGroup, TextInput } from "common/components/inputs2"
 import { Button } from "common/components/button2"
 import { useForm } from "common/components/form2"
 import { EditableCard } from "common/molecules/editable-card/editable-card"
+import { IcpeNumberField } from "common/molecules/sites/icpe-number-field"
+import { IcpeRegimeField } from "common/molecules/sites/icpe-regime-field"
 import { Installation, InstallationCardProps } from "../types"
 
 export function IcpeCard({
@@ -32,31 +32,9 @@ export function IcpeCard({
             })
           }
         >
-          <TextInput
-            readOnly={!isEditing}
-            label={t("N° ICPE")}
-            pattern="[0-9]{10}"
-            {...bind("icpe_number")}
-          />
-          <RadioGroup
-            readOnly={!isEditing}
-            label={t("Régime ICPE")}
-            options={[
-              {
-                value: IcpeRegimeEnum.AUTHORIZATION,
-                label: t("Autorisation"),
-              },
-              {
-                value: IcpeRegimeEnum.REGISTRATION,
-                label: t("Enregistrement"),
-              },
-              {
-                value: IcpeRegimeEnum.DECLARATION_PERIODIC_CONTROLS,
-                label: t("Déclaration (avec contrôles périodiques)"),
-              },
-            ]}
-            {...bind("icpe_regime")}
-          />
+          <IcpeNumberField readOnly={!isEditing} {...bind("icpe_number")} />
+          <IcpeRegimeField readOnly={!isEditing} {...bind("icpe_regime")} />
+
           {isEditing && (
             <Button
               type="submit"
