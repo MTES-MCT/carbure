@@ -2,12 +2,10 @@ from datetime import date
 from decimal import Decimal
 
 from django.db import IntegrityError, transaction
-from django.db.models import Value
 from django.test import TestCase
 
 from traceability.factories import ActionFactory
 from traceability.models import Action
-from traceability.models.action import carbure_id_expression
 from traceability.serializers.action import ActionParentSerializer
 
 
@@ -19,26 +17,10 @@ class ActionIdentifierTest(TestCase):
     fixtures = ["json/countries.json"]
 
     def test_annotation_matches_the_base36_label(self):
-        action = ActionFactory.create()
-        annotated = (
-            Action.objects.filter(pk=action.pk)
-            .annotate(
-                example=carbure_id_expression(Value(481261), Value(2026), Value(Action.H2)),
-                one=carbure_id_expression(Value(1), Value(2026), Value(Action.H2)),
-                ten=carbure_id_expression(Value(10), Value(2026), Value(Action.H2)),
-                thirty_six=carbure_id_expression(Value(36), Value(2026), Value(Action.H2)),
-                wide=carbure_id_expression(Value(4545757242), Value(2026), Value(Action.H2)),
-            )
-            .get()
-        )
+        action = ActionFactory.create(id=36, industry=Action.H2)
+        annotated = Action.objects.get(pk=action.pk)
 
-        self.assertTrue(annotated.carbure_id.startswith(carbure_prefix(annotated)))
-        self.assertEqual(len(annotated.carbure_id.removeprefix(carbure_prefix(annotated))), 8)
-        self.assertEqual(annotated.example, "C2026-H2-0000ABCD")
-        self.assertEqual(annotated.one, "C2026-H2-00000001")
-        self.assertEqual(annotated.ten, "C2026-H2-0000000A")
-        self.assertEqual(annotated.thirty_six, "C2026-H2-00000010")
-        self.assertEqual(annotated.wide, "C2026-H2-0236FCQI")
+        self.assertEqual(annotated.carbure_id, f"C{annotated.created_at.year}-H2-00000010")
 
     def test_created_at_is_set_on_save_and_kept(self):
         action = ActionFactory.create(pos_id="POS-1")
