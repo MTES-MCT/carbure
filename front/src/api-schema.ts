@@ -6389,6 +6389,7 @@ export interface components {
             readonly id: number;
             code: string;
             name: string;
+            description?: string;
             /**
              * PCI (MJ/kg)
              * Format: decimal

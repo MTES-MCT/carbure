@@ -20842,7 +20842,10 @@ components:
           maxLength: 16
         name:
           type: string
-          maxLength: 64
+          maxLength: 128
+        description:
+          type: string
+          maxLength: 512
         lhv:
           type: string
           format: decimal
