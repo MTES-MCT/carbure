@@ -20,6 +20,7 @@ import {
 } from "accounting/utils/formatters"
 import { FRACTION_DIGITS_LITERS } from "accounting/config"
 import { Unit } from "common/types"
+import { HttpError } from "common/services/api-fetch"
 
 type DeclareTeneurDialogProps = {
   values: DeclareTeneurDialogForm
@@ -64,10 +65,19 @@ export const useDeclareTeneurDialog = ({
       )
       onClose()
     },
-    onError: () => {
-      notify(t("Une erreur est survenue lors de la mise en teneur."), {
-        variant: "danger",
-      })
+    onError: (error) => {
+      const data: unknown =
+        error instanceof HttpError && error.status === 400
+          ? error.data
+          : undefined
+      const debt =
+        data && typeof data === "object" && "debt" in data ? data.debt : null
+      const message =
+        Array.isArray(debt) && typeof debt[0] === "string" && debt[0].trim()
+          ? debt[0]
+          : t("Une erreur est survenue lors de la mise en teneur.")
+
+      notify(message, { variant: "danger" })
     },
   })
 
