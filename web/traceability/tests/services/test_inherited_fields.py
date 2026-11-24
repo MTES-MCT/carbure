@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from traceability.factories import ActionFactory, MaterialFactory
-from traceability.models import Action
+from traceability.models import Action, Industry
 from traceability.services.inherited_fields import annotate_inherited_fields, attach_inherited_fields
 
 
@@ -11,9 +11,9 @@ class InheritedFieldsTest(TestCase):
     def setUp(self):
         self.hydrogen = MaterialFactory(code="H2", name="Hydrogène")
         self.other = MaterialFactory(code="CH4", name="Méthane")
-        self.root = ActionFactory.create(industry=Action.H2, parent=None, material=self.hydrogen)
-        self.middle = ActionFactory.create(industry=Action.H2, parent=self.root, material=None)
-        self.leaf = ActionFactory.create(industry=Action.H2, parent=self.middle, material=None)
+        self.root = ActionFactory.create(industry=Industry.H2, parent=None, material=self.hydrogen)
+        self.middle = ActionFactory.create(industry=Industry.H2, parent=self.root, material=None)
+        self.leaf = ActionFactory.create(industry=Industry.H2, parent=self.middle, material=None)
 
     def _by_id(self):
         actions = list(annotate_inherited_fields(Action.unannotated.all()))
@@ -54,8 +54,8 @@ class InheritedFieldsTest(TestCase):
         self.assertEqual(leaf["origin_material"].code, "H2")
 
     def test_origin_is_the_action_when_nothing_above_declares_a_material(self):
-        root = ActionFactory.create(industry=Action.H2, parent=None, material=None)
-        child = ActionFactory.create(industry=Action.H2, parent=root, material=self.other)
+        root = ActionFactory.create(industry=Industry.H2, parent=None, material=None)
+        child = ActionFactory.create(industry=Industry.H2, parent=root, material=self.other)
 
         by_id = self._by_id()
 

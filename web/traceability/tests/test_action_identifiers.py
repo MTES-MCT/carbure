@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from traceability.factories import ActionFactory
 from traceability.models import Action
+from traceability.models.action import Industry
 from traceability.serializers.action import ActionParentSerializer
 
 
@@ -17,7 +18,7 @@ class ActionIdentifierTest(TestCase):
     fixtures = ["json/countries.json"]
 
     def test_annotation_matches_the_base36_label(self):
-        action = ActionFactory.create(id=36, industry=Action.H2)
+        action = ActionFactory.create(id=36, industry=Industry.H2)
         annotated = Action.objects.get(pk=action.pk)
 
         self.assertEqual(annotated.carbure_id, f"C{annotated.created_at.year}-H2-00000010")
@@ -80,7 +81,7 @@ class ActionIdentifierTest(TestCase):
                     Action(
                         pos_id="",
                         holder=holder,
-                        industry=Action.H2,
+                        industry=Industry.H2,
                         type=Action.INIT,
                         working_date=date(2026, 1, 1),
                         quantity=Decimal("1.000"),
@@ -88,7 +89,7 @@ class ActionIdentifierTest(TestCase):
                     Action(
                         pos_id=None,
                         holder=holder,
-                        industry=Action.H2,
+                        industry=Industry.H2,
                         type=Action.INIT,
                         working_date=date(2026, 1, 1),
                         quantity=Decimal("2.000"),

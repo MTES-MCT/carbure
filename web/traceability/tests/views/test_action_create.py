@@ -13,7 +13,7 @@ from core.permissions import HasEntityWriteRights
 from core.tests_utils import setup_current_user
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.registry import ACTION_HANDLERS
-from traceability.models import Action, ActionStatus
+from traceability.models import Action, ActionStatus, Industry
 from traceability.views.action import ActionViewset
 
 
@@ -22,7 +22,7 @@ def is_holder(actor, holder, parent_holder):
 
 
 class GenericActionHandler(ActionIndustryHandler):
-    industry = Action.H2
+    industry = Industry.H2
     action_creation_flow = ((None, (Action.INIT, ActionStatus.PENDING)),)
     action_status_authorizations = {(Action.INIT, ActionStatus.PENDING): is_holder}
 

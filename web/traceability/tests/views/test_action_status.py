@@ -12,7 +12,7 @@ from core.tests_utils import PermissionTestMixin, setup_current_user
 from h2.handlers.action import H2ActionHandler
 from h2.permissions import HasH2AdminRights, HasHRSWriteRights
 from traceability.factories import ActionFactory
-from traceability.models import Action, ActionStatus
+from traceability.models import Action, ActionStatus, Industry
 from traceability.views.action import ActionViewset
 
 
@@ -21,13 +21,13 @@ class ActionStatusTest(SimpleTestCase, PermissionTestMixin):
         self.factory = APIRequestFactory()
         self.actor = Entity(id=1, entity_type=Entity.ADMIN)
         self.holder = Entity(id=2, entity_type=Entity.HRS)
-        self.action = Action(id=3, holder=self.holder, industry=Action.H2, type=Action.INIT)
+        self.action = Action(id=3, holder=self.holder, industry=Industry.H2, type=Action.INIT)
         self.action.status = ActionStatus.PENDING
         self.url = reverse("traceability-action-status", args=[self.action.pk])
         self.view = ActionViewset.as_view({"post": "status"})
 
     def post(self, data, actor=None, lookup_error=None):
-        request = self.factory.post(f"{self.url}?industry={Action.H2}", data, format="json")
+        request = self.factory.post(f"{self.url}?industry={Industry.H2}", data, format="json")
         request.entity = actor or self.actor
         force_authenticate(request, user=Mock())
         with (
@@ -81,7 +81,7 @@ class ActionStatusTest(SimpleTestCase, PermissionTestMixin):
 
     def test_authorizes_using_stored_type_and_holders(self):
         parent_holder = Entity(id=4, entity_type=Entity.HRS)
-        self.action.parent = Action(id=5, holder=parent_holder, industry=Action.H2, type=Action.INIT)
+        self.action.parent = Action(id=5, holder=parent_holder, industry=Industry.H2, type=Action.INIT)
         authorize = Mock(return_value=True)
         with patch.object(
             H2ActionHandler, "action_status_authorizations", {(Action.INIT, ActionStatus.ACCEPTED): authorize}
@@ -116,7 +116,7 @@ class ActionStatusIntegrationTest(TestCase):
         ExternalAdminRights.objects.create(entity=self.admin, right=ExternalAdminRights.H2)
         setup_current_user(self, "admin@carbure.local", "Admin", "password", [(self.admin, "RW")])
         self.action = ActionFactory.create(
-            holder=self.holder, industry=Action.H2, type=Action.INIT, status=ActionStatus.PENDING, material=None, site=None
+            holder=self.holder, industry=Industry.H2, type=Action.INIT, status=ActionStatus.PENDING, material=None, site=None
         )
         self.url = reverse("traceability-action-status", args=[self.action.pk])
 
@@ -125,7 +125,7 @@ class ActionStatusIntegrationTest(TestCase):
             self.url,
             {"status": target},
             content_type="application/json",
-            query_params={"entity_id": (entity or self.admin).pk, "industry": Action.H2},
+            query_params={"entity_id": (entity or self.admin).pk, "industry": Industry.H2},
         )
 
     @patch.object(H2ActionHandler, "write_permission", HasHRSWriteRights | HasH2AdminRights)

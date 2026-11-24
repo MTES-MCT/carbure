@@ -1,10 +1,10 @@
 from h2.handlers import H2ActionHandler
-from traceability.models import Action
+from traceability.models import Industry
 
 from .action import ActionIndustryHandler
 
 ACTION_HANDLERS: dict[str, type[ActionIndustryHandler]] = {
-    Action.H2: H2ActionHandler,
+    Industry.H2: H2ActionHandler,
 }
 
 

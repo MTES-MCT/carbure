@@ -4,7 +4,7 @@ from django.test import TestCase
 
 from traceability.exceptions import NoEligibleActionError
 from traceability.factories import ActionFactory, MaterialFactory
-from traceability.models import Action, ActionStatus, Material
+from traceability.models import Action, ActionStatus, Industry, Material
 from traceability.services.inherited_fields import annotate_inherited_fields, attach_inherited_fields
 from traceability.services.valorize import valorize
 
@@ -13,7 +13,7 @@ class ValorizeTest(TestCase):
     fixtures = ["json/countries.json"]
 
     def _pending_init(self, **kwargs):
-        action = ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, **kwargs)
+        action = ActionFactory.create(type=Action.INIT, industry=Industry.H2, parent=None, **kwargs)
         ActionStatus.objects.create(action=action, status=ActionStatus.PENDING)
         return action
 
@@ -54,7 +54,7 @@ class ValorizeTest(TestCase):
 
     def test_skips_ineligible_actions(self):
         pending = self._pending_init()
-        ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, status=ActionStatus.CREATED)
+        ActionFactory.create(type=Action.INIT, industry=Industry.H2, parent=None, status=ActionStatus.CREATED)
 
         created = valorize(Action.objects.filter(type=Action.INIT))
 
@@ -63,7 +63,7 @@ class ValorizeTest(TestCase):
         self.assertEqual(created[0].quantity, pending.quantity)
 
     def test_raises_when_nothing_is_eligible(self):
-        ActionFactory.create(type=Action.INIT, industry=Action.H2, parent=None, status=ActionStatus.CREATED)
+        ActionFactory.create(type=Action.INIT, industry=Industry.H2, parent=None, status=ActionStatus.CREATED)
 
         with self.assertRaises(NoEligibleActionError):
             valorize(Action.objects.all())

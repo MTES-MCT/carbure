@@ -10,7 +10,7 @@ from rest_framework import status
 from core.models import Entity, ExternalAdminRights
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory, MaterialFactory
-from traceability.models import Action
+from traceability.models import Action, Industry
 from traceability.services.parent_chain import annotate_parent_chain
 
 
@@ -23,13 +23,13 @@ class ActionViewsetQuerysetTest(TestCase):
         setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.entity, "RW")])
 
         self.list_url = reverse("traceability-action-list")
-        self.base_params = {"entity_id": self.entity.id, "industry": Action.H2}
+        self.base_params = {"entity_id": self.entity.id, "industry": Industry.H2}
 
-        self.own_action = ActionFactory.create(holder=self.entity, industry=Action.H2, quantity=Decimal("1000000.000"))
-        self.other_holder_action = ActionFactory.create(holder=self.other_entity, industry=Action.H2)
+        self.own_action = ActionFactory.create(holder=self.entity, industry=Industry.H2, quantity=Decimal("1000000.000"))
+        self.other_holder_action = ActionFactory.create(holder=self.other_entity, industry=Industry.H2)
         self.child_of_own_action = ActionFactory.create(
             holder=self.other_entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=self.own_action,
             quantity=Decimal("1.000"),
         )
@@ -94,10 +94,10 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertEqual(detail.data["quantity_available"], "60.000")
 
     def test_list_keeps_exhausted_actions_unless_the_caller_filters_them(self):
-        exhausted = ActionFactory.create(holder=self.entity, industry=Action.H2, quantity=Decimal("30.000"))
+        exhausted = ActionFactory.create(holder=self.entity, industry=Industry.H2, quantity=Decimal("30.000"))
         ActionFactory.create(
             holder=self.other_entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=exhausted,
             quantity=Decimal("30.000"),
         )
@@ -118,7 +118,7 @@ class ActionViewsetQuerysetTest(TestCase):
     def test_list_includes_inherited_material(self):
         child = ActionFactory.create(
             holder=self.other_entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=self.own_action,
             material=None,
         )
@@ -139,7 +139,7 @@ class ActionViewsetQuerysetTest(TestCase):
     def test_retrieve_includes_inherited_material(self):
         child = ActionFactory.create(
             holder=self.other_entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=self.own_action,
             material=None,
         )
@@ -206,7 +206,7 @@ class ActionViewsetQuerysetTest(TestCase):
         other = MaterialFactory(code="CH4", name="Méthane")
         child = ActionFactory.create(
             holder=self.other_entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=self.own_action,
             material=other,
         )
@@ -241,7 +241,7 @@ class ActionViewsetQuerysetTest(TestCase):
         other = MaterialFactory(code="CH4", name="Méthane")
         ActionFactory.create(
             holder=self.other_entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=self.own_action,
             material=other,
         )
@@ -270,10 +270,10 @@ class ActionViewsetAdminQuerysetTest(TestCase):
 
         self.list_url = reverse("traceability-action-list")
         self.import_url = reverse("traceability-action-import-actions")
-        self.admin_params = {"entity_id": self.h2_admin.id, "industry": Action.H2}
+        self.admin_params = {"entity_id": self.h2_admin.id, "industry": Industry.H2}
 
-        self.hrs_action = ActionFactory.create(holder=self.hrs, industry=Action.H2)
-        self.other_hrs_action = ActionFactory.create(holder=self.other_hrs, industry=Action.H2)
+        self.hrs_action = ActionFactory.create(holder=self.hrs, industry=Industry.H2)
+        self.other_hrs_action = ActionFactory.create(holder=self.other_hrs, industry=Industry.H2)
         self.other_industry_action = ActionFactory.create(holder=self.hrs, industry="BIOMASS")
 
     def test_admin_lists_every_action_of_the_industry(self):
@@ -308,7 +308,7 @@ class ActionViewsetAdminQuerysetTest(TestCase):
 
         response = self.client.get(
             self.list_url,
-            {"entity_id": self.elec_admin.id, "industry": Action.H2},
+            {"entity_id": self.elec_admin.id, "industry": Industry.H2},
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

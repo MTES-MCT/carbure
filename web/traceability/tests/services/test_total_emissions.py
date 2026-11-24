@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from traceability.factories import ActionFactory
-from traceability.models import Action
+from traceability.models import Action, Industry
 from traceability.services.total_emissions import annotate_total_emissions
 
 
@@ -12,7 +12,7 @@ class TotalEmissionsTest(TestCase):
 
     def setUp(self):
         self.root = ActionFactory.create(
-            industry=Action.H2,
+            industry=Industry.H2,
             type=Action.INIT,
             parent=None,
             ei=Decimal("1.000"),
@@ -26,7 +26,7 @@ class TotalEmissionsTest(TestCase):
             eccr=Decimal("1.000"),
         )
         self.middle = ActionFactory.create(
-            industry=Action.H2,
+            industry=Industry.H2,
             type=Action.VALORIZE,
             parent=self.root,
             ei=Decimal("10.000"),
@@ -36,7 +36,7 @@ class TotalEmissionsTest(TestCase):
             eccs=Decimal("50.000"),
         )
         self.leaf = ActionFactory.create(
-            industry=Action.H2,
+            industry=Industry.H2,
             type=Action.VALORIZE,
             parent=self.middle,
             ei=Decimal("100.000"),

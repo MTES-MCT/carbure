@@ -6,7 +6,7 @@ from rest_framework import serializers
 from core.serializer_fields import LabelChoiceField
 from core.serializer_validators import UniqueInListSerializer
 from core.serializers import EntityPreviewSerializer
-from traceability.models import Action
+from traceability.models import Action, Industry
 from traceability.models.action_status import ActionStatus
 from traceability.serializers.certificate import ActionCertificateSerializer
 from traceability.serializers.fields import (
@@ -50,7 +50,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
 class ActionQuerySerializer(serializers.Serializer):
-    industry = serializers.ChoiceField(choices=Action.INDUSTRIES)
+    industry = serializers.ChoiceField(choices=Industry.choices)
 
 
 class ActionExcelUploadSerializer(serializers.Serializer):

@@ -7,7 +7,7 @@ from rest_framework import status
 from core.models import Entity
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory
-from traceability.models import Action, ActionStatus
+from traceability.models import Action, ActionStatus, Industry
 
 
 class ActionDeleteTest(TestCase):
@@ -15,7 +15,7 @@ class ActionDeleteTest(TestCase):
         self.entity = Entity.objects.create(name="HRS", entity_type=Entity.HRS)
         self.other_entity = Entity.objects.create(name="Other HRS", entity_type=Entity.HRS)
         setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.entity, "RW")])
-        self.base_params = {"entity_id": self.entity.id, "industry": Action.H2}
+        self.base_params = {"entity_id": self.entity.id, "industry": Industry.H2}
 
     def delete_url(self, action):
         return reverse("traceability-action-detail", args=[action.id])
@@ -26,7 +26,7 @@ class ActionDeleteTest(TestCase):
     def create_action(self, **kwargs):
         return ActionFactory.create(
             holder=self.entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=None,
             material=None,
             site=None,
@@ -77,7 +77,7 @@ class ActionDeleteTest(TestCase):
     def test_returns_not_found_when_action_is_held_by_another_entity(self):
         action = ActionFactory.create(
             holder=self.other_entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=None,
             material=None,
             site=None,

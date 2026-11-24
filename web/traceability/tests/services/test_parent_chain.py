@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 
 from traceability.factories import ActionFactory, MaterialFactory
-from traceability.models import Action
+from traceability.models import Action, Industry
 from traceability.services.inherited_fields import attach_inherited_fields
 from traceability.services.parent_chain import annotate_parent_chain, filter_by_chain
 
@@ -25,10 +25,10 @@ class ParentChainTest(TestCase):
     def setUp(self):
         hydrogen = MaterialFactory(code="H2", name="Hydrogène")
         self.root = ActionFactory.create(
-            industry=Action.H2, parent=None, material=hydrogen, ei=1, quantity=Decimal("100.000")
+            industry=Industry.H2, parent=None, material=hydrogen, ei=1, quantity=Decimal("100.000")
         )
         self.leaf = ActionFactory.create(
-            industry=Action.H2, parent=self.root, material=None, ei=10, quantity=Decimal("40.000")
+            industry=Industry.H2, parent=self.root, material=None, ei=10, quantity=Decimal("40.000")
         )
 
     def _sql(self, **flags):
@@ -63,7 +63,7 @@ class ParentChainTest(TestCase):
 
     @patch("traceability.services.parent_chain.ROOT_COLUMNS", ROOT_COLUMNS)
     def test_root_columns_descend_when_the_roots_are_fewer_than_the_list(self):
-        outsider = ActionFactory.create(industry=Action.H2, parent=None)
+        outsider = ActionFactory.create(industry=Industry.H2, parent=None)
         queryset = Action.objects.filter(pk__in=[self.root.pk, self.leaf.pk, outsider.pk])
 
         with CaptureQueriesContext(connection) as captured:

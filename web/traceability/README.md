@@ -56,7 +56,7 @@ Tout passe par `ActionIndustryHandler`, chargé via le query param `industry` (`
 
 Le `POST` de création utilise `action_creation_flow` pour valider le lien de création et le statut initial demandé via `status`, puis vérifie le prédicat correspondant directement dans `action_status_authorizations` du handler ; voir [`docs/action_flows.md`](docs/action_flows.md).
 
-Le registre `ACTION_HANDLERS` associe le code filière (`Action.INDUSTRIES`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
+Le registre `ACTION_HANDLERS` associe le code filière (`Industry.choices`) à la classe handler, dans l’app de la filière (`web/<filiere>/handlers/`).
 
 Côté front, les catalogues (`useActionFields`, `useActionColumns`, `useActionFilters`) sont **composés** par la page filière : ordre, libellés, options (types de site, etc.). Une page peut passer `tabs` à `ActionsPage`. La route de la page est alors `:year/:tab?` : `tab` est la clé de l’onglet, et sa `query` s’ajoute à `fixedQuery`. Sans `tab`, ou avec une clé inconnue, la page ouvre le premier onglet. Une page peut passer `emptyState` : il remplace la liste quand elle est chargée, sans filtre, et sans résultat.
 

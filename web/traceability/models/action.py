@@ -69,9 +69,7 @@ class Action(models.Model):
         "core.Entity", on_delete=models.PROTECT, verbose_name="Entité détentrice de la quantité de l'action"
     )
 
-    H2 = Industry.H2
-    INDUSTRIES = Industry.choices
-    industry = models.CharField(verbose_name="Filière", choices=INDUSTRIES, max_length=16)
+    industry = models.CharField(verbose_name="Filière", choices=Industry.choices, max_length=16)
 
     INIT = "INIT"
     VALORIZE = "VALORIZE"

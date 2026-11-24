@@ -12,7 +12,7 @@ from core.models import Entity, StoredFile
 from core.tests_utils import assert_object_contains_data, setup_current_user
 from traceability.factories import MaterialFactory
 from traceability.handlers.registry import ACTION_HANDLERS
-from traceability.models import Action
+from traceability.models import Action, Industry
 from traceability.models.action_status import ActionStatus
 from traceability.services.action_excel import build_action_import_template
 from traceability.services.action_import_file import ACTION_IMPORT_UPLOAD_DIR
@@ -26,7 +26,7 @@ class ActionExcelImportViewTest(APITestCase):
     fixtures = ["json/countries.json"]
 
     def setUp(self):
-        self.handler_patch = patch.dict(ACTION_HANDLERS, {Action.H2: GenericExcelHandler})
+        self.handler_patch = patch.dict(ACTION_HANDLERS, {Industry.H2: GenericExcelHandler})
         self.handler_patch.start()
         self.addCleanup(self.handler_patch.stop)
 
@@ -46,7 +46,7 @@ class ActionExcelImportViewTest(APITestCase):
         return self.client.post(
             self.url,
             {"file": uploaded},
-            query_params={"entity_id": self.entity.id, "industry": Action.H2},
+            query_params={"entity_id": self.entity.id, "industry": Industry.H2},
             format="multipart",
         )
 
@@ -81,7 +81,7 @@ class ActionExcelImportViewTest(APITestCase):
             action,
             {
                 "holder": self.entity,
-                "industry": Action.H2,
+                "industry": Industry.H2,
                 "type": Action.INIT,
                 "material": self.material,
                 "certificate": self.certificate,

@@ -6,12 +6,12 @@ from openpyxl import load_workbook
 
 from core.import_export_template import get_data_start_row
 from traceability.handlers.action import ActionIndustryHandler
-from traceability.models import Action
+from traceability.models import Industry
 from traceability.services.action_excel import build_action_import_template
 
 
 class GenericExcelHandler(ActionIndustryHandler):
-    industry = Action.H2
+    industry = Industry.H2
 
 
 GENERIC_ROW = {

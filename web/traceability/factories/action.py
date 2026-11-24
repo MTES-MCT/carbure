@@ -5,7 +5,7 @@ from factory import fuzzy
 
 from core.models import Entity
 from entity.factories.entity import EntityFactory
-from traceability.models.action import Action
+from traceability.models.action import Action, Industry
 from traceability.models.action_status import ActionStatus
 from transactions.factories.site import SiteFactory
 
@@ -27,7 +27,7 @@ class ActionFactory(factory.django.DjangoModelFactory):
 
     pos_id = factory.Faker("lexify", text="POS-????????????")
     holder = factory.SubFactory(EntityFactory, entity_type=Entity.HRS)
-    industry = fuzzy.FuzzyChoice(Action.INDUSTRIES, getter=lambda x: x[0])
+    industry = fuzzy.FuzzyChoice(Industry.choices, getter=lambda x: x[0])
     type = fuzzy.FuzzyChoice(Action.TYPES, getter=lambda x: x[0])
     working_date = factory.Faker("date_between", start_date="-2y", end_date="today")
     parent = None
