@@ -5,6 +5,7 @@ from entity.factories.entity import EntityFactory
 from h2.factories.h2_station import H2StationFactory
 from h2.handlers import lookups
 from traceability.factories import MaterialFactory
+from traceability.models import Industry, Tag
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models import Site
 
@@ -13,14 +14,20 @@ class H2ActionLookupsTest(TestCase):
     fixtures = ["json/countries.json"]
 
     def test_materials_are_limited_to_hydrogen(self):
-        hydrogen = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux")
-        wood = MaterialFactory(code="BIO-WOOD", name="Bois")
+        hydrogen = MaterialFactory(
+            code="HYDROGEN",
+            name="Hydrogène gazeux",
+            tags=[(Tag.INDUSTRY, Industry.H2), (Tag.INDUSTRY, Industry.SOLID_BIOMASS)],
+        )
+        wood = MaterialFactory(code="H2-WOOD", name="Bois", tags=[(Tag.INDUSTRY, Industry.SOLID_BIOMASS)])
+        untagged = MaterialFactory(code="H2-UNTAGGED", name="Matière sans filière")
 
         materials = list(lookups.material(None))
 
         self.assertIn(hydrogen, materials)
         self.assertNotIn(wood, materials)
-        self.assertTrue(all(material.code.startswith("H2-") for material in materials))
+        self.assertNotIn(untagged, materials)
+        self.assertEqual(materials.count(hydrogen), 1)
 
     def test_sites_are_limited_to_entity_refueling_stations(self):
         entity = EntityFactory.create()

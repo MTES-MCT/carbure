@@ -12,7 +12,7 @@ from h2.handlers import H2ActionHandler
 from h2.serializers.action import H2ActionExcelImportSerializer
 from h2.tests.excel import filled_h2_template
 from traceability.factories import MaterialFactory
-from traceability.models import Action, Industry
+from traceability.models import Action, Industry, Tag
 from traceability.services.action_excel import parse_action_import_file
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models.site import Site
@@ -25,7 +25,7 @@ class H2ActionExcelImportViewTest(APITestCase):
         self.entity = Entity.objects.create(name="HRS", entity_type=Entity.HRS)
         setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.entity, "RW")])
         self.url = reverse("traceability-action-import-actions")
-        self.material = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux")
+        self.material = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux", tags=[(Tag.INDUSTRY, Industry.H2)])
         self.station = H2StationFactory.create(created_by=self.entity)
         self.non_h2_station = Site.objects.create(
             name="EFS",
@@ -217,7 +217,7 @@ class H2ActionExcelImportViewTest(APITestCase):
         self.assertTrue(serializer.is_valid(), serializer.errors)
 
     def test_import_rejects_material_from_another_industry(self):
-        MaterialFactory(code="BIO-WOOD", name="Bois")
+        MaterialFactory(code="BIO-WOOD", name="Bois", tags=[(Tag.INDUSTRY, Industry.SOLID_BIOMASS)])
 
         response = self._post(
             filled_h2_template(

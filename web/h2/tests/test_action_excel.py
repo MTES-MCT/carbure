@@ -6,6 +6,7 @@ from core.models.certificate import GenericCertificate
 from h2.handlers import H2ActionHandler
 from h2.tests.excel import filled_h2_template
 from traceability.factories import MaterialFactory
+from traceability.models import Industry, Tag
 from traceability.services.action_excel import build_action_import_template, parse_action_import_file
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models import Site
@@ -14,8 +15,8 @@ from transactions.models import Site
 class H2ActionExcelTemplateTest(TestCase):
     def test_template_uses_handler_columns_and_lookup_options(self):
         entity = Entity.objects.create(name="HRS", entity_type=Entity.HRS)
-        hydrogen = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux")
-        MaterialFactory(code="BIO-WOOD", name="Bois")
+        hydrogen = MaterialFactory(code="H2-GASE", name="Hydrogène gazeux", tags=[(Tag.INDUSTRY, Industry.H2)])
+        MaterialFactory(code="BIO-WOOD", name="Bois", tags=[(Tag.INDUSTRY, Industry.SOLID_BIOMASS)])
         station = Site.objects.create(
             name="Station Paris",
             site_type=Site.H2_REFUELING_STATION,
