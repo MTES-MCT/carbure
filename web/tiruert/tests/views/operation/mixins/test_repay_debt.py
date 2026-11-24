@@ -281,6 +281,58 @@ class DraftDebtRepaymentTest(DebtViewTestCase):
     def delete(self, operation):
         return self.client.delete(f"{reverse('operations-detail', kwargs={'pk': operation.id})}?entity_id={self.entity.id}")
 
+    def test_debt_stays_visible_until_full_draft_repayment_is_validated(self):
+        """A fully reserved debt stays visible and blocks debits until the repayment is validated."""
+        lot, _, operation = self.draft_one(volume=300)
+
+        response = self.get_debts()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]["remaining_volume"], 300)
+
+        body = {
+            "type": Operation.TRANSFERT,
+            "biofuel": self.biofuel.id,
+            "customs_category": MatierePremiere.CONV,
+            "debited_entity": self.entity.id,
+            "credited_entity": self.other_entity.id,
+            "lots": [{"id": lot.id, "volume": 10}],
+        }
+        response = self.client.post(
+            f"{reverse('operations-list')}?entity_id={self.entity.id}", body, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("debt", response.json())
+
+        response = self.patch_status(operation, Operation.VALIDATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.get_debts()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json(), [])
+
+    def test_debt_summary_deducts_only_validated_repayments(self):
+        """Draft volumes stay reserved but only validated repayments reduce the displayed debt."""
+        lot, _, operation = self.draft_one(volume=100)
+        response = self.post_repay([{"id": lot.id, "volume": 50}])
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.get_debts()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()), 1)
+        self.assertEqual(response.json()[0]["remaining_volume"], 250)
+
+        response = self.post_repay([{"id": lot.id, "volume": 151}])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("volume", response.json())
+
+        response = self.patch_status(operation, Operation.VALIDATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.get_debts()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()[0]["remaining_volume"], 150)
+
     def test_patch_draft_to_validated_is_accepted(self):
         """A repayment draft can be validated, without any new volume check."""
         lot, debt, operation = self.draft_one()
