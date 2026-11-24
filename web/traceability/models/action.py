@@ -15,6 +15,11 @@ CARBURE_ID_PREFIX = "C"
 CARBURE_ID_CODE_LENGTH = 8
 
 
+class Industry(models.TextChoices):
+    H2 = "H2", "Hydrogène"
+    SOLID_BIOMASS = "SB", "Biomasse solide"
+
+
 def carbure_id():
     """C{year}-{industry}-{id in base 36, padded to 8}. Past 8 characters, LPAD keeps the extra digits."""
     return Concat(
@@ -64,9 +69,7 @@ class Action(models.Model):
         "core.Entity", on_delete=models.PROTECT, verbose_name="Entité détentrice de la quantité de l'action"
     )
 
-    H2 = "H2"
-    INDUSTRIES = [(H2, "Hydrogène")]
-    industry = models.CharField(verbose_name="Filière", choices=INDUSTRIES, max_length=16)
+    industry = models.CharField(verbose_name="Filière", choices=Industry.choices, max_length=16)
 
     INIT = "INIT"
     VALORIZE = "VALORIZE"

@@ -2,7 +2,7 @@ from django.test import SimpleTestCase, TestCase
 
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.registry import get_action_handler
-from traceability.models import Action
+from traceability.models import Action, Industry
 from traceability.serializers.consumption import ConsumptionSerializer
 
 
@@ -33,10 +33,10 @@ class ActionHandlerRegistryTest(TestCase):
     def test_returns_the_h2_handler_for_the_h2_industry(self):
         from h2.handlers.action import H2ActionHandler
 
-        handler = get_action_handler(Action.H2)
+        handler = get_action_handler(Industry.H2)
 
         self.assertIsInstance(handler, H2ActionHandler)
-        self.assertEqual(handler.industry, Action.H2)
+        self.assertEqual(handler.industry, Industry.H2)
 
     def test_raises_for_an_unknown_industry(self):
         with self.assertRaises(ValueError):

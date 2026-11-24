@@ -17,7 +17,7 @@ from entity.factories.entity import EntityFactory
 from h2.factories import H2StationFactory
 from h2.models import H2Station
 from traceability.factories import ActionFactory
-from traceability.models import Action, Material
+from traceability.models import Action, Industry, Material
 from traceability.models.action_status import ActionStatus
 
 
@@ -88,7 +88,7 @@ def setup_h2_lots_init() -> tuple[Action, Action]:
     h2_lot_01 = ActionFactory(
         pos_id="H2-DEMO-INIT-001",
         holder=holder,
-        industry=Action.H2,
+        industry=Industry.H2,
         type=Action.INIT,
         material=h2_rfnbo,
         quantity=Decimal("120000.000"),
@@ -102,7 +102,7 @@ def setup_h2_lots_init() -> tuple[Action, Action]:
     h2_lot_02 = ActionFactory(
         pos_id="H2-DEMO-INIT-002",
         holder=holder,
-        industry=Action.H2,
+        industry=Industry.H2,
         type=Action.INIT,
         material=h2_bio,
         quantity=Decimal("240000.000"),
@@ -123,7 +123,7 @@ def valorize_child(parent: Action) -> Action:
         type=Action.VALORIZE,
         defaults={
             "holder": parent.holder,
-            "industry": Action.H2,
+            "industry": Industry.H2,
             "quantity": parent.quantity,
             "working_date": parent.working_date,
             "material": None,
@@ -148,7 +148,7 @@ def setup_h2_certificates() -> tuple[Action, Action]:
     h2_lot_03 = ActionFactory(
         pos_id="H2-DEMO-INIT-003",
         holder=holder,
-        industry=Action.H2,
+        industry=Industry.H2,
         type=Action.INIT,
         material=h2_rfnbo,
         quantity=Decimal("180000.000"),
@@ -164,7 +164,7 @@ def setup_h2_certificates() -> tuple[Action, Action]:
     h2_lot_04 = ActionFactory(
         pos_id="H2-DEMO-INIT-004",
         holder=holder,
-        industry=Action.H2,
+        industry=Industry.H2,
         type=Action.INIT,
         material=h2_bio,
         quantity=Decimal("300000.000"),
@@ -197,7 +197,7 @@ def setup_h2_inherited_material_chain() -> Action:
     parent = ActionFactory(
         pos_id="H2-DEMO-INHERIT-PARENT",
         holder=holder,
-        industry=Action.H2,
+        industry=Industry.H2,
         type=Action.INIT,
         material=h2_rfnbo,
         quantity=Decimal("80000.000"),
@@ -212,7 +212,7 @@ def setup_h2_inherited_material_chain() -> Action:
         pos_id="H2-DEMO-INHERIT-MIDDLE",
         parent=parent,
         holder=holder,
-        industry=Action.H2,
+        industry=Industry.H2,
         type=Action.INIT,
         material=None,
         quantity=Decimal("40000.000"),
@@ -227,7 +227,7 @@ def setup_h2_inherited_material_chain() -> Action:
         pos_id="H2-DEMO-INHERIT-INIT",
         parent=middle,
         holder=holder,
-        industry=Action.H2,
+        industry=Industry.H2,
         type=Action.INIT,
         material=None,
         quantity=Decimal("20000.000"),

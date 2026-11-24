@@ -3800,10 +3800,10 @@ export interface components {
             pos_id?: string | null;
         };
         /**
-         * @description * `ROAD` - Transport routier
+         * @description * `ROAD` - Road transport
          *     * `PIPELINE` - Pipeline
          *     * `RAILROAD` - Rail
-         *     * `SEA` - Transport maritime
+         *     * `SEA` - Maritime transport
          * @enum {string}
          */
         ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
@@ -6283,6 +6283,7 @@ export interface components {
         IcpeRegimeEnum: IcpeRegimeEnum;
         /**
          * @description * `H2` - Hydrogène
+         *     * `SB` - Biomasse solide
          * @enum {string}
          */
         IndustryEnum: PathsApiTraceabilityActionsGetParametersQueryIndustry;
@@ -7196,9 +7197,9 @@ export interface components {
         ResetPasswordRequest: {
             uidb64: string;
             token: string;
-            /** Mot de passe */
+            /** Password */
             password1: string;
-            /** Confirmation du mot de passe */
+            /** Password confirmation */
             password2: string;
         };
         Response: {
@@ -7748,9 +7749,9 @@ export interface components {
              */
             email: string;
             name: string;
-            /** Mot de passe */
+            /** Password */
             password1: string;
-            /** Confirmation du mot de passe */
+            /** Password confirmation */
             password2: string;
         };
         UserEntity: {
@@ -7790,10 +7791,7 @@ export interface components {
         };
         /** @description Resend the activation email for the pending account matching this address. */
         UserResendActivationLinkRequest: {
-            /**
-             * Adresse email
-             * Format: email
-             */
+            /** Format: email */
             email: string;
         };
         UserRights: {
@@ -15576,7 +15574,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15651,6 +15649,15 @@ export interface operations {
                     "application/vnd.ms-excel": File;
                 };
             };
+            /** @description Operation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
         };
     };
     reject_operation: {
@@ -15677,7 +15684,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16292,7 +16299,10 @@ export interface operations {
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16330,10 +16340,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16375,7 +16385,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16421,7 +16434,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16450,7 +16466,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16478,7 +16497,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16537,7 +16559,10 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiTraceabilityActionsFiltersGetParametersQueryFilter;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16571,10 +16596,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16616,7 +16641,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16656,7 +16684,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16684,7 +16715,10 @@ export interface operations {
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16718,10 +16752,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -17267,7 +17301,8 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     years = "years"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryIndustry {
-    H2 = "H2"
+    H2 = "H2",
+    SB = "SB"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinuscarbure_id = "-carbure_id",
