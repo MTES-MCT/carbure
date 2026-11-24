@@ -44,6 +44,7 @@ export function GeneralCard({
         <EditableCard.Form onSubmit={saveGeneral}>
           <Grid cols={2} gap="lg">
             <RadioGroup
+              required
               readOnly={!isEditing}
               label={t("Type de production")}
               options={[
@@ -65,6 +66,7 @@ export function GeneralCard({
             {value.production_type &&
               value.production_type !== ProductionTypeEnum.ELECTRICITY && (
                 <RadioGroup
+                  required
                   readOnly={!isEditing}
                   label={t("Type de production de chaleur")}
                   options={[
@@ -83,12 +85,14 @@ export function GeneralCard({
                 />
               )}
             <DateInput
+              required
               readOnly={!isEditing}
               label={t("Date de mise en service")}
               {...bind("commissioning_date")}
             />
             {isCogeneration && (
               <NumberInput
+                required
                 readOnly={!isEditing}
                 label={t("Température utile au point de fourniture (°C)")}
                 step={0.1}
@@ -97,6 +101,7 @@ export function GeneralCard({
             )}
             {producesElectricity && (
               <NumberInput
+                required
                 readOnly={!isEditing}
                 label={t("Rendement électrique (%)")}
                 min={0}
@@ -107,6 +112,7 @@ export function GeneralCard({
             )}
             {producesHeat && (
               <NumberInput
+                required
                 readOnly={!isEditing}
                 label={t("Rendement thermique (%)")}
                 min={0}
