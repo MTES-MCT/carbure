@@ -6,6 +6,7 @@ class Material(models.Model):
     code = models.CharField(max_length=16, unique=True)
     name = models.CharField(max_length=128, unique=True)
     description = models.CharField(max_length=512, blank=True, default="")
+    classification = models.ForeignKey("feedstocks.Classification", on_delete=models.SET_NULL, null=True, blank=True)
     lhv = models.DecimalField(
         verbose_name="PCI (MJ/kg)",
         max_digits=12,
