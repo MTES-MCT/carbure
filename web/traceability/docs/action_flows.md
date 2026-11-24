@@ -73,7 +73,7 @@ action_creation_serializers = {
 
 La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2. [`TransferSerializer`](../serializers/transfer.py) n'accepte que `quantity` : il date le transfert au jour de la création et laisse `pos_id` vide.
 
-Les endpoints de création et de changement de statut exigent aussi la `write_permission` du handler. Dans H2, elle vaut actuellement `HasHRSWriteRights` : autoriser `is_h2_admin` dans les règles ne donne donc pas, à lui seul, accès à ces endpoints aux administrateurs.
+Les endpoints d'écriture utilisent `write_permission`. Un endpoint appelé par d'autres entités se déclare dans `action_permissions`, sans réécrire `get_permissions`. Dans H2, la création reste `HasHRSWriteRights` : autoriser `is_h2_admin` dans les règles ne donne donc pas, à lui seul, accès à la création aux administrateurs. `status` vaut `HasHRSWriteRights | HasTiruertLiableWriteRights`. Une cession `TRANSFER` passe à `ACCEPTED` ou `REJECTED` seulement si l'acteur est le détenteur et qu'il est redevable TIRUERT (`is_liable_holder`). La lecture H2 inclut ces redevables : sans ce droit, le queryset scopé répond 404 avant l'autorisation.
 
 ### La matrice est toujours validée
 

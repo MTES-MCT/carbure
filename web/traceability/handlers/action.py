@@ -35,6 +35,8 @@ class ActionIndustryHandler:
     read_permission = HasEntityReadRights
     write_permission = HasEntityWriteRights
     admin_permission = None
+    # View actions whose caller is not the one allowed by write_permission or read_permission.
+    action_permissions: dict[str, Callable] = {}
 
     @classmethod
     def get_action_creation_serializers(cls):
@@ -53,6 +55,9 @@ class ActionIndustryHandler:
 
     @classmethod
     def get_permissions(cls, action: str):
+        permission = cls.action_permissions.get(action)
+        if permission is not None:
+            return [permission()]
         if action in cls.write_actions:
             return [cls.write_permission()]
         permission = cls.read_permission

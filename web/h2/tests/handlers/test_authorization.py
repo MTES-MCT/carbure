@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from core.models import Entity, ExternalAdminRights
-from h2.handlers.authorization import can_hrs_transfer, is_h2_admin, is_hrs_holder
+from h2.handlers.authorization import can_hrs_transfer, is_h2_admin, is_hrs_holder, is_liable_holder
 
 
 class ActionAuthorizationTest(SimpleTestCase):
@@ -31,6 +31,18 @@ class ActionAuthorizationTest(SimpleTestCase):
         self.assertFalse(can_hrs_transfer(hrs, hrs, None))
         self.assertFalse(can_hrs_transfer(hrs, other_operator, hrs))
         self.assertFalse(can_hrs_transfer(liable_hrs, liable_hrs, liable_hrs))
+
+    def test_status_assignment_requires_the_liable_holder(self):
+        liable = Entity(id=1, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        other_liable = Entity(id=2, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        sender = Entity(id=3, entity_type=Entity.HRS)
+        not_liable = Entity(id=4, entity_type=Entity.OPERATOR, is_tiruert_liable=False)
+
+        self.assertTrue(is_liable_holder(liable, liable, sender))
+        self.assertTrue(is_liable_holder(liable, liable, None))
+        self.assertFalse(is_liable_holder(other_liable, liable, sender))
+        self.assertFalse(is_liable_holder(sender, liable, sender))
+        self.assertFalse(is_liable_holder(not_liable, not_liable, sender))
 
     def test_status_assignment_requires_an_admin_or_h2_admin_right(self):
         admin = Entity(id=1, entity_type=Entity.ADMIN)

@@ -2,7 +2,13 @@ from django.test import TestCase
 
 from core.tests_utils import PermissionTestMixin
 from h2.handlers import H2ActionHandler
-from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
+from h2.permissions import (
+    HasH2AdminRights,
+    HasHRSRights,
+    HasHRSWriteRights,
+    HasTiruertLiableRights,
+    HasTiruertLiableWriteRights,
+)
 from traceability.views.action import ActionViewset
 
 
@@ -18,11 +24,15 @@ class H2ActionHandlerPermissionTest(TestCase, PermissionTestMixin):
             [
                 (
                     ["list", "retrieve", "filters", "get_years", "download_import_template"],
-                    [(HasHRSRights | HasH2AdminRights)()],
+                    [((HasHRSRights | HasTiruertLiableRights) | HasH2AdminRights)()],
                 ),
                 (
-                    ["create", "destroy", "import_actions", "status"],
+                    ["create", "destroy", "import_actions"],
                     [HasHRSWriteRights()],
+                ),
+                (
+                    ["status"],
+                    [(HasHRSWriteRights | HasTiruertLiableWriteRights)()],
                 ),
             ],
         )

@@ -10,7 +10,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from core.models import Entity, ExternalAdminRights
 from core.tests_utils import PermissionTestMixin, setup_current_user
 from h2.handlers.action import H2ActionHandler
-from h2.permissions import HasH2AdminRights, HasHRSWriteRights
+from h2.permissions import HasH2AdminRights, HasHRSWriteRights, HasTiruertLiableWriteRights
 from traceability.factories import ActionFactory
 from traceability.models import Action, ActionStatus, Industry
 from traceability.views.action import ActionViewset
@@ -103,7 +103,7 @@ class ActionStatusTest(SimpleTestCase, PermissionTestMixin):
     def test_requires_write_permission(self):
         self.assertPermissionsEqual(
             H2ActionHandler.get_permissions("status"),
-            [HasHRSWriteRights()],
+            [(HasHRSWriteRights | HasTiruertLiableWriteRights)()],
         )
 
 
@@ -133,7 +133,7 @@ class ActionStatusIntegrationTest(TestCase):
             query_params={"entity_id": (entity or self.admin).pk, "industry": Industry.H2},
         )
 
-    @patch.object(H2ActionHandler, "write_permission", HasHRSWriteRights | HasH2AdminRights)
+    @patch.object(H2ActionHandler, "action_permissions", {"status": HasHRSWriteRights | HasH2AdminRights})
     def test_appends_history_and_refuses_second_transition_from_accepted(self):
         response = self.post(ActionStatus.ACCEPTED)
 
@@ -149,7 +149,7 @@ class ActionStatusIntegrationTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(self.action.action_statuses.count(), 2)
 
-    @patch.object(H2ActionHandler, "write_permission", HasHRSWriteRights | HasH2AdminRights)
+    @patch.object(H2ActionHandler, "action_permissions", {"status": HasHRSWriteRights | HasH2AdminRights})
     def test_cannot_change_action_from_another_industry(self):
         Action.unannotated.filter(pk=self.action.pk).update(industry="OTHER")
 
@@ -180,3 +180,100 @@ class ActionStatusIntegrationTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(self.action.action_statuses.count(), 1)
+
+
+class TransferDecisionIntegrationTest(TestCase):
+    fixtures = ["json/countries.json"]
+
+    def setUp(self):
+        self.sender = Entity.objects.create(name="Station", entity_type=Entity.HRS)
+        self.recipient = Entity.objects.create(name="Redevable", entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        self.other = Entity.objects.create(name="Autre redevable", entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        parent = ActionFactory.create(
+            holder=self.sender,
+            industry=Action.H2,
+            type=Action.VALORIZE,
+            status=ActionStatus.CREATED,
+            material=None,
+            site=None,
+        )
+        self.transfer = ActionFactory.create(
+            holder=self.recipient,
+            industry=Action.H2,
+            type=Action.TRANSFER,
+            status=ActionStatus.PENDING,
+            parent=parent,
+            material=None,
+            site=None,
+        )
+        self.url = reverse("traceability-action-status", args=[self.transfer.pk])
+
+    def post(self, target, entity):
+        return self.client.post(
+            self.url,
+            {"status": target},
+            content_type="application/json",
+            query_params={"entity_id": entity.pk, "industry": Action.H2},
+        )
+
+    def test_liable_holder_can_accept(self):
+        setup_current_user(self, "recipient@carbure.local", "Recipient", "password", [(self.recipient, "RW")])
+
+        response = self.post(ActionStatus.ACCEPTED, self.recipient)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Action.objects.get(pk=self.transfer.pk).status, ActionStatus.ACCEPTED)
+
+    def test_liable_holder_can_reject(self):
+        setup_current_user(self, "recipient@carbure.local", "Recipient", "password", [(self.recipient, "RW")])
+
+        response = self.post(ActionStatus.REJECTED, self.recipient)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Action.objects.get(pk=self.transfer.pk).status, ActionStatus.REJECTED)
+
+    def test_sender_cannot_accept_the_transfer(self):
+        setup_current_user(self, "sender@carbure.local", "Sender", "password", [(self.sender, "RW")])
+
+        response = self.post(ActionStatus.ACCEPTED, self.sender)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Action.objects.get(pk=self.transfer.pk).status, ActionStatus.PENDING)
+
+    def test_other_liable_entity_cannot_see_the_transfer(self):
+        setup_current_user(self, "other@carbure.local", "Other", "password", [(self.other, "RW")])
+
+        response = self.post(ActionStatus.ACCEPTED, self.other)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(Action.objects.get(pk=self.transfer.pk).status, ActionStatus.PENDING)
+
+    def test_read_only_liable_holder_cannot_decide(self):
+        setup_current_user(self, "reader@carbure.local", "Reader", "password", [(self.recipient, "RO")])
+
+        response = self.post(ActionStatus.ACCEPTED, self.recipient)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Action.objects.get(pk=self.transfer.pk).status, ActionStatus.PENDING)
+
+    def test_non_liable_holder_cannot_decide(self):
+        holder = Entity.objects.create(name="Non redevable", entity_type=Entity.OPERATOR, is_tiruert_liable=False)
+        transfer = ActionFactory.create(
+            holder=holder,
+            industry=Action.H2,
+            type=Action.TRANSFER,
+            status=ActionStatus.PENDING,
+            material=None,
+            site=None,
+        )
+        setup_current_user(self, "holder@carbure.local", "Holder", "password", [(holder, "RW")])
+
+        response = self.client.post(
+            reverse("traceability-action-status", args=[transfer.pk]),
+            {"status": ActionStatus.ACCEPTED},
+            content_type="application/json",
+            query_params={"entity_id": holder.pk, "industry": Action.H2},
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Action.objects.get(pk=transfer.pk).status, ActionStatus.PENDING)

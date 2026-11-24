@@ -1,6 +1,12 @@
 import h2.handlers.lookups as lookups
-from h2.handlers.authorization import can_hrs_transfer, is_h2_admin, is_hrs_holder
-from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
+from h2.handlers.authorization import can_hrs_transfer, is_h2_admin, is_hrs_holder, is_liable_holder
+from h2.permissions import (
+    HasH2AdminRights,
+    HasHRSRights,
+    HasHRSWriteRights,
+    HasTiruertLiableRights,
+    HasTiruertLiableWriteRights,
+)
 from h2.serializers.action import SHIPPING_FUEL_TYPES, H2ActionExcelImportSerializer
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.excel import EXCEL_CONSUMPTION_COLOR, EXCEL_PRODUCTION_COLOR, EXCEL_TRANSPORT_COLOR, excel_column
@@ -10,7 +16,7 @@ from traceability.models import Action, ActionStatus, Industry
 class H2ActionHandler(ActionIndustryHandler):
     industry = Industry.H2
 
-    read_permission = HasHRSRights
+    read_permission = HasHRSRights | HasTiruertLiableRights
     write_permission = HasHRSWriteRights
     admin_permission = HasH2AdminRights
 
@@ -27,6 +33,12 @@ class H2ActionHandler(ActionIndustryHandler):
         (Action.CONSUME, ActionStatus.BLOCKED): is_h2_admin,
         (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
         (Action.TRANSFER, ActionStatus.PENDING): can_hrs_transfer,
+        (Action.TRANSFER, ActionStatus.ACCEPTED): is_liable_holder,
+        (Action.TRANSFER, ActionStatus.REJECTED): is_liable_holder,
+    }
+
+    action_permissions = {
+        "status": HasHRSWriteRights | HasTiruertLiableWriteRights,
     }
 
     lookups = lookups
