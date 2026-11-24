@@ -13856,10 +13856,10 @@ paths:
               type: string
               title: Type d'action
               enum:
-                - INIT
+                - CONSUME
                 - VALORIZE
           description: |-
-            * `INIT` - INIT
+            * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -14280,10 +14280,10 @@ paths:
               type: string
               title: Type d'action
               enum:
-                - INIT
+                - CONSUME
                 - VALORIZE
           description: |-
-            * `INIT` - INIT
+            * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -14591,10 +14591,10 @@ paths:
               type: string
               title: Type d'action
               enum:
-                - INIT
+                - CONSUME
                 - VALORIZE
           description: |-
-            * `INIT` - INIT
+            * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
           explode: true
           style: form
@@ -15168,11 +15168,11 @@ components:
         - total
     ActionTypeEnum:
       enum:
-        - INIT
+        - CONSUME
         - VALORIZE
       type: string
       description: |-
-        * `INIT` - INIT
+        * `CONSUME` - CONSUME
         * `VALORIZE` - VALORIZE
     ActivateAccountRequest:
       type: object

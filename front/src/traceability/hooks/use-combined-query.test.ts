@@ -28,12 +28,12 @@ describe("useCombinedQuery", () => {
     const { result } = renderHook(() =>
       useCombinedQuery(
         { type: [ActionType.VALORIZE], status: [ActionStatus.CREATED] },
-        { type: [ActionType.INIT] }
+        { type: [ActionType.CONSUME] }
       )
     )
 
     expect(result.current).toEqual({
-      type: [ActionType.INIT],
+      type: [ActionType.CONSUME],
       status: [ActionStatus.CREATED],
     })
   })
@@ -41,13 +41,13 @@ describe("useCombinedQuery", () => {
   it("adds filters that only a later query defines", () => {
     const { result } = renderHook(() =>
       useCombinedQuery(
-        { type: [ActionType.INIT] },
+        { type: [ActionType.CONSUME] },
         { origin_material: ["renewable"], site: ["station"] }
       )
     )
 
     expect(result.current).toEqual({
-      type: [ActionType.INIT],
+      type: [ActionType.CONSUME],
       origin_material: ["renewable"],
       site: ["station"],
     })
@@ -56,14 +56,14 @@ describe("useCombinedQuery", () => {
   it("merges more than two queries, each later query overriding the previous ones", () => {
     const { result } = renderHook(() =>
       useCombinedQuery(
-        { type: [ActionType.INIT], status: [ActionStatus.CREATED] },
+        { type: [ActionType.CONSUME], status: [ActionStatus.CREATED] },
         { type: [ActionType.VALORIZE], origin_material: ["renewable"] },
-        { type: [ActionType.INIT], status: undefined, site: ["station"] }
+        { type: [ActionType.CONSUME], status: undefined, site: ["station"] }
       )
     )
 
     expect(result.current).toEqual({
-      type: [ActionType.INIT],
+      type: [ActionType.CONSUME],
       status: [ActionStatus.CREATED],
       origin_material: ["renewable"],
       site: ["station"],

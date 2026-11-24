@@ -21,7 +21,7 @@ class ActionIndustryHandler:
     action_creation_flow: list[ActionFlowEdge] = []
 
     action_creation_serializers = {
-        Action.INIT: ConsumptionSerializer,
+        Action.CONSUME: ConsumptionSerializer,
     }
 
     action_status_authorizations: dict[tuple[str, str], Callable[[Entity, Entity, Entity | None], bool]] = {}

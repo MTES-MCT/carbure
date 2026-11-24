@@ -21,7 +21,7 @@ class ActionStatusTest(SimpleTestCase, PermissionTestMixin):
         self.factory = APIRequestFactory()
         self.actor = Entity(id=1, entity_type=Entity.ADMIN)
         self.holder = Entity(id=2, entity_type=Entity.HRS)
-        self.action = Action(id=3, holder=self.holder, industry=Industry.H2, type=Action.INIT)
+        self.action = Action(id=3, holder=self.holder, industry=Industry.H2, type=Action.CONSUME)
         self.action.status = ActionStatus.PENDING
         self.url = reverse("traceability-action-status", args=[self.action.pk])
         self.view = ActionViewset.as_view({"post": "status"})
@@ -40,7 +40,7 @@ class ActionStatusTest(SimpleTestCase, PermissionTestMixin):
             response = self.view(request, pk=self.action.pk)
         return response, create_status
 
-    def test_admin_can_accept_reject_or_block_pending_init(self):
+    def test_admin_can_accept_reject_or_block_pending_consume(self):
         for target in (ActionStatus.ACCEPTED, ActionStatus.REJECTED, ActionStatus.BLOCKED):
             with self.subTest(status=target):
                 response, create_status = self.post({"status": target})
@@ -81,10 +81,10 @@ class ActionStatusTest(SimpleTestCase, PermissionTestMixin):
 
     def test_authorizes_using_stored_type_and_holders(self):
         parent_holder = Entity(id=4, entity_type=Entity.HRS)
-        self.action.parent = Action(id=5, holder=parent_holder, industry=Industry.H2, type=Action.INIT)
+        self.action.parent = Action(id=5, holder=parent_holder, industry=Industry.H2, type=Action.CONSUME)
         authorize = Mock(return_value=True)
         with patch.object(
-            H2ActionHandler, "action_status_authorizations", {(Action.INIT, ActionStatus.ACCEPTED): authorize}
+            H2ActionHandler, "action_status_authorizations", {(Action.CONSUME, ActionStatus.ACCEPTED): authorize}
         ):
             response, create_status = self.post(
                 {"status": ActionStatus.ACCEPTED, "type": Action.VALORIZE, "holder": self.actor.pk, "parent": None}
@@ -116,7 +116,12 @@ class ActionStatusIntegrationTest(TestCase):
         ExternalAdminRights.objects.create(entity=self.admin, right=ExternalAdminRights.H2)
         setup_current_user(self, "admin@carbure.local", "Admin", "password", [(self.admin, "RW")])
         self.action = ActionFactory.create(
-            holder=self.holder, industry=Industry.H2, type=Action.INIT, status=ActionStatus.PENDING, material=None, site=None
+            holder=self.holder,
+            industry=Industry.H2,
+            type=Action.CONSUME,
+            status=ActionStatus.PENDING,
+            material=None,
+            site=None,
         )
         self.url = reverse("traceability-action-status", args=[self.action.pk])
 

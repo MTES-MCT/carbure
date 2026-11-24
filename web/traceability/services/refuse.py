@@ -7,13 +7,15 @@ from traceability.models import Action, ActionStatus
 
 @transaction.atomic
 def refuse(actions: QuerySet[Action]) -> list[Action]:
-    """Create a REJECTED status for each INIT action currently PENDING.
+    """Create a REJECTED status for each CONSUME action currently PENDING.
 
     Ineligible rows in `actions` are skipped. Raises NoEligibleActionError if none remain.
     """
-    pending_inits = list(actions.filter(type=Action.INIT, status=ActionStatus.PENDING))
-    if not pending_inits:
+    pending_consumes = list(actions.filter(type=Action.CONSUME, status=ActionStatus.PENDING))
+    if not pending_consumes:
         raise NoEligibleActionError()
 
-    ActionStatus.objects.bulk_create(ActionStatus(status=ActionStatus.REJECTED, action=action) for action in pending_inits)
-    return pending_inits
+    ActionStatus.objects.bulk_create(
+        ActionStatus(status=ActionStatus.REJECTED, action=action) for action in pending_consumes
+    )
+    return pending_consumes

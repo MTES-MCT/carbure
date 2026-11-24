@@ -99,7 +99,7 @@ Modèle : `OriginMaterialFilter`. C'est aujourd'hui le seul filtre de ce parcour
 
 ## Ajouter un groupe de colonnes
 
-Utile pour une question du type « un ancêtre a le type INIT », qui n'est pas un champ déjà porté par `inherited_fields`.
+Utile pour une question du type « un ancêtre a le type CONSUME », qui n'est pas un champ déjà porté par `inherited_fields`.
 
 1. `start`, `climb`, et `annotate` si la liste doit renvoyer la valeur. Pour un prédicat : au départ, la valeur de l'action. En montant, garder `cte.col` dès qu'il est vrai, sinon lire le parent. Une fois vrai, la valeur le reste jusqu'à la racine.
 2. L'enregistrer dans `COLUMN_GROUPS`.

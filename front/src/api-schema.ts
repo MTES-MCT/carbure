@@ -3852,7 +3852,7 @@ export interface components {
             readonly total: string;
         };
         /**
-         * @description * `INIT` - INIT
+         * @description * `CONSUME` - CONSUME
          *     * `VALORIZE` - VALORIZE
          * @enum {string}
          */
@@ -16357,7 +16357,7 @@ export interface operations {
                  */
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
-                 * @description * `INIT` - INIT
+                 * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16613,7 +16613,7 @@ export interface operations {
                  */
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
-                 * @description * `INIT` - INIT
+                 * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -16769,7 +16769,7 @@ export interface operations {
                  */
                 status?: PathsApiTraceabilityActionsGetParametersQueryStatus[];
                 /**
-                 * @description * `INIT` - INIT
+                 * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
@@ -17339,7 +17339,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
     REJECTED = "REJECTED"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
-    INIT = "INIT",
+    CONSUME = "CONSUME",
     VALORIZE = "VALORIZE"
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {

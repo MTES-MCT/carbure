@@ -34,7 +34,7 @@ class ActionDeleteTest(TestCase):
         )
 
     def test_deletes_init_action_when_status_is_pending(self):
-        action = self.create_action(type=Action.INIT, status=ActionStatus.PENDING)
+        action = self.create_action(type=Action.CONSUME, status=ActionStatus.PENDING)
 
         response = self.delete(action)
 
@@ -43,7 +43,7 @@ class ActionDeleteTest(TestCase):
         self.assertFalse(ActionStatus.objects.filter(action_id=action.pk).exists())
 
     def test_deletes_init_action_when_status_is_rejected(self):
-        action = self.create_action(type=Action.INIT, status=ActionStatus.REJECTED)
+        action = self.create_action(type=Action.CONSUME, status=ActionStatus.REJECTED)
 
         response = self.delete(action)
 
@@ -51,7 +51,7 @@ class ActionDeleteTest(TestCase):
         self.assertFalse(Action.unannotated.filter(pk=action.pk).exists())
 
     def test_keeps_init_action_when_status_is_accepted(self):
-        action = self.create_action(type=Action.INIT, status=ActionStatus.ACCEPTED)
+        action = self.create_action(type=Action.CONSUME, status=ActionStatus.ACCEPTED)
 
         response = self.delete(action)
 
@@ -59,7 +59,7 @@ class ActionDeleteTest(TestCase):
         self.assertTrue(Action.unannotated.filter(pk=action.pk).exists())
 
     def test_keeps_init_action_when_status_is_created(self):
-        action = self.create_action(type=Action.INIT, status=ActionStatus.CREATED)
+        action = self.create_action(type=Action.CONSUME, status=ActionStatus.CREATED)
 
         response = self.delete(action)
 
@@ -81,7 +81,7 @@ class ActionDeleteTest(TestCase):
             parent=None,
             material=None,
             site=None,
-            type=Action.INIT,
+            type=Action.CONSUME,
             status=ActionStatus.PENDING,
         )
 
@@ -92,7 +92,7 @@ class ActionDeleteTest(TestCase):
 
     def test_returns_forbidden_when_user_has_read_only_rights(self):
         setup_current_user(self, "reader@carbure.local", "Reader", "password", [(self.entity, "RO")])
-        action = self.create_action(type=Action.INIT, status=ActionStatus.PENDING)
+        action = self.create_action(type=Action.CONSUME, status=ActionStatus.PENDING)
 
         response = self.delete(action)
 

@@ -8,12 +8,12 @@ Chaque filière configure son handler, qui hérite d'`ActionIndustryHandler`. L'
 
 ```python
 action_creation_flow = [
-    (None, (Action.INIT, ActionStatus.PENDING)),
-    ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
+    (None, (Action.CONSUME, ActionStatus.PENDING)),
+    ((Action.CONSUME, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
 ]
 ```
 
-Le premier lien permet de créer une action `INIT` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `INIT` actuellement en `PENDING` comme parent.
+Le premier lien permet de créer une action `CONSUME` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `CONSUME` actuellement en `PENDING` comme parent.
 
 La création est refusée si aucun lien ne correspond exactement au parent, au type et au statut demandés. Le parent doit aussi appartenir à la même filière.
 
@@ -23,15 +23,15 @@ La création est refusée si aucun lien ne correspond exactement au parent, au t
 
 ```python
 action_status_authorizations = {
-    (Action.INIT, ActionStatus.PENDING): is_hrs_holder,
-    (Action.INIT, ActionStatus.ACCEPTED): is_h2_admin,
-    (Action.INIT, ActionStatus.REJECTED): is_h2_admin,
-    (Action.INIT, ActionStatus.BLOCKED): is_h2_admin,
+    (Action.CONSUME, ActionStatus.PENDING): is_hrs_holder,
+    (Action.CONSUME, ActionStatus.ACCEPTED): is_h2_admin,
+    (Action.CONSUME, ActionStatus.REJECTED): is_h2_admin,
+    (Action.CONSUME, ActionStatus.BLOCKED): is_h2_admin,
     (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
 }
 ```
 
-Ici, une station HRS peut créer sa propre action `INIT` en `PENDING`. Les statuts `ACCEPTED`, `REJECTED` et `BLOCKED` sont réservés à l'administration H2. La création d'une `VALORIZE` en `CREATED` lui est aussi réservée.
+Ici, une station HRS peut créer sa propre action `CONSUME` en `PENDING`. Les statuts `ACCEPTED`, `REJECTED` et `BLOCKED` sont réservés à l'administration H2. La création d'une `VALORIZE` en `CREATED` lui est aussi réservée.
 
 Chaque clé est un tuple contenant le type d'action et le statut à attribuer.
 
@@ -57,20 +57,20 @@ Une transition est le passage d'un statut à un autre pour une même action. `Ac
 Le changement de statut vérifie deux conditions : le couple demandé figure dans cette liste et la fonction d'autorisation permet d'attribuer le statut d'arrivée.
 
 ```python
-# Transition existante pour une action INIT en attente :
+# Transition existante pour une action CONSUME en attente :
 ActionStatus.can_transition(ActionStatus.PENDING, ActionStatus.ACCEPTED)  # True
-# L'autorisation is_h2_admin est ensuite vérifiée pour INIT / ACCEPTED.
+# L'autorisation is_h2_admin est ensuite vérifiée pour CONSUME / ACCEPTED.
 ```
 
 `action_creation_flow` sert à créer une nouvelle action. Passer une action existante de `PENDING` à `ACCEPTED` conserve la même action et ajoute une entrée à son historique de statuts.
 
 ## Permettre la création par l'API
 
-Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit celui d'`INIT` :
+Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit celui d'`CONSUME` :
 
 ```python
 action_creation_serializers = {
-    Action.INIT: ConsumptionSerializer,
+    Action.CONSUME: ConsumptionSerializer,
 }
 ```
 
@@ -90,7 +90,7 @@ class ConsumptionSerializer(ActionCreationSerializer):
         fields = ["pos_id", "quantity", "working_date", ...]
 ```
 
-Un `POST` d'`INIT` doit donc quand même envoyer `type`, `status` et `holder`. Ces trois valeurs, plus `parent` s'il est présent, se retrouvent dans `validated_data` sans être déclarées par l'enfant.
+Un `POST` d'`CONSUME` doit donc quand même envoyer `type`, `status` et `holder`. Ces trois valeurs, plus `parent` s'il est présent, se retrouvent dans `validated_data` sans être déclarées par l'enfant.
 
 ### Seuls les champs listés sont contrôlés
 

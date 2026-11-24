@@ -23,8 +23,8 @@ def is_holder(actor, holder, parent_holder):
 
 class GenericActionHandler(ActionIndustryHandler):
     industry = Industry.H2
-    action_creation_flow = ((None, (Action.INIT, ActionStatus.PENDING)),)
-    action_status_authorizations = {(Action.INIT, ActionStatus.PENDING): is_holder}
+    action_creation_flow = ((None, (Action.CONSUME, ActionStatus.PENDING)),)
+    action_status_authorizations = {(Action.CONSUME, ActionStatus.PENDING): is_holder}
 
 
 @patch.dict(ACTION_HANDLERS, {GenericActionHandler.industry: GenericActionHandler})
@@ -34,7 +34,7 @@ class ActionCreateTest(SimpleTestCase):
         self.holder = Entity(id=1, entity_type=Entity.OPERATOR)
         self.view = ActionViewset.as_view({"post": "create"})
         self.payload = {
-            "type": Action.INIT,
+            "type": Action.CONSUME,
             "status": ActionStatus.PENDING,
             "holder": self.holder.id,
             "pos_id": "POS-1",
@@ -57,7 +57,7 @@ class ActionCreateTest(SimpleTestCase):
 
     def test_request_matching_flow_validates_action_data(self):
         response = self.post(
-            {"type": Action.INIT, "status": ActionStatus.PENDING, "holder": self.holder.id, "quantity": "invalid"}
+            {"type": Action.CONSUME, "status": ActionStatus.PENDING, "holder": self.holder.id, "quantity": "invalid"}
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -66,7 +66,7 @@ class ActionCreateTest(SimpleTestCase):
 
     def test_missing_serializer_is_reported_as_validation_error(self):
         with patch.object(GenericActionHandler, "get_action_creation_serializers", return_value={}):
-            response = self.post({"type": Action.INIT, "status": ActionStatus.PENDING, "holder": self.holder.id})
+            response = self.post({"type": Action.CONSUME, "status": ActionStatus.PENDING, "holder": self.holder.id})
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("type", response.data)
@@ -105,7 +105,7 @@ class ActionCreateIntegrationTest(TestCase):
         self.url = reverse("traceability-action-list")
         self.params = {"entity_id": self.holder.id, "industry": GenericActionHandler.industry}
         self.payload = {
-            "type": Action.INIT,
+            "type": Action.CONSUME,
             "status": ActionStatus.PENDING,
             "holder": self.holder.id,
             "pos_id": "POS-1",
@@ -125,7 +125,7 @@ class ActionCreateIntegrationTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         action = Action.objects.get(pk=response.data["id"])
-        self.assertEqual(action.type, Action.INIT)
+        self.assertEqual(action.type, Action.CONSUME)
         self.assertEqual(action.industry, GenericActionHandler.industry)
         self.assertEqual(action.holder, self.holder)
         self.assertIsNone(action.parent)

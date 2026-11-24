@@ -80,7 +80,7 @@ def setup_h2_materials() -> tuple[Material, Material]:
     return h2_rfnbo, h2_bio
 
 
-def setup_h2_lots_init() -> tuple[Action, Action]:
+def setup_h2_consume_lots() -> tuple[Action, Action]:
     holder = setup_h2_entity()
     paris_station, lyon_station = setup_h2_stations()
     h2_rfnbo, h2_bio = setup_h2_materials()
@@ -89,7 +89,7 @@ def setup_h2_lots_init() -> tuple[Action, Action]:
         pos_id="H2-DEMO-INIT-001",
         holder=holder,
         industry=Industry.H2,
-        type=Action.INIT,
+        type=Action.CONSUME,
         material=h2_rfnbo,
         quantity=Decimal("120000.000"),
         site=paris_station,
@@ -103,7 +103,7 @@ def setup_h2_lots_init() -> tuple[Action, Action]:
         pos_id="H2-DEMO-INIT-002",
         holder=holder,
         industry=Industry.H2,
-        type=Action.INIT,
+        type=Action.CONSUME,
         material=h2_bio,
         quantity=Decimal("240000.000"),
         site=lyon_station,
@@ -149,7 +149,7 @@ def setup_h2_certificates() -> tuple[Action, Action]:
         pos_id="H2-DEMO-INIT-003",
         holder=holder,
         industry=Industry.H2,
-        type=Action.INIT,
+        type=Action.CONSUME,
         material=h2_rfnbo,
         quantity=Decimal("180000.000"),
         site=paris_station,
@@ -165,7 +165,7 @@ def setup_h2_certificates() -> tuple[Action, Action]:
         pos_id="H2-DEMO-INIT-004",
         holder=holder,
         industry=Industry.H2,
-        type=Action.INIT,
+        type=Action.CONSUME,
         material=h2_bio,
         quantity=Decimal("300000.000"),
         site=lyon_station,
@@ -185,10 +185,10 @@ def setup_h2_certificates() -> tuple[Action, Action]:
 
 
 def setup_h2_inherited_material_chain() -> Action:
-    """INIT lot with no stored material, so the lots page shows the parent's.
+    """CONSUME lot with no stored material, so the lots page shows the parent's.
 
-    The leaf is an INIT (what the H2 lots page lists). Its parent has no material
-    either. The material is resolved one step further, on the root INIT.
+    The leaf is a CONSUME (what the H2 lots page lists). Its parent has no material
+    either. The material is resolved one step further, on the root CONSUME.
     """
     holder = setup_h2_entity()
     paris_station, _lyon_station = setup_h2_stations()
@@ -198,7 +198,7 @@ def setup_h2_inherited_material_chain() -> Action:
         pos_id="H2-DEMO-INHERIT-PARENT",
         holder=holder,
         industry=Industry.H2,
-        type=Action.INIT,
+        type=Action.CONSUME,
         material=h2_rfnbo,
         quantity=Decimal("80000.000"),
         site=paris_station,
@@ -213,7 +213,7 @@ def setup_h2_inherited_material_chain() -> Action:
         parent=parent,
         holder=holder,
         industry=Industry.H2,
-        type=Action.INIT,
+        type=Action.CONSUME,
         material=None,
         quantity=Decimal("40000.000"),
         site=paris_station,
@@ -228,7 +228,7 @@ def setup_h2_inherited_material_chain() -> Action:
         parent=middle,
         holder=holder,
         industry=Industry.H2,
-        type=Action.INIT,
+        type=Action.CONSUME,
         material=None,
         quantity=Decimal("20000.000"),
         site=paris_station,
@@ -252,6 +252,6 @@ def create_sample_data():
     setup_h2_entity()
     setup_h2_stations()
     setup_h2_materials()
-    setup_h2_lots_init()
+    setup_h2_consume_lots()
     setup_h2_certificates()
     setup_h2_inherited_material_chain()

@@ -11,17 +11,17 @@ class H2ActionCreationTest(SimpleTestCase):
         self.handler = H2ActionHandler()
 
     def test_creation_flow(self):
-        pending_init = SimpleNamespace(type=Action.INIT, status=ActionStatus.PENDING)
+        pending_consume = SimpleNamespace(type=Action.CONSUME, status=ActionStatus.PENDING)
 
-        self.assertTrue(self.handler.can_create_action(Action.INIT, ActionStatus.PENDING))
-        self.assertTrue(self.handler.can_create_action(Action.VALORIZE, ActionStatus.CREATED, parent=pending_init))
-        self.assertFalse(self.handler.can_create_action(Action.INIT, ActionStatus.PENDING, parent=pending_init))
+        self.assertTrue(self.handler.can_create_action(Action.CONSUME, ActionStatus.PENDING))
+        self.assertTrue(self.handler.can_create_action(Action.VALORIZE, ActionStatus.CREATED, parent=pending_consume))
+        self.assertFalse(self.handler.can_create_action(Action.CONSUME, ActionStatus.PENDING, parent=pending_consume))
         self.assertFalse(self.handler.can_create_action(Action.VALORIZE, ActionStatus.CREATED))
         self.assertFalse(
             self.handler.can_create_action(
                 Action.VALORIZE,
                 ActionStatus.CREATED,
-                parent=SimpleNamespace(type=Action.INIT, status=ActionStatus.ACCEPTED),
+                parent=SimpleNamespace(type=Action.CONSUME, status=ActionStatus.ACCEPTED),
             )
         )
         self.assertFalse(

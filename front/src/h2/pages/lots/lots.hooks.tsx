@@ -13,7 +13,7 @@ import { ActionIndustry, ActionQuery, ActionType } from "traceability/types"
 import { ActionsPageProps } from "traceability/components/actions-page"
 
 const H2_LOT_QUERY: Partial<ActionQuery> = {
-  type: [ActionType.INIT],
+  type: [ActionType.CONSUME],
 }
 
 const H2_SITE_FIELD_OPTIONS: ActionSiteFieldOptions = {

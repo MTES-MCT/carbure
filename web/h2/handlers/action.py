@@ -15,15 +15,15 @@ class H2ActionHandler(ActionIndustryHandler):
     admin_permission = HasH2AdminRights
 
     action_creation_flow = [
-        (None, (Action.INIT, ActionStatus.PENDING)),
-        ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
+        (None, (Action.CONSUME, ActionStatus.PENDING)),
+        ((Action.CONSUME, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
     ]
 
     action_status_authorizations = {
-        (Action.INIT, ActionStatus.PENDING): is_hrs_holder,
-        (Action.INIT, ActionStatus.ACCEPTED): is_h2_admin,
-        (Action.INIT, ActionStatus.REJECTED): is_h2_admin,
-        (Action.INIT, ActionStatus.BLOCKED): is_h2_admin,
+        (Action.CONSUME, ActionStatus.PENDING): is_hrs_holder,
+        (Action.CONSUME, ActionStatus.ACCEPTED): is_h2_admin,
+        (Action.CONSUME, ActionStatus.REJECTED): is_h2_admin,
+        (Action.CONSUME, ActionStatus.BLOCKED): is_h2_admin,
         (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
     }
 
