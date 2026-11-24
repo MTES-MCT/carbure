@@ -53,7 +53,7 @@ class MaterialTagInline(admin.StackedInline):
 
 @admin.register(Material)
 class MaterialAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "name", "unit", "lhv", "density")
+    list_display = ("id", "code", "name", "classification", "unit", "lhv", "density")
     search_fields = ("code", "name")
     inlines = (MaterialTagInline,)
 
