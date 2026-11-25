@@ -62,7 +62,7 @@ ActionStatus.can_transition(ActionStatus.PENDING, ActionStatus.ACCEPTED)  # True
 
 ## Permettre la création par l'API
 
-Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit ceux d'`CONSUME` et de `TRANSFER` :
+Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit ceux de `CONSUME` et de `TRANSFER` :
 
 ```python
 action_creation_serializers = {
@@ -71,7 +71,7 @@ action_creation_serializers = {
 }
 ```
 
-La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2. [`TransferSerializer`](../serializers/transfer.py) n'accepte que `quantity` : il génère `pos_id` et recopie `working_date` du parent.
+La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2. [`TransferSerializer`](../serializers/transfer.py) n'accepte que `quantity` : il date le transfert au jour de la création et laisse `pos_id` vide.
 
 Les endpoints de création et de changement de statut exigent aussi la `write_permission` du handler. Dans H2, elle vaut actuellement `HasHRSWriteRights` : autoriser `is_h2_admin` dans les règles ne donne donc pas, à lui seul, accès à ces endpoints aux administrateurs.
 

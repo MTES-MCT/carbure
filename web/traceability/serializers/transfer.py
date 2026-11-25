@@ -7,8 +7,8 @@ class TransferSerializer(ActionCreationSerializer):
     """A quantity taken from a parent action.
 
     The recipient stays on the authorization fields, which the view writes as
-    ``holder``. ``pos_id`` is generated and ``working_date`` is copied from the
-    parent, because the client does not send them.
+    ``holder``. ``working_date`` is the day of the transfer. ``pos_id`` stays
+    empty, because the client does not send them.
     """
 
     class Meta(ActionCreationSerializer.Meta):

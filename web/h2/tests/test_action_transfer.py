@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from decimal import Decimal
 
 from django.db import connection
@@ -10,7 +11,7 @@ from rest_framework import status
 from core.models import Entity
 from core.tests_utils import setup_current_user
 from traceability.factories import ActionFactory
-from traceability.models import Action, ActionStatus
+from traceability.models import Action, ActionStatus, Industry
 
 
 class TransferCreateTest(TestCase):
@@ -22,14 +23,14 @@ class TransferCreateTest(TestCase):
         setup_current_user(self, "tester@carbure.local", "Tester", "password", [(self.hrs, "RW")])
         self.certificate = ActionFactory(
             holder=self.hrs,
-            industry=Action.H2,
+            industry=Industry.H2,
             type=Action.VALORIZE,
             status=ActionStatus.CREATED,
             quantity=Decimal("30.000"),
             material=None,
         )
         self.url = reverse("traceability-action-list")
-        self.params = {"entity_id": self.hrs.id, "industry": Action.H2}
+        self.params = {"entity_id": self.hrs.id, "industry": Industry.H2}
 
     def post(self, payload):
         return self.client.post(
@@ -57,9 +58,9 @@ class TransferCreateTest(TestCase):
         self.assertEqual(transfer.holder, self.recipient)
         self.assertEqual(transfer.parent, self.certificate)
         self.assertEqual(transfer.quantity, Decimal("10.000"))
-        self.assertEqual(transfer.working_date, self.certificate.working_date)
-        self.assertEqual(transfer.industry, Action.H2)
-        self.assertTrue(transfer.pos_id)
+        self.assertEqual(transfer.working_date, date.today())
+        self.assertEqual(transfer.industry, Industry.H2)
+        self.assertIsNone(transfer.pos_id)
 
     def test_refuses_a_recipient_that_is_not_tiruert_liable(self):
         other = Entity.objects.create(name="Autre", entity_type=Entity.OPERATOR, is_tiruert_liable=False)

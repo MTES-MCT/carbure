@@ -136,13 +136,21 @@ class ActionViewset(
 
         parent = authorization_serializer.validated_data.get("parent")
 
-        with transaction.atomic():
-            if parent is not None:
-                Action.unannotated.select_for_update().filter(pk=parent.pk).first()
+        if parent is None:
+            # Nothing to lock. Reject the body before opening a transaction.
             serializer = serializer_class(data=request.data, context=context)
             serializer.is_valid(raise_exception=True)
-            action = serializer.save()
-            ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
+            with transaction.atomic():
+                action = serializer.save()
+                ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
+        else:
+            # quantity_available sums the children. Hold the parent lock while it is read.
+            with transaction.atomic():
+                Action.unannotated.select_for_update().filter(pk=parent.pk).first()
+                serializer = serializer_class(data=request.data, context=context)
+                serializer.is_valid(raise_exception=True)
+                action = serializer.save()
+                ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
 
         action = Action.annotate_actions([action])[0]
 
