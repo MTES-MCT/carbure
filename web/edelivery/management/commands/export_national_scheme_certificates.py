@@ -2,6 +2,7 @@ from functools import reduce
 
 from django.core.management.base import BaseCommand
 
+from core.models.certificate import valid_certificate_scope
 from core.models.entity import Entity
 from core.models.entity_certificate import EntityCertificate
 from edelivery.ebms.requests.add_organisation_request import AddOrganisationRequest
@@ -43,6 +44,31 @@ def carbure_entities(fetch_all=False, entity_name=None):
     return (entities, [])
 
 
+def carbure_entity_certificates(entities, errors=None):
+    def check_validity(acc, entity_certificate):
+        certificate = entity_certificate.certificate
+        if valid_certificate_scope(certificate.certificate_type, certificate.scope):
+            acc[0].append(entity_certificate)
+        else:
+            acc[1].append(f"Scope invalid for certificate '{certificate.certificate_id}'")
+
+        return acc
+
+    errors = errors or []
+
+    names = entity_names(entities)
+    fetched_entity_certificates = EntityCertificate.all_for_entities_with_valid_national_scheme_certificate(entities)
+    (entity_certificates, certificate_errors) = reduce(check_validity, fetched_entity_certificates, ([], []))
+    if not entity_certificates:
+        error_message = (
+            f"No valid entity certificate found for {names}: {'; '.join(certificate_errors)}"
+            if certificate_errors
+            else f"No entity certificate found for {names}"
+        )
+        raise RuntimeError(error_message)
+    return (entity_certificates, errors + certificate_errors)
+
+
 def certificate_ids(entity_certificates):
     if not entity_certificates:
         return "no certificate"
@@ -61,11 +87,7 @@ def entity_names(entities):
     return f"{entities_label} {names}"
 
 
-def export_certificates(entities):
-    entity_certificates = EntityCertificate.all_for_entities_with_valid_national_scheme_certificate(entities)
-    if not entity_certificates:
-        raise RuntimeError(f"No valid NS certificate found for {entity_names(entities)}")
-
+def export_certificates(entity_certificates):
     request = AddUpdateCertificateRequest(*entity_certificates)
     requester = Requester(request, timeout=70)
     return requester.do_request()
@@ -117,11 +139,12 @@ class Command(BaseCommand):
         fetch_all = options["all"]
         entity_name = options["entity_name"]
 
-        (entities, errors) = carbure_entities(fetch_all=fetch_all, entity_name=entity_name)
-        entity_certificates = EntityCertificate.all_for_entities_with_valid_national_scheme_certificate(entities)
-        request = AddUpdateCertificateRequest(*entity_certificates)
+        (entities, entity_errors) = carbure_entities(fetch_all=fetch_all, entity_name=entity_name)
+        (entity_certificates, errors) = carbure_entity_certificates(entities, entity_errors)
 
         if dry_run:
+            request = AddUpdateCertificateRequest(*entity_certificates)
+
             self.stdout.write(f"Would check if {entity_names(entities)} present in UDB… (assuming not)")
             self.stdout.write(f"Would create {entity_names(entities)} in UDB…")
             self.stdout.write(f"Would export {certificate_ids(entity_certificates)}…")
@@ -129,19 +152,20 @@ class Command(BaseCommand):
                 self.stdout.write(f"""\
 Would send UDB request with body being:
 {request.body}
-…""")
+""")
+            self.stdout.write("---")
             self.stdout.write("End of dry run")
-            exit(0)
 
-        self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
-        entities_not_in_udb = find_entities_not_in_udb(entities)
+        else:
+            self.stdout.write(f"Checking if {entity_names(entities)} present in UDB…")
+            entities_not_in_udb = find_entities_not_in_udb(entities)
 
-        self.stdout.write(f"Creating {entity_names(entities_not_in_udb)} in UDB…")
-        export_entities(entities_not_in_udb)
+            self.stdout.write(f"Creating {entity_names(entities_not_in_udb)} in UDB…")
+            export_entities(entities_not_in_udb)
 
-        self.stdout.write(f"Exporting {certificate_ids(entity_certificates)}…")
-        result = export_certificates(entities)
-        self.stdout.write(str(result))
+            self.stdout.write(f"Exporting {certificate_ids(entity_certificates)}…")
+            result = export_certificates(entity_certificates)
+            self.stdout.write(str(result))
 
         if errors:
             self.stderr.write(f"Errors encountered: {errors}")

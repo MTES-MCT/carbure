@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from edelivery.management.commands.export_national_scheme_certificates import (
     carbure_entities,
+    carbure_entity_certificates,
     certificate_ids,
     entity_names,
     export_certificates,
@@ -109,6 +110,90 @@ class CarbureEntitiesTest(TestCase):
         self.assertEqual(["Oops"], errors)
 
 
+class CarbureEntityCertificatesTest(TestCase):
+    def setUp(self):
+        module = "edelivery.management.commands.export_national_scheme_certificates"
+        self.patched_EntityCertificate = patch(f"{module}.EntityCertificate").start()
+        self.patched_valid_certificate_scope = patch(f"{module}.valid_certificate_scope", return_value=True).start()
+
+    def tearDown(self):
+        patch.stopall()
+
+    def test_fetches_all_entity_certificates_for_entities_with_valid_national_scheme_certificate(self):
+        query_result = [MagicMock(name="EC1")]
+        patched_query = self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate
+        patched_query.return_value = query_result
+
+        entities = MagicMock(name="entities")
+        (entity_certificates, _) = carbure_entity_certificates(entities)
+        patched_query.assert_called_with(entities)
+        self.assertEqual(query_result, entity_certificates)
+
+    def test_raises_an_error_if_no_certificate_found(self):
+        self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate.return_value = []
+
+        with self.assertRaises(RuntimeError) as context:
+            carbure_entity_certificates([EntityFactory.build(name="ENTITY 1")])
+
+        self.assertEqual("No entity certificate found for entity 'ENTITY 1'", context.exception.args[0])
+
+    def test_adds_error_messages_if_fetched_entity_certificates_in_error(self):
+        self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate.return_value = [
+            MagicMock(
+                name="EC1",
+                **{
+                    "certificate.certificate_id": "CERT_1",
+                    "certificate.certificate_type": "TYPE_1",
+                    "certificate.scope": "SCOPE_1",
+                },
+            ),
+            MagicMock(
+                name="EC2",
+                **{
+                    "certificate.certificate_id": "CERT_2",
+                    "certificate.certificate_type": "TYPE_2",
+                    "certificate.scope": "SCOPE_2",
+                },
+            ),
+        ]
+        self.patched_valid_certificate_scope.return_value = False
+
+        with self.assertRaises(RuntimeError) as context:
+            carbure_entity_certificates([EntityFactory.build(name="ENTITY 1")])
+
+        self.patched_valid_certificate_scope.assert_any_call("TYPE_1", "SCOPE_1")
+        self.patched_valid_certificate_scope.assert_any_call("TYPE_2", "SCOPE_2")
+        self.assertEqual(
+            "No valid entity certificate found for entity 'ENTITY 1': "
+            "Scope invalid for certificate 'CERT_1'; "
+            "Scope invalid for certificate 'CERT_2'",
+            context.exception.args[0],
+        )
+
+    def test_only_keeps_valid_entity_certificates(self):
+        self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate.return_value = [
+            MagicMock(name="EC1", **{"certificate.certificate_id": "CERT_1"}),
+            MagicMock(name="EC2", **{"certificate.certificate_id": "CERT_2"}),
+        ]
+        self.patched_valid_certificate_scope.side_effect = [False, True]
+
+        entities = [EntityFactory.build(name="ENTITY 1")]
+        (entity_certificates, _) = carbure_entity_certificates(entities)
+        self.assertEqual(["CERT_2"], [ec.certificate.certificate_id for ec in entity_certificates])
+
+    def test_adds_encountered_errors_to_previous_errors(self):
+        self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate.return_value = [
+            MagicMock(name="EC1", **{"certificate.certificate_id": "CERT_1"}),
+            MagicMock(name="EC2", **{"certificate.certificate_id": "CERT_2"}),
+        ]
+        self.patched_valid_certificate_scope.side_effect = [False, True]
+
+        entities = [EntityFactory.build(name="ENTITY 1")]
+        previous_errors = ["Some error"]
+        (_, errors) = carbure_entity_certificates(entities, previous_errors)
+        self.assertEqual(["Some error", "Scope invalid for certificate 'CERT_1'"], errors)
+
+
 class CertificateIdsTest(TestCase):
     def test_format_certificate_ids(self):
         ids = ["CERT_ID_1", "CERT_ID_2", "CERT_ID_3"]
@@ -185,40 +270,23 @@ class ExportCertificates(TestCase):
         patch.stopall()
 
     def test_export_national_scheme_certificates(self):
-        patched_fetch = self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate
-        patched_fetch.return_value = [
-            "entity_certificate_1",
-            "entity_certificate_2",
-        ]
         request = "request"
         self.patched_AddUpdateCertificateRequest.return_value = request
         patched_do_request = self.patched_Requester.return_value.do_request
         patched_do_request.return_value = {"responseStatus": "success"}
 
-        patched_fetch.assert_not_called()
         self.patched_AddUpdateCertificateRequest.assert_not_called()
         self.patched_Requester.assert_not_called()
         patched_do_request.assert_not_called()
 
-        entities = ["entity_1", "entity_2"]
-        result = export_certificates(entities)
-        patched_fetch.assert_called_with(entities)
+        entity_certificates = ["entity_certificate_1", "entity_certificate_2"]
+        result = export_certificates(entity_certificates)
         self.patched_AddUpdateCertificateRequest.assert_called_with("entity_certificate_1", "entity_certificate_2")
         self.patched_Requester.assert_called()
         call_args = self.patched_Requester.call_args
         self.assertEqual((request,), call_args.args)
         patched_do_request.assert_called()
         self.assertEqual({"responseStatus": "success"}, result)
-
-    def test_raises_error_if_no_certificate_to_export(self):
-        patched_fetch = self.patched_EntityCertificate.all_for_entities_with_valid_national_scheme_certificate
-        patched_fetch.return_value = []
-
-        with self.assertRaises(RuntimeError) as context:
-            entities = [EntityFactory.build(name="entity_1")]
-            export_certificates(entities)
-
-        self.assertEqual("No valid NS certificate found for entity 'entity_1'", context.exception.args[0])
 
 
 class ExportEntitiesTest(TestCase):
