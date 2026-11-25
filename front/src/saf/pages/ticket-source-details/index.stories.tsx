@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { TicketSourceDetails } from "./index"
 import { okSafTicketSourceDetails } from "saf/__test__/api"
 import { COMMON_MOCKS } from "@storybook/mocks/common"

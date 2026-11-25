@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react"
-import { userEvent, waitFor, within } from "@storybook/test"
+import type { Meta, StoryObj } from "@storybook/react-vite"
+import { userEvent, waitFor, within } from "storybook/test"
 import mswHandlers from "@storybook/mocks"
 import { mockUser } from "common/__test__/helpers"
 import { EntityType } from "common/types"

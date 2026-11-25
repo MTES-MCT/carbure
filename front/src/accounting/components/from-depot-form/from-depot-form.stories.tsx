@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { FromDepotForm } from "./from-depot-form"
 import { Form, useForm } from "common/components/form2"

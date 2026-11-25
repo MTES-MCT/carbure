@@ -8,7 +8,7 @@ import {
   useNavigationType,
   createRoutesFromChildren,
   matchRoutes,
-} from "react-router-dom"
+} from "react-router"
 
 export const initSentry = () => {
   // Define sentry only if url/env are defined in .env AND environment is not local

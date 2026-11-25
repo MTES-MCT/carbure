@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { OperationDetail } from "./operation-detail"
 import { generateGetOperationDetail } from "accounting/__test__/api/biofuels/operations"

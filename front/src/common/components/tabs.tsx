@@ -6,7 +6,7 @@ import {
   resolvePath,
   useLocation,
   useResolvedPath,
-} from "react-router-dom"
+} from "react-router"
 import { useRouteBase } from "common/hooks/route-base"
 import css from "./tabs.module.css"
 import { Layout, layout } from "./scaffold"

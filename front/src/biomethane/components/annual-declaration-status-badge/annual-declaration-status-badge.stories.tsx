@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { AnnualDeclarationStatusBadge } from "./annual-declaration-status-badge"
 import { AnnualDeclarationStatus } from "biomethane/types"
 

@@ -16,7 +16,7 @@ import {
 import MeterReadingsApplicationsTable from "elec-charge-points/components/meter-readings/table"
 import { ElecMeterReadingsApplication } from "elec-charge-points/types"
 import { useTranslation } from "react-i18next"
-import { useLocation, useMatch } from "react-router-dom"
+import { useLocation, useMatch } from "react-router"
 import FilterMultiSelect from "../../../common/molecules/filter-select"
 import * as api from "../../api"
 import { StatusSwitcher } from "./status-switcher"

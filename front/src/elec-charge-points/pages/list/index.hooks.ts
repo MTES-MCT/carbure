@@ -1,7 +1,7 @@
 import { FilterMultiSelectProps } from "common/molecules/filter-select"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
-import { useMatch } from "react-router-dom"
+import { useMatch } from "react-router"
 import { ChargePointFilter } from "./types"
 import * as api from "./api"
 import { CBQueryParams } from "common/hooks/query-builder"

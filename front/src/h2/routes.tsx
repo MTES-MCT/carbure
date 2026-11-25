@@ -1,6 +1,6 @@
 import useEntity from "common/hooks/entity"
 import { lazy } from "react"
-import { Navigate, Outlet, Route, Routes } from "react-router-dom"
+import { Navigate, Outlet, Route, Routes } from "react-router"
 import { useH2Permissions } from "./hooks/use-h2-permissions"
 
 const currentYear = new Date().getFullYear()

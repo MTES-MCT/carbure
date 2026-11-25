@@ -17,7 +17,7 @@ import {
   normalizeEntityType,
 } from "common/utils/normalizers"
 import useEntity from "common/hooks/entity"
-import { useLocation } from "react-router-dom"
+import { useLocation } from "react-router"
 import Tag from "common/components/tag"
 import { Operation, useEntitySummaryFilters } from "./entity-summary.hooks"
 import { SearchInput } from "common/components/input"

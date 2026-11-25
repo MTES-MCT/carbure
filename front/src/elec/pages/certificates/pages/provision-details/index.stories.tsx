@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { reactRouterParameters } from "storybook-addon-remix-react-router"
 import GLOBAL_MOCKS from "@storybook/mocks"
 import { getViewport } from "@storybook/mocks/utils"

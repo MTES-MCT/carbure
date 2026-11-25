@@ -1,4 +1,4 @@
-import { Navigate, useLocation, useParams } from "react-router-dom"
+import { Navigate, useLocation, useParams } from "react-router"
 
 import { ActionQuery } from "traceability/types"
 import { useStableQuery } from "traceability/hooks/use-stable-query"

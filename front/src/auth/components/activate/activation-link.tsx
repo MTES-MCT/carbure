@@ -1,6 +1,6 @@
 import { ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { Button } from "common/components/button2"
 import { LoaderLine } from "common/components/icon"
 import { Text } from "common/components/text"

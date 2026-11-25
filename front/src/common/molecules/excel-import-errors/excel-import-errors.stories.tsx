@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { ExcelImportErrors } from "./excel-import-errors"
 
 const meta: Meta<typeof ExcelImportErrors> = {

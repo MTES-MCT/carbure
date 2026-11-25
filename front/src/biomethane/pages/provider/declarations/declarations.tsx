@@ -1,6 +1,6 @@
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { useTranslation } from "react-i18next"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 import { useQuery } from "common/hooks/async"
 import { Table } from "common/components/table2"
 import { NoResult } from "common/components/no-result2"

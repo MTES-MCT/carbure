@@ -1,10 +1,10 @@
 import React, { lazy, Suspense, useEffect } from "react"
-import type { Preview } from "@storybook/react"
+import type { Preview } from "@storybook/react-vite"
 import isChromatic from "chromatic/isChromatic"
 import i18n from "../src/i18n"
 import { LoaderOverlay } from "../src/common/components/scaffold"
 import { I18nextProvider } from "react-i18next"
-import { initialize, mswLoader } from "msw-storybook-addon"
+import { mswLoader } from "msw-storybook-addon/csf3"
 import { withRouter } from "storybook-addon-remix-react-router"
 import mswHandlers from "./mocks"
 import useUserManager, { UserContext } from "../src/common/hooks/user"
@@ -20,16 +20,6 @@ import "../src/common/assets/css/index.css"
 // Do not import the component directly to avoid bad css order import during storybook build
 // For more information, replace the line with a simple import and see Missing fields stories in dev and build mode
 const StoryDescription = lazy(() => import("./components/description"))
-
-// Init MSW
-initialize({
-  onUnhandledRequest: ({ url, method }) => {
-    const pathname = new URL(url).pathname
-    if (pathname.endsWith(".css")) {
-      return
-    }
-  },
-})
 
 const withI18next = (Story, context) => {
   const { locale } = context.globals
@@ -88,7 +78,7 @@ const preview: Preview = {
       handlers: mswHandlers,
     },
   },
-  loaders: [mswLoader],
+  loaders: [mswLoader()],
 }
 
 export const globalTypes = {

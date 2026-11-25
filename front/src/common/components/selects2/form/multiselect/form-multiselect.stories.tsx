@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { FormMultiSelect } from "./form-multiselect"
 import { ReactNode, useState } from "react"
 

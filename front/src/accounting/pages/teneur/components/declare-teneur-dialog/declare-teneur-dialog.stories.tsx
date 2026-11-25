@@ -1,7 +1,7 @@
-import { Meta, StoryObj } from "@storybook/react"
+import { Meta, StoryObj } from "@storybook/react-vite"
 import { DeclareTeneurDialog } from "./declare-teneur-dialog"
 import { getViewport } from "@storybook/mocks/utils"
-import { expect, userEvent, waitFor, within } from "@storybook/test"
+import { expect, userEvent, waitFor, within } from "storybook/test"
 import {
   fillQuantityInput,
   fillQuantityForm,

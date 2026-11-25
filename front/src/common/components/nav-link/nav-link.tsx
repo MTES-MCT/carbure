@@ -1,7 +1,7 @@
 import {
   NavLink as RouterNavLink,
   NavLinkProps as RouterNavLinkProps,
-} from "react-router-dom"
+} from "react-router"
 import cl from "clsx"
 import css from "./nav-link.module.css"
 

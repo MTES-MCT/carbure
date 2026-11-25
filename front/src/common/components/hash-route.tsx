@@ -1,4 +1,4 @@
-import { matchPath, useLocation, useMatch } from "react-router-dom"
+import { matchPath, useLocation, useMatch } from "react-router"
 
 interface HashRouteProps {
   path: string

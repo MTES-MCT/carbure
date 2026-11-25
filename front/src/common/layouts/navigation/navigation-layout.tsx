@@ -7,7 +7,7 @@ import { CarbureFooter } from "./footer"
 import { PrivateNavigationProvider } from "./private/private-navigation.context"
 import { DevBanner } from "common/components/dev-banner"
 import css from "./navigation-layout.module.css"
-import { useLocation } from "react-router-dom"
+import { useLocation } from "react-router"
 import { ROUTE_URLS } from "common/utils/routes"
 
 export const NavigationLayout = ({ children }: PropsWithChildren) => {

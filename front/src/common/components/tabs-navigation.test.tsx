@@ -8,7 +8,7 @@ import {
   Route,
   Routes,
   useLocation,
-} from "react-router-dom"
+} from "react-router"
 import LegacyTabs from "./tabs"
 import legacyCss from "./tabs.module.css"
 import { Tabs } from "./tabs2"

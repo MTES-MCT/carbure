@@ -4,7 +4,7 @@ import { useQuery } from "common/hooks/async"
 import { useYearsProvider } from "common/providers/years-provider"
 import { Api } from "common/services/api"
 import { useCallback, useEffect } from "react"
-import { useLocation, useNavigate, useParams } from "react-router-dom"
+import { useLocation, useNavigate, useParams } from "react-router"
 
 const currentYear = new Date().getFullYear()
 

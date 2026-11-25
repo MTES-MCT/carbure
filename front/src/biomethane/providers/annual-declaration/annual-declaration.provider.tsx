@@ -4,7 +4,7 @@ import { useQuery } from "common/hooks/async"
 import useEntity from "common/hooks/entity"
 import { LoaderOverlay } from "common/components/scaffold"
 import { AnnualDeclaration, AnnualDeclarationStatus } from "biomethane/types"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"
 
 export interface AnnualDeclarationContextValue {

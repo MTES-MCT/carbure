@@ -1,6 +1,6 @@
 import { ObjectivesYearSelect } from "accounting/components/objectives-year-select"
 import { Content, Row } from "common/components/scaffold"
-import { Outlet } from "react-router-dom"
+import { Outlet } from "react-router"
 
 export const TeneurLayout = () => {
   return (

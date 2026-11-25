@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { ShowMore } from "./show-more"
 import { Select } from "../selects2"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 
 const meta: Meta<typeof ShowMore> = {
   component: ShowMore,

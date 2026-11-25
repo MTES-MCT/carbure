@@ -1,6 +1,6 @@
 import { Button } from "common/components/button2"
 import { useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { Form, useForm } from "common/components/form2"
 import { TextInput } from "common/components/inputs2"
 import { useNotify, useNotifyError } from "common/components/notifications"

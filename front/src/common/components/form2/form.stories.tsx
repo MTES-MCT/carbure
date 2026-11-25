@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Form, useForm } from "./form"
 import { TextInput } from "../inputs2"
 import { Button } from "../button2"
-import { fn } from "@storybook/test"
+import { fn } from "storybook/test"
 
 const meta: Meta<typeof Form> = {
   component: Form,

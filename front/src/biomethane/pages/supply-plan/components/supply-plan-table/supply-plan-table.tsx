@@ -8,7 +8,7 @@ import { NoResult } from "common/components/no-result2"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { useTranslation } from "react-i18next"
 import { useSupplyPlanColumns } from "./supply-plan-table.hooks"
-import { useLocation } from "react-router-dom"
+import { useLocation } from "react-router"
 import { Pagination } from "common/components/pagination2"
 import { formatNumber } from "common/utils/formatters"
 

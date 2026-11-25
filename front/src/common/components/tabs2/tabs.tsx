@@ -1,4 +1,4 @@
-import { createPath, NavLink, resolvePath, useLocation } from "react-router-dom"
+import { createPath, NavLink, resolvePath, useLocation } from "react-router"
 import { useRouteBase } from "common/hooks/route-base"
 import { layout, Layout } from "../scaffold"
 import { useMatcher } from "./tabs.hooks"

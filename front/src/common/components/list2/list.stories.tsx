@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { List } from "./list"
 import { useState } from "react"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 
 const meta: Meta<typeof List<{ label: string; value: string }, string>> = {
   component: List,

@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 
 import Dialog from "common/components/dialog2/dialog"
 import { useHashMatch } from "common/components/hash-route"

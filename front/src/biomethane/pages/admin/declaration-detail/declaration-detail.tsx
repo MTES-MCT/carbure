@@ -1,5 +1,5 @@
 import { SelectedEntityProvider } from "common/providers/selected-entity-provider"
-import { Navigate, Outlet, useParams } from "react-router-dom"
+import { Navigate, Outlet, useParams } from "react-router"
 import { DeclarationDetailHeader } from "./components/declaration-detail-header"
 import { useRoutes } from "common/hooks/routes"
 import { useBiomethaneProducers } from "../hooks/use-biomethane-producers"

@@ -10,7 +10,7 @@ import { Column } from "common/components/table2"
 import { Tab } from "common/components/tabs2"
 import useEntity from "common/hooks/entity"
 import { compact } from "common/utils/collection"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 
 export function useStatus() {
   const params = useParams<"status">()

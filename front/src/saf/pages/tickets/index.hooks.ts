@@ -1,7 +1,7 @@
 import useEntity from "common/hooks/entity"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 import { useMemo } from "react"
-import { useMatch } from "react-router-dom"
+import { useMatch } from "react-router"
 
 import {
   SafTicketQueryBuilder,

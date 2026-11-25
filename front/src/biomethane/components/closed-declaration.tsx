@@ -9,7 +9,7 @@ import { usePrivateNavigation } from "common/layouts/navigation"
 import { formatDate } from "common/utils/formatters"
 import { ROUTE_URLS } from "common/utils/routes"
 import { Trans, useTranslation } from "react-i18next"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 
 const currentYear = new Date().getFullYear()
 /**

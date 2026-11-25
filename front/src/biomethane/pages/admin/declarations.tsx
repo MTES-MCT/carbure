@@ -7,7 +7,7 @@ import {
   getBiomethaneProducers,
 } from "./api"
 import useEntity from "common/hooks/entity"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { useRoutes } from "common/hooks/routes"
 import { usePrivateNavigation } from "common/layouts/navigation"
 import { Autocomplete } from "common/components/autocomplete2"

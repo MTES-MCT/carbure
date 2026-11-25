@@ -1,5 +1,5 @@
 import { Content } from "common/components/scaffold"
-import { Outlet, useParams } from "react-router-dom"
+import { Outlet, useParams } from "react-router"
 import { AccountingSectorTabs } from "accounting/components/accounting-sector-tabs"
 
 const OperationsBalancesLayout = () => {

@@ -13,7 +13,7 @@ import {
   ElecAuditorApplicationsStatus,
 } from "elec-auditor/types"
 import { useTranslation } from "react-i18next"
-import { To, useLocation, useMatch } from "react-router-dom"
+import { To, useLocation, useMatch } from "react-router"
 import {
   useCBQueryBuilder,
   useCBQueryParamsStore,

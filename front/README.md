@@ -11,7 +11,7 @@
 - `create-react-app`
 - `typescript`
 - `react` + `react-dom`
-- `react-router-dom`: navigation client
+- `react-router`: navigation client
 - `axios`: communication avec l'api
 - `react-async-hook`: intégration de l'async dans react
 - `clsx`: outil pour combiner des classes CSS

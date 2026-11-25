@@ -15,7 +15,7 @@ import {
 } from "./supply-input-dialog"
 import { ExcelImportDialog } from "./supply-excel-import-dialog"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 import { useRoutes } from "common/hooks/routes"
 import { MissingFields } from "biomethane/components/missing-fields"
 import { useSelectedEntity } from "common/providers/selected-entity-provider"

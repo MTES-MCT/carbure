@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import mswHandlers from "@storybook/mocks"
 import { CompanyRegistrationDialog } from "./registration-dialog"
 import {
