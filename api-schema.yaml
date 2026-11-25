@@ -13857,10 +13857,12 @@ paths:
               title: Type d'action
               enum:
                 - CONSUME
+                - TRANSFER
                 - VALORIZE
           description: |-
             * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
+            * `TRANSFER` - TRANSFER
           explode: true
           style: form
         - in: query
@@ -14281,10 +14283,12 @@ paths:
               title: Type d'action
               enum:
                 - CONSUME
+                - TRANSFER
                 - VALORIZE
           description: |-
             * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
+            * `TRANSFER` - TRANSFER
           explode: true
           style: form
         - in: query
@@ -14592,10 +14596,12 @@ paths:
               title: Type d'action
               enum:
                 - CONSUME
+                - TRANSFER
                 - VALORIZE
           description: |-
             * `CONSUME` - CONSUME
             * `VALORIZE` - VALORIZE
+            * `TRANSFER` - TRANSFER
           explode: true
           style: form
         - in: query
@@ -15043,8 +15049,13 @@ components:
           nullable: true
           title: N° de POS
           maxLength: 48
+        working_date:
+          type: string
+          format: date
+          title: Date de référence
       required:
         - id
+        - working_date
     ActionShippingMethodEnum:
       enum:
         - ROAD
@@ -15170,10 +15181,12 @@ components:
       enum:
         - CONSUME
         - VALORIZE
+        - TRANSFER
       type: string
       description: |-
         * `CONSUME` - CONSUME
         * `VALORIZE` - VALORIZE
+        * `TRANSFER` - TRANSFER
     ActivateAccountRequest:
       type: object
       properties:

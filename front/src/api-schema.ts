@@ -3798,6 +3798,11 @@ export interface components {
             readonly id: number;
             /** N° de POS */
             pos_id?: string | null;
+            /**
+             * Date de référence
+             * Format: date
+             */
+            working_date: string;
         };
         /**
          * @description * `ROAD` - Road transport
@@ -3854,6 +3859,7 @@ export interface components {
         /**
          * @description * `CONSUME` - CONSUME
          *     * `VALORIZE` - VALORIZE
+         *     * `TRANSFER` - TRANSFER
          * @enum {string}
          */
         ActionTypeEnum: PathsApiTraceabilityActionsGetParametersQueryType;
@@ -16361,6 +16367,7 @@ export interface operations {
                 /**
                  * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -16617,6 +16624,7 @@ export interface operations {
                 /**
                  * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -16773,6 +16781,7 @@ export interface operations {
                 /**
                  * @description * `CONSUME` - CONSUME
                  *     * `VALORIZE` - VALORIZE
+                 *     * `TRANSFER` - TRANSFER
                  */
                 type?: PathsApiTraceabilityActionsGetParametersQueryType[];
                 /** @description Filter actions by working date year. */
@@ -17342,6 +17351,7 @@ export enum PathsApiTraceabilityActionsGetParametersQueryStatus {
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryType {
     CONSUME = "CONSUME",
+    TRANSFER = "TRANSFER",
     VALORIZE = "VALORIZE"
 }
 export enum PathsApiTraceabilityActionsFiltersGetParametersQueryFilter {

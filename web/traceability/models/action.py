@@ -73,7 +73,8 @@ class Action(models.Model):
 
     CONSUME = "CONSUME"
     VALORIZE = "VALORIZE"
-    TYPES = [(CONSUME, "CONSUME"), (VALORIZE, "VALORIZE")]
+    TRANSFER = "TRANSFER"
+    TYPES = [(CONSUME, "CONSUME"), (VALORIZE, "VALORIZE"), (TRANSFER, "TRANSFER")]
     type = models.CharField(verbose_name="Type d'action", choices=TYPES, max_length=16)
 
     parent = models.ForeignKey(

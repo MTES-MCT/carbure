@@ -10,10 +10,11 @@ Chaque filière configure son handler, qui hérite d'`ActionIndustryHandler`. L'
 action_creation_flow = [
     (None, (Action.CONSUME, ActionStatus.PENDING)),
     ((Action.CONSUME, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
+    ((Action.VALORIZE, ActionStatus.CREATED), (Action.TRANSFER, ActionStatus.PENDING)),
 ]
 ```
 
-Le premier lien permet de créer une action `CONSUME` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `CONSUME` actuellement en `PENDING` comme parent.
+Le premier lien permet de créer une action `CONSUME` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `CONSUME` actuellement en `PENDING` comme parent. Le troisième permet de créer une action `TRANSFER` en `PENDING`, avec une action `VALORIZE` actuellement en `CREATED` comme parent.
 
 La création est refusée si aucun lien ne correspond exactement au parent, au type et au statut demandés. Le parent doit aussi appartenir à la même filière.
 
@@ -25,15 +26,10 @@ La création est refusée si aucun lien ne correspond exactement au parent, au t
 action_status_authorizations = {
     (Action.CONSUME, ActionStatus.PENDING): is_hrs_holder,
     (Action.CONSUME, ActionStatus.ACCEPTED): is_h2_admin,
-    (Action.CONSUME, ActionStatus.REJECTED): is_h2_admin,
-    (Action.CONSUME, ActionStatus.BLOCKED): is_h2_admin,
-    (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
 }
 ```
 
-Ici, une station HRS peut créer sa propre action `CONSUME` en `PENDING`. Les statuts `ACCEPTED`, `REJECTED` et `BLOCKED` sont réservés à l'administration H2. La création d'une `VALORIZE` en `CREATED` lui est aussi réservée.
-
-Chaque clé est un tuple contenant le type d'action et le statut à attribuer.
+Chaque clé est un couple `(type, statut)`. La fonction dit qui peut l'attribuer. La liste complète est celle du handler de la filière.
 
 La fonction reçoit trois entités : l'entité qui agit, le détenteur de l'action et le détenteur du parent (`None` sans parent). Par exemple, [`is_hrs_holder`](../../h2/handlers/authorization.py) vérifie que l'entité est une station HRS et agit pour elle-même :
 
@@ -66,15 +62,16 @@ ActionStatus.can_transition(ActionStatus.PENDING, ActionStatus.ACCEPTED)  # True
 
 ## Permettre la création par l'API
 
-Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit celui d'`CONSUME` :
+Le flow et l'autorisation ne suffisent pas : le type doit aussi avoir un serializer de création, qui hérite d'[`ActionCreationSerializer`](../serializers/creation/serializer.py). La base fournit ceux de `CONSUME` et de `TRANSFER` :
 
 ```python
 action_creation_serializers = {
     Action.CONSUME: ConsumptionSerializer,
+    Action.TRANSFER: TransferSerializer,
 }
 ```
 
-La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2.
+La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2. [`TransferSerializer`](../serializers/transfer.py) n'accepte que `quantity` : il date le transfert au jour de la création et laisse `pos_id` vide.
 
 Les endpoints de création et de changement de statut exigent aussi la `write_permission` du handler. Dans H2, elle vaut actuellement `HasHRSWriteRights` : autoriser `is_h2_admin` dans les règles ne donne donc pas, à lui seul, accès à ces endpoints aux administrateurs.
 
@@ -96,10 +93,12 @@ Un `POST` d'`CONSUME` doit donc quand même envoyer `type`, `status` et `holder`
 
 [`field_checks`](../serializers/creation/serializer.py) associe un champ à une méthode. La méthode ne tourne que si l'enfant a mis le champ dans `Meta.fields`. Aujourd'hui, la règle commune est la quantité : strictement positive, et au plus égale à la quantité restante du parent.
 
+Quand le corps contient un `parent`, [`create`](../views/action.py) verrouille cette ligne avant de contrôler la quantité. La création suivante attend la fin de la première, puis relit `quantity_available`. Deux créations simultanées du même parent ne peuvent plus dépasser le reste.
+
 Remplacer la règle pour un type :
 
 ```python
-class TransferSerializer(ActionCreationSerializer):
+class ChildSerializer(ActionCreationSerializer):
     class Meta(ActionCreationSerializer.Meta):
         fields = ["quantity"]
 

@@ -134,16 +134,27 @@ class ActionViewset(
         if serializer_class is None:
             raise ValidationError({"type": _("Ce type d'action ne peut pas être créé.")})
 
-        # Validate the request data against the serializer class
-        serializer = serializer_class(data=request.data, context=context)
-        serializer.is_valid(raise_exception=True)
+        parent = authorization_serializer.validated_data.get("parent")
 
-        # Create the action and assign the status
-        with transaction.atomic():
-            action = serializer.save()
-            ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
-            action = Action.annotate_actions([action])[0]
-            return Response(ActionSerializer(action, context=context).data, status=status.HTTP_201_CREATED)
+        if parent is None:
+            # Nothing to lock. Reject the body before opening a transaction.
+            serializer = serializer_class(data=request.data, context=context)
+            serializer.is_valid(raise_exception=True)
+            with transaction.atomic():
+                action = serializer.save()
+                ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
+        else:
+            # quantity_available sums the children. Hold the parent lock while it is read.
+            with transaction.atomic():
+                Action.unannotated.select_for_update().filter(pk=parent.pk).first()
+                serializer = serializer_class(data=request.data, context=context)
+                serializer.is_valid(raise_exception=True)
+                action = serializer.save()
+                ActionStatus.objects.create(action=action, status=serializer.validated_data["status"])
+
+        action = Action.annotate_actions([action])[0]
+
+        return Response(ActionSerializer(action, context=context).data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
         request=ActionStatusAuthorizationSerializer,
