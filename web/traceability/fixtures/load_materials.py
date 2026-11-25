@@ -1,5 +1,6 @@
 import csv
 import os
+from pathlib import Path
 
 import django
 from django.db import transaction
@@ -12,83 +13,82 @@ from feedstocks.models import Classification  # noqa: E402
 from traceability.models import Material, MaterialTag  # noqa: E402
 from traceability.models.material_tag import Tag  # noqa: E402
 
-filename = "%s/web/traceability/fixtures/materials.csv" % (os.environ["CARBURE_HOME"])
+REQUIRED_COLUMNS = {"code", "name", "unit"}
 
 
-def cell(row, column):
-    """Return None for empty or missing cells."""
-    return (row.get(column) or "").strip() or None
-
-
-def read_materials(filename):
-    materials = {}
-    material_tags = {}
-
+def read_catalog(filename):
+    catalog = {}
     with open(filename, newline="", encoding="utf-8-sig") as csvfile:
         reader = csv.DictReader(csvfile)
         columns = set(reader.fieldnames or ())
-        tag_columns = columns & set(Tag.values)
 
-        for row in reader:
-            code = cell(row, "code")
-            name = cell(row, "name")
-            unit = cell(row, "unit")
-            if not code or not name or not unit:
-                raise ValueError(f"Material row is missing code, name or unit: {row}")
+        for raw_row in reader:
+            row = {column: (raw_row[column] or "").strip() for column in columns}
+            if not all(row.get(column) for column in REQUIRED_COLUMNS):
+                raise ValueError(f"Material row is missing code, name or unit: {raw_row}")
+            catalog[row["code"]] = row
 
-            materials[code] = {
-                "code": code,
-                "name": name,
-                "unit": unit,
-                "description": cell(row, "description") or "",
-                "lhv": cell(row, "lhv"),
-                "density": cell(row, "density"),
-            }
-            if "category" in columns:
-                materials[code]["category"] = cell(row, "category")
-            material_tags[code] = {tag_type: (cell(row, tag_type) or "").split() for tag_type in tag_columns}
-
-    return materials, material_tags, tag_columns
+    return catalog, columns
 
 
-def resolve_classifications(materials):
-    categories = {material["category"] for material in materials.values() if material.get("category")}
+def sync_materials(catalog):
+    categories = {row["category"] for row in catalog.values() if row.get("category")}
     classifications = {
         category: Classification.objects.get_or_create(group="", category=category, subcategory="")[0]
         for category in categories
     }
-    for material in materials.values():
-        if "category" in material:
-            material["classification"] = classifications.get(material.pop("category"))
+
+    materials = []
+    for code, row in catalog.items():
+        material = {
+            "code": code,
+            "name": row["name"],
+            "unit": row["unit"],
+            "description": row.get("description", ""),
+            "lhv": row.get("lhv") or None,
+            "density": row.get("density") or None,
+        }
+        if "category" in row:
+            material["classification"] = classifications.get(row["category"])
+        materials.append(material)
+
+    bulk_update_or_create(Material, "code", materials)
 
 
-def sync_tags(material_tags, tag_columns):
-    material_ids = dict(Material.objects.filter(code__in=material_tags).values_list("code", "id"))
-    missing_tags = {
+def sync_tags(catalog, columns):
+    tag_columns = columns & set(Tag.values)
+    if not catalog or not tag_columns:
+        return
+
+    material_ids = dict(Material.objects.filter(code__in=catalog).values_list("code", "pk"))
+    tags_to_create = {
         (material_ids[code], tag_type, value)
-        for code, tags in material_tags.items()
-        for tag_type, values in tags.items()
-        for value in values
+        for code, row in catalog.items()
+        for tag_type in tag_columns
+        for value in row[tag_type].split()
     }
 
     existing_tags = MaterialTag.objects.filter(material_id__in=material_ids.values(), type__in=tag_columns).order_by("pk")
     obsolete_ids = []
     for tag in existing_tags:
         key = (tag.material_id, tag.type, tag.value)
-        if key in missing_tags:
-            missing_tags.remove(key)
+        if key in tags_to_create:
+            tags_to_create.remove(key)
         else:
             obsolete_ids.append(tag.pk)
 
     MaterialTag.objects.filter(pk__in=obsolete_ids).delete()
     MaterialTag.objects.bulk_create(
-        [MaterialTag(material_id=material_id, type=tag_type, value=value) for material_id, tag_type, value in missing_tags]
+        [MaterialTag(material_id=material_id, type=tag_type, value=value) for material_id, tag_type, value in tags_to_create]
     )
 
 
-materials, material_tags, tag_columns = read_materials(filename)
+def load_materials(filename):
+    catalog, columns = read_catalog(filename)
 
-with transaction.atomic():
-    resolve_classifications(materials)
-    bulk_update_or_create(Material, "code", list(materials.values()))
-    sync_tags(material_tags, tag_columns)
+    with transaction.atomic():
+        sync_materials(catalog)
+        sync_tags(catalog, columns)
+
+
+load_materials(Path(os.environ["CARBURE_HOME"]) / "web/traceability/fixtures/materials.csv")
