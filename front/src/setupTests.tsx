@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom/extend-expect"
+import "@testing-library/jest-dom"
 import i18n from "i18next"
 import { Suspense } from "react"
 import { render as baseRender } from "@testing-library/react"
