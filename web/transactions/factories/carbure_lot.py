@@ -54,7 +54,7 @@ class CarbureLotFactory(factory.django.DjangoModelFactory):
     carbure_client = factory.Iterator(Entity.objects.all())
     unknown_client = factory.Faker("company")
 
-    dispatch_date = factory.Faker("date_this_year")
+    dispatch_date = factory.LazyAttribute(lambda lot: lot.delivery_date)
     carbure_dispatch_site = None
     unknown_dispatch_site = None
     dispatch_site_country = None
