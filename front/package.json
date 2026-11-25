@@ -65,7 +65,7 @@
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "test": "vitest",
+    "test": "vitest --no-isolate",
     "translate": "i18next",
     "translate-missing": "node scripts/translate-missing.js",
     "lint": "oxlint src",
