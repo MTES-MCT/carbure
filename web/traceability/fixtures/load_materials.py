@@ -21,10 +21,12 @@ def read_catalog(filename):
     with open(filename, newline="", encoding="utf-8-sig") as csvfile:
         reader = csv.DictReader(csvfile)
         columns = set(reader.fieldnames or ())
+        if not REQUIRED_COLUMNS <= columns:
+            raise ValueError("Material CSV must have code, name and unit columns")
 
         for raw_row in reader:
             row = {column: (raw_row[column] or "").strip() for column in columns}
-            if not all(row.get(column) for column in REQUIRED_COLUMNS):
+            if not all(row[column] for column in REQUIRED_COLUMNS):
                 raise ValueError(f"Material row is missing code, name or unit: {raw_row}")
             catalog[row["code"]] = row
 
@@ -47,12 +49,14 @@ def sync_materials(catalog):
             "description": row.get("description", ""),
             "lhv": row.get("lhv") or None,
             "density": row.get("density") or None,
+            "is_active": True,
         }
         if "category" in row:
             material["classification"] = classifications.get(row["category"])
         materials.append(material)
 
     bulk_update_or_create(Material, "code", materials)
+    Material.active.exclude(code__in=catalog).update(is_active=False)
 
 
 def sync_tags(catalog, columns):

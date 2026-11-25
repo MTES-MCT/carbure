@@ -4,7 +4,7 @@ from transactions.models import Site
 
 
 def material(_entity):
-    return Material.objects.all()
+    return Material.active.all()
 
 
 def site(_entity):

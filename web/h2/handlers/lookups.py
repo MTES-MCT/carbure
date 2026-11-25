@@ -4,7 +4,7 @@ from transactions.models import Site
 
 
 def material(_entity):
-    return Material.objects.filter(T(Tag.INDUSTRY, Industry.H2))
+    return Material.active.filter(T(Tag.INDUSTRY, Industry.H2))
 
 
 def site(entity):

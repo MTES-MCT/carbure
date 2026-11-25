@@ -2,9 +2,18 @@ from django.db import models
 from django.db.models import Q
 
 
+class ActiveMaterialManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+
 class Material(models.Model):
+    objects = models.Manager()
+    active = ActiveMaterialManager()
+
     code = models.CharField(max_length=16, unique=True)
     name = models.CharField(max_length=128, unique=True)
+    is_active = models.BooleanField(verbose_name="Active", default=True)
     description = models.CharField(max_length=512, blank=True, default="")
     classification = models.ForeignKey("feedstocks.Classification", on_delete=models.SET_NULL, null=True, blank=True)
     lhv = models.DecimalField(
