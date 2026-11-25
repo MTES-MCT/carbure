@@ -40,7 +40,8 @@ class EntityTest(TestCase):
 
     def test_fetches_all_entities_currently_certified_under_national_scheme(self):
         query_result = MagicMock()
-        patched_filter = Entity.objects.filter = MagicMock(return_value=query_result)
+        filter_result = MagicMock(**{"distinct.return_value": query_result})
+        patched_filter = Entity.objects.filter = MagicMock(return_value=filter_result)
 
         entities = Entity.all_currently_certified_under_national_scheme()
         patched_filter.assert_called_with(
