@@ -1,4 +1,4 @@
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 import { baseHandlers as recipientBaseHandlers } from "accounting/components/recipient-form/recipient-form.stories.utils"
 import { okCountrySearch } from "common/__test__/api"
 

@@ -1,4 +1,4 @@
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 import { http, HttpResponse } from "msw"
 import { companyResult } from "companies/__test__/data"
 

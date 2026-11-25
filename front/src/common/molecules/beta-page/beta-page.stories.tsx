@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { BetaPage } from "./beta-page"
 
 const meta: Meta<typeof BetaPage> = {

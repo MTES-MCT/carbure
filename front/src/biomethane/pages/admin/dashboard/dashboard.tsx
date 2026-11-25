@@ -16,7 +16,7 @@ import { Content, LoaderOverlay, Main } from "common/components/scaffold"
 import { useRoutes } from "common/hooks/routes"
 import { RecapQuantity } from "common/molecules/recap-quantity"
 import { SelectYears } from "../../../components/select-years"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 
 const currentYear = new Date().getFullYear()
 

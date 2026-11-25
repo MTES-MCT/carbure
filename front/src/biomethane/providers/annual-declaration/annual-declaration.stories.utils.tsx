@@ -1,6 +1,6 @@
 import { getAnnualDeclarationOk } from "biomethane/tests/api"
 import { AnnualDeclarationProvider } from "./annual-declaration.provider"
-import { StoryFn } from "@storybook/react"
+import { StoryFn } from "@storybook/react-vite"
 
 export const AnnualDeclarationStoryUtils = {
   parameters: {

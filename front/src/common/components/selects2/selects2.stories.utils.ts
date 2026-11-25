@@ -1,4 +1,4 @@
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 
 type TextMatcher = string | RegExp
 

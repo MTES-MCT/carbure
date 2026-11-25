@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { TextInput } from "./text-input"
 import { useState } from "react"
-import { expect, fn, userEvent, waitFor, within } from "@storybook/test"
+import { expect, fn, userEvent, waitFor, within } from "storybook/test"
 
 const meta: Meta<typeof TextInput> = {
   component: TextInput,

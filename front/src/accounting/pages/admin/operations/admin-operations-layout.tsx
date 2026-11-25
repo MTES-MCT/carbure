@@ -1,6 +1,6 @@
 import { Autocomplete } from "common/components/autocomplete2"
 import { Content, Row } from "common/components/scaffold"
-import { Navigate, Outlet, useNavigate, useParams } from "react-router-dom"
+import { Navigate, Outlet, useNavigate, useParams } from "react-router"
 import { useTranslation } from "react-i18next"
 import { EntityPreview } from "common/types"
 import { normalizeEntityPreview } from "common/utils/normalizers"

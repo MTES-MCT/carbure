@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { CategoryObjectiveProgressCard } from "./category-objective-progress-card"
 import {
   cappedCategories,

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 import { useMutation } from "common/hooks/async"
 import { useNotify } from "common/components/notifications"
 import { TextInput } from "common/components/inputs2"

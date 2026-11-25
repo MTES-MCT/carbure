@@ -13,7 +13,7 @@ import {
 } from "../../types"
 import { useDeclareMonthlyQuantityColumns } from "./declare-monthly-quantity.hooks"
 import { useNotify, useNotifyError } from "common/components/notifications"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { useAnnualDeclaration } from "biomethane/providers/annual-declaration"
 import { useInjectionHoursCoherence } from "./declare-monthly-quantity.coherence.hooks"
 

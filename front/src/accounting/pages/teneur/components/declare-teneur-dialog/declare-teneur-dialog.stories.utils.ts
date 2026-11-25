@@ -1,4 +1,4 @@
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 import { setGHGRangeValue } from "accounting/components/ghg-range-form/ghg-range-form.stories.utils"
 
 export const clickNextStepButton = async (canvasElement: HTMLElement) => {

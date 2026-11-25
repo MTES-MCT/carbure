@@ -1,5 +1,5 @@
 import { ReactNode, useCallback } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 import { isEmpty } from "ramda"
 
 import HashRoute from "common/components/hash-route"

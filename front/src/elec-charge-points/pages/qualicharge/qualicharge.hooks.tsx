@@ -15,7 +15,7 @@ import { formatQualichargeStatus } from "./formatters"
 import { compact } from "common/utils/collection"
 import useEntity from "common/hooks/entity"
 import useYears from "common/hooks/years-2"
-import { useMatch } from "react-router-dom"
+import { useMatch } from "react-router"
 import { ExternalAdminPages } from "common/types"
 import { useQueryBuilder } from "common/hooks/query-builder-2"
 

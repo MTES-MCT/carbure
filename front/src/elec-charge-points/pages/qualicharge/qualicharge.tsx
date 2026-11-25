@@ -9,7 +9,7 @@ import {
 import { ActionBar, Content, Main } from "common/components/scaffold"
 import { Select } from "common/components/selects2"
 import { Tabs } from "common/components/tabs2"
-import { Navigate, Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router"
 import { useQuery } from "common/hooks/async"
 import { NoResult } from "common/components/no-result2"
 import { Table } from "common/components/table2"

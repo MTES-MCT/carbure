@@ -1,4 +1,4 @@
-import { fireEvent, waitFor, within } from "@storybook/test"
+import { fireEvent, waitFor, within } from "storybook/test"
 import { balance } from "accounting/__test__/data/balances"
 import { apiTypes } from "common/services/api-fetch.types"
 import { http, HttpResponse } from "msw"

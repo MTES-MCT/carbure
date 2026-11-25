@@ -1,5 +1,5 @@
 import { Trans, useTranslation } from "react-i18next"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router"
 import { Button } from "common/components/button2"
 import { Form, useForm } from "common/components/form2"
 import { TextInput } from "common/components/inputs2"

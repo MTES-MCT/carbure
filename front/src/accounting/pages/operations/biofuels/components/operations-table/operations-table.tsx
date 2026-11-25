@@ -1,6 +1,6 @@
 import { OperationList } from "accounting/types"
 import { Order, Table } from "common/components/table2"
-import { To } from "react-router-dom"
+import { To } from "react-router"
 import { useOperationsBiofuelsColumns } from "./operations-table.columns"
 
 type OperationTableProps = {

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { Button } from "common/components/button2"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 
 import { useNotify, useNotifyError } from "common/components/notifications"
 import { useMutation } from "common/hooks/async"

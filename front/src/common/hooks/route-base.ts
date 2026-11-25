@@ -1,9 +1,4 @@
-import {
-  useLocation,
-  useMatch,
-  useParams,
-  useResolvedPath,
-} from "react-router-dom"
+import { useLocation, useMatch, useParams, useResolvedPath } from "react-router"
 
 // Module tabs resolve from the base of their wildcard route, excluding `*`.
 // An explicit pattern can still target a particular ancestor in redirect hooks.

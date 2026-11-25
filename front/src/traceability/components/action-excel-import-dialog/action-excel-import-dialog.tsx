@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 import { Trans, useTranslation } from "react-i18next"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 
 import { Button } from "common/components/button2"
 import { Dialog } from "common/components/dialog2"

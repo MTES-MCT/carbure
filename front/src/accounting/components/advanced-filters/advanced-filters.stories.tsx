@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Form, useForm } from "common/components/form2"
 import { AdvancedFiltersBalanceCard } from "./advanced-filters"
 import { balance } from "accounting/__test__/data/balances"
-import { userEvent, waitFor, within } from "@storybook/test"
+import { userEvent, waitFor, within } from "storybook/test"
 import { setGHGRangeValue } from "../ghg-range-form/ghg-range-form.stories.utils"
 import {
   okGetBalances,

@@ -2,7 +2,7 @@ import { useAnnualDeclarationTiruert } from "accounting/providers/annual-declara
 import { Notice } from "common/components/notice"
 import { LoaderOverlay } from "common/components/scaffold"
 import { useTranslation } from "react-i18next"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 import useEntity from "common/hooks/entity"
 import { useQuery } from "common/hooks/async"
 import { getObjectives } from "accounting/pages/teneur/api"

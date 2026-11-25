@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react-vite"
 import { InjectedBiomethane } from "./injected-biomethane"
 import { contractData } from "biomethane/pages/contract/tests/contract.data"
 import { energyData } from "../../tests/energy.data"

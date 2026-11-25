@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useMemo, useContext } from "react"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 import { useQuery } from "common/hooks/async"
 import { getCurrentAnnualDeclaration } from "accounting/api/api"
 import useEntity from "common/hooks/entity"

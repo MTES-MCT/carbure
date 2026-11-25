@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom"
+import { NavLink, useLocation } from "react-router"
 import { MenuItem } from "../sidebar.types"
 import styles from "./child-item.module.css"
 import cl from "clsx"
