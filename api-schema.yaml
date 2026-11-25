@@ -20843,6 +20843,7 @@ components:
         name:
           type: string
           maxLength: 128
+          title: Nom
         description:
           type: string
           maxLength: 512

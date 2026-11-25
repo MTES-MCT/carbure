@@ -6388,6 +6388,7 @@ export interface components {
         Material: {
             readonly id: number;
             code: string;
+            /** Nom */
             name: string;
             description?: string;
             /**

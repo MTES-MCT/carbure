@@ -11,11 +11,13 @@ class Material(models.Model):
     objects = models.Manager()
     active = ActiveMaterialManager()
 
-    code = models.CharField(max_length=16, unique=True)
-    name = models.CharField(max_length=128, unique=True)
+    code = models.CharField(verbose_name="Code", max_length=16, unique=True)
+    name = models.CharField(verbose_name="Nom", max_length=128, unique=True)
     is_active = models.BooleanField(verbose_name="Active", default=True)
-    description = models.CharField(max_length=512, blank=True, default="")
-    classification = models.ForeignKey("feedstocks.Classification", on_delete=models.SET_NULL, null=True, blank=True)
+    description = models.CharField(verbose_name="Description", max_length=512, blank=True, default="")
+    classification = models.ForeignKey(
+        "feedstocks.Classification", verbose_name="Classification", on_delete=models.SET_NULL, null=True, blank=True
+    )
     lhv = models.DecimalField(
         verbose_name="PCI (MJ/kg)",
         max_digits=12,
