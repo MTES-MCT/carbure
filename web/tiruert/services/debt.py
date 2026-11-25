@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from core.models import Biocarburant
 from core.utils import truncate
-from tiruert.models import TiruertDebt
+from tiruert.models import Operation, TiruertDebt
 
 # Volumes carry 2 decimals: anything below is float residue of `value - repaid`
 MIN_OPEN_VOLUME = 0.005
@@ -32,12 +32,12 @@ class DebtService:
     @staticmethod
     def summarize_open_debts(entity_id) -> list[dict]:
         """
-        Remaining debt volume (L) per (biofuel, customs_category) for an entity.
+        Remaining debt volume (L) after validated repayments per (biofuel, customs_category) for an entity.
 
         Returns [{"biofuel": Biocarburant, "customs_category", "remaining_volume"}].
         """
         rows = list(
-            DebtService.get_open_debts(entity_id)
+            DebtService.get_open_debts(entity_id, repayment_statuses=[Operation.VALIDATED])
             .order_by()
             .values("biofuel_id", "customs_category")
             .annotate(remaining_volume=Sum("remaining"))

@@ -4,11 +4,11 @@ from h2.permissions import HasH2AdminRights, HasHRSRights, HasHRSWriteRights
 from h2.serializers.action import SHIPPING_FUEL_TYPES, H2ActionExcelImportSerializer
 from traceability.handlers.action import ActionIndustryHandler
 from traceability.handlers.excel import EXCEL_CONSUMPTION_COLOR, EXCEL_PRODUCTION_COLOR, EXCEL_TRANSPORT_COLOR, excel_column
-from traceability.models import Action, ActionStatus
+from traceability.models import Action, ActionStatus, Industry
 
 
 class H2ActionHandler(ActionIndustryHandler):
-    industry = Action.H2
+    industry = Industry.H2
 
     read_permission = HasHRSRights
     write_permission = HasHRSWriteRights

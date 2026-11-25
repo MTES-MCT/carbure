@@ -15,13 +15,22 @@ def check_if_red_ii_for_biomethane(entity: Entity):
     return entity.entity_type != Entity.BIOMETHANE_PRODUCER or entity.is_red_ii
 
 
+CERTIFICATE_ENTITY_TYPES = [
+    Entity.PRODUCER,
+    Entity.TRADER,
+    Entity.OPERATOR,
+    Entity.POWER_OR_HEAT_PRODUCER,
+    Entity.SOLID_BIOMASS_ENERGY_PRODUCER,
+    Entity.BIOMETHANE_PRODUCER,
+]
+
 HasCertificateRights = UserRightsFactory(
-    entity_type=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR, Entity.POWER_OR_HEAT_PRODUCER, Entity.BIOMETHANE_PRODUCER],
+    entity_type=CERTIFICATE_ENTITY_TYPES,
     check=check_if_red_ii_for_biomethane,
 )
 
 HasCertificateWriteRights = UserRightsFactory(
-    entity_type=[Entity.PRODUCER, Entity.TRADER, Entity.OPERATOR, Entity.POWER_OR_HEAT_PRODUCER, Entity.BIOMETHANE_PRODUCER],
+    entity_type=CERTIFICATE_ENTITY_TYPES,
     role=[UserRights.RW, UserRights.ADMIN],
     check=check_if_red_ii_for_biomethane,
 )

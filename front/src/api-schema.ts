@@ -2879,6 +2879,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/solid-biomass/energy-installation/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["solid_biomass_energy_installation_retrieve"];
+        put: operations["solid_biomass_energy_installation_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tiruert/declaration-period/": {
         parameters: {
             query?: never;
@@ -3784,10 +3800,10 @@ export interface components {
             pos_id?: string | null;
         };
         /**
-         * @description * `ROAD` - Transport routier
+         * @description * `ROAD` - Road transport
          *     * `PIPELINE` - Pipeline
          *     * `RAILROAD` - Rail
-         *     * `SEA` - Transport maritime
+         *     * `SEA` - Maritime transport
          * @enum {string}
          */
         ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
@@ -5753,6 +5769,40 @@ export interface components {
         EmptyResponseRequest: {
             empty?: string;
         };
+        EnergyInstallation: {
+            production_type?: components["schemas"]["ProductionTypeEnum"] | null;
+            heat_type?: components["schemas"]["HeatTypeEnum"] | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Format: double */
+            useful_temperature?: number | null;
+            /** Format: double */
+            electrical_efficiency?: number | null;
+            /** Format: double */
+            thermal_efficiency?: number | null;
+            icpe_number?: (string) | null;
+            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+        };
+        EnergyInstallationRequest: {
+            production_type?: components["schemas"]["ProductionTypeEnum"] | null;
+            heat_type?: components["schemas"]["HeatTypeEnum"] | null;
+            /**
+             * Date de mise en service
+             * Format: date
+             */
+            commissioning_date?: string | null;
+            /** Format: double */
+            useful_temperature?: number | null;
+            /** Format: double */
+            electrical_efficiency?: number | null;
+            /** Format: double */
+            thermal_efficiency?: number | null;
+            icpe_number?: (string) | null;
+            icpe_regime?: components["schemas"]["IcpeRegimeEnum"] | null;
+        };
         /**
          * @description * `PRODUCED_BIOGAS` - Biogaz produit par l'installation
          *     * `PRODUCED_BIOMETHANE` - Biométhane produit par l'installation
@@ -5981,7 +6031,7 @@ export interface components {
          *     * `Charge Point Operator` - Charge Point Operator
          *     * `Compagnie aérienne` - Compagnie aérienne
          *     * `Unknown` - Unknown
-         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+         *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
          *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
          *     * `SAF Trader` - Trader de SAF
          *     * `Producteur de biométhane` - Producteur de biométhane
@@ -6211,6 +6261,14 @@ export interface components {
             country?: number | null;
         };
         /**
+         * @description * `HOT_WATER` - Eau chaude
+         *     * `STEAM` - Vapeur
+         *     * `HOT_WATER_STEAM` - Eau chaude et vapeur
+         *     * `INDUSTRIAL_PROCESS` - Process industriel
+         * @enum {string}
+         */
+        HeatTypeEnum: HeatTypeEnum;
+        /**
          * @description * `TOTAL` - Totale
          *     * `PARTIAL` - Partielle
          * @enum {string}
@@ -6225,6 +6283,7 @@ export interface components {
         IcpeRegimeEnum: IcpeRegimeEnum;
         /**
          * @description * `H2` - Hydrogène
+         *     * `SB` - Biomasse solide
          * @enum {string}
          */
         IndustryEnum: PathsApiTraceabilityActionsGetParametersQueryIndustry;
@@ -7069,6 +7128,13 @@ export interface components {
             readonly type: string;
             readonly certificate_id: string;
         };
+        /**
+         * @description * `ELECTRICITY` - Électricité seule
+         *     * `HEAT` - Chaleur/Froid seul
+         *     * `COGENERATION` - Cogénération
+         * @enum {string}
+         */
+        ProductionTypeEnum: ProductionTypeEnum;
         ProvisionCertificateBulkRequest: {
             entity: string;
             siren: string;
@@ -7133,9 +7199,9 @@ export interface components {
         ResetPasswordRequest: {
             uidb64: string;
             token: string;
-            /** Mot de passe */
+            /** Password */
             password1: string;
-            /** Confirmation du mot de passe */
+            /** Password confirmation */
             password2: string;
         };
         Response: {
@@ -7470,7 +7536,8 @@ export interface components {
             name: string;
         };
         /**
-         * @description * `OTHER` - Autre
+         * @description * `ENERGY INSTALLATION` - Installation de chaleur et d’électricité
+         *     * `OTHER` - Autre
          *     * `EFS` - EFS
          *     * `EFPE` - EFPE
          *     * `OIL DEPOT` - OIL DEPOT
@@ -7684,9 +7751,9 @@ export interface components {
              */
             email: string;
             name: string;
-            /** Mot de passe */
+            /** Password */
             password1: string;
-            /** Confirmation du mot de passe */
+            /** Password confirmation */
             password2: string;
         };
         UserEntity: {
@@ -7726,10 +7793,7 @@ export interface components {
         };
         /** @description Resend the activation email for the pending account matching this address. */
         UserResendActivationLinkRequest: {
-            /**
-             * Adresse email
-             * Format: email
-             */
+            /** Format: email */
             email: string;
         };
         UserRights: {
@@ -11546,7 +11610,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -11623,7 +11687,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -11702,7 +11766,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -11777,7 +11841,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -14073,7 +14137,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -14337,7 +14401,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -14430,7 +14494,7 @@ export interface operations {
                  *     * `Charge Point Operator` - Charge Point Operator
                  *     * `Compagnie aérienne` - Compagnie aérienne
                  *     * `Unknown` - Unknown
-                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (biomasse liquide)
+                 *     * `Power or Heat Producer` - Producteur d'électricité ou de chaleur (bioliquide)
                  *     * `Solid Biomass Energy Producer` - Producteur d'électricité ou de chaleur (biomasse solide)
                  *     * `SAF Trader` - Trader de SAF
                  *     * `Producteur de biométhane` - Producteur de biométhane
@@ -14537,6 +14601,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    solid_biomass_energy_installation_retrieve: {
+        parameters: {
+            query: {
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyInstallation"];
+                };
+            };
+        };
+    };
+    solid_biomass_energy_installation_update: {
+        parameters: {
+            query: {
+                entity_id: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["EnergyInstallationRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["EnergyInstallationRequest"];
+                "multipart/form-data": components["schemas"]["EnergyInstallationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnergyInstallation"];
                 };
             };
         };
@@ -15464,7 +15576,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15539,6 +15651,15 @@ export interface operations {
                     "application/vnd.ms-excel": File;
                 };
             };
+            /** @description Operation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
         };
     };
     reject_operation: {
@@ -15565,7 +15686,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -16180,7 +16301,10 @@ export interface operations {
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16218,10 +16342,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16263,7 +16387,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16309,7 +16436,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16338,7 +16468,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16366,7 +16499,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16425,7 +16561,10 @@ export interface operations {
                 /** @description Filter string to apply */
                 filter: PathsApiTraceabilityActionsFiltersGetParametersQueryFilter;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16459,10 +16598,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16504,7 +16643,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16544,7 +16686,10 @@ export interface operations {
             query: {
                 /** @description Authorised entity ID. */
                 entity_id: number;
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 /** @description Filter actions by working date year. */
                 year?: number;
@@ -16572,7 +16717,10 @@ export interface operations {
                 /** @description Authorised entity ID. */
                 entity_id: number;
                 holder?: string[];
-                /** @description * `H2` - Hydrogène */
+                /**
+                 * @description * `H2` - Hydrogène
+                 *     * `SB` - Biomasse solide
+                 */
                 industry: PathsApiTraceabilityActionsGetParametersQueryIndustry;
                 material?: string[];
                 /**
@@ -16606,10 +16754,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Transport routier
+                 * @description * `ROAD` - Road transport
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Transport maritime
+                 *     * `SEA` - Maritime transport
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -17155,7 +17303,8 @@ export enum PathsApiTiruertOperationsFiltersGetParametersQueryFilter {
     years = "years"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryIndustry {
-    H2 = "H2"
+    H2 = "H2",
+    SB = "SB"
 }
 export enum PathsApiTraceabilityActionsGetParametersQueryOrder_by {
     ValueMinuscarbure_id = "-carbure_id",
@@ -17381,6 +17530,12 @@ export enum GesOptionEnum {
     Actual = "Actual",
     NUTS2 = "NUTS2"
 }
+export enum HeatTypeEnum {
+    HOT_WATER = "HOT_WATER",
+    STEAM = "STEAM",
+    HOT_WATER_STEAM = "HOT_WATER_STEAM",
+    INDUSTRIAL_PROCESS = "INDUSTRIAL_PROCESS"
+}
 export enum HygienizationExemptionTypeEnum {
     TOTAL = "TOTAL",
     PARTIAL = "PARTIAL"
@@ -17468,6 +17623,11 @@ export enum ProcessTypeEnum {
     LIQUID_PROCESS = "LIQUID_PROCESS",
     DRY_PROCESS = "DRY_PROCESS"
 }
+export enum ProductionTypeEnum {
+    ELECTRICITY = "ELECTRICITY",
+    HEAT = "HEAT",
+    COGENERATION = "COGENERATION"
+}
 export enum RoleEnum {
     ReadOnly = "RO",
     ReadWrite = "RW",
@@ -17475,6 +17635,7 @@ export enum RoleEnum {
     Auditor = "AUDITOR"
 }
 export enum SiteTypeEnum {
+    ENERGY_INSTALLATION = "ENERGY INSTALLATION",
     OTHER = "OTHER",
     EFS = "EFS",
     EFPE = "EFPE",

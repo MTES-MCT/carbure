@@ -12,7 +12,7 @@ from h2.handlers import H2ActionHandler
 from h2.serializers.action import H2ActionExcelImportSerializer
 from h2.tests.excel import filled_h2_template
 from traceability.factories import MaterialFactory
-from traceability.models import Action
+from traceability.models import Action, Industry
 from traceability.services.action_excel import parse_action_import_file
 from transactions.factories.certificate import GenericCertificateFactory
 from transactions.models.site import Site
@@ -50,7 +50,7 @@ class H2ActionExcelImportViewTest(APITestCase):
         return self.client.post(
             self.url,
             {"file": uploaded},
-            query_params={"entity_id": self.entity.id, "industry": Action.H2},
+            query_params={"entity_id": self.entity.id, "industry": Industry.H2},
             format="multipart",
         )
 

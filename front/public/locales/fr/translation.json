@@ -2524,5 +2524,18 @@
   "Fluvial (éligible)": "Fluvial (éligible)",
   "Ferroviaire (éligible)": "Ferroviaire (éligible)",
   "Pêche (non éligible)": "Pêche (non éligible)",
-  "Autres (non éligible)": "Autres (non éligible)"
+  "Autres (non éligible)": "Autres (non éligible)",
+  "Quantité renouvelable": "Quantité renouvelable",
+  "Le modèle du fichier attendu est disponible <2>sur ce lien</2>.": "Le modèle du fichier attendu est disponible <2>sur ce lien</2>.",
+  "Pensez à retélécharger le modèle afin d'avoir les dernières modifications du fichier.": "Pensez à retélécharger le modèle afin d'avoir les dernières modifications du fichier.",
+  "Renseigner mes mises à consommation": "Renseigner mes mises à consommation",
+  "Base calculée : {{energy_basis}} GJ": "Base calculée : {{energy_basis}} GJ",
+  "Dévaluation": "Dévaluation",
+  "Producteur d'électricité ou de chaleur (bioliquide)": "Producteur d'électricité ou de chaleur (bioliquide)",
+  "{{count}} agréments sélectionnés_one": "{{count}} agrément sélectionné",
+  "{{count}} agréments sélectionnés_many": "{{count}} agréments sélectionnés",
+  "{{count}} agréments sélectionnés_other": "{{count}} agréments sélectionnés",
+  "Le statut des agréments a été mis à jour.": "Le statut des agréments a été mis à jour.",
+  "En acceptant ces lots, vous indiquez réaliser des mises à consommation de B100 ou ED95.": "En acceptant ces lots, vous indiquez réaliser des mises à consommation de B100 ou ED95.",
+  "Report 2026": "Report 2026"
 }

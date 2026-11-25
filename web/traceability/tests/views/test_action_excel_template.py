@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 
 from core.models import Entity
 from core.tests_utils import setup_current_user
-from traceability.models import Action
+from traceability.models import Industry
 
 
 class ActionExcelTemplateViewTest(TestCase):
@@ -16,7 +16,7 @@ class ActionExcelTemplateViewTest(TestCase):
         self.url = reverse("traceability-action-download-import-template")
 
     def test_download_returns_the_h2_excel_template(self):
-        response = self.client.get(self.url, {"entity_id": self.entity.id, "industry": Action.H2})
+        response = self.client.get(self.url, {"entity_id": self.entity.id, "industry": Industry.H2})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/vnd.ms-excel")

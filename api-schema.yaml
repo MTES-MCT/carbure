@@ -5773,7 +5773,7 @@ paths:
             * `Unknown` - Unknown
 
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-            (biomasse liquide)
+            (bioliquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -5945,7 +5945,7 @@ paths:
             * `Unknown` - Unknown
 
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-            (biomasse liquide)
+            (bioliquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -6117,7 +6117,7 @@ paths:
             * `Unknown` - Unknown
 
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-            (biomasse liquide)
+            (bioliquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -6298,7 +6298,7 @@ paths:
             * `Unknown` - Unknown
 
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-            (biomasse liquide)
+            (bioliquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -9703,7 +9703,7 @@ paths:
             * `Unknown` - Unknown
 
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-            (biomasse liquide)
+            (bioliquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10161,7 +10161,7 @@ paths:
             * `Unknown` - Unknown
 
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-            (biomasse liquide)
+            (bioliquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10417,7 +10417,7 @@ paths:
             * `Unknown` - Unknown
 
             * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-            (biomasse liquide)
+            (bioliquide)
 
             * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
             chaleur (biomasse solide)
@@ -10685,6 +10685,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+          description: ""
+  /api/solid-biomass/energy-installation/:
+    get:
+      operationId: solid_biomass_energy_installation_retrieve
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - solid-biomass
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyInstallation"
+          description: ""
+    put:
+      operationId: solid_biomass_energy_installation_update
+      parameters:
+        - in: query
+          name: entity_id
+          schema:
+            type: integer
+          required: true
+      tags:
+        - solid-biomass
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/EnergyInstallationRequest"
+      security:
+        - cookieAuth: []
+        - basicAuth: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyInstallation"
           description: ""
   /api/tiruert/declaration-period/:
     get:
@@ -12309,8 +12361,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
@@ -12388,6 +12440,12 @@ paths:
                 type: string
                 format: binary
           description: ""
+        "404":
+          content:
+            application/json:
+              schema:
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/reject/:
     post:
       operationId: reject_operation
@@ -12421,8 +12479,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
@@ -13633,9 +13691,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: material
@@ -13751,10 +13812,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -13834,9 +13895,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -13893,9 +13957,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -13935,9 +14002,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -13974,9 +14044,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -14054,9 +14127,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: material
@@ -14160,10 +14236,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -14255,9 +14331,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -14310,9 +14389,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: year
@@ -14356,9 +14438,12 @@ paths:
           schema:
             enum:
               - H2
+              - SB
             type: string
             minLength: 1
-          description: "* `H2` - Hydrogène"
+          description: |-
+            * `H2` - Hydrogène
+            * `SB` - Biomasse solide
           required: true
         - in: query
           name: material
@@ -14462,10 +14547,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Transport routier
+            * `ROAD` - Road transport
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Transport maritime
+            * `SEA` - Maritime transport
           explode: true
           style: form
         - in: query
@@ -14968,10 +15053,10 @@ components:
         - SEA
       type: string
       description: |-
-        * `ROAD` - Transport routier
+        * `ROAD` - Road transport
         * `PIPELINE` - Pipeline
         * `RAILROAD` - Rail
-        * `SEA` - Transport maritime
+        * `SEA` - Maritime transport
     ActionSite:
       type: object
       properties:
@@ -19196,6 +19281,94 @@ components:
         empty:
           type: string
           minLength: 1
+    EnergyInstallation:
+      type: object
+      properties:
+        production_type:
+          allOf:
+            - $ref: "#/components/schemas/ProductionTypeEnum"
+          nullable: true
+        heat_type:
+          allOf:
+            - $ref: "#/components/schemas/HeatTypeEnum"
+          nullable: true
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        icpe_number:
+          nullable: true
+          oneOf:
+            - type: string
+              pattern: ^\d{10}$
+              maxLength: 10
+            - type: string
+              maxLength: 0
+        icpe_regime:
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
+    EnergyInstallationRequest:
+      type: object
+      properties:
+        production_type:
+          allOf:
+            - $ref: "#/components/schemas/ProductionTypeEnum"
+          nullable: true
+        heat_type:
+          allOf:
+            - $ref: "#/components/schemas/HeatTypeEnum"
+          nullable: true
+        commissioning_date:
+          type: string
+          format: date
+          nullable: true
+          title: Date de mise en service
+        useful_temperature:
+          type: number
+          format: double
+          nullable: true
+        electrical_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        thermal_efficiency:
+          type: number
+          format: double
+          maximum: 100
+          minimum: 0
+          nullable: true
+        icpe_number:
+          nullable: true
+          oneOf:
+            - type: string
+              pattern: ^\d{10}$
+              maxLength: 10
+            - type: string
+              maxLength: 0
+        icpe_regime:
+          allOf:
+            - $ref: "#/components/schemas/IcpeRegimeEnum"
+          nullable: true
     EnergyTypesEnum:
       enum:
         - PRODUCED_BIOGAS
@@ -19834,7 +20007,7 @@ components:
         * `Unknown` - Unknown
 
         * `Power or Heat Producer` - Producteur d'électricité ou de chaleur
-        (biomasse liquide)
+        (bioliquide)
 
         * `Solid Biomass Energy Producer` - Producteur d'électricité ou de
         chaleur (biomasse solide)
@@ -20391,6 +20564,18 @@ components:
         - distribution_capacity
         - name
         - storage_capacity
+    HeatTypeEnum:
+      enum:
+        - HOT_WATER
+        - STEAM
+        - HOT_WATER_STEAM
+        - INDUSTRIAL_PROCESS
+      type: string
+      description: |-
+        * `HOT_WATER` - Eau chaude
+        * `STEAM` - Vapeur
+        * `HOT_WATER_STEAM` - Eau chaude et vapeur
+        * `INDUSTRIAL_PROCESS` - Process industriel
     HygienizationExemptionTypeEnum:
       enum:
         - TOTAL
@@ -20415,8 +20600,11 @@ components:
     IndustryEnum:
       enum:
         - H2
+        - SB
       type: string
-      description: "* `H2` - Hydrogène"
+      description: |-
+        * `H2` - Hydrogène
+        * `SB` - Biomasse solide
     InstallationCategoryEnum:
       enum:
         - INSTALLATION_CATEGORY_1
@@ -22126,6 +22314,16 @@ components:
       required:
         - certificate_id
         - type
+    ProductionTypeEnum:
+      enum:
+        - ELECTRICITY
+        - HEAT
+        - COGENERATION
+      type: string
+      description: |-
+        * `ELECTRICITY` - Électricité seule
+        * `HEAT` - Chaleur/Froid seul
+        * `COGENERATION` - Cogénération
     ProvisionCertificateBulkRequest:
       type: object
       properties:
@@ -22294,12 +22492,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Mot de passe
+          title: Password
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Confirmation du mot de passe
+          title: Password confirmation
       required:
         - password1
         - password2
@@ -23205,6 +23403,7 @@ components:
         - name
     SiteTypeEnum:
       enum:
+        - ENERGY INSTALLATION
         - OTHER
         - EFS
         - EFPE
@@ -23220,6 +23419,7 @@ components:
         - H2 REFUELING STATION
       type: string
       description: |-
+        * `ENERGY INSTALLATION` - Installation de chaleur et d’électricité
         * `OTHER` - Autre
         * `EFS` - EFS
         * `EFPE` - EFPE
@@ -23650,12 +23850,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Mot de passe
+          title: Password
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Confirmation du mot de passe
+          title: Password confirmation
       required:
         - email
         - name
@@ -23804,7 +24004,6 @@ components:
           type: string
           format: email
           minLength: 1
-          title: Adresse email
       required:
         - email
     UserRights:

@@ -1,10 +1,12 @@
+from datetime import timezone
 from decimal import Decimal
 
 from django.db import models, transaction
-from django.db.models import CharField, F, Func, Q, QuerySet, Value
+from django.db.models import CharField, F, Q, QuerySet, Value
 from django.db.models.functions import Concat, ExtractMonth, ExtractYear, LPad
 from django.utils.translation import gettext_lazy as _
 
+from core.db_functions import Conv
 from traceability.services.quantities import quantity_available
 
 from .action_status import ActionStatus, latest_status
@@ -13,22 +15,29 @@ CARBURE_ID_PREFIX = "C"
 CARBURE_ID_CODE_LENGTH = 8
 
 
-class Conv(Func):
-    """MySQL CONV: number written in another base, uppercase."""
-
-    function = "CONV"
-    output_field = CharField()
+class Industry(models.TextChoices):
+    H2 = "H2", "Hydrogène"
+    SOLID_BIOMASS = "SB", "Biomasse solide"
 
 
-def carbure_id_expression(action_id, year, industry):
+def carbure_id():
     """C{year}-{industry}-{id in base 36, padded to 8}. Past 8 characters, LPAD keeps the extra digits."""
     return Concat(
         Value(CARBURE_ID_PREFIX),
-        year,
+        ExtractYear("created_at", tzinfo=timezone.utc),
         Value("-"),
-        industry,
+        F("industry"),
         Value("-"),
-        LPad(Conv(action_id, 10, 36), CARBURE_ID_CODE_LENGTH, Value("0")),
+        LPad(Conv(F("id"), 10, 36), CARBURE_ID_CODE_LENGTH, Value("0")),
+        output_field=CharField(),
+    )
+
+
+def period():
+    return Concat(
+        ExtractYear("working_date"),
+        Value("-"),
+        LPad(ExtractMonth("working_date"), 2, Value("0")),
         output_field=CharField(),
     )
 
@@ -40,15 +49,8 @@ class ActionManager(models.Manager):
             .get_queryset()
             .select_related("holder", "material", "site", "parent", "certificate")
             .annotate(status=latest_status())
-            .annotate(
-                period=Concat(
-                    ExtractYear("working_date"),
-                    Value("-"),
-                    LPad(ExtractMonth("working_date"), 2, Value("0")),
-                    output_field=CharField(),
-                )
-            )
-            .annotate(carbure_id=carbure_id_expression(F("id"), ExtractYear("created_at"), F("industry")))
+            .annotate(period=period())
+            .annotate(carbure_id=carbure_id())
             .annotate(quantity_available=quantity_available())
         )
 
@@ -67,9 +69,7 @@ class Action(models.Model):
         "core.Entity", on_delete=models.PROTECT, verbose_name="Entité détentrice de la quantité de l'action"
     )
 
-    H2 = "H2"
-    INDUSTRIES = [(H2, "Hydrogène")]
-    industry = models.CharField(verbose_name="Filière", choices=INDUSTRIES, max_length=16)
+    industry = models.CharField(verbose_name="Filière", choices=Industry.choices, max_length=16)
 
     INIT = "INIT"
     VALORIZE = "VALORIZE"

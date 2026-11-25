@@ -1,0 +1,1 @@
+from .energy_installation import EnergyInstallationFactory

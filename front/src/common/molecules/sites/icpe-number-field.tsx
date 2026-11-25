@@ -1,8 +1,34 @@
+import { TextInput, TextInputProps } from "common/components/inputs2"
+import { useTranslation } from "react-i18next"
 import { Dialog } from "common/components/dialog2"
 import { NavLink } from "common/components/nav-link"
 import { usePortal } from "common/components/portal"
 import { Text } from "common/components/text"
-import { useTranslation } from "react-i18next"
+
+export const IcpeNumberField = ({
+  label,
+  ...props
+}: Omit<TextInputProps, "pattern" | "hintText">) => {
+  const { t } = useTranslation()
+  const portal = usePortal()
+
+  const showHelper = () => {
+    portal((close) => <IcpeNumberDialog onClose={close} />)
+  }
+
+  return (
+    <TextInput
+      {...props}
+      label={label ?? t("N° ICPE")}
+      pattern="[0-9]{10}"
+      hintText={
+        <button onClick={showHelper} style={{ padding: 0 }} type="button">
+          {t("Où trouver mon numéro ICPE ?")}
+        </button>
+      }
+    />
+  )
+}
 
 const IcpeNumberDialog = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation()
@@ -38,20 +64,5 @@ const IcpeNumberDialog = ({ onClose }: { onClose: () => void }) => {
         </Text>
       </Dialog>
     </div>
-  )
-}
-
-export const IcpeNumberHelper = () => {
-  const { t } = useTranslation()
-  const portal = usePortal()
-
-  const handleClick = () => {
-    portal((close) => <IcpeNumberDialog onClose={close} />)
-  }
-
-  return (
-    <button onClick={handleClick} style={{ padding: 0 }} type="button">
-      {t("Où trouver mon numéro ICPE ?")}
-    </button>
   )
 }
