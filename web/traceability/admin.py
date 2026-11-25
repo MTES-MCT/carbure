@@ -53,10 +53,20 @@ class MaterialTagInline(admin.StackedInline):
 
 @admin.register(Material)
 class MaterialAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "name", "classification", "unit", "lhv", "density")
+    list_display = ("id", "code", "name", "classification", "unit", "lhv", "density", "is_active")
+    list_filter = ("is_active",)
     search_fields = ("code", "name")
     list_select_related = ("classification",)
     inlines = (MaterialTagInline,)
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.action(description="Valider les actions sélectionnées et créer les certificats")
