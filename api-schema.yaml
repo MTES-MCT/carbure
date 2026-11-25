@@ -21565,6 +21565,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Action"
+        total_quantity:
+          type: string
+          format: decimal
     PaginatedAdminUserRowList:
       type: object
       required:

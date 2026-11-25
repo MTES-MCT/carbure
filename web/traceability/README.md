@@ -16,6 +16,7 @@ Noyau partagé des **actions** (lots). Une filière ne duplique pas ce module : 
 - **`quantity` est strictement positive.** Contrainte SQL `action_quantity_positive` (`quantity > 0`), en plus du contrôle à la création.
 - **`quantity` et `quantity_available` sont renvoyés tels quels.** `quantity` est la valeur stockée. `quantity_available` vaut `quantity` moins la somme des `quantity` des enfants directs, hors `DELETED`. Même unité que `quantity`. Pas de conversion en masse, volume ou énergie. `quantity_available` est toujours renvoyée : 0 si elle n'a pas été calculée.
 - **La liste filtre la quantité restante en trois états.** `quantity_available=true` ne garde que `> 0`. `quantity_available=false` ne garde que `= 0`. Sans paramètre, toutes les actions sont renvoyées. Le manager ne retire pas ces lignes.
+- **La liste renvoie `total_quantity`.** Somme de `quantity` sur le queryset filtré, avant la page. Les valeurs sont additionnées telles quelles, sans conversion d’unité. Comme `quantity`, ce total est un décimal sérialisé en chaîne.
 
 ## Modèle
 

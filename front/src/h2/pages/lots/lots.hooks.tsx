@@ -2,6 +2,8 @@ import { useTranslation } from "react-i18next"
 
 import { SiteTypeEnum } from "api-schema"
 import { Text } from "common/components/text"
+import { Unit } from "common/types"
+import { formatUnitActionDecimal } from "traceability/utils/formatters"
 import { useActionColumns } from "traceability/hooks/action-columns"
 import { useActionFilters } from "traceability/hooks/use-action-filters"
 import {
@@ -30,6 +32,7 @@ type H2LotsPageConfig = Pick<
   | "filters"
   | "columns"
   | "fieldsets"
+  | "renderQuantityTotal"
 >
 
 export function useH2LotsPage(): {
@@ -68,6 +71,11 @@ export function useH2LotsPage(): {
         filters.shipping_method,
       ],
       columns: pageColumns,
+      renderQuantityTotal: (count, total) =>
+        t("{{count}} lots pour un total de {{total}}", {
+          count,
+          total: formatUnitActionDecimal(total ?? 0, Unit.kg),
+        }),
       fieldsets: [
         {
           legend: t("Production"),

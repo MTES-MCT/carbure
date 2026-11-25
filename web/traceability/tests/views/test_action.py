@@ -48,6 +48,27 @@ class ActionViewsetQuerysetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_list_sums_quantity_over_the_filtered_set(self):
+        page = self.client.get(self.list_url, {**self.base_params, "page_size": 1})
+        self.own_action.working_date = self.own_action.working_date.replace(year=2024)
+        self.own_action.save(update_fields=["working_date"])
+        self.child_of_own_action.working_date = self.child_of_own_action.working_date.replace(year=2020)
+        self.child_of_own_action.save(update_fields=["working_date"])
+        filtered = self.client.get(self.list_url, {**self.base_params, "year": 2024})
+        empty = self.client.get(self.list_url, {**self.base_params, "year": 1999})
+
+        self.assertEqual(page.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(page.data["results"]), 1)
+        self.assertEqual(
+            Decimal(page.data["total_quantity"]),
+            self.own_action.quantity + self.child_of_own_action.quantity,
+        )
+        self.assertEqual(filtered.status_code, status.HTTP_200_OK)
+        self.assertEqual(Decimal(filtered.data["total_quantity"]), self.own_action.quantity)
+        self.assertEqual(empty.status_code, status.HTTP_200_OK)
+        self.assertEqual(Decimal(empty.data["total_quantity"]), Decimal("0"))
+        self.assertEqual(empty.data["results"], [])
+
     def test_list_includes_actions_held_or_whose_parent_is_held(self):
         response = self.client.get(self.list_url, self.base_params)
 
