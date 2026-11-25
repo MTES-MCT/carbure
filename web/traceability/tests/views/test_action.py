@@ -262,13 +262,13 @@ class ActionViewsetQuerysetTest(TestCase):
         methane = MaterialFactory(code="CH4", name="Méthane")
         middle = ActionFactory.create(
             holder=self.entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=self.own_action,
             material=methane,
         )
         leaf = ActionFactory.create(
             holder=self.entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=middle,
             material=None,
         )
@@ -297,13 +297,13 @@ class ActionViewsetQuerysetTest(TestCase):
         methane = MaterialFactory(code="CH4", name="Méthane")
         middle = ActionFactory.create(
             holder=self.entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=self.own_action,
             material=methane,
         )
         ActionFactory.create(
             holder=self.entity,
-            industry=Action.H2,
+            industry=Industry.H2,
             parent=middle,
             material=None,
         )

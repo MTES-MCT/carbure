@@ -191,7 +191,7 @@ class TransferDecisionIntegrationTest(TestCase):
         self.other = Entity.objects.create(name="Autre redevable", entity_type=Entity.OPERATOR, is_tiruert_liable=True)
         parent = ActionFactory.create(
             holder=self.sender,
-            industry=Action.H2,
+            industry=Industry.H2,
             type=Action.VALORIZE,
             status=ActionStatus.CREATED,
             material=None,
@@ -199,7 +199,7 @@ class TransferDecisionIntegrationTest(TestCase):
         )
         self.transfer = ActionFactory.create(
             holder=self.recipient,
-            industry=Action.H2,
+            industry=Industry.H2,
             type=Action.TRANSFER,
             status=ActionStatus.PENDING,
             parent=parent,
@@ -213,7 +213,7 @@ class TransferDecisionIntegrationTest(TestCase):
             self.url,
             {"status": target},
             content_type="application/json",
-            query_params={"entity_id": entity.pk, "industry": Action.H2},
+            query_params={"entity_id": entity.pk, "industry": Industry.H2},
         )
 
     def test_liable_holder_can_accept(self):
@@ -260,7 +260,7 @@ class TransferDecisionIntegrationTest(TestCase):
         holder = Entity.objects.create(name="Non redevable", entity_type=Entity.OPERATOR, is_tiruert_liable=False)
         transfer = ActionFactory.create(
             holder=holder,
-            industry=Action.H2,
+            industry=Industry.H2,
             type=Action.TRANSFER,
             status=ActionStatus.PENDING,
             material=None,
@@ -272,7 +272,7 @@ class TransferDecisionIntegrationTest(TestCase):
             reverse("traceability-action-status", args=[transfer.pk]),
             {"status": ActionStatus.ACCEPTED},
             content_type="application/json",
-            query_params={"entity_id": holder.pk, "industry": Action.H2},
+            query_params={"entity_id": holder.pk, "industry": Industry.H2},
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
