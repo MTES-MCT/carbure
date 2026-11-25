@@ -82,7 +82,7 @@ class ActionExcelImportListSerializer(UniqueInListSerializer):
                         **{key: value for key, value in attrs.items() if key in _ACTION_MODEL_FIELDS},
                         holder=holder,
                         industry=industry,
-                        type=Action.INIT,
+                        type=Action.CONSUME,
                     )
                 )
 

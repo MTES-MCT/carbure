@@ -33,7 +33,7 @@ uv run python web/traceability/fixtures/load_materials.py
 
 Fichier : [`fixtures/materials.csv`](fixtures/materials.csv), le catalogue éditable. Chargé automatiquement au deploy (`bin/post_deploy.sh`).
 
-Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `INIT` dont le statut courant est `PENDING` ou `REJECTED`.
+Le `DELETE` supprime l'action de la bdd. Il n'est autorisé que pour une action `CONSUME` dont le statut courant est `PENDING` ou `REJECTED`.
 
 Le graphe commun des changements de statut est défini par `ActionStatus.TRANSITIONS`. Le changement de statut vérifie la transition avec `ActionStatus.can_transition(statut de départ, statut d’arrivée)`, puis l'autorisation d'attribuer le statut d'arrivée.
 

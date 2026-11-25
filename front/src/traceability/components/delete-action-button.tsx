@@ -20,7 +20,7 @@ const DELETABLE_STATUSES: Set<ActionStatus> = new Set([
 export function canDeleteAction(action: Action, canWrite: boolean) {
   return (
     canWrite &&
-    action.type === ActionType.INIT &&
+    action.type === ActionType.CONSUME &&
     action.status != null &&
     DELETABLE_STATUSES.has(action.status)
   )

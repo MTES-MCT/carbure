@@ -13,7 +13,7 @@ class TotalEmissionsTest(TestCase):
     def setUp(self):
         self.root = ActionFactory.create(
             industry=Industry.H2,
-            type=Action.INIT,
+            type=Action.CONSUME,
             parent=None,
             ei=Decimal("1.000"),
             ep=Decimal("2.000"),

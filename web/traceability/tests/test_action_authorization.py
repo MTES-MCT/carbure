@@ -17,11 +17,11 @@ def is_holder(actor, holder, parent_holder):
 class GenericActionHandler(ActionIndustryHandler):
     industry = "TEST"
     action_creation_flow = (
-        (None, (Action.INIT, ActionStatus.PENDING)),
-        ((Action.INIT, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
+        (None, (Action.CONSUME, ActionStatus.PENDING)),
+        ((Action.CONSUME, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
     )
     action_status_authorizations = {
-        (Action.INIT, ActionStatus.PENDING): is_holder,
+        (Action.CONSUME, ActionStatus.PENDING): is_holder,
         (Action.VALORIZE, ActionStatus.CREATED): is_holder,
     }
 
@@ -29,7 +29,7 @@ class GenericActionHandler(ActionIndustryHandler):
 class ActionAuthorizationSerializerTest(SimpleTestCase):
     def setUp(self):
         self.holder = Entity(id=1, entity_type=Entity.OPERATOR)
-        self.parent = Action(id=3, type=Action.INIT, industry=GenericActionHandler.industry, holder=self.holder)
+        self.parent = Action(id=3, type=Action.CONSUME, industry=GenericActionHandler.industry, holder=self.holder)
         self.parent.status = ActionStatus.PENDING
 
     def validate_action(self, data, parent=None, holder=None, actor=None, missing_parent=False):
@@ -62,7 +62,7 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         self.assertEqual(serializer.validated_data["status"], ActionStatus.CREATED)
 
     def test_validates_root_without_parent(self):
-        serializer = self.validate_action({"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1})
+        serializer = self.validate_action({"type": Action.CONSUME, "status": ActionStatus.PENDING, "holder": 1})
 
         self.assertEqual(serializer.errors, {})
         self.assertEqual(serializer.validated_data["status"], ActionStatus.PENDING)
@@ -85,9 +85,9 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
 
     def test_refuses_missing_or_denied_status_authorization(self):
         denied = Mock(return_value=False)
-        for rules in ({}, {(Action.INIT, ActionStatus.PENDING): denied}):
+        for rules in ({}, {(Action.CONSUME, ActionStatus.PENDING): denied}):
             with self.subTest(rules=rules), patch.object(GenericActionHandler, "action_status_authorizations", rules):
-                serializer = self.validate_action({"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1})
+                serializer = self.validate_action({"type": Action.CONSUME, "status": ActionStatus.PENDING, "holder": 1})
 
                 self.assertIn("non_field_errors", serializer.errors)
         denied.assert_called_once_with(self.holder, self.holder, None)
@@ -122,20 +122,20 @@ class ActionAuthorizationSerializerTest(SimpleTestCase):
         self.assertIs(handler.can_create_action(Action.VALORIZE, ActionStatus.PENDING, self.parent), False)
         self.parent.type = Action.VALORIZE
         self.assertIs(handler.can_create_action(Action.VALORIZE, ActionStatus.CREATED, self.parent), False)
-        self.parent.type = Action.INIT
+        self.parent.type = Action.CONSUME
         self.parent.status = ActionStatus.ACCEPTED
         self.assertIs(handler.can_create_action(Action.VALORIZE, ActionStatus.CREATED, self.parent), False)
 
     def test_rejects_missing_or_invalid_status(self):
         for fields in ({}, {"status": "UNKNOWN"}, {"status": None}, {"status": ""}):
             with self.subTest(fields=fields):
-                serializer = self.validate_action({"type": Action.INIT, "holder": 1, **fields})
+                serializer = self.validate_action({"type": Action.CONSUME, "holder": 1, **fields})
 
                 self.assertIn("status", serializer.errors)
 
     def test_rejects_status_without_matching_edge(self):
         for data in (
-            {"type": Action.INIT, "status": ActionStatus.CREATED, "holder": 1},
+            {"type": Action.CONSUME, "status": ActionStatus.CREATED, "holder": 1},
             {"type": Action.VALORIZE, "status": ActionStatus.PENDING, "parent": 3, "holder": 1},
         ):
             with self.subTest(data=data):
@@ -162,19 +162,19 @@ class RelaxedQuantitySerializer(QuantitySerializer):
 class ActionCreationFieldTest(ActionAuthorizationSerializerTest):
     def test_child_field_list_keeps_authorization_fields(self):
         serializer = QuantitySerializer(
-            data={"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1, "quantity": "1.000"},
+            data={"type": Action.CONSUME, "status": ActionStatus.PENDING, "holder": 1, "quantity": "1.000"},
             context={"handler": GenericActionHandler(), "entity": self.holder},
         )
 
         self.assertTrue(self._is_valid(serializer), serializer.errors)
-        self.assertEqual(serializer.validated_data["type"], Action.INIT)
+        self.assertEqual(serializer.validated_data["type"], Action.CONSUME)
         self.assertEqual(serializer.validated_data["status"], ActionStatus.PENDING)
         self.assertIs(serializer.validated_data["holder"], self.holder)
         self.assertEqual(serializer.validated_data["quantity"], Decimal("1.000"))
 
     def test_rejects_quantity_that_is_not_strictly_positive(self):
         serializer = QuantitySerializer(
-            data={"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1, "quantity": "0"},
+            data={"type": Action.CONSUME, "status": ActionStatus.PENDING, "holder": 1, "quantity": "0"},
             context={"handler": GenericActionHandler(), "entity": self.holder},
         )
 
@@ -202,7 +202,7 @@ class ActionCreationFieldTest(ActionAuthorizationSerializerTest):
 
         attrs = serializer.validate(
             {
-                "type": Action.INIT,
+                "type": Action.CONSUME,
                 "status": ActionStatus.PENDING,
                 "holder": self.holder,
                 "quantity": Decimal("0"),
@@ -213,7 +213,7 @@ class ActionCreationFieldTest(ActionAuthorizationSerializerTest):
 
     def test_child_can_replace_the_shared_quantity_check(self):
         serializer = RelaxedQuantitySerializer(
-            data={"type": Action.INIT, "status": ActionStatus.PENDING, "holder": 1, "quantity": "0"},
+            data={"type": Action.CONSUME, "status": ActionStatus.PENDING, "holder": 1, "quantity": "0"},
             context={"handler": GenericActionHandler(), "entity": self.holder},
         )
 

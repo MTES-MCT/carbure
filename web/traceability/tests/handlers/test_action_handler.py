@@ -12,21 +12,21 @@ class GenericActionHandler(ActionIndustryHandler):
 
 class ActionCreationSerializersTest(SimpleTestCase):
     def test_industry_inherits_default_serializer(self):
-        self.assertIs(GenericActionHandler.get_action_creation_serializers()[Action.INIT], ConsumptionSerializer)
+        self.assertIs(GenericActionHandler.get_action_creation_serializers()[Action.CONSUME], ConsumptionSerializer)
 
     def test_industry_can_extend_and_override_defaults(self):
         class IndustryHandler(ActionIndustryHandler):
             action_creation_serializers = {Action.VALORIZE: object}
 
         class OtherIndustryHandler(ActionIndustryHandler):
-            action_creation_serializers = {Action.INIT: str}
+            action_creation_serializers = {Action.CONSUME: str}
 
         self.assertEqual(
             IndustryHandler.get_action_creation_serializers(),
-            {Action.INIT: ConsumptionSerializer, Action.VALORIZE: object},
+            {Action.CONSUME: ConsumptionSerializer, Action.VALORIZE: object},
         )
-        self.assertIs(OtherIndustryHandler.get_action_creation_serializers()[Action.INIT], str)
-        self.assertEqual(ActionIndustryHandler.get_action_creation_serializers(), {Action.INIT: ConsumptionSerializer})
+        self.assertIs(OtherIndustryHandler.get_action_creation_serializers()[Action.CONSUME], str)
+        self.assertEqual(ActionIndustryHandler.get_action_creation_serializers(), {Action.CONSUME: ConsumptionSerializer})
 
 
 class ActionHandlerRegistryTest(TestCase):

@@ -82,7 +82,7 @@ class ActionExcelImportViewTest(APITestCase):
             {
                 "holder": self.entity,
                 "industry": Industry.H2,
-                "type": Action.INIT,
+                "type": Action.CONSUME,
                 "material": self.material,
                 "certificate": self.certificate,
                 "site_id": self.site.id,
