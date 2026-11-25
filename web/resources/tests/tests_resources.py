@@ -145,6 +145,7 @@ class ResourcesTest(TestCase):
         country = Pays.objects.get(code_pays="FR")
         Site.objects.create(name="Hydrogen station", site_type=Site.H2_REFUELING_STATION, country=country)
         Site.objects.create(name="Other site", site_type=Site.OTHER, country=country)
+        Site.objects.create(name="Disabled station", site_type=Site.H2_REFUELING_STATION, country=country, is_enabled=False)
 
         response = self.client.get(reverse("resources-sites"), {"site_type": Site.H2_REFUELING_STATION})
 
