@@ -21,7 +21,6 @@ CSV_COLUMNS = [
     "prise_type_combo_ccs",
     "prise_type_chademo",
     "date_maj",
-    "last_modified",
     "nom_amenageur",
     "siren_amenageur",
 ]
@@ -116,10 +115,12 @@ class TransportDataGouvTest(unittest.TestCase):
 
         api_payload = {
             "resources": [
+                {"id": "other-resource", "latest": "https://example.test/other.csv"},
                 {
+                    "id": "4ca78c71-4ea4-475d-bd3a-d4aef88f7bf8",
                     "latest": "https://example.test/charge-points.csv",
                     "last_modified": last_modified,
-                }
+                },
             ]
         }
 
@@ -157,6 +158,8 @@ class TransportDataGouvTest(unittest.TestCase):
             self.assertEqual(second_path, file_path)
             self.assertEqual(Path(file_path).read_bytes(), payload)
             self.assertEqual(get.call_count, 3)
+            self.assertEqual(get.call_args_list[0].args[0], TransportDataGouv.URL)
+            self.assertEqual(get.call_args_list[1].args[0], "https://example.test/charge-points.csv")
         finally:
             for path in (file_path, f"{file_path}.part"):
                 if os.path.exists(path):
@@ -174,7 +177,6 @@ def synthetic_rows():
             "prise_type_combo_ccs": "FALSE",
             "prise_type_chademo": "FALSE",
             "date_maj": "2020-01-01",
-            "last_modified": "2024-01-01T00:00:00+00:00",
             "nom_amenageur": "N",
             "siren_amenageur": "1",
         },
@@ -187,7 +189,6 @@ def synthetic_rows():
             "prise_type_combo_ccs": "FALSE",
             "prise_type_chademo": "FALSE",
             "date_maj": "2022-01-01",
-            "last_modified": "2024-01-01T00:00:00+00:00",
             "nom_amenageur": "CPO-A",
             "siren_amenageur": "0123",
         },
@@ -200,7 +201,6 @@ def synthetic_rows():
             "prise_type_combo_ccs": "TRUE",
             "prise_type_chademo": "TRUE",
             "date_maj": "2023-06-01",
-            "last_modified": "2024-06-01T00:00:00+00:00",
             "nom_amenageur": "CPO-B",
             "siren_amenageur": "9999",
         },
@@ -213,7 +213,6 @@ def synthetic_rows():
             "prise_type_combo_ccs": "FALSE",
             "prise_type_chademo": "FALSE",
             "date_maj": "2020-05-05",
-            "last_modified": "2024-01-02T00:00:00+00:00",
             "nom_amenageur": "Only",
             "siren_amenageur": "0007",
         },
