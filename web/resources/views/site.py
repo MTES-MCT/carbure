@@ -31,7 +31,7 @@ from transactions.models import Site
 def get_sites(request, *args, **kwargs):
     query = request.query_params.get("query")
     site_types = request.query_params.getlist("site_type")
-    sites = Site.objects.filter(private=False).order_by("name")
+    sites = Site.objects.filter(private=False, is_enabled=True).order_by("name")
 
     if query:
         sites = sites.filter(Q(name__icontains=query) | Q(site_siret__icontains=query) | Q(city__icontains=query))
