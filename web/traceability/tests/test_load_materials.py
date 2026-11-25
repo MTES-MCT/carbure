@@ -1,14 +1,16 @@
 import os
 import runpy
+from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from django.core.management import call_command
 from django.db import IntegrityError
 from django.test import TestCase
 
 from feedstocks.models import Classification
-from traceability.models import Material, MaterialTag
+from traceability.models import Action, Material, MaterialTag
 from traceability.models.material_tag import Tag
 
 
@@ -25,7 +27,7 @@ class LoadMaterialsTest(TestCase):
             fixture_dir.mkdir(parents=True)
             (fixture_dir / "materials.csv").write_text(csv_text, encoding="utf-8")
             with patch.dict(os.environ, {"CARBURE_HOME": directory}):
-                runpy.run_path(str(Path(__file__).resolve().parents[1] / "fixtures/load_materials.py"))
+                runpy.run_path(str(Path(__file__).resolve().parents[1] / "fixtures/load_materials.py"), run_name="__main__")
 
     def tags(self, material):
         return list(material.tags.order_by("value").values_list("type", "value"))
@@ -90,3 +92,19 @@ class LoadMaterialsTest(TestCase):
         self.assertEqual(self.material.name, "Alpha")
         self.assertEqual(self.tags(self.material), [(Tag.INDUSTRY, "H2")])
         self.assertEqual(self.tags(self.other), [(Tag.INDUSTRY, "H2")])
+
+
+class SampleDataMaterialsTest(TestCase):
+    def test_app_seed_loads_the_catalog_before_creating_demo_lots(self):
+        with patch("h2.factories.sample_data.setup_h2_producer_certificates"):
+            call_command("create_sample_data", "h2", stdout=StringIO())
+
+        lot = Action.unannotated.get(pos_id="H2-DEMO-INIT-001")
+        self.assertEqual(lot.material.code, "H2-RFNBO")
+        self.assertEqual(lot.material.classification.category, "Hydrogène")
+        self.assertTrue(lot.material.tags.filter(type=Tag.INDUSTRY, value="H2").exists())
+
+    def test_solid_biomass_seed_also_loads_the_catalog(self):
+        call_command("create_sample_data", "solid_biomass", stdout=StringIO())
+
+        self.assertTrue(Material.active.filter(code="BOIS-ROND", tags__type=Tag.INDUSTRY, tags__value="SB").exists())

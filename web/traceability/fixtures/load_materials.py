@@ -5,8 +5,9 @@ from pathlib import Path
 import django
 from django.db import transaction
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
-django.setup()
+if __name__ == "__main__":
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "carbure.settings")
+    django.setup()
 
 from core.utils import bulk_update_or_create  # noqa: E402
 from feedstocks.models import Classification  # noqa: E402
@@ -87,7 +88,15 @@ def sync_tags(catalog, columns):
     )
 
 
-def load_materials(filename):
+def load_materials(filename=None):
+    if filename is None:
+        carbure_home = os.environ.get("CARBURE_HOME")
+        filename = (
+            Path(carbure_home) / "web/traceability/fixtures/materials.csv"
+            if carbure_home
+            else Path(__file__).with_name("materials.csv")
+        )
+
     catalog, columns = read_catalog(filename)
 
     with transaction.atomic():
@@ -95,4 +104,5 @@ def load_materials(filename):
         sync_tags(catalog, columns)
 
 
-load_materials(Path(os.environ["CARBURE_HOME"]) / "web/traceability/fixtures/materials.csv")
+if __name__ == "__main__":
+    load_materials()

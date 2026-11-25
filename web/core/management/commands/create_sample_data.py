@@ -3,6 +3,8 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, transaction
 
+from traceability.fixtures.load_materials import load_materials
+
 
 class Command(BaseCommand):
     help = "Crée les données de démonstration d'une app"
@@ -25,6 +27,7 @@ class Command(BaseCommand):
             self._reset_database()
 
         self._load_reference_fixtures()
+        load_materials()
 
         if app_name is None:
             for app_config in apps.get_app_configs():

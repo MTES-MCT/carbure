@@ -69,14 +69,8 @@ def setup_h2_stations() -> tuple[H2Station, H2Station]:
 
 
 def setup_h2_materials() -> tuple[Material, Material]:
-    h2_rfnbo, _ = Material.objects.get_or_create(
-        code="H2-RFNBO",
-        defaults={"name": "Hydrogène RFNBO", "lhv": Decimal("120"), "unit": Material.KG},
-    )
-    h2_bio, _ = Material.objects.get_or_create(
-        code="H2-BIO",
-        defaults={"name": "Bio-H2", "lhv": Decimal("120"), "unit": Material.KG},
-    )
+    h2_rfnbo = Material.active.get(code="H2-RFNBO")
+    h2_bio = Material.active.get(code="H2-BIO")
     return h2_rfnbo, h2_bio
 
 
@@ -251,7 +245,6 @@ def create_sample_data():
     setup_h2_producer_certificates()
     setup_h2_entity()
     setup_h2_stations()
-    setup_h2_materials()
     setup_h2_consume_lots()
     setup_h2_certificates()
     setup_h2_inherited_material_chain()
