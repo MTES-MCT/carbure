@@ -12,8 +12,9 @@ from rest_framework_api_key.models import APIKey
 from rest_framework_simplejwt.tokens import AccessToken
 
 from biomethane.factories import BiomethaneContractFactory, BiomethaneProductionUnitFactory
-from biomethane.models import BiomethaneAnnualDeclaration
-from core.models import Entity, UserRights
+from biomethane.factories.supply_plan import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
+from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneFeedstockTariffCoefficient, BiomethaneSupplyInput
+from core.models import Entity, MatierePremiere, UserRights
 from core.tests_utils import setup_current_user, setup_current_user_with_jwt
 from entity.factories import EntityFactory
 
@@ -86,8 +87,8 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_response_exposes_status_producer_and_production_unit(self):
-        """Each item exposes the declaration status, the producer and its production unit."""
+    def test_response_exposes_declaration_and_tariff_coefficient_fields(self):
+        """Each item exposes declaration details and tariff coefficient information."""
         producer = self._create_producer("Producer", self.provider)
         BiomethaneProductionUnitFactory.create(
             producer=producer,
@@ -100,7 +101,10 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
         item = self._get().data["results"][0]
 
-        self.assertEqual(set(item.keys()), {"status", "producer", "production_unit"})
+        self.assertEqual(
+            set(item.keys()),
+            {"status", "producer", "production_unit", "tariff_reference", "tariff_coefficients", "tariff_tonnages"},
+        )
         self.assertEqual(item["status"], "DECLARED")
         self.assertEqual(item["producer"]["id"], producer.id)
         self.assertEqual(
@@ -113,6 +117,110 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
                 "city": "Paris",
             },
         )
+
+    def test_tariff_coefficient_summary_uses_only_declaration_year_and_producer(self):
+        producer = self._create_producer("Producer", self.provider)
+        contract = producer.biomethane_contract
+        contract.tariff_reference = "2011"
+        contract.save(update_fields=["tariff_reference"])
+        p1 = MatierePremiere.objects.create(name="P1 input", code="PROVIDER-P1", is_methanogenic=True)
+        p2 = MatierePremiere.objects.create(name="P2 input", code="PROVIDER-P2", is_methanogenic=True)
+        unclassified = MatierePremiere.objects.create(name="Other input", code="PROVIDER-OTHER", is_methanogenic=True)
+        Coeff = BiomethaneFeedstockTariffCoefficient
+        Coeff.objects.create(feedstock=p1, regime=Coeff.AT_2011, coefficient=Coeff.P1)
+        Coeff.objects.create(feedstock=p2, regime=Coeff.AT_2011, coefficient=Coeff.P2)
+        plan = BiomethaneSupplyPlanFactory.create(producer=producer, year=self.year)
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=plan,
+            feedstock=p1,
+            material_unit=BiomethaneSupplyInput.DRY,
+            volume=100,
+            dry_matter_ratio_percent=40,
+        )
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=plan,
+            feedstock=p2,
+            material_unit=BiomethaneSupplyInput.WET,
+            volume=50,
+        )
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=plan,
+            feedstock=unclassified,
+            material_unit=BiomethaneSupplyInput.WET,
+            volume=200,
+        )
+        other_year = BiomethaneSupplyPlanFactory.create(producer=producer, year=self.year - 1)
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=other_year,
+            feedstock=p1,
+            material_unit=BiomethaneSupplyInput.WET,
+            volume=500,
+        )
+        other_producer = self._create_producer("Other provider producer", self.other_provider)
+        other_plan = BiomethaneSupplyPlanFactory.create(producer=other_producer, year=self.year)
+        BiomethaneSupplyInputFactory.create(
+            supply_plan=other_plan,
+            feedstock=p1,
+            material_unit=BiomethaneSupplyInput.WET,
+            volume=500,
+        )
+
+        item = self._get().data["results"][0]
+
+        self.assertEqual(item["tariff_reference"], "2011")
+        self.assertEqual(item["tariff_coefficients"], {"p1": 50.0, "p2": 10.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
+        self.assertEqual(
+            item["tariff_tonnages"],
+            {"total": 500.0, "p1": 250.0, "p2": 50.0, "p3": 0.0, "p": 0.0, "pef": 0.0},
+        )
+
+    def test_tariff_coefficient_summary_is_null_without_referential(self):
+        self._create_producer("Producer", self.provider)
+
+        item = self._get().data["results"][0]
+
+        self.assertIsNone(item["tariff_coefficients"])
+        self.assertIsNone(item["tariff_tonnages"])
+
+    def test_tariff_coefficient_summaries_are_independent_for_multiple_contracts(self):
+        first = self._create_producer("First", self.provider)
+        second = self._create_producer("Second", self.provider)
+        first.biomethane_contract.tariff_reference = "2011"
+        first.biomethane_contract.save(update_fields=["tariff_reference"])
+        second.biomethane_contract.tariff_reference = "2023"
+        second.biomethane_contract.save(update_fields=["tariff_reference"])
+        feedstock = MatierePremiere.objects.create(name="Input", code="PROVIDER-CONDITIONAL", is_methanogenic=True)
+        Coeff = BiomethaneFeedstockTariffCoefficient
+        Coeff.objects.create(feedstock=feedstock, regime=Coeff.AT_2011, coefficient=Coeff.P1)
+        Coeff.objects.create(feedstock=feedstock, regime=Coeff.AT_2020_PLUS, coefficient=Coeff.PEF)
+        for producer in (first, second):
+            plan = BiomethaneSupplyPlanFactory.create(producer=producer, year=self.year)
+            BiomethaneSupplyInputFactory.create(
+                supply_plan=plan,
+                feedstock=feedstock,
+                material_unit=BiomethaneSupplyInput.WET,
+                volume=100,
+            )
+
+        items = {item["producer"]["id"]: item for item in self._get().data["results"]}
+
+        self.assertEqual(items[first.id]["tariff_coefficients"]["p1"], 100.0)
+        self.assertEqual(items[first.id]["tariff_tonnages"]["p1"], 100.0)
+        self.assertEqual(items[second.id]["tariff_coefficients"]["pef"], 100.0)
+        self.assertEqual(items[second.id]["tariff_tonnages"]["pef"], 100.0)
+        self.assertEqual(items[second.id]["tariff_tonnages"]["p1"], 0.0)
+
+    def test_tariff_coefficient_summary_is_zero_without_inputs(self):
+        producer = self._create_producer("Producer", self.provider)
+        feedstock = MatierePremiere.objects.create(name="Input", code="PROVIDER-EMPTY", is_methanogenic=True)
+        Coeff = BiomethaneFeedstockTariffCoefficient
+        Coeff.objects.create(feedstock=feedstock, regime=Coeff.AT_2011, coefficient=Coeff.P1)
+
+        item = self._get().data["results"][0]
+
+        self.assertEqual(item["tariff_reference"], producer.biomethane_contract.tariff_reference)
+        self.assertEqual(item["tariff_coefficients"], {"p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
+        self.assertEqual(item["tariff_tonnages"], {"total": 0.0, "p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
 
     def test_production_unit_is_null_without_production_unit(self):
         """Without a production unit, production_unit is null."""

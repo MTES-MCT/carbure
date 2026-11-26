@@ -4809,6 +4809,11 @@ export interface components {
             readonly status: components["schemas"]["BiomethaneAnnualDeclarationStatusEnum"];
             readonly producer: components["schemas"]["EntityPreview"];
             readonly production_unit: components["schemas"]["BiomethaneProductionUnitPreview"] | null;
+            readonly tariff_reference: components["schemas"]["TariffReferenceEnum"] | null;
+            /** @description Percentages of the declaration year's total wet matter tonnage, or null without tariff reference data. */
+            readonly tariff_coefficients: components["schemas"]["TariffCoefficients"] | null;
+            /** @description Wet matter tonnages used to calculate the percentages, or null without tariff reference data. */
+            readonly tariff_tonnages: components["schemas"]["TariffTonnages"] | null;
         };
         BiomethaneSupplyInput: {
             readonly id: number;
@@ -7614,6 +7619,21 @@ export interface components {
          * @enum {string}
          */
         TariffReferenceEnum: PathsApiBiomethaneAdminAnnualDeclarationsGetParametersQueryTariff_reference;
+        /** @description Wet matter tonnages (tMB) by tariff coefficient, including unclassified inputs in the total. */
+        TariffTonnages: {
+            /** Format: double */
+            readonly p1: number;
+            /** Format: double */
+            readonly p2: number;
+            /** Format: double */
+            readonly p3: number;
+            /** Format: double */
+            readonly p: number;
+            /** Format: double */
+            readonly pef: number;
+            /** Format: double */
+            readonly total: number;
+        };
         ToggleElecRequest: {
             /** @default false */
             has_elec: boolean;
@@ -15576,7 +15596,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15651,6 +15671,15 @@ export interface operations {
                     "application/vnd.ms-excel": File;
                 };
             };
+            /** @description Operation not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
         };
     };
     reject_operation: {
@@ -15677,7 +15706,7 @@ export interface operations {
                     "application/json": unknown;
                 };
             };
-            /** @description Error message */
+            /** @description Operation not found */
             404: {
                 headers: {
                     [name: string]: unknown;

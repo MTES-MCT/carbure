@@ -12361,8 +12361,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/correct/:
     post:
       operationId: correct_operation
@@ -12440,6 +12440,12 @@ paths:
                 type: string
                 format: binary
           description: ""
+        "404":
+          content:
+            application/json:
+              schema:
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/{id}/reject/:
     post:
       operationId: reject_operation
@@ -12473,8 +12479,8 @@ paths:
           content:
             application/json:
               schema:
-                error: OPERATION_NOT_FOUND
-          description: Error message
+                detail: Not found.
+          description: Operation not found
   /api/tiruert/operations/balance/:
     get:
       operationId: list_balances
@@ -16987,10 +16993,32 @@ components:
             - $ref: "#/components/schemas/BiomethaneProductionUnitPreview"
           readOnly: true
           nullable: true
+        tariff_reference:
+          allOf:
+            - $ref: "#/components/schemas/TariffReferenceEnum"
+          readOnly: true
+          nullable: true
+        tariff_coefficients:
+          allOf:
+            - $ref: "#/components/schemas/TariffCoefficients"
+          nullable: true
+          readOnly: true
+          description: Percentages of the declaration year's total wet matter tonnage, or
+            null without tariff reference data.
+        tariff_tonnages:
+          allOf:
+            - $ref: "#/components/schemas/TariffTonnages"
+          nullable: true
+          readOnly: true
+          description: Wet matter tonnages used to calculate the percentages, or null
+            without tariff reference data.
       required:
         - producer
         - production_unit
         - status
+        - tariff_coefficients
+        - tariff_reference
+        - tariff_tonnages
     BiomethaneSupplyInput:
       type: object
       properties:
@@ -23533,6 +23561,42 @@ components:
         * `2020` - 2020
         * `2021` - 2021
         * `2023` - 2023
+    TariffTonnages:
+      type: object
+      description: Wet matter tonnages (tMB) by tariff coefficient, including
+        unclassified inputs in the total.
+      properties:
+        p1:
+          type: number
+          format: double
+          readOnly: true
+        p2:
+          type: number
+          format: double
+          readOnly: true
+        p3:
+          type: number
+          format: double
+          readOnly: true
+        p:
+          type: number
+          format: double
+          readOnly: true
+        pef:
+          type: number
+          format: double
+          readOnly: true
+        total:
+          type: number
+          format: double
+          readOnly: true
+      required:
+        - p
+        - p1
+        - p2
+        - p3
+        - pef
+        - total
     ToggleElecRequest:
       type: object
       properties:
