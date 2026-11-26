@@ -273,11 +273,17 @@ const Org = () => {
         </>
       )}
 
-      {(isHRS || canAccessH2Admin) && (
+      {(isHRS || canAccessH2Admin || entity.is_tiruert_liable) && (
         <Route path="h2/*" element={<H2Routes />} />
       )}
       {isHRS && (
         <Route path="*" element={<Navigate replace to="../h2/stations" />} />
+      )}
+      {!isHRS && entity.is_tiruert_liable && !canAccessH2Admin && (
+        <Route
+          path="*"
+          element={<Navigate replace to="../h2/liable-volumes" />}
+        />
       )}
       {canAccessH2Admin && (
         <Route path="*" element={<Navigate replace to="../h2/admin/lots" />} />

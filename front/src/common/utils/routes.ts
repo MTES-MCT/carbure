@@ -169,6 +169,10 @@ export const ROUTE_URLS = {
       LOTS: `${baseUrl}/lots/${year}`,
       LOT: (actionId: number) => `${baseUrl}/lots/${year}#action/${actionId}`,
       CERTIFICATES: `${baseUrl}/certificates`,
+      VOLUMES: `${baseUrl}/volumes`,
+      SENT_CERTIFICATES: `${baseUrl}/sent-certificates`,
+      LIABLE_VOLUMES: `${baseUrl}/liable-volumes`,
+      LIABLE_CERTIFICATES: `${baseUrl}/liable-certificates`,
       ADMIN: {
         STATIONS: `${baseUrl}/admin/stations`,
         LOTS: `${baseUrl}/admin/lots/${year}`,

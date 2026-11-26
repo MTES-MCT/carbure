@@ -26,9 +26,11 @@ from traceability.services.action_import_file import store_action_import_file
 class ActionParentSerializer(serializers.ModelSerializer):
     """Small representation used for the parent action relation."""
 
+    holder = EntityPreviewSerializer(read_only=True)
+
     class Meta:
         model = Action
-        fields = ["id", "pos_id", "working_date"]
+        fields = ["id", "pos_id", "working_date", "holder"]
 
 
 class ActionSerializer(serializers.ModelSerializer):

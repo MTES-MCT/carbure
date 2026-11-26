@@ -43,6 +43,21 @@ export function getActions(industry: ActionIndustry, query: ActionQuery) {
   })
 }
 
+export function updateActionStatus(
+  entity_id: number,
+  id: number,
+  industry: ActionIndustry,
+  status: ActionCreateRequest["status"]
+) {
+  return api.POST("/traceability/actions/{id}/status/", {
+    params: {
+      path: { id },
+      query: { entity_id, industry },
+    },
+    body: { status },
+  })
+}
+
 export function createAction(
   entity_id: number,
   industry: ActionIndustry,

@@ -7,7 +7,12 @@ const currentYear = new Date().getFullYear()
 
 const StationsPage = lazy(() => import("h2/pages/stations"))
 const LotsPage = lazy(() => import("h2/pages/lots"))
-const CertificatesPage = lazy(() => import("h2/pages/certificates"))
+const VolumesPage = lazy(() => import("h2/pages/volumes"))
+const SentCertificatesPage = lazy(() => import("h2/pages/sent-certificates"))
+const LiableVolumesPage = lazy(() => import("h2/pages/liable-volumes"))
+const LiableCertificatesPage = lazy(
+  () => import("h2/pages/liable-certificates")
+)
 const AdminLotsPage = lazy(() => import("h2/pages/admin/lots"))
 const AdminCertificatesPage = lazy(() => import("h2/pages/admin/certificates"))
 
@@ -36,24 +41,64 @@ const H2AdminRoutes = () => {
 }
 
 export const H2Routes = () => {
-  const { isHRS } = useEntity()
+  const { isHRS, is_tiruert_liable } = useEntity()
   const { canAccessAdmin } = useH2Permissions()
 
   if (canAccessAdmin) return <H2AdminRoutes />
 
-  if (!isHRS) return null
+  if (!isHRS && !is_tiruert_liable) return null
 
   return (
     <Routes>
-      <Route path="stations" element={<StationsPage />} />
-      <Route path="lots" element={<Navigate replace to={`${currentYear}`} />} />
-      <Route path="lots/:year" element={<LotsPage />} />
+      {isHRS && (
+        <>
+          <Route path="stations" element={<StationsPage />} />
+          <Route
+            path="lots"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
+          <Route path="lots/:year" element={<LotsPage />} />
+          <Route
+            path="volumes"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
+          <Route path="volumes/:year/:tab?" element={<VolumesPage />} />
+          <Route
+            path="sent-certificates"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
+          <Route
+            path="sent-certificates/:year/:tab?"
+            element={<SentCertificatesPage />}
+          />
+        </>
+      )}
+      {is_tiruert_liable && (
+        <>
+          <Route
+            path="liable-volumes"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
+          <Route
+            path="liable-volumes/:year/:tab?"
+            element={<LiableVolumesPage />}
+          />
+          <Route
+            path="liable-certificates"
+            element={<Navigate replace to={`${currentYear}`} />}
+          />
+          <Route
+            path="liable-certificates/:year/:tab?"
+            element={<LiableCertificatesPage />}
+          />
+        </>
+      )}
       <Route
-        path="certificates"
-        element={<Navigate replace to={`${currentYear}`} />}
+        path="*"
+        element={
+          <Navigate replace to={isHRS ? "../stations" : "../liable-volumes"} />
+        }
       />
-      <Route path="certificates/:year/:tab?" element={<CertificatesPage />} />
-      <Route path="*" element={<Navigate replace to="../stations" />} />
     </Routes>
   )
 }

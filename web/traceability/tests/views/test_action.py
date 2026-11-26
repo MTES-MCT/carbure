@@ -136,6 +136,18 @@ class ActionViewsetQuerysetTest(TestCase):
         self.assertEqual(exhausted_only.status_code, status.HTTP_200_OK)
         self.assertEqual([item["id"] for item in exhausted_only.data["results"]], [exhausted.id])
 
+    def test_held_splits_actions_the_caller_holds_from_the_ones_they_issued(self):
+        held = self.client.get(self.list_url, {**self.base_params, "held": True})
+        issued = self.client.get(self.list_url, {**self.base_params, "held": False})
+
+        self.assertEqual(held.status_code, status.HTTP_200_OK)
+        self.assertIn(self.own_action.id, [item["id"] for item in held.data["results"]])
+        self.assertNotIn(self.child_of_own_action.id, [item["id"] for item in held.data["results"]])
+        self.assertEqual(issued.status_code, status.HTTP_200_OK)
+        issued_rows = issued.data["results"]
+        self.assertEqual([item["id"] for item in issued_rows], [self.child_of_own_action.id])
+        self.assertEqual(issued_rows[0]["parent"]["holder"]["name"], self.entity.name)
+
     def test_list_includes_inherited_material(self):
         child = ActionFactory.create(
             holder=self.other_entity,

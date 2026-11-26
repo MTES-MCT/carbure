@@ -3,7 +3,14 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from core.models import Entity, ExternalAdminRights
-from h2.handlers.authorization import can_hrs_transfer, is_h2_admin, is_hrs_holder, is_liable_holder
+from h2.handlers.authorization import (
+    can_hrs_transfer,
+    can_liable_consume,
+    can_liable_transfer,
+    is_h2_admin,
+    is_hrs_holder,
+    is_liable_holder,
+)
 
 
 class ActionAuthorizationTest(SimpleTestCase):
@@ -31,6 +38,25 @@ class ActionAuthorizationTest(SimpleTestCase):
         self.assertFalse(can_hrs_transfer(hrs, hrs, None))
         self.assertFalse(can_hrs_transfer(hrs, other_operator, hrs))
         self.assertFalse(can_hrs_transfer(liable_hrs, liable_hrs, liable_hrs))
+
+    def test_a_liable_holder_can_transfer_to_another_liable_party(self):
+        liable = Entity(id=1, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        recipient = Entity(id=2, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        other = Entity(id=3, entity_type=Entity.OPERATOR, is_tiruert_liable=False)
+
+        self.assertTrue(can_liable_transfer(liable, recipient, liable))
+        self.assertFalse(can_liable_transfer(liable, liable, liable))
+        self.assertFalse(can_liable_transfer(liable, other, liable))
+        self.assertFalse(can_liable_transfer(recipient, recipient, liable))
+
+    def test_a_liable_holder_can_consume_their_own_volume(self):
+        liable = Entity(id=1, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        other = Entity(id=2, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+
+        self.assertTrue(can_liable_consume(liable, liable, liable))
+        self.assertFalse(can_liable_consume(liable, other, liable))
+        self.assertFalse(can_liable_consume(other, liable, liable))
+        self.assertFalse(can_liable_consume(liable, liable, other))
 
     def test_status_assignment_requires_the_liable_holder(self):
         liable = Entity(id=1, entity_type=Entity.OPERATOR, is_tiruert_liable=True)

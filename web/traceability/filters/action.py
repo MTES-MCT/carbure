@@ -22,11 +22,21 @@ class ActionFilter(RecursiveFilterSet):
     previous_material = PreviousMaterialFilter()
     # true keeps quantity_available > 0, false keeps = 0. Absent skips the cutoff.
     quantity_available = BooleanFilter(method="filter_quantity_available")
+    # true keeps actions held by the caller. false keeps children they issued.
+    held = BooleanFilter(method="filter_held")
 
     def filter_quantity_available(self, queryset, name, value):
         if value:
             return queryset.filter(quantity_available__gt=0)
         return queryset.filter(quantity_available=0)
+
+    def filter_held(self, queryset, name, value):
+        entity = getattr(self.request, "entity", None)
+        if entity is None:
+            return queryset
+        if value:
+            return queryset.filter(holder=entity)
+        return queryset.filter(parent__holder=entity).exclude(holder=entity)
 
     order_by = OrderingFilter(
         fields=(

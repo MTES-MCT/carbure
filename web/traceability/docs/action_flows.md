@@ -11,10 +11,12 @@ action_creation_flow = [
     (None, (Action.CONSUME, ActionStatus.PENDING)),
     ((Action.CONSUME, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
     ((Action.VALORIZE, ActionStatus.CREATED), (Action.TRANSFER, ActionStatus.PENDING)),
+    ((Action.TRANSFER, ActionStatus.ACCEPTED), (Action.TRANSFER, ActionStatus.PENDING)),
+    ((Action.TRANSFER, ActionStatus.ACCEPTED), (Action.CONSUME, ActionStatus.CREATED)),
 ]
 ```
 
-Le premier lien permet de créer une action `CONSUME` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `CONSUME` actuellement en `PENDING` comme parent. Le troisième permet de créer une action `TRANSFER` en `PENDING`, avec une action `VALORIZE` actuellement en `CREATED` comme parent.
+Le premier lien permet de créer une action `CONSUME` en `PENDING`, sans parent (`None`). Le second permet de créer une action `VALORIZE` en `CREATED`, avec une action `CONSUME` actuellement en `PENDING` comme parent. Le troisième permet de créer une action `TRANSFER` en `PENDING`, avec une action `VALORIZE` actuellement en `CREATED` comme parent. Les deux suivants partent d'un `TRANSFER` en `ACCEPTED` : une nouvelle cession en `PENDING`, ou une `CONSUME` en `CREATED` qui prend une partie du volume.
 
 La création est refusée si aucun lien ne correspond exactement au parent, au type et au statut demandés. Le parent doit aussi appartenir à la même filière.
 
@@ -73,7 +75,7 @@ action_creation_serializers = {
 
 La filière peut ajouter ou remplacer des serializers ; les autres entrées de base restent disponibles. Actuellement, `VALORIZE` n'a pas de serializer de création, même si son lien figure dans le flow H2. [`TransferSerializer`](../serializers/transfer.py) n'accepte que `quantity` : il date le transfert au jour de la création et laisse `pos_id` vide.
 
-Les endpoints d'écriture utilisent `write_permission`. Un endpoint appelé par d'autres entités se déclare dans `action_permissions`, sans réécrire `get_permissions`. Dans H2, la création reste `HasHRSWriteRights` : autoriser `is_h2_admin` dans les règles ne donne donc pas, à lui seul, accès à la création aux administrateurs. `status` vaut `HasHRSWriteRights | HasTiruertLiableWriteRights`. Une cession `TRANSFER` passe à `ACCEPTED` ou `REJECTED` seulement si l'acteur est le détenteur et qu'il est redevable TIRUERT (`is_liable_holder`). La lecture H2 inclut ces redevables : sans ce droit, le queryset scopé répond 404 avant l'autorisation.
+Les endpoints d'écriture utilisent `write_permission`. Un endpoint appelé par d'autres entités se déclare dans `action_permissions`, sans réécrire `get_permissions`. Dans H2, `create` et `status` valent `HasHRSWriteRights | HasTiruertLiableWriteRights`. La suppression et l'import restent `HasHRSWriteRights`. Autoriser `is_h2_admin` dans les règles ne donne donc pas, à lui seul, accès à la création aux administrateurs. Une cession `TRANSFER` en `PENDING` est ouverte par la station qui détient le parent, ou par le redevable qui détient un volume accepté, vers un autre redevable (`can_transfer`). Elle passe à `ACCEPTED` ou `REJECTED` seulement si l'acteur est le détenteur et qu'il est redevable TIRUERT (`is_liable_holder`). Une `CONSUME` en `CREATED` sur ce volume n'est ouverte que par ce même redevable (`can_liable_consume`). La lecture H2 inclut ces redevables : sans ce droit, le queryset scopé répond 404 avant l'autorisation.
 
 ### La matrice est toujours validée
 

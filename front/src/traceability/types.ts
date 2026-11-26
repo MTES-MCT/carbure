@@ -22,6 +22,7 @@ export type ActionQueryBuilder = QueryBuilder<ActionStatus[], ActionOrderBy[]>
 
 export type ActionQuery = ActionQueryBuilder["query"] & {
   quantity_available?: boolean
+  held?: boolean
   [ActionFilter.holder]?: string[]
   [ActionFilter.type]?: ActionType[]
   [ActionFilter.material]?: string[]

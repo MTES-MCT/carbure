@@ -50,6 +50,17 @@ class H2ActionCreationTest(SimpleTestCase):
                 parent=pending_consume,
             )
         )
+        accepted_transfer = SimpleNamespace(type=Action.TRANSFER, status=ActionStatus.ACCEPTED)
+        self.assertTrue(self.handler.can_create_action(Action.TRANSFER, ActionStatus.PENDING, parent=accepted_transfer))
+        self.assertTrue(self.handler.can_create_action(Action.CONSUME, ActionStatus.CREATED, parent=accepted_transfer))
+        self.assertFalse(self.handler.can_create_action(Action.CONSUME, ActionStatus.CREATED, parent=created_valorize))
+        self.assertFalse(
+            self.handler.can_create_action(
+                Action.CONSUME,
+                ActionStatus.CREATED,
+                parent=SimpleNamespace(type=Action.TRANSFER, status=ActionStatus.PENDING),
+            )
+        )
 
     def test_only_the_hrs_holding_the_certificate_can_create_a_transfer(self):
         hrs = Entity(id=1, entity_type=Entity.HRS)
@@ -69,3 +80,16 @@ class H2ActionCreationTest(SimpleTestCase):
         self.assertFalse(
             self.handler.can_assign_status(hrs, Action.TRANSFER, ActionStatus.PENDING, other_operator, certificate)
         )
+
+    def test_the_liable_holding_an_accepted_transfer_can_cede_or_consume_it(self):
+        liable = Entity(id=1, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        recipient = Entity(id=2, entity_type=Entity.OPERATOR, is_tiruert_liable=True)
+        other = Entity(id=3, entity_type=Entity.OPERATOR, is_tiruert_liable=False)
+        volume = SimpleNamespace(type=Action.TRANSFER, status=ActionStatus.ACCEPTED, holder=liable)
+
+        self.assertTrue(self.handler.can_assign_status(liable, Action.TRANSFER, ActionStatus.PENDING, recipient, volume))
+        self.assertTrue(self.handler.can_assign_status(liable, Action.CONSUME, ActionStatus.CREATED, liable, volume))
+        self.assertFalse(self.handler.can_assign_status(liable, Action.TRANSFER, ActionStatus.PENDING, liable, volume))
+        self.assertFalse(self.handler.can_assign_status(liable, Action.TRANSFER, ActionStatus.PENDING, other, volume))
+        self.assertFalse(self.handler.can_assign_status(recipient, Action.CONSUME, ActionStatus.CREATED, liable, volume))
+        self.assertFalse(self.handler.can_assign_status(liable, Action.CONSUME, ActionStatus.CREATED, recipient, volume))

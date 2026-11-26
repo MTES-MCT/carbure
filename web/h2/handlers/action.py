@@ -1,5 +1,5 @@
 import h2.handlers.lookups as lookups
-from h2.handlers.authorization import can_hrs_transfer, is_h2_admin, is_hrs_holder, is_liable_holder
+from h2.handlers.authorization import can_liable_consume, can_transfer, is_h2_admin, is_hrs_holder, is_liable_holder
 from h2.permissions import (
     HasH2AdminRights,
     HasHRSRights,
@@ -24,6 +24,8 @@ class H2ActionHandler(ActionIndustryHandler):
         (None, (Action.CONSUME, ActionStatus.PENDING)),
         ((Action.CONSUME, ActionStatus.PENDING), (Action.VALORIZE, ActionStatus.CREATED)),
         ((Action.VALORIZE, ActionStatus.CREATED), (Action.TRANSFER, ActionStatus.PENDING)),
+        ((Action.TRANSFER, ActionStatus.ACCEPTED), (Action.TRANSFER, ActionStatus.PENDING)),
+        ((Action.TRANSFER, ActionStatus.ACCEPTED), (Action.CONSUME, ActionStatus.CREATED)),
     ]
 
     action_status_authorizations = {
@@ -32,12 +34,14 @@ class H2ActionHandler(ActionIndustryHandler):
         (Action.CONSUME, ActionStatus.REJECTED): is_h2_admin,
         (Action.CONSUME, ActionStatus.BLOCKED): is_h2_admin,
         (Action.VALORIZE, ActionStatus.CREATED): is_h2_admin,
-        (Action.TRANSFER, ActionStatus.PENDING): can_hrs_transfer,
+        (Action.TRANSFER, ActionStatus.PENDING): can_transfer,
+        (Action.CONSUME, ActionStatus.CREATED): can_liable_consume,
         (Action.TRANSFER, ActionStatus.ACCEPTED): is_liable_holder,
         (Action.TRANSFER, ActionStatus.REJECTED): is_liable_holder,
     }
 
     action_permissions = {
+        "create": HasHRSWriteRights | HasTiruertLiableWriteRights,
         "status": HasHRSWriteRights | HasTiruertLiableWriteRights,
     }
 

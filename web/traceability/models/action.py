@@ -47,7 +47,7 @@ class ActionManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .select_related("holder", "material", "site", "parent", "certificate")
+            .select_related("holder", "material", "site", "parent", "parent__holder", "certificate")
             .annotate(status=latest_status())
             .annotate(period=period())
             .annotate(carbure_id=carbure_id())

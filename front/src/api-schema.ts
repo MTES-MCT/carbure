@@ -3803,6 +3803,7 @@ export interface components {
              * Format: date
              */
             working_date: string;
+            holder: components["schemas"]["EntityPreview"];
         };
         /**
          * @description * `ROAD` - Road transport
@@ -16346,6 +16347,8 @@ export interface operations {
                 period?: string[];
                 previous_material?: string[];
                 quantity_available?: boolean;
+                /** @description true keeps actions held by the caller. false keeps children they issued. */
+                held?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16604,6 +16607,8 @@ export interface operations {
                 period?: string[];
                 previous_material?: string[];
                 quantity_available?: boolean;
+                /** @description true keeps actions held by the caller. false keeps children they issued. */
+                held?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**
@@ -16762,6 +16767,8 @@ export interface operations {
                 period?: string[];
                 previous_material?: string[];
                 quantity_available?: boolean;
+                /** @description true keeps actions held by the caller. false keeps children they issued. */
+                held?: boolean;
                 /** @description A search term. */
                 search?: string;
                 /**

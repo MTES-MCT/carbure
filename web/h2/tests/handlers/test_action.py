@@ -27,11 +27,11 @@ class H2ActionHandlerPermissionTest(TestCase, PermissionTestMixin):
                     [((HasHRSRights | HasTiruertLiableRights) | HasH2AdminRights)()],
                 ),
                 (
-                    ["create", "destroy", "import_actions"],
+                    ["destroy", "import_actions"],
                     [HasHRSWriteRights()],
                 ),
                 (
-                    ["status"],
+                    ["create", "status"],
                     [(HasHRSWriteRights | HasTiruertLiableWriteRights)()],
                 ),
             ],

@@ -8,10 +8,19 @@ export const useHydrogen = () => {
   const { t } = useTranslation()
   const routes = useRoutes()
   const h2Routes = routes.HYDROGEN()
-  const { isHRS } = useEntity()
+  const { isHRS, is_tiruert_liable } = useEntity()
   const { canAccessAdmin } = useH2Permissions()
 
-  const baseMenu: Record<"lot" | "certificate" | "station", MenuItem> = {
+  const baseMenu: Record<
+    | "lot"
+    | "certificate"
+    | "volume"
+    | "sentCertificate"
+    | "liableVolume"
+    | "liableCertificate"
+    | "station",
+    MenuItem
+  > = {
     lot: {
       path: h2Routes.LOTS,
       title: t("Lots"),
@@ -23,6 +32,30 @@ export const useHydrogen = () => {
       title: t("Certificats"),
       icon: "ri-send-plane-line",
       iconActive: "ri-send-plane-fill",
+    },
+    volume: {
+      path: h2Routes.VOLUMES,
+      title: t("Volumes H2"),
+      icon: "ri-stack-line",
+      iconActive: "ri-stack-fill",
+    },
+    sentCertificate: {
+      path: h2Routes.SENT_CERTIFICATES,
+      title: t("Certificats envoyés"),
+      icon: "ri-send-plane-line",
+      iconActive: "ri-send-plane-fill",
+    },
+    liableVolume: {
+      path: h2Routes.LIABLE_VOLUMES,
+      title: t("Volumes H2"),
+      icon: "ri-stack-line",
+      iconActive: "ri-stack-fill",
+    },
+    liableCertificate: {
+      path: h2Routes.LIABLE_CERTIFICATES,
+      title: t("Certificats"),
+      icon: "ri-file-list-3-line",
+      iconActive: "ri-file-list-3-fill",
     },
     station: {
       path: h2Routes.STATIONS,
@@ -41,7 +74,12 @@ export const useHydrogen = () => {
     {
       title: t("Lots d'hydrogène"),
       condition: isHRS,
-      children: [baseMenu.lot, baseMenu.certificate],
+      children: [baseMenu.lot, baseMenu.volume, baseMenu.sentCertificate],
+    },
+    {
+      title: t("Hydrogène"),
+      condition: is_tiruert_liable,
+      children: [baseMenu.liableVolume, baseMenu.liableCertificate],
     },
   ]
 
