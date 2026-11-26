@@ -27,10 +27,9 @@ fi
 backup_source=$1
 backup_location=$2
 database_url=${3:-${DATABASE_URL:-}}
-production_app=carbure-prod
 
-if [[ "${APP:-}" == "$production_app" ]]; then
-  read -r -p 'Vous êtes en production ! Voulez vous vraiment importer le dump en PROD ?? Si oui tapez "production" pour confirmer : ' confirmation || true
+if [[ "${APP:-}" == "carbure-prod" || "$database_url" == *carbure-pro* ]]; then
+  read -r -p 'ATTENTION !!! Vous allez importer des données en production. Voulez-vous vraiment continuer ? Tapez "production" pour confirmer : ' confirmation || true
   if [[ "$confirmation" != "production" ]]; then
     echo "Import annulé." >&2
     exit 1
