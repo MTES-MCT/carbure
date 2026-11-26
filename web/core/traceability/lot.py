@@ -36,6 +36,9 @@ class LotNode(Node):
         "lhv_amount": True,
         "transport_document_type": True,
         "transport_document_reference": True,
+        "carbure_dispatch_site": True,
+        "unknown_dispatch_site": True,
+        "dispatch_site_country": True,
         "carbure_delivery_site": True,
         "unknown_delivery_site": True,
         "delivery_site_country": True,
@@ -74,6 +77,8 @@ class LotNode(Node):
     # data to copy only from a direct parent stock
     FROM_PARENT_STOCK = {
         "carbure_client": "carbure_supplier",
+        "depot_id": "carbure_dispatch_site_id",
+        "depot_country_id": "dispatch_site_country_id",
         **FROM_STOCK,
     }
 
@@ -126,6 +131,16 @@ class LotNode(Node):
         "carbure_delivery_site_id",
         "unknown_delivery_site",
         "delivery_site_country",
+    ]
+
+    # Dispatch sites are entered on root lots. On lots extracted from a stock,
+    # this information is inherited from the stock depot and cannot be edited.
+    DISPATCH_FIELDS = [
+        "dispatch_site",
+        "carbure_dispatch_site",
+        "carbure_dispatch_site_id",
+        "unknown_dispatch_site",
+        "dispatch_site_country",
     ]
 
     # fields only available to the root owner (the one who input the data first on carbure)
@@ -203,7 +218,11 @@ class LotNode(Node):
         # if the lot has no parent, allow all fields
         if self.parent is None:
             return (
-                LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS
+                LotNode.TRANSACTION_FIELDS
+                + LotNode.TRADING_FIELDS
+                + LotNode.DELIVERY_FIELDS
+                + LotNode.DISPATCH_FIELDS
+                + LotNode.SUSTAINABILITY_FIELDS
             )
 
         # find the first lot of the current traceability chain
@@ -233,7 +252,11 @@ class LotNode(Node):
 
     def get_disabled_fields(self, entity_id) -> tuple[bool, list[str]]:
         all_fields = (
-            LotNode.TRANSACTION_FIELDS + LotNode.TRADING_FIELDS + LotNode.DELIVERY_FIELDS + LotNode.SUSTAINABILITY_FIELDS
+            LotNode.TRANSACTION_FIELDS
+            + LotNode.TRADING_FIELDS
+            + LotNode.DELIVERY_FIELDS
+            + LotNode.DISPATCH_FIELDS
+            + LotNode.SUSTAINABILITY_FIELDS
         )
 
         allowed_fields = self.get_allowed_fields(entity_id)
@@ -301,8 +324,19 @@ class LotNode(Node):
             if field == "carbure_production_site" and value:
                 derived_fields["production_country"] = value.country
                 derived_fields["production_site_commissioning_date"] = value.date_mise_en_service
+                derived_fields["unknown_production_site"] = None
             if field == "carbure_delivery_site" and value:
                 derived_fields["delivery_site_country"] = value.country
+                derived_fields["unknown_delivery_site"] = None
+            if field == "carbure_dispatch_site" and value:
+                derived_fields["dispatch_site_country"] = value.country
+                derived_fields["unknown_dispatch_site"] = None
+            if field == "carbure_producer" and value:
+                derived_fields["unknown_producer"] = None
+            if field == "carbure_supplier" and value:
+                derived_fields["unknown_supplier"] = None
+            if field == "carbure_client" and value:
+                derived_fields["unknown_client"] = None
         return derived_fields
 
 

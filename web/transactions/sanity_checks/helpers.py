@@ -16,7 +16,7 @@ from core.models import (
 )
 from ml.models import EECStats, EPStats, ETDStats
 from producers.models import ProductionSiteInput, ProductionSiteOutput
-from transactions.models import Depot, EntitySite, ProductionSite
+from transactions.models import Depot, EntitySite, ProductionSite, Site
 from transactions.models.year_config import YearConfig
 
 july1st2021 = datetime.date(year=2021, month=7, day=1)
@@ -100,6 +100,8 @@ def enrich_lot(lot):
 
 class PrefetchedData(TypedDict):
     countries: dict[str, Pays]
+    sites: dict[int, Site]
+    sitesbyname: dict[str, Site]
     biofuels: dict[str, Biocarburant]
     depots: dict[str, Depot]
     depotsbyname: dict[str, Depot]
@@ -122,6 +124,8 @@ class PrefetchedData(TypedDict):
 def get_prefetched_data(entity=None):
     data: PrefetchedData = {
         "countries": {},
+        "sites": {},
+        "sitesbyname": {},
         "biofuels": {},
         "depots": {},
         "depotsbyname": {},
@@ -142,6 +146,8 @@ def get_prefetched_data(entity=None):
     }
 
     data["countries"] = {p.code_pays: p for p in Pays.objects.all()}
+    data["sites"] = {site.pk: site for site in Site.objects.filter(is_enabled=True)}
+    data["sitesbyname"] = {site.name.upper(): site for site in data["sites"].values()}
     data["biofuels"] = {b.code: b for b in Biocarburant.objects.all()}
     data["feedstocks"] = {m.code: m for m in MatierePremiere.biofuel.all()}
     data["depots"] = {d.depot_id: d for d in Depot.objects.all()}

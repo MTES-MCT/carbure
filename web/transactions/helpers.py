@@ -23,6 +23,7 @@ def check_locked_year(current_year: int):
 
 INCORRECT_DELIVERY_DATE = "INCORRECT_DELIVERY_DATE"
 INCORRECT_FORMAT_DELIVERY_DATE = "INCORRECT_FORMAT_DELIVERY_DATE"
+INCORRECT_FORMAT_DISPATCH_DATE = "INCORRECT_FORMAT_DISPATCH_DATE"
 COULD_NOT_FIND_PRODUCTION_SITE = "COULD_NOT_FIND_PRODUCTION_SITE"
 MISSING_BIOFUEL = "MISSING_BIOFUEL"
 MISSING_FEEDSTOCK = "MISSING_FEEDSTOCK"
@@ -45,7 +46,7 @@ def try_get_date(dd):
     if dd == "":
         return None
     if dd is None:
-        return dd
+        return None
     if pd.isna(dd):
         return None
     if isinstance(dd, int):
@@ -92,6 +93,24 @@ def fill_delivery_date(lot, data):
         lot.delivery_date = today
     lot.period = lot.delivery_date.year * 100 + lot.delivery_date.month
     lot.year = lot.delivery_date.year
+    return errors
+
+
+def fill_dispatch_date(lot, data):
+    errors = []
+    try:
+        lot.dispatch_date = try_get_date(data.get("dispatch_date", ""))
+    except Exception:
+        errors.append(
+            GenericError(
+                lot=lot,
+                field="dispatch_date",
+                error=INCORRECT_FORMAT_DISPATCH_DATE,
+                value=data.get("dispatch_date", ""),
+                display_to_creator=True,
+                is_blocking=True,
+            )
+        )
     return errors
 
 
@@ -522,6 +541,28 @@ def fill_delivery_data(lot, data, entity, prefetched_data):
     return errors
 
 
+def fill_dispatch_data(lot, data, prefetched_data):
+    dispatch_site = None
+    dispatch_site_id = data.get("carbure_dispatch_site_id", None)
+    if dispatch_site_id:
+        try:
+            dispatch_site = prefetched_data["sites"].get(int(dispatch_site_id))
+        except (TypeError, ValueError):
+            dispatch_site = None
+
+    if dispatch_site is not None:
+        lot.carbure_dispatch_site = dispatch_site
+        lot.unknown_dispatch_site = None
+        lot.dispatch_site_country = dispatch_site.country
+    else:
+        lot.carbure_dispatch_site = None
+        lot.unknown_dispatch_site = data.get("unknown_dispatch_site", None)
+        dispatch_country_code = data.get("dispatch_site_country_code", None)
+        lot.dispatch_site_country = prefetched_data["countries"].get(dispatch_country_code)
+
+    return []
+
+
 def fill_client_data(lot, data, entity, prefetched_data):
     errors = []
     carbure_client_id = data.get("carbure_client_id", None)
@@ -574,12 +615,12 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot = existing_lot
     else:
         lot = CarbureLot()
-    lot.dispatch_date = try_get_date(data.get("dispatch_date", None))
     lot.free_field = data.get("free_field", None)
     lot.udb_transaction_id = data.get("udb_transaction_id", "")
     lot.added_by = entity
     carbure_stock_id = data.get("carbure_stock_id", False)
 
+    errors += fill_dispatch_date(lot, data)
     errors += fill_delivery_date(lot, data)
 
     if carbure_stock_id or lot.parent_stock_id:
@@ -598,6 +639,8 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         lot.copy_production_details(original_lot)
         lot.copy_sustainability_data(original_lot)
         lot.carbure_dispatch_site = parent_stock.depot
+        lot.unknown_dispatch_site = None
+        lot.dispatch_site_country = lot.carbure_dispatch_site.country if lot.carbure_dispatch_site else None
         lot.carbure_supplier = parent_stock.carbure_client
         lot.biofuel = parent_stock.biofuel
     else:
@@ -605,6 +648,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
         errors += fill_basic_info(lot, data, prefetched_data)
         errors += fill_production_info(lot, data, entity, prefetched_data)
         errors += fill_ghg_info(lot, data)
+        errors += fill_dispatch_data(lot, data, prefetched_data)
 
     # common data
     fill_delivery_type(lot, data)
@@ -620,7 +664,7 @@ def construct_carbure_lot(prefetched_data, entity, data, existing_lot=None):
 def bulk_insert_lots(
     entity: Entity,
     lots: List[CarbureLot],
-    errors: List[GenericError],
+    errors: List[List[GenericError]],
     prefetched_data: dict,
 ) -> QuerySet:
     CarbureLot.objects.bulk_create(lots, batch_size=100)
@@ -661,7 +705,7 @@ def bulk_insert_lots(
         .filter(added_by=entity)
         .order_by("-id")[0 : len(lots)]
     )
-    errors = reversed(errors)  # lots are fetched by DESC ID
+    errors = list(reversed(errors))  # lots are fetched by DESC ID
     for lot, lot_errors in zip(inserted_lots, errors):
         for e in lot_errors:
             e.lot_id = lot.id

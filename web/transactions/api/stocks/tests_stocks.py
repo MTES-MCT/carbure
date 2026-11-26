@@ -105,6 +105,7 @@ class StocksFlowTest(TestCase):
             delivery_type=CarbureLot.STOCK,
             lot_status="ACCEPTED",
             carbure_producer=self.producer,
+            unknown_dispatch_site="Previous dispatch site",
         )
 
         assert parent_lot.lot_status == CarbureLot.ACCEPTED
@@ -117,6 +118,7 @@ class StocksFlowTest(TestCase):
         payload = {
             "volume": 10000,
             "stock_id": stock.carbure_id,
+            "dispatch_date": today,
             "delivery_date": today,
             "delivery_site_country_id": "DE",
             "delivery_type": "EXPORT",
@@ -124,6 +126,10 @@ class StocksFlowTest(TestCase):
         lot = self.stock_split([payload])
         assert lot.lot_status == CarbureLot.DRAFT
         assert lot.delivery_type == CarbureLot.EXPORT
+        assert lot.dispatch_date == datetime.date.today()
+        assert lot.carbure_dispatch_site_id == stock.depot_id
+        assert lot.unknown_dispatch_site is None
+        assert lot.dispatch_site_country_id == stock.depot.country_id
 
         # 2: split 10000L for RFC
         payload = {

@@ -1,13 +1,17 @@
 import os
+from datetime import date
 from unittest.mock import patch
 
+import openpyxl
 import pandas as pd
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from core.models import CarbureLot, Entity, Pays
+from core.serializers import CarbureLotCSVSerializer
 from core.tests_utils import setup_current_user
+from core.xlsx_v3 import template_v4
 from transactions.models import Depot, ProductionSite
 from transactions.models.entity_site import EntitySite
 from transactions.models.site import Site
@@ -138,6 +142,80 @@ class LotsExcelImportTest(TestCase):
 
         assert lots.filter(carbure_delivery_site=self.owner_depot).count() == 1
         assert lots.filter(carbure_delivery_site=self.other_depot).count() == 5
+
+    def test_biofuel_template_contains_dispatch_fields(self):
+        self.owner.entity_type = Entity.PRODUCER
+        self.owner.save()
+        invalid_dispatch_site = Site.objects.create(
+            name="Invalid Dispatch Site",
+            site_type=Site.POWER_PLANT,
+            country=self.FR,
+        )
+        private_dispatch_site = Site.objects.create(
+            name="Private Dispatch Site",
+            site_type=Site.EFS,
+            country=self.FR,
+            private=True,
+        )
+        disabled_dispatch_site = Site.objects.create(
+            name="Disabled Dispatch Site",
+            site_type=Site.EFS,
+            country=self.FR,
+            is_enabled=False,
+        )
+
+        template_path = template_v4(self.owner)
+        workbook = openpyxl.load_workbook(template_path, read_only=True)
+        headers = next(workbook["lots"].iter_rows(values_only=True))
+        dispatch_sheet = workbook["SitesDExpedition"]
+        dispatch_headers = next(dispatch_sheet.iter_rows(values_only=True))
+        dispatch_rows = list(dispatch_sheet.iter_rows(min_row=2, values_only=True))
+        workbook.close()
+
+        assert headers[10:13] == ("dispatch_site", "dispatch_site_country", "dispatch_date")
+        assert dispatch_headers == ("name", "city", "country", "site_type")
+        dispatch_names = {row[0] for row in dispatch_rows}
+        assert self.owner_production_site.name in dispatch_names
+        assert self.owner_depot.name in dispatch_names
+        assert invalid_dispatch_site.name not in dispatch_names
+        assert private_dispatch_site.name not in dispatch_names
+        assert disabled_dispatch_site.name not in dispatch_names
+
+    def test_lot_export_contains_dispatch_fields(self):
+        lot = CarbureLot(
+            dispatch_date=date(2025, 2, 15),
+            carbure_dispatch_site=self.owner_production_site,
+            dispatch_site_country=self.FR,
+        )
+
+        data = CarbureLotCSVSerializer(lot).data
+
+        assert data["dispatch_date"] == "15/02/2025"
+        assert data["dispatch_site"] == self.owner_production_site.name
+        assert data["dispatch_site_country"] == "FR"
+
+    def test_dispatch_fields_are_parsed_from_fixture(self):
+        self.owner.entity_type = Entity.PRODUCER
+        self.owner.has_trading = False
+        self.owner.has_stocks = False
+        self.owner.save()
+
+        EntitySite.objects.update_or_create(entity=self.owner, site=self.owner_production_site)
+        EntitySite.objects.filter(entity=self.owner, site=self.owner_depot).delete()
+
+        lots = self.send_excel(self.owner, "test_lot_template_with_dispatch.xlsx")
+
+        known_site_lot = lots.get(free_field="je suis le producteur")
+        assert known_site_lot.carbure_dispatch_site_id == self.owner_production_site.id
+        assert known_site_lot.unknown_dispatch_site is None
+        assert known_site_lot.dispatch_site_country == self.FR
+        assert known_site_lot.dispatch_date.isoformat() == "2025-02-15"
+
+        unknown_site_lot = lots.get(free_field="je n'ai pas d'info de producteur")
+        assert unknown_site_lot.carbure_dispatch_site is None
+        assert unknown_site_lot.unknown_dispatch_site == "Unknown Dispatch Site"
+        assert unknown_site_lot.dispatch_site_country.code_pays == "DE"
+        assert unknown_site_lot.dispatch_date.isoformat() == "2025-02-16"
 
     def test_producer_trader_excel(self):
         self.owner.entity_type = Entity.PRODUCER

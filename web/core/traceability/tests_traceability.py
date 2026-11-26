@@ -6,6 +6,7 @@ from core.models import (
     CarbureStock,
     CarbureStockTransformation,
     Entity,
+    Pays,
 )
 from core.tests_utils import setup_current_user
 from core.traceability import LotNode, Node
@@ -64,6 +65,8 @@ class TraceabilityTest(TestCase):
             delivery_type=CarbureLot.TRADING,
             supplier_certificate="PARENT_CERT",
             parent_lot=None,
+            carbure_dispatch_site=self.depot,
+            dispatch_site_country=self.depot.country,
         )
 
         CarbureLotFactory.create(
@@ -103,6 +106,8 @@ class TraceabilityTest(TestCase):
         assert child_node.data.transport_document_reference == "ABCD"
         assert child_node.data.supplier_certificate == original_child_supplier_cert
         assert child_node.data.esca == 2.0
+        assert child_node.data.carbure_dispatch_site == self.depot
+        assert child_node.data.dispatch_site_country == self.depot.country
 
     def test_traceability_lot_to_stock_lot(self):
         parent_lot = CarbureLotFactory.create(lot_status="ACCEPTED", added_by=self.entity, carbure_client=self.entity)
@@ -142,6 +147,62 @@ class TraceabilityTest(TestCase):
         assert lot_node.data.biofuel_id == 12
         assert lot_node.data.unknown_delivery_site == original_child_lot_unknown_delivery_site
         assert lot_node.data.esca == 2.0
+
+    def test_traceability_stock_depot_to_lot_dispatch_site(self):
+        france = Pays.objects.get(code_pays="FR")
+        germany = Pays.objects.get(code_pays="DE")
+        self.depot.country = germany
+        self.depot.save()
+        self.depot2.country = france
+        self.depot2.save()
+
+        parent_lot = CarbureLotFactory.create(
+            lot_status="ACCEPTED",
+            added_by=self.entity,
+            carbure_client=self.entity,
+            carbure_delivery_site=self.depot2,
+            carbure_dispatch_site=self.depot2,
+            dispatch_site_country=france,
+        )
+        parent_stock = CarbureStockFactory.create(
+            parent_lot=parent_lot,
+            carbure_client=self.entity,
+            depot=self.depot,
+        )
+        CarbureLotFactory.create(
+            lot_status="ACCEPTED",
+            parent_stock=parent_stock,
+            added_by=self.entity,
+            carbure_dispatch_site=self.depot,
+            dispatch_site_country=germany,
+        )
+
+        root_node = LotNode(parent_lot)
+        stock_node = root_node.get_first(Node.STOCK)
+        lot_node = stock_node.get_first(Node.LOT)
+
+        assert lot_node.data.carbure_dispatch_site_id == self.depot.id
+        assert lot_node.data.dispatch_site_country == germany
+        assert "carbure_dispatch_site_id" not in lot_node.diff_with_parent()
+        assert "dispatch_site_country_id" not in lot_node.diff_with_parent()
+
+        stock_node.propagate()
+
+        assert lot_node.data.carbure_dispatch_site_id == self.depot.id
+        assert lot_node.data.dispatch_site_country == germany
+        assert "carbure_dispatch_site_id" not in lot_node.diff_with_parent()
+        assert "dispatch_site_country_id" not in lot_node.diff_with_parent()
+
+        stock_node.data.depot = self.depot2
+        stock_node.data.save()
+        stock_node.propagate()
+
+        assert lot_node.data.carbure_dispatch_site_id == self.depot2.id
+        assert lot_node.data.dispatch_site_country == france
+        assert "carbure_dispatch_site_id" not in lot_node.diff_with_parent()
+        assert "dispatch_site_country_id" not in lot_node.diff_with_parent()
+        _, disabled_fields = lot_node.get_disabled_fields(self.entity.id)
+        assert "carbure_dispatch_site" in disabled_fields
 
     def test_traceability_lot_to_stock_transform_lot(self):
         root_lot = CarbureLotFactory.create(
