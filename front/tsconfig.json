@@ -15,12 +15,12 @@
     "noEmit": true, 
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "src",
     "plugins": [{ "name": "typescript-plugin-css-modules" }],
     "types": ["vite/client", "vite-plugin-svgr/client", "jest", "node"],
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "@storybook/*": ["../.storybook/*"]
+      "@storybook/*": ["./.storybook/*"],
+      "*": ["./src/*"]
     },
   },
   "include": ["src", ".storybook"],
