@@ -95,7 +95,7 @@ class BiomethaneProviderDeclarationSerializer(serializers.Serializer):
 
     @staticmethod
     def _non_primed_tonnage(tonnages):
-        return tonnages["total"] - sum(value for key, value in tonnages.items() if key != "total")
+        return max(0.0, tonnages["total"] - sum(value for key, value in tonnages.items() if key != "total"))
 
     def _get_energy_metrics(self, obj):
         if "declaration_energies" not in self.context:
