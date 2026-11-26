@@ -10,11 +10,23 @@ from biomethane.services.supply_plan.tariff_coefficient import (
     compute_tariff_coefficient_summaries_for_declarations,
     get_tariff_coefficient_summary,
 )
-from core.serializers import EntityPreviewSerializer
+from core.models.entity import Entity
 
 
 class ProviderTariffCoefficientsSerializer(TariffCoefficientsSerializer):
     non_primed = serializers.FloatField(read_only=True)
+
+
+class EntityPreviewSerializer(serializers.ModelSerializer):
+    unique_identification_number = serializers.CharField(
+        source="biomethane_injection_site.unique_identification_number",
+        read_only=True,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = Entity
+        fields = ["unique_identification_number", "name", "entity_type", "registration_id"]
 
 
 class TariffTonnagesSerializer(ProviderTariffCoefficientsSerializer):

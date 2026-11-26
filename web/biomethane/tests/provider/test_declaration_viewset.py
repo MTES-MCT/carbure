@@ -11,7 +11,12 @@ from rest_framework.test import APIClient
 from rest_framework_api_key.models import APIKey
 from rest_framework_simplejwt.tokens import AccessToken
 
-from biomethane.factories import BiomethaneContractFactory, BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
+from biomethane.factories import (
+    BiomethaneContractFactory,
+    BiomethaneEnergyFactory,
+    BiomethaneInjectionSiteFactory,
+    BiomethaneProductionUnitFactory,
+)
 from biomethane.factories.supply_plan import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneFeedstockTariffCoefficient, BiomethaneSupplyInput
 from core.models import Entity, MatierePremiere, UserRights
@@ -68,8 +73,8 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # An unfinished declaration of a past year is exposed with the virtual OVERDUE status
         self.assertEqual(
-            {item["producer"]["id"]: item["status"] for item in response.data["results"]},
-            {own.id: "DECLARED", in_progress.id: "OVERDUE"},
+            {item["producer"]["name"]: item["status"] for item in response.data["results"]},
+            {own.name: "DECLARED", in_progress.name: "OVERDUE"},
         )
 
     def test_year_filter(self):
@@ -79,7 +84,7 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
         response = self._get(year=2023)
 
-        self.assertEqual([item["producer"]["id"] for item in response.data["results"]], [producer_2023.id])
+        self.assertEqual([item["producer"]["name"] for item in response.data["results"]], [producer_2023.name])
 
     def test_year_is_required(self):
         """The year query parameter is mandatory."""
@@ -90,6 +95,10 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
     def test_response_exposes_declaration_and_tariff_coefficient_fields(self):
         """Each item exposes declaration details and tariff coefficient information."""
         producer = self._create_producer("Producer", self.provider)
+        injection_site = BiomethaneInjectionSiteFactory.create(
+            producer=producer,
+            unique_identification_number="INJ12345",
+        )
         BiomethaneProductionUnitFactory.create(
             producer=producer,
             site_siret="12345678901234",
@@ -115,7 +124,8 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
             },
         )
         self.assertEqual(item["status"], "DECLARED")
-        self.assertEqual(item["producer"]["id"], producer.id)
+        self.assertNotIn("id", item["producer"])
+        self.assertEqual(item["producer"]["unique_identification_number"], injection_site.unique_identification_number)
         self.assertEqual(
             item["production_unit"],
             {
@@ -244,15 +254,15 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
                 volume=100,
             )
 
-        items = {item["producer"]["id"]: item for item in self._get().data["results"]}
+        items = {item["producer"]["name"]: item for item in self._get().data["results"]}
 
-        self.assertEqual(items[first.id]["tariff_coefficients"]["p1"], 100.0)
-        self.assertEqual(items[first.id]["tariff_tonnages"]["p1"], 100.0)
-        self.assertEqual(items[second.id]["tariff_coefficients"]["pef"], 100.0)
-        self.assertEqual(items[second.id]["tariff_tonnages"]["pef"], 100.0)
-        self.assertEqual(items[second.id]["tariff_tonnages"]["p1"], 0.0)
-        self.assertEqual(items[second.id]["tariff_coefficients"]["non_primed"], 0.0)
-        self.assertEqual(items[second.id]["tariff_tonnages"]["non_primed"], 0.0)
+        self.assertEqual(items[first.name]["tariff_coefficients"]["p1"], 100.0)
+        self.assertEqual(items[first.name]["tariff_tonnages"]["p1"], 100.0)
+        self.assertEqual(items[second.name]["tariff_coefficients"]["pef"], 100.0)
+        self.assertEqual(items[second.name]["tariff_tonnages"]["pef"], 100.0)
+        self.assertEqual(items[second.name]["tariff_tonnages"]["p1"], 0.0)
+        self.assertEqual(items[second.name]["tariff_coefficients"]["non_primed"], 0.0)
+        self.assertEqual(items[second.name]["tariff_tonnages"]["non_primed"], 0.0)
 
     def test_tariff_coefficient_summary_is_zero_without_inputs(self):
         producer = self._create_producer("Producer", self.provider)
@@ -330,8 +340,8 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
                 injected_biomethane_gwh_pcs_per_year=0,
             )
 
-        items = {item["producer"]["id"]: item for item in self._get().data["results"]}
-        self.assertEqual(items[missing.id]["electricity_consumption"], 0)
+        items = {item["producer"]["name"]: item for item in self._get().data["results"]}
+        self.assertEqual(items[missing.name]["electricity_consumption"], 0)
         for item in items.values():
             expected_consumption = 100 if item["producer"]["name"].endswith("zero denominator") else 0
             self.assertEqual(item["electricity_consumption"], expected_consumption)
@@ -454,7 +464,7 @@ class BiomethaneProviderDeclarationFrontTest(TestCase):
         response = self.client.get(self.url, {"entity_id": self.provider.id, "year": 2024})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual([item["producer"]["id"] for item in response.data["results"]], [producer.id])
+        self.assertEqual([item["producer"]["name"] for item in response.data["results"]], [producer.name])
 
     def test_session_without_verified_otp_is_forbidden(self):
         """A logged-in session without a verified OTP cannot access the provider page API."""
