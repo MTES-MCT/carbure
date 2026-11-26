@@ -78,6 +78,9 @@ class BiomethaneProducersViewSetTest(TestCase):
 
     def test_list_producers_returns_only_accessible_producers(self):
         """list returns only producers with units in accessible departments"""
+        ExternalAdminRights.objects.create(entity=self.dreal, right=ExternalAdminRights.BIOMETHANE)
+        provider = Entity.objects.create(name="Gas Provider", entity_type=Entity.BIOMETHANE_PROVIDER)
+        self.assertIn(provider, self.dreal.get_allowed_entities())
         response = self.client.get(self.producers_url, {"entity_id": self.dreal.id})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -90,6 +93,7 @@ class BiomethaneProducersViewSetTest(TestCase):
         self.assertIn(self.producer2.id, producer_ids)
         self.assertIn(self.producer3.id, producer_ids)
         self.assertNotIn(self.producer4.id, producer_ids)
+        self.assertNotIn(provider.id, producer_ids)
 
     def test_list_producers_orders_by_name(self):
         """list returns producers ordered alphabetically by name"""

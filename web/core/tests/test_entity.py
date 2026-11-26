@@ -149,3 +149,35 @@ class EntityTest(TestCase):
 
         self.assertIn(hrs, allowed_entities)
         self.assertNotIn(other, allowed_entities)
+
+    def test_get_allowed_entities_for_dreal_and_biomethane_admin(self):
+        admin = create_entity_with_department(self.dept_02, name="Biomethane admin")
+        ExternalAdminRights.objects.create(entity=admin, right=ExternalAdminRights.BIOMETHANE)
+        provider = EntityFactory.create(name="Biomethane provider", entity_type=Entity.BIOMETHANE_PROVIDER)
+        producer_without_unit = EntityFactory.create(name="Producer without unit", entity_type=Entity.BIOMETHANE_PRODUCER)
+        producer_outside_scope = EntityFactory.create(name="Producer outside scope", entity_type=Entity.BIOMETHANE_PRODUCER)
+        BiomethaneProductionUnit.objects.create(
+            producer=producer_outside_scope, name="Outside scope", department=self.dept_01
+        )
+        other = EntityFactory.create(entity_type=Entity.OPERATOR)
+
+        allowed_entities = admin.get_allowed_entities()
+
+        self.assertIn(self.entity, allowed_entities)
+        self.assertIn(provider, allowed_entities)
+        self.assertNotIn(producer_without_unit, allowed_entities)
+        self.assertNotIn(producer_outside_scope, allowed_entities)
+        self.assertNotIn(other, allowed_entities)
+
+    def test_get_allowed_entities_for_dreal_does_not_include_providers(self):
+        provider = EntityFactory.create(name="Biomethane provider", entity_type=Entity.BIOMETHANE_PROVIDER)
+
+        self.assertNotIn(provider, self.dreal_other.get_allowed_entities())
+
+    def test_get_allowed_entities_for_biomethane_right_alone(self):
+        admin = EntityFactory.create(name="Biomethane admin", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=admin, right=ExternalAdminRights.BIOMETHANE)
+        provider = EntityFactory.create(name="Biomethane provider", entity_type=Entity.BIOMETHANE_PROVIDER)
+
+        self.assertIn(provider, admin.get_allowed_entities())
+        self.assertNotIn(self.entity, admin.get_allowed_entities())
