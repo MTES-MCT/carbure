@@ -44,11 +44,26 @@ export function useActionTabs(tabs?: ActionTab[]) {
   }
 }
 
+// Build the pathname of another tab by swapping the current tab segment.
+// `tabKey` comes from useParams, which decodes it. `pathname` comes from
+// useLocation and keeps the URL's own spelling: a typed "+" stays "+", while
+// an already encoded "%2B" stays "%2B". These two hooks are not the same
+// string. useMatch would return both from the decoded path, but it needs the
+// full route pattern and this hook does not know the /org/:id prefix.
+// useMatches would too, but it requires a data router and the app uses
+// BrowserRouter. Compare both spellings as plain text.
 function tabPathname(
   pathname: string,
   tabKey: string | undefined,
   key: string
 ) {
-  if (!tabKey) return `${pathname.replace(/\/$/, "")}/${key}`
-  return pathname.replace(new RegExp(`/${tabKey}$`), `/${key}`)
+  const normalized = pathname.replace(/\/$/, "")
+  if (!tabKey) return `${normalized}/${key}`
+
+  const encoded = `/${encodeURIComponent(tabKey)}`
+  const literal = `/${tabKey}`
+  const suffix =
+    encoded !== literal && normalized.endsWith(encoded) ? encoded : literal
+  if (!normalized.endsWith(suffix)) return normalized
+  return `${normalized.slice(0, -suffix.length)}/${key}`
 }
