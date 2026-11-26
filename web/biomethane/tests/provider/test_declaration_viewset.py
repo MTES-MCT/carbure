@@ -11,7 +11,7 @@ from rest_framework.test import APIClient
 from rest_framework_api_key.models import APIKey
 from rest_framework_simplejwt.tokens import AccessToken
 
-from biomethane.factories import BiomethaneContractFactory, BiomethaneProductionUnitFactory
+from biomethane.factories import BiomethaneContractFactory, BiomethaneEnergyFactory, BiomethaneProductionUnitFactory
 from biomethane.factories.supply_plan import BiomethaneSupplyInputFactory, BiomethaneSupplyPlanFactory
 from biomethane.models import BiomethaneAnnualDeclaration, BiomethaneFeedstockTariffCoefficient, BiomethaneSupplyInput
 from core.models import Entity, MatierePremiere, UserRights
@@ -103,7 +103,16 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
         self.assertEqual(
             set(item.keys()),
-            {"status", "producer", "production_unit", "tariff_reference", "tariff_coefficients", "tariff_tonnages"},
+            {
+                "status",
+                "producer",
+                "production_unit",
+                "tariff_reference",
+                "tariff_coefficients",
+                "tariff_tonnages",
+                "electricity_consumption",
+                "energy_efficiency_coefficient",
+            },
         )
         self.assertEqual(item["status"], "DECLARED")
         self.assertEqual(item["producer"]["id"], producer.id)
@@ -168,10 +177,13 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
         item = self._get().data["results"][0]
 
         self.assertEqual(item["tariff_reference"], "2011")
-        self.assertEqual(item["tariff_coefficients"], {"p1": 50.0, "p2": 10.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
+        self.assertEqual(
+            item["tariff_coefficients"],
+            {"p1": 50.0, "p2": 10.0, "p3": 0.0, "p": 0.0, "pef": 0.0, "non_primed": 40.0},
+        )
         self.assertEqual(
             item["tariff_tonnages"],
-            {"total": 500.0, "p1": 250.0, "p2": 50.0, "p3": 0.0, "p": 0.0, "pef": 0.0},
+            {"total": 500.0, "p1": 250.0, "p2": 50.0, "p3": 0.0, "p": 0.0, "pef": 0.0, "non_primed": 200.0},
         )
 
     def test_tariff_coefficient_summary_is_null_without_referential(self):
@@ -181,6 +193,36 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
 
         self.assertIsNone(item["tariff_coefficients"])
         self.assertIsNone(item["tariff_tonnages"])
+
+    def test_tonnages_are_rounded_without_rounding_percentage_input(self):
+        """Tonnages are rounded for output, but percentages use the unrounded difference."""
+        p1 = MatierePremiere.objects.create(name="P1 input", code="PROVIDER-ROUND-P1", is_methanogenic=True)
+        other = MatierePremiere.objects.create(name="Other input", code="PROVIDER-ROUND-OTHER", is_methanogenic=True)
+        Coeff = BiomethaneFeedstockTariffCoefficient
+        Coeff.objects.create(feedstock=p1, regime=Coeff.AT_2011, coefficient=Coeff.P1)
+
+        for name, primed, non_primed in (
+            ("Decimal", 1000.12, 155.57),
+            ("Small", 0.9951, 0.0049),
+            ("Total", 0.1, 0.2),
+        ):
+            producer = self._create_producer(name, self.provider)
+            contract = producer.biomethane_contract
+            contract.tariff_reference = "2011"
+            contract.save(update_fields=["tariff_reference"])
+            plan = BiomethaneSupplyPlanFactory.create(producer=producer, year=self.year)
+            for feedstock, volume in ((p1, primed), (other, non_primed)):
+                BiomethaneSupplyInputFactory.create(
+                    supply_plan=plan, feedstock=feedstock, material_unit=BiomethaneSupplyInput.WET, volume=volume
+                )
+
+        items = {item["producer"]["name"]: item for item in self._get().data["results"]}
+        self.assertEqual(items["Decimal"]["tariff_tonnages"]["non_primed"], 155.57)
+        self.assertEqual(items["Small"]["tariff_tonnages"]["non_primed"], 0.0)
+        self.assertEqual(items["Small"]["tariff_tonnages"]["p1"], 1.0)
+        self.assertEqual(items["Small"]["tariff_coefficients"]["non_primed"], 0.49)
+        self.assertEqual(items["Small"]["tariff_coefficients"]["p1"], 99.51)
+        self.assertEqual(items["Total"]["tariff_tonnages"]["total"], 0.3)
 
     def test_tariff_coefficient_summaries_are_independent_for_multiple_contracts(self):
         first = self._create_producer("First", self.provider)
@@ -209,6 +251,8 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
         self.assertEqual(items[second.id]["tariff_coefficients"]["pef"], 100.0)
         self.assertEqual(items[second.id]["tariff_tonnages"]["pef"], 100.0)
         self.assertEqual(items[second.id]["tariff_tonnages"]["p1"], 0.0)
+        self.assertEqual(items[second.id]["tariff_coefficients"]["non_primed"], 0.0)
+        self.assertEqual(items[second.id]["tariff_tonnages"]["non_primed"], 0.0)
 
     def test_tariff_coefficient_summary_is_zero_without_inputs(self):
         producer = self._create_producer("Producer", self.provider)
@@ -219,8 +263,79 @@ class BiomethaneProviderDeclarationViewSetTest(TestCase):
         item = self._get().data["results"][0]
 
         self.assertEqual(item["tariff_reference"], producer.biomethane_contract.tariff_reference)
-        self.assertEqual(item["tariff_coefficients"], {"p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
-        self.assertEqual(item["tariff_tonnages"], {"total": 0.0, "p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "pef": 0.0})
+        self.assertEqual(
+            item["tariff_coefficients"],
+            {"p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "pef": 0.0, "non_primed": 0.0},
+        )
+        self.assertEqual(
+            item["tariff_tonnages"],
+            {"total": 0.0, "p1": 0.0, "p2": 0.0, "p3": 0.0, "p": 0.0, "pef": 0.0, "non_primed": 0.0},
+        )
+
+    def test_energy_values_follow_tariff_and_declaration_year(self):
+        """Energy values use the declaration year and the formula for the producer's tariff."""
+        for tariff in ("2011", "2020", "2021", "2023"):
+            producer = self._create_producer(tariff, self.provider)
+            contract = producer.biomethane_contract
+            contract.tariff_reference = tariff
+            contract.save(update_fields=["tariff_reference"])
+            BiomethaneEnergyFactory.create(
+                producer=producer,
+                year=self.year,
+                purification_electric_consumption_kwe=200,
+                purified_biogas_quantity_nm3=100,
+                total_unit_electric_consumption_kwe=300,
+                injected_biomethane_gwh_pcs_per_year=100,
+            )
+            BiomethaneEnergyFactory.create(
+                producer=producer,
+                year=self.year - 1,
+                purification_electric_consumption_kwe=500,
+                total_unit_electric_consumption_kwe=500,
+            )
+
+        items = {item["producer"]["name"]: item for item in self._get().data["results"]}
+        for tariff in ("2011", "2020", "2021"):
+            self.assertEqual(items[tariff]["electricity_consumption"], 200)
+            self.assertEqual(items[tariff]["energy_efficiency_coefficient"], 2)
+        self.assertEqual(items["2023"]["electricity_consumption"], 300)
+        self.assertAlmostEqual(items["2023"]["energy_efficiency_coefficient"], 0.000003)
+
+    def test_energy_values_are_zero_when_missing_or_denominator_is_zero(self):
+        """Missing energy, missing consumption and zero denominators are represented as zero."""
+        missing = self._create_producer("Missing", self.provider)
+        for tariff in ("2011", "2023"):
+            producer = self._create_producer(tariff, self.provider)
+            contract = producer.biomethane_contract
+            contract.tariff_reference = tariff
+            contract.save(update_fields=["tariff_reference"])
+            BiomethaneEnergyFactory.create(
+                producer=producer,
+                year=self.year,
+                purification_electric_consumption_kwe=None,
+                purified_biogas_quantity_nm3=0,
+                total_unit_electric_consumption_kwe=None,
+                injected_biomethane_gwh_pcs_per_year=0,
+            )
+            zero_denominator = self._create_producer(f"{tariff} zero denominator", self.provider)
+            contract = zero_denominator.biomethane_contract
+            contract.tariff_reference = tariff
+            contract.save(update_fields=["tariff_reference"])
+            BiomethaneEnergyFactory.create(
+                producer=zero_denominator,
+                year=self.year,
+                purification_electric_consumption_kwe=100,
+                purified_biogas_quantity_nm3=0,
+                total_unit_electric_consumption_kwe=100,
+                injected_biomethane_gwh_pcs_per_year=0,
+            )
+
+        items = {item["producer"]["id"]: item for item in self._get().data["results"]}
+        self.assertEqual(items[missing.id]["electricity_consumption"], 0)
+        for item in items.values():
+            expected_consumption = 100 if item["producer"]["name"].endswith("zero denominator") else 0
+            self.assertEqual(item["electricity_consumption"], expected_consumption)
+            self.assertEqual(item["energy_efficiency_coefficient"], 0)
 
     def test_production_unit_is_null_without_production_unit(self):
         """Without a production unit, production_unit is null."""

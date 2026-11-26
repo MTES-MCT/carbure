@@ -4811,9 +4811,19 @@ export interface components {
             readonly production_unit: components["schemas"]["BiomethaneProductionUnitPreview"] | null;
             readonly tariff_reference: components["schemas"]["TariffReferenceEnum"] | null;
             /** @description Percentages of the declaration year's total wet matter tonnage, or null without tariff reference data. */
-            readonly tariff_coefficients: components["schemas"]["TariffCoefficients"] | null;
+            readonly tariff_coefficients: components["schemas"]["ProviderTariffCoefficients"] | null;
             /** @description Wet matter tonnages used to calculate the percentages, or null without tariff reference data. */
             readonly tariff_tonnages: components["schemas"]["TariffTonnages"] | null;
+            /**
+             * Format: double
+             * @description Electricity consumption in kWe.
+             */
+            readonly electricity_consumption: number;
+            /**
+             * Format: double
+             * @description Energy efficiency coefficient according to the tariff reference.
+             */
+            readonly energy_efficiency_coefficient: number;
         };
         BiomethaneSupplyInput: {
             readonly id: number;
@@ -7137,6 +7147,21 @@ export interface components {
          * @enum {string}
          */
         ProductionTypeEnum: ProductionTypeEnum;
+        /** @description P1 / P2 / P3 / P / Pef shares from the tariff decree referential. */
+        ProviderTariffCoefficients: {
+            /** Format: double */
+            readonly p1: number;
+            /** Format: double */
+            readonly p2: number;
+            /** Format: double */
+            readonly p3: number;
+            /** Format: double */
+            readonly p: number;
+            /** Format: double */
+            readonly pef: number;
+            /** Format: double */
+            readonly non_primed: number;
+        };
         ProvisionCertificateBulkRequest: {
             entity: string;
             siren: string;
@@ -7631,6 +7656,8 @@ export interface components {
             readonly p: number;
             /** Format: double */
             readonly pef: number;
+            /** Format: double */
+            readonly non_primed: number;
             /** Format: double */
             readonly total: number;
         };
