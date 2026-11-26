@@ -87,6 +87,28 @@ def compute_tariff_coefficient_summaries(queryset: QuerySet[BiomethaneSupplyInpu
     return result
 
 
+def compute_tariff_coefficient_summaries_for_declarations(declarations):
+    """Compute tariff coefficient summaries for the producers and years in declarations."""
+    declarations = list(declarations)
+    inputs = BiomethaneSupplyInput.objects.filter(
+        supply_plan__producer_id__in={item.producer_id for item in declarations},
+        supply_plan__year__in={item.year for item in declarations},
+    )
+    return compute_tariff_coefficient_summaries(inputs)
+
+
+def get_tariff_coefficient_summary(declaration, summaries):
+    """Get a declaration summary, or a zero summary when no supply inputs are available."""
+    if summaries is None:
+        return None
+
+    zeros = {coefficient.lower(): 0.0 for coefficient in COEFFICIENTS}
+    return summaries.get(
+        (declaration.producer_id, declaration.year),
+        {"proportions": zeros, "tonnages": {"total": 0.0, **zeros}},
+    )
+
+
 def _annotate_tonnages(queryset, tariff_reference=None):
     return (
         _annotate_regime(queryset, tariff_reference)
