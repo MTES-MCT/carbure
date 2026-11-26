@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react"
 import { ReactNode } from "react"
-import { MemoryRouter, Route, Routes } from "react-router-dom"
+import { MemoryRouter, Route, Routes } from "react-router"
 import { describe, expect, it } from "vitest"
 
 import { useActionTabs } from "./use-action-tabs"
