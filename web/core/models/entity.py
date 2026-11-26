@@ -108,7 +108,7 @@ class Entity(models.Model):
         return Entity.objects.filter(
             entitycertificate__certificate__certificate_type=GenericCertificate.SYSTEME_NATIONAL,
             entitycertificate__certificate__status=GenericCertificate.VALID,
-        )
+        ).distinct()
 
     def __str__(self):
         return self.name
