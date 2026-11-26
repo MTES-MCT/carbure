@@ -13812,10 +13812,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Road transport
+            * `ROAD` - Transport routier
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Maritime transport
+            * `SEA` - Transport maritime
           explode: true
           style: form
         - in: query
@@ -14238,10 +14238,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Road transport
+            * `ROAD` - Transport routier
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Maritime transport
+            * `SEA` - Transport maritime
           explode: true
           style: form
         - in: query
@@ -14551,10 +14551,10 @@ paths:
                 - ROAD
                 - SEA
           description: |-
-            * `ROAD` - Road transport
+            * `ROAD` - Transport routier
             * `PIPELINE` - Pipeline
             * `RAILROAD` - Rail
-            * `SEA` - Maritime transport
+            * `SEA` - Transport maritime
           explode: true
           style: form
         - in: query
@@ -15064,10 +15064,10 @@ components:
         - SEA
       type: string
       description: |-
-        * `ROAD` - Road transport
+        * `ROAD` - Transport routier
         * `PIPELINE` - Pipeline
         * `RAILROAD` - Rail
-        * `SEA` - Maritime transport
+        * `SEA` - Transport maritime
     ActionSite:
       type: object
       properties:
@@ -20074,6 +20074,7 @@ components:
         - ELEC
         - TRANSFERRED_ELEC
         - BIOFUEL
+        - BIOMETHANE
         - DREAL
         - ADEME
         - DGDDI
@@ -20088,6 +20089,7 @@ components:
         * `ELEC` - ELEC
         * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
         * `BIOFUEL` - BIOFUEL
+        * `BIOMETHANE` - BIOMETHANE
         * `DREAL` - DREAL
         * `ADEME` - ADEME
         * `DGDDI` - DGDDI
@@ -22505,12 +22507,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password
+          title: Mot de passe
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password confirmation
+          title: Confirmation du mot de passe
       required:
         - password1
         - password2
@@ -23863,12 +23865,12 @@ components:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password
+          title: Mot de passe
         password2:
           type: string
           writeOnly: true
           minLength: 1
-          title: Password confirmation
+          title: Confirmation du mot de passe
       required:
         - email
         - name
@@ -24017,6 +24019,7 @@ components:
           type: string
           format: email
           minLength: 1
+          title: Adresse email
       required:
         - email
     UserRights:
