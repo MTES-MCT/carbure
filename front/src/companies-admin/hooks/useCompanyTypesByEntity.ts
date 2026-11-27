@@ -3,6 +3,7 @@ import { EntityType, ExternalAdminPages } from "common/types"
 
 const ADMIN_TO_ENTITIES: Partial<Record<ExternalAdminPages, EntityType[]>> = {
   [ExternalAdminPages.DREAL]: [EntityType.Producteur_de_biom_thane],
+  [ExternalAdminPages.BIOMETHANE]: [EntityType.Fournisseur_de_biom_thane],
   [ExternalAdminPages.ELEC]: [EntityType.Operator, EntityType.CPO],
   [ExternalAdminPages.H2]: [EntityType.HRS],
 }

@@ -11,6 +11,7 @@ from datetime import date
 from unittest.mock import patch
 
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
@@ -126,6 +127,9 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
 
     def test_list_returns_only_declarations_from_accessible_departments(self):
         """list returns only producers whose unit is in an accessible department."""
+        ExternalAdminRights.objects.create(entity=self.dreal, right=ExternalAdminRights.BIOMETHANE)
+        provider = Entity.objects.create(name="Gas Provider", entity_type=Entity.BIOMETHANE_PROVIDER)
+        self.assertIn(provider, self.dreal.get_allowed_entities())
         BiomethaneAnnualDeclaration.objects.create(
             producer=self.producer_dept_01,
             year=self.current_year,
@@ -149,10 +153,30 @@ class BiomethaneAdminAnnualDeclarationViewSetTest(TestCase, FiltersActionTestMix
         producer_ids = [d["producer"]["id"] for d in results]
 
         self.assertEqual(set(producer_ids), {self.producer_dept_01.id, self.producer_dept_02.id})
+        self.assertNotIn(provider.id, producer_ids)
         self.assertNotIn(self.producer_no_unit_zipcode_01.id, producer_ids)
         self.assertNotIn(self.producer_no_unit_zipcode_03.id, producer_ids)
         for result in results:
             self.assertEqual(result["year"], self.current_year)
+
+    @patch("biomethane.views.dreal_export.ExcelResponse", return_value=HttpResponse(b"excel"))
+    @patch("biomethane.views.dreal_export.generate_dreal_export")
+    def test_biomethane_right_excludes_providers_from_dreal_export(self, mock_export, mock_response):
+        ExternalAdminRights.objects.create(entity=self.dreal, right=ExternalAdminRights.BIOMETHANE)
+        provider = Entity.objects.create(name="Gas Provider", entity_type=Entity.BIOMETHANE_PROVIDER)
+        self.assertIn(provider, self.dreal.get_allowed_entities())
+
+        response = self.client.get(
+            reverse("biomethane-dreal-annual-export"),
+            self._list_params(self.dreal.id),
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        mock_export.assert_called_once()
+        producer_ids, year = mock_export.call_args.args
+        self.assertEqual(set(producer_ids), {self.producer_dept_01.id, self.producer_dept_02.id})
+        self.assertEqual(year, self.current_year)
+        mock_response.assert_called_once_with(mock_export.return_value)
 
     def test_list_filters_by_year(self):
         """list with year param returns declarations for the requested year only."""

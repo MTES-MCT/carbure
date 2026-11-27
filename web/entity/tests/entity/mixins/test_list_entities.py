@@ -161,6 +161,18 @@ class EntityListActionTest(TestCase):
         entities_data = response.json()
         expect_entities(self, [hrs1, hrs2], entities_data)
 
+    def test_list_with_dreal_and_biomethane_rights_includes_providers(self):
+        admin = EntityFactory.create(name="Biomethane admin", entity_type=Entity.EXTERNAL_ADMIN)
+        ExternalAdminRights.objects.create(entity=admin, right=ExternalAdminRights.DREAL)
+        ExternalAdminRights.objects.create(entity=admin, right=ExternalAdminRights.BIOMETHANE)
+        provider = EntityFactory.create(name="Biomethane provider", entity_type=Entity.BIOMETHANE_PROVIDER)
+        setup_current_user(self, "biomethane-admin@test.com", "Admin", "test", [(admin, "RW")], True)
+
+        response = self.client.get(reverse("entity-list") + f"?entity_id={admin.id}")
+
+        self.assertEqual(response.status_code, 200)
+        expect_entities(self, [provider], response.json())
+
     def test_list_with_query_param_q_filters_by_name(self):
         """Test that q parameter filters by name"""
         setup_current_user(self, "admin@test.com", "Admin", "test", [(self.admin, "RW")], True)

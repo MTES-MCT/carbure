@@ -247,6 +247,8 @@ class Entity(models.Model):
             filter_condition |= Q(entity_type=Entity.CPO) | Q(is_tiruert_liable=True, has_elec=True)
         if self.has_external_admin_right(ExternalAdminRights.H2):
             filter_condition |= Q(entity_type=Entity.HRS)
+        if self.has_external_admin_right(ExternalAdminRights.BIOMETHANE):
+            filter_condition |= Q(entity_type=Entity.BIOMETHANE_PROVIDER)
 
         has_dreal_right = self.has_external_admin_right(ExternalAdminRights.DREAL)
         has_ademe_right = self.has_external_admin_right(ExternalAdminRights.ADEME)
@@ -289,6 +291,7 @@ class ExternalAdminRights(models.Model):
     ELEC = "ELEC"
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC"
     BIOFUEL = "BIOFUEL"
+    BIOMETHANE = "BIOMETHANE"
     DREAL = "DREAL"
     ADEME = "ADEME"
     DGDDI = "DGDDI"
@@ -303,6 +306,7 @@ class ExternalAdminRights(models.Model):
         (ELEC, ELEC),
         (TRANSFERRED_ELEC, TRANSFERRED_ELEC),
         (BIOFUEL, BIOFUEL),
+        (BIOMETHANE, BIOMETHANE),
         (DREAL, DREAL),
         (ADEME, ADEME),
         (DGDDI, DGDDI),

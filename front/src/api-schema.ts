@@ -3805,10 +3805,10 @@ export interface components {
             working_date: string;
         };
         /**
-         * @description * `ROAD` - Road transport
+         * @description * `ROAD` - Transport routier
          *     * `PIPELINE` - Pipeline
          *     * `RAILROAD` - Rail
-         *     * `SEA` - Maritime transport
+         *     * `SEA` - Transport maritime
          * @enum {string}
          */
         ActionShippingMethodEnum: PathsApiTraceabilityActionsGetParametersQueryShipping_method;
@@ -6065,6 +6065,7 @@ export interface components {
          *     * `ELEC` - ELEC
          *     * `TRANSFERRED_ELEC` - TRANSFERRED_ELEC
          *     * `BIOFUEL` - BIOFUEL
+         *     * `BIOMETHANE` - BIOMETHANE
          *     * `DREAL` - DREAL
          *     * `ADEME` - ADEME
          *     * `DGDDI` - DGDDI
@@ -7206,9 +7207,9 @@ export interface components {
         ResetPasswordRequest: {
             uidb64: string;
             token: string;
-            /** Password */
+            /** Mot de passe */
             password1: string;
-            /** Password confirmation */
+            /** Confirmation du mot de passe */
             password2: string;
         };
         Response: {
@@ -7758,9 +7759,9 @@ export interface components {
              */
             email: string;
             name: string;
-            /** Password */
+            /** Mot de passe */
             password1: string;
-            /** Password confirmation */
+            /** Confirmation du mot de passe */
             password2: string;
         };
         UserEntity: {
@@ -7800,7 +7801,10 @@ export interface components {
         };
         /** @description Resend the activation email for the pending account matching this address. */
         UserResendActivationLinkRequest: {
-            /** Format: email */
+            /**
+             * Adresse email
+             * Format: email
+             */
             email: string;
         };
         UserRights: {
@@ -16349,10 +16353,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Road transport
+                 * @description * `ROAD` - Transport routier
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Maritime transport
+                 *     * `SEA` - Transport maritime
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16606,10 +16610,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Road transport
+                 * @description * `ROAD` - Transport routier
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Maritime transport
+                 *     * `SEA` - Transport maritime
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -16763,10 +16767,10 @@ export interface operations {
                 /** @description A search term. */
                 search?: string;
                 /**
-                 * @description * `ROAD` - Road transport
+                 * @description * `ROAD` - Transport routier
                  *     * `PIPELINE` - Pipeline
                  *     * `RAILROAD` - Rail
-                 *     * `SEA` - Maritime transport
+                 *     * `SEA` - Transport maritime
                  */
                 shipping_method?: PathsApiTraceabilityActionsGetParametersQueryShipping_method[];
                 site?: string[];
@@ -17525,6 +17529,7 @@ export enum ExtAdminPagesEnum {
     ELEC = "ELEC",
     TRANSFERRED_ELEC = "TRANSFERRED_ELEC",
     BIOFUEL = "BIOFUEL",
+    BIOMETHANE = "BIOMETHANE",
     DREAL = "DREAL",
     ADEME = "ADEME",
     DGDDI = "DGDDI",

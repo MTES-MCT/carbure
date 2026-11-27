@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from biomethane.permissions import CanDownloadDeclaration
 from biomethane.services.dreal_export import generate_dreal_export
 from core.excel import ExcelResponse
+from core.models import Entity
 
 
 @extend_schema(
@@ -29,6 +30,6 @@ def export_dreal_annual_declaration(request):
 
     entity = request.entity
     # Only export producers the requesting entity is allowed to access (DREAL/ADEME department scope)
-    producer_ids = entity.get_allowed_entities().values_list("id", flat=True)
+    producer_ids = entity.get_allowed_entities().filter(entity_type=Entity.BIOMETHANE_PRODUCER).values_list("id", flat=True)
     excel_file = generate_dreal_export(producer_ids, int(year))
     return ExcelResponse(excel_file)

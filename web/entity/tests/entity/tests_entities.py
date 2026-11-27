@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from biomethane.models import BiomethaneProductionUnit
 from core.models import Entity
 from core.tests_utils import setup_current_user
 from entity.factories.entity import EntityFactory
@@ -28,6 +29,28 @@ class AdminEntitiesTest(TestCase):
 
         assert response.status_code == 201
         assert Entity.objects.filter(name="Test Entity").exists()
+        assert not BiomethaneProductionUnit.objects.filter(producer__name="Test Entity").exists()
+
+    def test_create_biomethane_producer_creates_production_unit(self):
+        data = {
+            "name": "Biomethane producer",
+            "entity_type": Entity.BIOMETHANE_PRODUCER,
+            "has_saf": False,
+            "has_elec": False,
+            "company_address": "1 rue de la Méthanisation",
+            "postal_code": "75001",
+            "city": "Paris",
+            "insee_code": "75101",
+            "site_siret": "12345678901234",
+        }
+
+        response = self.client.post(reverse("entity-list") + f"?entity_id={self.admin.id}", data)
+
+        assert response.status_code == 201
+        producer = Entity.objects.get(name=data["name"])
+        production_unit = BiomethaneProductionUnit.objects.get(producer=producer)
+        assert production_unit.address == data["company_address"]
+        assert production_unit.site_siret == data["site_siret"]
 
     def test_create_biomass_operator(self):
         data = {
