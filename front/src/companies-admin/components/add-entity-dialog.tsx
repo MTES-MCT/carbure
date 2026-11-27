@@ -26,9 +26,7 @@ export const AddEntityDialog = ({
 }: AddEntityDialogProps) => {
   const { t } = useTranslation()
   const entity = useEntity()
-  const companyTypes = useCompanyTypesByEntity({
-    includeBiomethaneProviders: false,
-  })
+  const companyTypes = useCompanyTypesByEntity()
   const { value, bind, setField } = useForm<AddForm>({
     ...defaultEntity,
     entity_type:

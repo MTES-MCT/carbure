@@ -22,16 +22,7 @@ const getCompanyTypesForAdmin = (entity: EntityManager) => {
   )
 }
 
-export const useCompanyTypesByEntity = ({
-  includeBiomethaneProviders = true,
-}: { includeBiomethaneProviders?: boolean } = {}) => {
+export const useCompanyTypesByEntity = () => {
   const entity = useEntity()
-  const companyTypes = entity.isAdmin
-    ? ALL_ENTITIES
-    : getCompanyTypesForAdmin(entity)
-  return includeBiomethaneProviders
-    ? companyTypes
-    : companyTypes.filter(
-        (type) => type !== EntityType.Fournisseur_de_biom_thane
-      )
+  return entity.isAdmin ? ALL_ENTITIES : getCompanyTypesForAdmin(entity)
 }
