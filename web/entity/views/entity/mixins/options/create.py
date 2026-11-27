@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer, ValidationError
 
 from biomethane.models import BiomethaneProductionUnit
-from core.models import Department, Entity, ExternalAdminRights
+from core.models import Department, Entity
 from transactions.models import Site
 
 
@@ -25,7 +25,10 @@ SITE_CREATE_FIELDS = ["company_address", "postal_code", "city", "department", "i
 
 
 class CreateEntitySerializer(ModelSerializer):
-    """Optional fields for entity creation (DREAL only)."""
+    """
+    Serializer for entity creation
+    With optional site fields for biomethane producers (NOT used for any other entity types).
+    """
 
     company_address = serializers.CharField(required=False, allow_blank=True, max_length=256)
     postal_code = serializers.CharField(required=False, allow_blank=True, max_length=32)
@@ -44,12 +47,9 @@ class CreateEntitySerializer(ModelSerializer):
         return value
 
 
-def _should_create_production_unit(request):
-    """True if the current entity is an EXTERNAL_ADMIN with DREAL rights."""
-    entity = getattr(request, "entity", None)
-    if not entity:
-        return False
-    return entity.entity_type == Entity.EXTERNAL_ADMIN and entity.has_external_admin_right(ExternalAdminRights.DREAL)
+def _should_create_production_unit(entity: Entity) -> bool:
+    """Return whether the created company is a biomethane producer."""
+    return entity.entity_type == Entity.BIOMETHANE_PRODUCER
 
 
 def _create_production_unit_for_entity(entity, validated_data):
@@ -118,7 +118,7 @@ class CreateEntityActionMixin:
             entity_data = {k: validated_data[k] for k in ENTITY_CREATE_FIELDS}
             entity = Entity.objects.create(**entity_data)
 
-            if _should_create_production_unit(request):
+            if _should_create_production_unit(entity):
                 _create_production_unit_for_entity(entity, validated_data)
 
             return Response({"status": "success"}, status=status.HTTP_201_CREATED)
