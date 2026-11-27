@@ -1,3 +1,4 @@
+import json
 from functools import reduce
 
 from django.core.management.base import BaseCommand
@@ -168,4 +169,5 @@ Would send UDB request with body being:
             self.stdout.write(str(result))
 
         if errors:
-            self.stderr.write(f"Errors encountered: {errors}")
+            prettyfied_errors = json.dumps(errors, indent=4)
+            self.stderr.write(f"Errors encountered: \n{prettyfied_errors}")
